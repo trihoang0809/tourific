@@ -1,5 +1,5 @@
 const { MongoClient, ObjectId } = require("mongodb");
-const { client } = require("../db");
+const { client } = require("../../db");
 
 const dbName = "databaseName";
 const db = client.db(dbName);
