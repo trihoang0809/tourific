@@ -1,5 +1,5 @@
 import React from "react";
-import { HomeScreen } from "./screens/HomeScreen";
+import { HomeScreen } from "./screens/HomeScreen.tsx";
 
 const App: React.FC = () => {
   return <HomeScreen />;
