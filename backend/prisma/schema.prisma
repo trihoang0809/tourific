@@ -9,3 +9,70 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+model Trip {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  location Location
+  startDate DateTime @default(now())
+  endDate DateTime
+  pendingInvitations String[]
+  participants User[] @relation(fields: [participantsID], references: [id])
+  activities String[]
+  participantsID String[] @db.ObjectId
+  image Photo
+}
+
+type Location {
+  address String
+  city String
+  state String
+  latitude Float
+  longitude Float
+}
+
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userName String @unique
+  password String
+  friendRequestReceived   Friendship[]   @relation("friendRequestReceived")
+  tripID String[] @db.ObjectId
+  trips Trip[] @relation(fields: [tripID], references: [id])
+  firstName String
+  lastName String
+  dateOfBirth DateTime
+  avatar Photo
+}
+
+model Friendship {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  receiver    User     @relation("friendRequestReceived", fields: [receiverID], references: [id])
+  receiverID  String   @db.ObjectId
+  senderID  String   @db.ObjectId
+  friendStatus    FriendStatus @default(PENDING)
+  @@unique([receiverID, senderID])
+}
+
+enum FriendStatus {
+  ACCEPTED
+  PENDING
+  REJECTED
+}
+
+model Activity {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  description String
+  startTime DateTime
+  endTime DateTime
+  location Location
+  notes String
+  netUpvotes Int @default(0)
+  isOnCalendar Boolean @default(false)
+  category String[]
+}
+
+type Photo {
+  height Int
+  width  Int
+  url    String
+}
