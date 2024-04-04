@@ -1,16 +1,13 @@
-const { MongoClient } = require("mongodb");
+import { PrismaClient } from '@prisma/client';
 
-// Replace the url string with MongoDB connection string.
-const uri = "mongodb_connection_string";
-const client = new MongoClient(uri);
+const prisma = new PrismaClient();
 
-async function connect() {
+export const connect = async () => {
   try {
-    await client.connect();
-    console.log("Connected to MongoDB");
-  } catch (e) {
-    console.error(e);
+    await prisma.$connect();
+    console.log('Connected to MongoDB.');
+  } catch (error) {
+    console.error('Could not connect to MongoDB:', error);
+    process.exit(1);
   }
-}
-
-module.exports = { client, connect };
+};
