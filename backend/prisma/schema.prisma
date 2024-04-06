@@ -12,6 +12,7 @@ datasource db {
 
 model Trip {
   id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
   location Location
   startDate DateTime @default(now())
   endDate DateTime
@@ -19,7 +20,7 @@ model Trip {
   participants User[] @relation(fields: [participantsID], references: [id])
   activities String[]
   participantsID String[] @db.ObjectId
-  image Photo
+  image Photo?
 }
 
 type Location {
