@@ -4,19 +4,12 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/app/*"
-      ],
-      "@components/*": [
-        "src/components/*"
-      ],
-      "@assets/*": [
-        "assets/*"
-      ]
+      "@/*": ["src/app/*"],
+      "@components/*": ["src/components/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@types/*": ["src/types/*"],
+      "@assets/*": ["assets/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx"
-  ]
+  "include": ["**/*.ts", "**/*.tsx"]
 }
