@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 export default function App() {
   return (
     <View className="flex-1 bg-white items-center justify-center">
-      <Text>Open up app/index.tsx to start working on your app!</Text>
+      <Text>inside test/index.tsx</Text>
       <StatusBar style="auto" />
     </View>
   );
