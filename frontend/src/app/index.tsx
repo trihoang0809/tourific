@@ -8,6 +8,7 @@ export default function App() {
     <View className="flex-1 bg-white items-center justify-center">
       <Text>Open up app/index.tsx to start working on your app!</Text>
       <Link href='/trips/[id]'>Go to trip detail page</Link>
+      <Link href='/trips/create'>Go to trip create</Link>
       <StatusBar style="auto" />
     </View>
   );

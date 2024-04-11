@@ -5,7 +5,7 @@ import { ScrollView, View } from 'react-native';
 // this should be our home page, list all the trips that we have
 const Layout = () => {
   return <Stack>
-    <Stack.Screen name='[id]' options={{ title: 'Testing', headerShown: false }}
+    <Stack.Screen name='index' options={{ title: 'Testing', headerShown: false }}
     />
   </Stack>;
 };

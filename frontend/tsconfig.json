@@ -4,12 +4,10 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/app/*"],
-      "@components/*": ["src/components/*"],
-      "@hooks/*": ["src/hooks/*"],
-      "@types/*": ["src/types/*"],
-      "@assets/*": ["assets/*"]
-    }
+      "@/*": ["src/*"],
+      "@/assets/*": ["assets/*"]
+    },
+    "allowImportingTsExtensions": true
   },
   "include": ["**/*.ts", "**/*.tsx"]
 }

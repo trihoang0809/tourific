@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native';
 import React from 'react';
-import favicon from "@assets/favicon.png";
+import favicon from "@/assets/favicon.png";
 import { AntDesign } from '@expo/vector-icons';
 import { Link, useLocalSearchParams } from 'expo-router';
 
