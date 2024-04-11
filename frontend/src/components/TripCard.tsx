@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
 
 type Trip = {
-  id: String;
-  name: String;
+  id: string;
+  name: string;
   location: {
     address: string;
     city: string;
@@ -18,6 +18,10 @@ type Trip = {
   };
 };
 
+interface tripProps {
+  trip: Trip,
+}
+
 //Remove "trip: Trip" temporarily for testing UI
 // export const TripCard: React.FC<Trip> = (trip: Trip) => {
   // const [trip, setTrip] = useState<Trip[]>([]);
@@ -30,7 +34,7 @@ type Trip = {
   //   }
   // })
 //StyleSheet.create({images:{height: 200}})
-export const TripCard: React.FC<Trip> = (trip: Trip) => {
+export const TripCard: React.FC<tripProps> = ({trip}) => {
   const [tripImage, setTripImage] = useState(trip.image);
   const [tripLocation, setTripLocation] = useState(trip.location);
   const [tripName, setTripName] = useState(trip.name);
@@ -58,7 +62,7 @@ export const TripCard: React.FC<Trip> = (trip: Trip) => {
               <Text style={[styles.TextLooks, {color: "blue"}]}>{tripStartDate} - {tripEndDate}</Text>
             </View>
             <View>
-              <Text style={[styles.TextLooks, {color: "blue"}]}>{tripLocation.city}</Text>
+              <Text style={[styles.TextLooks, {color: "blue"}]}>{tripLocation?.city}</Text>
             </View>
           </View>
 
@@ -78,10 +82,10 @@ const styles = StyleSheet.create({
 
   image: {
     width: "100%",
-    // height: 200,
+    height: 200,
     marginBottom: 5,
-    borderTopRightRadius: 16,
-    borderTopLeftRadius: 16,
+    borderTopRightRadius: 14,
+    borderTopLeftRadius: 14,
   },
 
   descriptionContainer: {
