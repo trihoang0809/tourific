@@ -30,12 +30,12 @@ type Trip = {
   //   }
   // })
 //StyleSheet.create({images:{height: 200}})
-export const TripCard: React.FC = (imageHeight=200) => {
-  const [tripImage, setTripImage] = useState("https://a.cdn-hotels.com/gdcs/production44/d1089/979c7f1b-91af-4e60-ad8c-4c76b97fca9b.jpg?impolicy=fcrop&w=800&h=533&q=medium");
-  const [tripLocation, setTripLocation] = useState("Washington");
-  const [tripName, setTripName] = useState("Viettech Meet Up");
-  const [tripStartDate, setTripStartDate] = useState("16 Jan");
-  const [tripEndDate, setTripEndDate] = useState("18 Jan");
+export const TripCard: React.FC<Trip> = (trip: Trip) => {
+  const [tripImage, setTripImage] = useState(trip.image);
+  const [tripLocation, setTripLocation] = useState(trip.location);
+  const [tripName, setTripName] = useState(trip.name);
+  const [tripStartDate, setTripStartDate] = useState(trip.startDate);
+  const [tripEndDate, setTripEndDate] = useState(trip.endDate);
 
   const onPressTripCard = () => {
     console.log("You pressed this card");
@@ -51,14 +51,14 @@ export const TripCard: React.FC = (imageHeight=200) => {
         <Text style={styles.name}>{trip.name}</Text>
         <Text>{`${trip.startDate} - ${trip.endDate}`}</Text> */}
 
-          <Image source={{ uri: tripImage}} style={[styles.image, {height: 200}]}></Image>
+          <Image source={{ uri: tripImage?.url}} style={styles.image}></Image>
           <View style={styles.descriptionContainer}>
             <View>
               <Text style={styles.TextLooks}>{tripName}</Text>
               <Text style={[styles.TextLooks, {color: "blue"}]}>{tripStartDate} - {tripEndDate}</Text>
             </View>
             <View>
-              <Text style={[styles.TextLooks, {color: "blue"}]}>{tripLocation}</Text>
+              <Text style={[styles.TextLooks, {color: "blue"}]}>{tripLocation.city}</Text>
             </View>
           </View>
 
