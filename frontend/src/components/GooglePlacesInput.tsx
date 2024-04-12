@@ -1,6 +1,5 @@
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import Geocoder from "react-native-geocoding";
-import { Button } from "./Button";
 import React, { useState, useEffect, useRef } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE, Circle } from "react-native-maps";
 import { StyleSheet, View, ViewStyle, Dimensions, Text } from "react-native";
@@ -11,6 +10,7 @@ const { width, height } = Dimensions.get("window");
 
 const GooglePlacesInput = () => {
   Geocoder.init(GOOGLE_MAP_API_KEY); // use a valid API key
+  console.log("key", GOOGLE_MAP_API_KEY)
   const [query, setQuery] = useState("");
   const [coord, setCoord] = useState<{ latitude: number; longitude: number }>({
     latitude: 0,

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, SafeAreaView, FlatList, StatusBar } from "react-native";
 import { Button } from "../components/Button";
-import { MapForm } from "../components/MapForm";
 import GooglePlacesInput from "../components/GooglePlacesInput";
 
 export const MockTripCreate: React.FC = () => {
