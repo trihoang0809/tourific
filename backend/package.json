@@ -2,10 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "src/server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "nodemon src/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -14,10 +14,13 @@
     "@prisma/client": "^5.11.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "mongodb": "^6.5.0",
-    "nodemon": "^3.1.0"
+    "mongodb": "^6.5.0"
   },
   "devDependencies": {
-    "prisma": "^5.11.0"
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.4",
+    "prisma": "^5.11.0",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2"
   }
 }
