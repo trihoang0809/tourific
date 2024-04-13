@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, SafeAreaView, FlatList, StatusBar } from "react-native";
-import { Button } from "../components/Button";
-import GooglePlacesInput from "../components/GooglePlacesInput";
+import GooglePlacesInput from "@/components/GooglePlacesInput";
 
 export const MockTripCreate: React.FC = () => {
 
@@ -31,7 +30,7 @@ export const MockTripCreate: React.FC = () => {
     content?: string; // content property is optional and can contain string
   };
 
-  const renderItem = ({ item }: { item: DataItem }) => {
+  const renderItem = ({ item }: { item: DataItem; }) => {
     if (item.component) {
       return item.component;
     } else {
@@ -53,7 +52,6 @@ export const MockTripCreate: React.FC = () => {
         contentContainerStyle={styles.scroll}
       />
       {/* Button outside of FlatList */}
-      <Button title="Submit" onPress={handlePress} />
     </SafeAreaView>
   );
 };

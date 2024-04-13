@@ -9,6 +9,8 @@ export interface TripData { // for using in mock data in displaying trip details
   location: string;
 };
 
-export interface CreateTripFormProps {
-  isTripCreated: Boolean;
-}
+export type DataItem = {
+  id: string;
+  component?: JSX.Element; // component property is optional and can contain JSX.Element
+  content?: string; // content property is optional and can contain string
+};

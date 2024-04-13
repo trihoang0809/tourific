@@ -3,6 +3,7 @@ import React from 'react';
 import favicon from "@/assets/favicon.png";
 import { AntDesign } from '@expo/vector-icons';
 import { Link, useLocalSearchParams } from 'expo-router';
+import { trips } from '@/mock-data/trips';
 
 const TripDetailsScreen = () => {
   const { id: idString } = useLocalSearchParams();
@@ -17,9 +18,6 @@ const TripDetailsScreen = () => {
           </TouchableOpacity>
         </View>
         <View style={{ borderTopLeftRadius: 40, borderTopRightRadius: 40 }} className='bg-white -mt-12 pt-6'>
-          <View className='px-5'>
-            <Text className='text-3xl font<i class="fa fa-xing-square" aria-hidden="true"></i>'>Trip Name</Text>
-          </View>
         </View>
       </ScrollView>
     </View>

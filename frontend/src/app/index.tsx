@@ -3,7 +3,8 @@ import { Button, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Link } from 'expo-router';
 import { MockTripCreate } from '@/screens/MockTripCreate';
-
+import DateRangePicker from '@/components/DateTimePicker/DateRangePicker';
+import TimePickers from '@/components/DateTimePicker/TimePicker';
 export default function App() {
   return (
     <View className="flex-1 bg-white items-center justify-center">
@@ -11,7 +12,7 @@ export default function App() {
       <Link href='/trips/[id]'>Go to trip detail page</Link>
       <Link href='/trips/create'>Go to trip create</Link>
       <StatusBar style="auto" />
-      <MockTripCreate />
+      <TimePickers />
     </View>
   );
 }

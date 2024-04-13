@@ -4,20 +4,19 @@ import React, { useState, useEffect, useRef } from "react";
 import MapView, { Marker, PROVIDER_GOOGLE, Circle } from "react-native-maps";
 import { StyleSheet, View, ViewStyle, Dimensions, Text } from "react-native";
 import Slider from "@react-native-community/slider";
-const GOOGLE_MAP_API_KEY = "";
+const GOOGLE_MAP_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAP_API_KEY || "undefined";
 
 const { width, height } = Dimensions.get("window");
 
 const GooglePlacesInput = () => {
   Geocoder.init(GOOGLE_MAP_API_KEY); // use a valid API key
-  console.log("key", GOOGLE_MAP_API_KEY)
   const [query, setQuery] = useState("");
-  const [coord, setCoord] = useState<{ latitude: number; longitude: number }>({
-    latitude: 0,
-    longitude: 0,
+  const [coord, setCoord] = useState<{ latitude: number; longitude: number; }>({
+    latitude: 37.733795,
+    longitude: -122.446747,
   });
   const mapRef = useRef(null);
-  const [radius, setRadius] = useState(1000);
+  const [radius, setRadius] = useState(30000);
   const handleSliderChange = (value: number) => {
     setRadius(value);
   };
@@ -27,7 +26,7 @@ const GooglePlacesInput = () => {
       Geocoder.from(query)
         .then((json) => {
           const location = json.results[0].geometry.location;
-          console.log(location);
+          //console.log(location);
           setCoord({ latitude: location.lat, longitude: location.lng });
         })
         .catch((error) => console.warn(error));
@@ -38,11 +37,13 @@ const GooglePlacesInput = () => {
     <View>
       <View style={styles.container}>
         <GooglePlacesAutocomplete
-          placeholder="Search the center location"
+          placeholder="Search destination"
           onPress={(data, details = null) => {
             // 'details' is provided when fetchDetails = true
-            console.log("press")
+            //console.log("press");
             console.log("data: ", data, "details: ", details);
+            console.log("data description", data.description)
+            console.log("city-level location", data.structured_formatting.secondary_text)
             setQuery(data.description);
           }}
           keepResultsAfterBlur={true}
@@ -54,52 +55,52 @@ const GooglePlacesInput = () => {
       </View>
       <Slider
         minimumValue={800}
-        maximumValue={50000}
+        maximumValue={100000}
         //step={1}
         value={radius}
         onValueChange={handleSliderChange}
-        />
-      <Text>Current radius: {(radius * 0.000621371).toFixed(2)} miles</Text>
+      />
+      <Text>Select desired radius: {(radius * 0.000621371).toFixed(2)} miles</Text>
       <MapView
-        ref = {mapRef}
+        ref={mapRef}
         onRegionChangeComplete={async (val) => {
-          if (mapRef.current) {
-            console.log(await (mapRef.current as MapView).getMapBoundaries());
-          }
+          // if (mapRef.current) {
+          //   console.log(await (mapRef.current as MapView).getMapBoundaries());
+          // }
         }}
         region={{
           latitude: coord.latitude,
           longitude: coord.longitude,
-          latitudeDelta: radius / 111139 * 2,
-          longitudeDelta: radius / 111139 * 2,
+          latitudeDelta: radius / 111139 * 3.2,
+          longitudeDelta: radius / 111139 * 3.2,
           // latitudeDelta: 0.03,
           // longitudeDelta: 0.03,
         }}
         style={{
-          width: width-40,
-          height: width-40,
+          width: width - 40,
+          height: width - 40,
         }}
         provider={PROVIDER_GOOGLE}
         onPress={(e) => {
-          console.log(e.nativeEvent.coordinate);
+          //console.log(e.nativeEvent.coordinate);
           setCoord({
             latitude: e.nativeEvent.coordinate.latitude,
             longitude: e.nativeEvent.coordinate.longitude,
           });
         }}
-        // className="flex-1 -mt-10 z-0"
-        // mapType="mutedStandard"
+      // className="flex-1 -mt-10 z-0"
+      // mapType="mutedStandard"
       >
-        <Marker
-        coordinate={{
-          latitude: coord.latitude,
-          longitude: coord.longitude,
-        }}
-        // title={"Title"}
-        // description={"Description"}
-        // identifier="origin"
-        pinColor="#00CCBB"
-        />
+        {/* <Marker
+          coordinate={{
+            latitude: coord.latitude,
+            longitude: coord.longitude,
+          }}
+          // title={"Title"}
+          // description={"Description"}
+          // identifier="origin"
+          pinColor="#00CCBB"
+        /> */}
         <Circle
           center={{
             latitude: coord.latitude,
@@ -119,7 +120,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "black",
     borderRadius: 5,
-    margin: 10,
+    margin: 30,
   },
 });
 
