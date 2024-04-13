@@ -1,6 +1,6 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
-
+// const express = require('express')
 const router = express.Router();
 const prisma = new PrismaClient();
 
@@ -40,10 +40,11 @@ router.get("/", async (req, res) => {
       queryConditions = {
         where: {
           startDate: {
-            lt: now,
+            gt: now,
           },
         },
       };
+      console.log(now);
     }
 
     const trips = await prisma.trip.findMany(queryConditions);
@@ -55,7 +56,7 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { name, startDate, endDate, location } = req.body;
+  const { name, startDate, endDate, location, image } = req.body;
   try {
     const trip = await prisma.trip.create({
       data: {
@@ -63,6 +64,7 @@ router.post("/", async (req, res) => {
         startDate,
         endDate,
         location,
+        image,
       },
     });
     res.status(201).json(trip);
