@@ -1,28 +1,36 @@
 import favicon from "@/assets/favicon.png";
 import { TripData } from "../types";
-export const trips: TripData[] = [
+export const mockTripData: TripData[] = [
   {
-    name: "Beach Vacation",
-    startDate: "2024-07-10",
-    startTime: "10:00:00",
-    endDate: "2024-07-17",
-    endTime: "16:00:00",
-    location: "Maui, Hawaii",
+    name: "Trip to London",
+    startDate: "2024-04-15",
+    startHour: 9,
+    endHour: 18,
+    startMinute: 30,
+    endMinute: 0,
+    endDate: "2024-04-17",
+    location: "London"
   },
   {
-    name: "City Exploration",
-    startDate: "2024-08-05",
-    startTime: "08:00:00",
-    endDate: "2024-08-10",
-    endTime: "18:00:00",
-    location: "New York City, USA",
+    name: "Exploring the Amazon",
+    startDate: "2024-05-01",
+    startHour: 8,
+    endHour: 16,
+    startMinute: 0,
+    endMinute: 0,
+    endDate: "2024-05-05",
+    location: "Amazon Rainforest"
   },
   {
-    name: "Mountain Hiking Trip",
-    startDate: "2024-09-15",
-    startTime: "07:30:00",
-    endDate: "2024-09-20",
-    endTime: "15:00:00",
-    location: "Banff National Park, Canada",
-  },
+    name: "Business Trip to New York",
+    startDate: "2024-06-10",
+    startHour: 10,
+    endHour: 17,
+    startMinute: 0,
+    endMinute: 0,
+    endDate: "2024-06-12",
+    location: "New York City"
+  }
 ];
+
+export default mockTripData;

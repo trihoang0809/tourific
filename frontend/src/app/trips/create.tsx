@@ -1,13 +1,16 @@
 import { View, ScrollView, Image, TouchableOpacity, TextInput, Button, Text, FlatList, StatusBar } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import favicon from "@/assets/favicon.png";
 import { AntDesign } from '@expo/vector-icons';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
-import { trips } from '@/mock-data/trips';
+import trips from '@/mock-data/trips';
 import { DataItem, TripData } from '@/types';
 import GooglePlacesInput from '@/components/GooglePlacesInput';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import DateRangePicker from '@/components/DateTimePicker/DateRangePicker';
+import { DatePickerModal, TimePickerModal } from 'react-native-paper-dates';
+import { Button as Buttons } from 'react-native-paper';
+import { CalendarDate } from 'react-native-paper-dates/lib/typescript/Date/Calendar';
+import { number } from 'zod';
+
 
 // CREATING: /trips/create
 // UPDATING: /trips/create?id=${id}
@@ -36,9 +39,27 @@ const CreateTripScreen = () => {
   const [formData, setFormData] = useState(isUpdating ? trips[0] : {
     name: '',
     startDate: '',
+    startTime: '',
+    startHour: number, // chu y cho nay
+    endHour: number,
+    startMinute: number,
+    endMinute: number,
     endDate: '',
+    endTime: '',
     location: '',
   });
+
+  // for date range picker modal
+  const [range, setRange] = useState<{ startDate: Date | undefined; endDate: Date | undefined; }>({ startDate: undefined, endDate: undefined });
+  const [open, setOpen] = useState(false);
+
+  //for time picker 
+  const [startHour, setStartHour] = useState<number | undefined>(undefined);
+  const [startMinute, setStartMinute] = useState<number | undefined>(undefined);
+  const [endHour, setEndHour] = useState<number | undefined>(undefined);
+  const [endMinute, setEndMinute] = useState<number | undefined>(undefined);
+  const [visibleStart, setVisibleStart] = React.useState(false);
+  const [visibleEnd, setVisibleEnd] = React.useState(false);
 
   // useEffect(() => {
   //   const createTrip = () => {
@@ -67,6 +88,48 @@ const CreateTripScreen = () => {
   const handleSubmit = () => {
     // Implement handleSubmit logic here
   };
+
+
+  // function for date picker
+  const onDismiss = useCallback(() => {
+    setOpen(false);
+  }, [setOpen]);
+
+  const onConfirm = useCallback(
+    ({ startDate, endDate }: { startDate: CalendarDate; endDate: CalendarDate; }) => {
+      setOpen(false);
+      setRange({ startDate, endDate });
+    },
+    [setOpen, setRange]
+  );
+
+  //functions for time picker
+  const onDismissTime = React.useCallback((type: String) => {
+    if (type === 'start') {
+      setVisibleStart(!visibleStart);
+    } else {
+      setVisibleEnd(!visibleEnd);
+    }
+  }, [setVisibleStart, setVisibleEnd]);
+
+  const onConfirmStartTime = React.useCallback(
+    ({ hours, minutes }: { hours: number; minutes: number; }) => {
+      setStartHour(hours);
+      setStartMinute(minutes);
+      setVisibleStart(false);
+    },
+    [setVisibleStart, setStartHour, setStartMinute]
+  );
+
+  const onConfirmEndTime = React.useCallback(
+    ({ hours, minutes }: { hours: number; minutes: number; }) => {
+      setEndHour(hours);
+      setEndMinute(minutes);
+      setVisibleEnd(false);
+    },
+    [setVisibleEnd, setEndHour, setEndMinute]
+  );
+
   return (
     <View>
       <Stack.Screen
@@ -96,13 +159,68 @@ const CreateTripScreen = () => {
             />
 
             {/* calendar component goes here */}
-            <DateRangePicker
-            dateRange={}
-              startDate={formData.startDate}
-              endDate={formData.endDate}
-              onSelectRange={(startDate, endDate) => {
+
+            {/* <DateRangePicker
+              onSelectRange={(startDate: any, endDate: any) => {
                 setFormData({ ...formData, startDate, endDate });
-              }} />
+              }} /> */}
+
+            <View style={{ justifyContent: 'space-around', flex: 1, alignItems: 'center', flexDirection: 'row' }}>
+              <Text>{range.startDate ? range.startDate.toLocaleDateString() : 'Start Date'} - {range.endDate ? range.endDate.toLocaleDateString() : 'End Date'}</Text>
+              {/* <Buttons onPress={() => setOpen(true)} uppercase={false} mode="outlined">
+                Pick start and end date
+              </Buttons> */}
+              <AntDesign name='calendar' size={30} color="black" onPress={() => setOpen(true)} />
+              <DatePickerModal
+                locale="en"
+                mode="range"
+                visible={open}
+                onDismiss={onDismiss}
+                startDate={range.startDate}
+                endDate={range.endDate}
+                onConfirm={onConfirm}
+                disableStatusBarPadding
+                startYear={2023}
+                endYear={2030}
+              />
+            </View>
+
+            {/* Time picker */}
+            <View style={{ justifyContent: 'space-around', flex: 1, alignItems: 'center', flexDirection: 'row' }}>
+              <Text>
+                {formData.startHour !== undefined && formData.startMinute !== undefined
+                  ? `${formData.startHour}:${formData.startMinute.toString().padStart(2, '0')}`
+                  : 'Start Time'}
+                {' - '}
+                {formData.endHour !== undefined && formData.endMinute !== undefined
+                  ? `${formData.endHour.toString().padStart(2, '0')}:${formData.endMinute.toString().padStart(2, '0')}`
+                  : 'End Time'}
+              </Text>
+              <Buttons onPress={() => setVisibleStart(true)} uppercase={false} mode="outlined">
+                Start Time
+              </Buttons>
+            </View>
+            {/* <AntDesign name='clockcircleo' size={30} color="black" onPress={() => setVisibleStart(true)} /> */}
+            <View style={{ justifyContent: 'space-around', flex: 1, alignItems: 'center', flexDirection: 'row' }}>
+              <TimePickerModal
+                visible={visibleStart}
+                onDismiss={() => onDismissTime('start')}
+                onConfirm={onConfirmStartTime}
+                hours={12}
+                minutes={0}
+              />
+              {/* <AntDesign name='calendar' size={30} color="black" onPress={() => setOpen(true)} /> */}
+              <Buttons onPress={() => setVisibleEnd(true)} uppercase={false} mode="outlined">
+                End Time
+              </Buttons>
+              <TimePickerModal
+                visible={visibleEnd}
+                onDismiss={() => onDismissTime('end')}
+                onConfirm={onConfirmEndTime}
+                hours={12}
+                minutes={0}
+              />
+            </View>
             {/* select location and showing map */}
             <FlatList
               data={data}
@@ -115,8 +233,8 @@ const CreateTripScreen = () => {
               title={isUpdating ? 'Update Trip' : 'Create Trip'} onPress={handleSubmit} />
           </View>
         </View>
-      </ScrollView>
-    </View>
+      </ScrollView >
+    </View >
   );
 };
 
