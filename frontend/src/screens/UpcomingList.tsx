@@ -12,8 +12,8 @@ type Trip = {
     address: string;
     city: string;
   };
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
   image?: {
     height: number;
     width: number;
@@ -42,80 +42,52 @@ const Header = () => (
 
 export const ListFilteredCards: React.FC = () => {
   const [upcomingTrips, setUpcoming] = useState<Trip[]>([]);
-  const serverUrl = 'http://10.0.3.2:3000';
+  const serverUrl = 'http://10.0.2.2:3000';
 
   //Fetching data
   useEffect(() => {
-      const getData = async () => {
-      
-      try{
-        console.log("hihi");
-        const link = serverUrl + '/trips?upcoming=true';
-        const upcoming = await fetch(link,);
-        console.log(upcoming)
-      }
-      catch(error)
-      {
-        console.log(error);
-      }
-    };
-    getData();
-  },[serverUrl]);
+      const cleanData = (data: Trip[]) => {
+        let cleanedData: Trip[] = [];
+        let index = 0;
+        for(let trip of data) {
+          let format : Trip = {
+            id: trip.id,
+            name: trip.name,
+            location: trip.location,
+            startDate: new Date(trip.startDate), 
+            endDate: new Date(trip.endDate),
+            image: trip.image,
+          };
+          
+          cleanedData.push(format);
+          
+        }
+        return cleanedData;
+      };
 
-  
-  //Fake Data to test Flatlist
-  const DATA: Trip[] = [
-    {
-      id: "1",
-      name: "Viettech Camping",
-      location: {
-        address: "11",
-        city: "Seattle",
-      },
-      startDate: "Jan 16",
-      endDate: "Jan 18",
-      image: {
-        height: 200,
-        width: 200,
-        url: "https://www.amtrakvacations.ca/sites/amtrak/files/styles/hero/public/images/seattle.jpg?h=5a5fc591&itok=u7M-pblq",
-      }
-    },
-    {
-      id: "3",
-      name: "Viettech Camping",
-      location: {
-        address: "11",
-        city: "Seattle",
-      },
-      startDate: "Jan 16",
-      endDate: "Jan 18",
-      image: {
-        height: 200,
-        width: 200,
-        url: "https://www.amtrakvacations.ca/sites/amtrak/files/styles/hero/public/images/seattle.jpg?h=5a5fc591&itok=u7M-pblq",
-      }
-    },
-    {
-      id: "2",
-      name: "Viettech Camping",
-      location: {
-        address: "11",
-        city: "Seattle",
-      },
-      startDate: "Jan 16",
-      endDate: "Jan 18",
-      image: {
-        height: 200,
-        width: 200,
-        url: "https://www.amtrakvacations.ca/sites/amtrak/files/styles/hero/public/images/seattle.jpg?h=5a5fc591&itok=u7M-pblq",
-      }
-    },
-  ];
+
+      const getData = async () => {
+        try{ 
+          const link = serverUrl + '/trips?upcoming=true';
+          const upcoming = await fetch(link);
+          let data = await upcoming.json();
+          data = cleanData(data);
+          setUpcoming(data);
+          // console.log(upcomingTrips[);
+        }
+        catch(error)
+        {
+          console.log(error);
+        }
+      };
+    getData();
+  },[]);
+
 
   return(
       <View style={{flex: 1}}>
         <Header/>
-        <FlatList data={DATA} renderItem={({item}) => <TripCard trip={item}/>}/>
+        <FlatList data={upcomingTrips} renderItem={({item}) => <TripCard trip={item}/>}/>
       </View>
   );
 };

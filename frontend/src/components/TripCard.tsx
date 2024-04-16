@@ -9,8 +9,8 @@ type Trip = {
     address: string;
     city: string;
   };
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
   image?: {
     height: number;
     width: number;
@@ -22,18 +22,6 @@ interface tripProps {
   trip: Trip,
 }
 
-//Remove "trip: Trip" temporarily for testing UI
-// export const TripCard: React.FC<Trip> = (trip: Trip) => {
-  // const [trip, setTrip] = useState<Trip[]>([]);
-
-  // useEffect(() => {
-  //   const getTrips = async () => {
-  //     const upcomingTrips = await fetch("http://localhost:3000/trips?upcoming=true")
-  //     const ongoingTrips = await fetch("http://localhost:3000/trips?ongoing=true")
-  //     const pastTrips = await fetch("http://localhost:3000/trips?past=true")
-  //   }
-  // })
-//StyleSheet.create({images:{height: 200}})
 export const TripCard: React.FC<tripProps> = ({trip}) => {
   const [tripImage, setTripImage] = useState(trip.image);
   const [tripLocation, setTripLocation] = useState(trip.location);
@@ -41,28 +29,30 @@ export const TripCard: React.FC<tripProps> = ({trip}) => {
   const [tripStartDate, setTripStartDate] = useState(trip.startDate);
   const [tripEndDate, setTripEndDate] = useState(trip.endDate);
 
+  const noImage = "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg";
+
   const onPressTripCard = () => {
     console.log("You pressed this card");
+    console.log(tripImage?.height);
   };
   
+  const tripDate = (date : Date) => {
+    const month = date.toLocaleString('default', { month: 'short' });
+    return date.getDate() + " " + month + ", " + date.getFullYear();
+  };
+
   return (
     <TouchableHighlight style={styles.card} underlayColor="#BEC0F5" onPress={onPressTripCard}>
       <View>
-        {/* {trip.image && (
-          <Image source={{ uri: trip.image.url }} style={styles.image} />
-        )}
-        <Text>{trip.location.city}</Text>
-        <Text style={styles.name}>{trip.name}</Text>
-        <Text>{`${trip.startDate} - ${trip.endDate}`}</Text> */}
-
-          <Image source={{ uri: tripImage?.url}} style={styles.image}></Image>
+          <Image source={ tripImage?.url === undefined ? {uri: noImage} : { uri: tripImage?.url } } 
+          style={[styles.image, {height: tripImage === null ? 250 : tripImage?.height, width: "100%"}]}></Image>
           <View style={styles.descriptionContainer}>
             <View>
               <Text style={styles.TextLooks}>{tripName}</Text>
-              <Text style={[styles.TextLooks, {color: "blue"}]}>{tripStartDate} - {tripEndDate}</Text>
+              <Text style={[styles.TextLooks, {color: "blue"}]}>{tripDate(tripStartDate)} - {tripDate(tripEndDate)}</Text>
             </View>
             <View>
-              <Text style={[styles.TextLooks, {color: "blue"}]}>{tripLocation?.city}</Text>
+              <Text style={[styles.TextLooks, {color: "blue", fontSize: 18}]}>{tripLocation?.city}</Text>
             </View>
           </View>
 
@@ -82,7 +72,7 @@ const styles = StyleSheet.create({
 
   image: {
     width: "100%",
-    height: 200,
+    height: 300,
     marginBottom: 5,
     borderTopRightRadius: 14,
     borderTopLeftRadius: 14,
