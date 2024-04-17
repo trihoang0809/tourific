@@ -3,6 +3,9 @@ import React, { useState, useEffect, useRef } from "react";
 import MapView, { PROVIDER_GOOGLE, Circle } from "react-native-maps";
 import { StyleSheet, View, Dimensions, Text } from "react-native";
 import Slider from "@react-native-community/slider";
+import { GooglePlacesInputProps } from "@/types";
+
+// env
 const GOOGLE_MAP_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAP_API_KEY || "undefined";
 import { LocationSearch } from "./LocationSearch";
 import Geocoding from 'react-native-geocoding';
@@ -10,10 +13,10 @@ import Geocoding from 'react-native-geocoding';
 const { width, height } = Dimensions.get("window");
 Geocoding.init(GOOGLE_MAP_API_KEY);
 
-const GooglePlacesInput = () => {
+const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
   Geocoder.init(GOOGLE_MAP_API_KEY); // use a valid API key
-  const [query, setQuery] = useState("");
-  const [centerCircle, setCenterCircle] = useState("")
+  const [query, setQuery] = useState({ address: "", citystate: "" });
+  const [centerCircle, setCenterCircle] = useState("");
   const [coord, setCoord] = useState<{ latitude: number; longitude: number; }>({
     latitude: 37.733795,
     longitude: -122.446747,
@@ -25,8 +28,8 @@ const GooglePlacesInput = () => {
   };
 
   useEffect(() => {
-    if (query !== "") {
-      Geocoder.from(query)
+    if (query.address !== "" && query.citystate !== "") {
+      Geocoder.from(query.address + " " + query.citystate)
         .then((json) => {
           const location = json.results[0].geometry.location;
           //console.log(location);
@@ -36,13 +39,21 @@ const GooglePlacesInput = () => {
     }
   }, [query]);
 
+  useEffect(() => {
+    try {
+      onLocationSelect(query, coord);
+    } catch (error) {
+      console.log("Error get location", error);
+    }
+  }, [query, coord]);
+
   return (
     <View>
       <View style={styles.container}>
-        <LocationSearch onLocationSelected={({ location }) => {
-            setQuery(location);
+        <LocationSearch onLocationSelected={(location) => {
+          setQuery( {address: location.address, citystate: location.citystate} );
         }} />
-            
+
       </View>
       <Slider
         minimumValue={800}
@@ -52,7 +63,7 @@ const GooglePlacesInput = () => {
         onValueChange={handleSliderChange}
       />
       <Text>Select desired radius: {(radius * 0.000621371).toFixed(2)} miles</Text>
-      { centerCircle && <Text>Current area: {centerCircle}</Text>}
+      {centerCircle && <Text>Current area: {centerCircle}</Text>}
       <MapView
         ref={mapRef}
         // onRegionChangeComplete={async (val) => {
@@ -86,11 +97,11 @@ const GooglePlacesInput = () => {
           if (response.results.length > 0) {
             const address = response.results[0].formatted_address;
             setCenterCircle(address);
-            console.log(address);
+            console.log("new address:", address, " lat long: ", { latitude, longitude });
           }
         }}
 
-        
+
       // className="flex-1 -mt-10 z-0"
       // mapType="mutedStandard"
       >
@@ -113,7 +124,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "navy",
     borderRadius: 15,
-    padding: 3, 
+    padding: 3,
   },
 });
 

@@ -3,39 +3,18 @@ import { TripData } from "../types";
 export const trips: TripData[] = [
   {
     id: '1',
-    name: "Trip to London",
-    startDate: "2024-04-15",
-    startHour: 9,
-    endHour: 18,
-    startMinute: 30,
-    endMinute: 0,
-    endDate: "2024-04-17",
-    location: "London",
-    radius: 10000,
-  },
-  {
-    id: '2',
-    name: "Exploring the Amazon",
-    startDate: "2024-05-01",
+    name: 'Trip to Paris',
+    startDate: new Date(2024, 3, 16), // April 16, 2024
     startHour: 8,
-    endHour: 16,
     startMinute: 0,
-    endMinute: 0,
-    endDate: "2024-05-05",
-    location: "Amazon Rainforest",
-    radius: 10000,
-  },
-  {
-    id: '3',
-    name: "Business Trip to New York",
-    startDate: "2024-06-10",
-    startHour: 10,
-    endHour: 17,
-    startMinute: 0,
-    endMinute: 0,
-    endDate: "2024-06-12",
-    location: "New York City",
-    radius: 10000,
+    endHour: 20,
+    endMinute: 30,
+    endDate: new Date(2024, 3, 20), // April 20, 2024
+    location: 'Paris',
+    mapData: {
+      latitude: 48.8566,
+      longitude: 2.3522,
+    },
   }
 ];
 

@@ -35,7 +35,7 @@ router.post("/", async (req, res) => {
   try {
     const trip = await prisma.trip.create({
       data: {
-        name,
+        name: name,
         startDate,
         endDate,
         location,

@@ -4,7 +4,7 @@ import { View, Text, FlatList } from "react-native";
 const GOOGLE_MAP_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAP_API_KEY || "undefined"
 import { DataItem } from '@/types';;
 
-export const LocationSearch = ({ onLocationSelected }: { onLocationSelected: (location: { location: string }) => void; }) => {
+export const LocationSearch = ({ onLocationSelected }: { onLocationSelected: (location: { address: string, citystate: string }) => void; }) => {
 
   const data = [
     {
@@ -12,9 +12,12 @@ export const LocationSearch = ({ onLocationSelected }: { onLocationSelected: (lo
       component: <GooglePlacesAutocomplete
         placeholder='Search a location'
         onPress={(data, details = null) => {
+          console.log("location", data)
+          console.log("street", data.structured_formatting.main_text)
           console.log("city-level location", data.structured_formatting.secondary_text)
           onLocationSelected({
-            location: data.structured_formatting.secondary_text,
+              address: data.structured_formatting.main_text,
+              citystate: data.structured_formatting.secondary_text,
           });
         }}
         keepResultsAfterBlur={true}
