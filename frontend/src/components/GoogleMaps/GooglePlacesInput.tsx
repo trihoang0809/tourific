@@ -1,16 +1,19 @@
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import Geocoder from "react-native-geocoding";
 import React, { useState, useEffect, useRef } from "react";
-import MapView, { Marker, PROVIDER_GOOGLE, Circle } from "react-native-maps";
-import { StyleSheet, View, ViewStyle, Dimensions, Text } from "react-native";
+import MapView, { PROVIDER_GOOGLE, Circle } from "react-native-maps";
+import { StyleSheet, View, Dimensions, Text } from "react-native";
 import Slider from "@react-native-community/slider";
 const GOOGLE_MAP_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAP_API_KEY || "undefined";
+import { LocationSearch } from "./LocationSearch";
+import Geocoding from 'react-native-geocoding';
 
 const { width, height } = Dimensions.get("window");
+Geocoding.init(GOOGLE_MAP_API_KEY);
 
 const GooglePlacesInput = () => {
   Geocoder.init(GOOGLE_MAP_API_KEY); // use a valid API key
   const [query, setQuery] = useState("");
+  const [centerCircle, setCenterCircle] = useState("")
   const [coord, setCoord] = useState<{ latitude: number; longitude: number; }>({
     latitude: 37.733795,
     longitude: -122.446747,
@@ -36,38 +39,27 @@ const GooglePlacesInput = () => {
   return (
     <View>
       <View style={styles.container}>
-        <GooglePlacesAutocomplete
-          placeholder="Search destination"
-          onPress={(data, details = null) => {
-            // 'details' is provided when fetchDetails = true
-            //console.log("press");
-            console.log("data: ", data, "details: ", details);
-            console.log("data description", data.description)
-            console.log("city-level location", data.structured_formatting.secondary_text)
-            setQuery(data.description);
-          }}
-          keepResultsAfterBlur={true}
-          query={{
-            key: GOOGLE_MAP_API_KEY,
-            language: "en",
-          }}
-        />
+        <LocationSearch onLocationSelected={({ location }) => {
+            setQuery(location);
+        }} />
+            
       </View>
       <Slider
         minimumValue={800}
-        maximumValue={100000}
+        maximumValue={50000}
         //step={1}
         value={radius}
         onValueChange={handleSliderChange}
       />
       <Text>Select desired radius: {(radius * 0.000621371).toFixed(2)} miles</Text>
+      { centerCircle && <Text>Current area: {centerCircle}</Text>}
       <MapView
         ref={mapRef}
-        onRegionChangeComplete={async (val) => {
-          // if (mapRef.current) {
-          //   console.log(await (mapRef.current as MapView).getMapBoundaries());
-          // }
-        }}
+        // onRegionChangeComplete={async (val) => {
+        //   if (mapRef.current) {
+        //     console.log(await (mapRef.current as MapView).getMapBoundaries());
+        //   }
+        // }}
         region={{
           latitude: coord.latitude,
           longitude: coord.longitude,
@@ -81,26 +73,27 @@ const GooglePlacesInput = () => {
           height: width - 40,
         }}
         provider={PROVIDER_GOOGLE}
-        onPress={(e) => {
+        onPress={async (e) => {
           //console.log(e.nativeEvent.coordinate);
           setCoord({
             latitude: e.nativeEvent.coordinate.latitude,
             longitude: e.nativeEvent.coordinate.longitude,
           });
+
+          const { latitude, longitude } = e.nativeEvent.coordinate;
+          const response = await Geocoding.from({ latitude, longitude });
+
+          if (response.results.length > 0) {
+            const address = response.results[0].formatted_address;
+            setCenterCircle(address);
+            console.log(address);
+          }
         }}
+
+        
       // className="flex-1 -mt-10 z-0"
       // mapType="mutedStandard"
       >
-        {/* <Marker
-          coordinate={{
-            latitude: coord.latitude,
-            longitude: coord.longitude,
-          }}
-          // title={"Title"}
-          // description={"Description"}
-          // identifier="origin"
-          pinColor="#00CCBB"
-        /> */}
         <Circle
           center={{
             latitude: coord.latitude,
@@ -118,9 +111,9 @@ const GooglePlacesInput = () => {
 const styles = StyleSheet.create({
   container: {
     borderWidth: 1,
-    borderColor: "black",
-    borderRadius: 5,
-    margin: 30,
+    borderColor: "navy",
+    borderRadius: 15,
+    padding: 3, 
   },
 });
 
