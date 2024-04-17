@@ -1,41 +1,5 @@
 import { View, Text, Image, StyleSheet } from "react-native";
-
-type Trip = {
-  id: string;
-  name: string;
-  location: {
-    address: string;
-    city: string;
-  };
-  startDate: string;
-  endDate: string;
-  image?: {
-    height: number;
-    width: number;
-    url: string;
-  };
-};
-
-type User = {
-  id: string;
-  username: string;
-  password: string;
-  friendRequestReceived: [];
-  tripID: [];
-  trips: Trip[];
-  firstName: string;
-  lastName: string;
-  dateOfBirth: Date;
-  avatar: {
-    height: number;
-    width: number;
-    url: string;
-  };
-};
-
-interface UserProps {
-  user: User;
-}
+import { UserProps, Trip } from "../types";
 
 export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
