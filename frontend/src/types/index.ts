@@ -1,16 +1,16 @@
 // this file is for declaring types
 
-export interface TripData { // for using in mock data in displaying trip details, temporary for noe
+export interface TripData {
+  id: string;
   name: string;
   startDate: string;
-  // startTime: string;
-  startHour: number, // chu y cho nay
-  endHour: number,
-  startMinute: number,
-  endMinute: number,
+  startHour: number; // chu y cho nay
+  endHour: number;
+  startMinute: number;
+  endMinute: number;
   endDate: string;
-  // endTime: string;
   location: string;
+  radius: number;
 };
 
 export type DataItem = {
