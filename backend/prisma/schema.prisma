@@ -13,9 +13,9 @@ datasource db {
 model Trip {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String
-  location Location
-  startDate DateTime @default(now())
-  endDate DateTime
+  location Location?
+  startDate DateTime? @default(now())
+  endDate DateTime?
   pendingInvitations String[]
   participants User[] @relation(fields: [participantsID], references: [id])
   activities String[]
@@ -25,8 +25,9 @@ model Trip {
 
 type Location {
   address String
-  city String
-  state String
+  citystate String @default("")
+  city String?
+  state String?
   latitude Float
   longitude Float
 }
