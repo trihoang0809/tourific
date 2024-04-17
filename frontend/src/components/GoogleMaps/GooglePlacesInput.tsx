@@ -15,7 +15,7 @@ Geocoding.init(GOOGLE_MAP_API_KEY);
 
 const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
   Geocoder.init(GOOGLE_MAP_API_KEY); // use a valid API key
-  const [query, setQuery] = useState({ address: "", citystate: "" });
+  const [query, setQuery] = useState({ address: "", citystate: ""});
   const [centerCircle, setCenterCircle] = useState("");
   const [coord, setCoord] = useState<{ latitude: number; longitude: number; }>({
     latitude: 37.733795,
@@ -26,6 +26,13 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
   const handleSliderChange = (value: number) => {
     setRadius(value);
   };
+  const [mapData, setMapData] = useState({ 
+    address: query.address, 
+    citystate: query.citystate, 
+    latitude: coord.latitude, 
+    longitude: coord.longitude, 
+    radius: radius 
+  });
 
   useEffect(() => {
     if (query.address !== "" && query.citystate !== "") {
@@ -41,11 +48,13 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
 
   useEffect(() => {
     try {
-      onLocationSelect(query, coord);
+      setMapData({ address: query.address, citystate: query.citystate, latitude: coord.latitude, longitude: coord.longitude, radius: radius })
+      console.log("mapData", mapData);
+      onLocationSelect(mapData);
     } catch (error) {
       console.log("Error get location", error);
     }
-  }, [query, coord]);
+  }, [query, coord, radius]);
 
   return (
     <View>
@@ -97,7 +106,7 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
           if (response.results.length > 0) {
             const address = response.results[0].formatted_address;
             setCenterCircle(address);
-            console.log("new address:", address, " lat long: ", { latitude, longitude });
+            // console.log("new address:", address, " lat long: ", { latitude, longitude });
           }
         }}
 

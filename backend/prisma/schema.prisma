@@ -26,10 +26,9 @@ model Trip {
 type Location {
   address String
   citystate String @default("")
-  city String?
-  state String?
   latitude Float
   longitude Float
+  radius Float
 }
 
 model User {
