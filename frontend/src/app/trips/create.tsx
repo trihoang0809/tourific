@@ -51,7 +51,8 @@ const CreateTripScreen = () => {
 
     console.log("data bf4 submit", req);
     try {
-      const response = await fetch('http://172.20.16.1:3000/trips', {
+      // need to extract localhost to a constant folder
+      const response = await fetch('http://localhost:3000/trips', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
