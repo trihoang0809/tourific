@@ -9,7 +9,7 @@ import GooglePlacesInput from '@/components/GoogleMaps/GooglePlacesInput';
 import { DatePickerModal, TimePickerModal } from 'react-native-paper-dates';
 import { Button as Buttons } from 'react-native-paper';
 import { number } from 'zod';
-
+import { formatDateTime } from '@/utils';
 
 // CREATING: /trips/create
 // UPDATING: /trips/create?id=${id}
@@ -27,7 +27,7 @@ const CreateTripScreen = () => {
     name: '',
     startDate: new Date(),
     startTime: '',
-    startHour: number, // chu y cho nay
+    startHour: number,
     endHour: number,
     startMinute: number,
     endMinute: number,
@@ -44,14 +44,16 @@ const CreateTripScreen = () => {
   const [visibleEnd, setVisibleEnd] = useState(false);
 
   const createTrip = async () => {
-    const { name, startDate, endDate, location } = formData;
+    const { name, startDate, endDate, location, startHour, startMinute, endHour, endMinute } = formData;
+    // const isoStartDate = formatDateTime(startDate, startHour, startMinute);
+    // const isoEndDate = formatDateTime(endDate, endHour, endMinute);
     const isoStartDate = startDate.toISOString();
     const isoEndDate = endDate.toISOString();
     const req = { name, startDate: isoStartDate, endDate: isoEndDate, location };
 
     console.log("data bf4 submit", req);
     try {
-      const response = await fetch('http://172.20.16.1:3000/trips', {
+      const response = await fetch('http://localhost:3000/trips', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -123,8 +125,8 @@ const CreateTripScreen = () => {
 
   // Define custom data structure for FlatList map
   const onLocationSelect = useCallback(
-    (location: MapData, coord: { latitude: number, longitude: number; }) => {
-      setFormData(prevFormData => ({ ...prevFormData, location: { ...location, longitude: coord.longitude, latitude: coord.latitude } } as TripData));
+    (location: MapData) => {
+      setFormData(prevFormData => ({ ...prevFormData, location: location } as TripData));
       setVisibleStart(false);
     },
     [setFormData]

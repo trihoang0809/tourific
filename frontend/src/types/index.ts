@@ -21,7 +21,7 @@ export type MapData = {
   citystate: String,
   latitude: number;
   longitude: number;
-  radius?: number;
+  radius: number;
 };
 
 export type DataItem = {
@@ -35,5 +35,5 @@ export interface DateRangePickerProps {
 }
 
 export interface GooglePlacesInputProps {
-  onLocationSelect: (location: MapData, coord: { latitude: number, longitude: number; }) => void;
+  onLocationSelect: (location: MapData) => void;
 }
