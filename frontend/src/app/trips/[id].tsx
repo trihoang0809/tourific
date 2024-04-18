@@ -5,6 +5,8 @@ import { Link, useLocalSearchParams } from "expo-router";
 import { trips } from "@/mock-data/trips";
 import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
+import { DateTime } from 'luxon';
+
 
 const TripDetailsScreen = () => {
   const { id } = useLocalSearchParams();
@@ -67,20 +69,20 @@ const TripDetailsScreen = () => {
             }}
           >
             <Text className="font-bold text-3xl mb-3">{trip.name}</Text>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Ionicons name="location" size={20} color="navy" />
-              <Text className="ml-3 text-gray-800 text-xl font-semibold">
-                {trip.location.address} {trip.location.citystate}
-              </Text>
+            <View style={{ flexDirection: "row", alignItems: "start" }}>
+              <Ionicons name="location" size={25} color="navy" />
+              <View>
+                <Text className="ml-2 text-lg font-semibold">
+                  {trip.location.address} {trip.location.citystate}
+                </Text>
+                <Text className='ml-2 text-gray-500 text-lg'>
+                + {(Number(trip.location.radius * 0.0006213712).toFixed(2))} miles
+                </Text>
+              </View>
             </View>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Ionicons name="locate" size={20} color="navy" />
-              <Text className='ml-3 text-gray-500 text-lg font-semibold'>{(Number(trip.location.radius * 0.0006213712).toFixed(2))} miles</Text>
-            </View>
-            {/* <View style={{ borderBottomWidth: 0.5, borderColor: 'navy', marginVertical: 20 }}></View> */}
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Ionicons name="calendar" size={20} color="navy" />
-              <View className="ml-3 mr-3" style={{ justifyContent: "center" }}>
+            <View style={{ flexDirection: "row", alignItems: "start" }}>
+              <Ionicons name="calendar" size={25} color="navy" />
+              <View className="ml-2 mr-2" style={{ justifyContent: "center" }}>
                 <Text className="text-lg font-semibold">
                   {new Date(trip.startDate).toLocaleString("en-US", {
                     weekday: "short",
@@ -89,11 +91,12 @@ const TripDetailsScreen = () => {
                   })}
                 </Text>
                 <Text className="text-gray-500 text-lg">
+                { DateTime.fromISO(trip.startDate.toString()).setZone("system").toLocaleString(DateTime.TIME_SIMPLE)}
                 {/* {trip.startDate.getHours() % 12 || 12}:{trip.startDate.getMinutes().toString().padStart(2, '0')} {trip.startDate.getHours() >= 12 ? 'PM' : 'AM'} */}
                 </Text>
               </View>
-              <Ionicons name="arrow-forward-outline" size={20} color="navy" />
-              <View className="ml-3" style={{ justifyContent: "center" }}>
+              <Ionicons name="arrow-forward-outline" size={25} color="navy" />
+              <View className="ml-2" style={{ justifyContent: "center" }}>
                 <Text className="text-lg font-semibold">
                   {new Date(trip.endDate).toLocaleString("en-US", {
                     weekday: "short",
@@ -102,10 +105,12 @@ const TripDetailsScreen = () => {
                   })}
                 </Text>
                 <Text className="text-gray-500 text-lg">
+                { DateTime.fromISO(trip.endDate.toString()).setZone("system").toLocaleString(DateTime.TIME_SIMPLE)}
                 {/* {trip.endDate.getHours() % 12 || 12}:{trip.endDate.getMinutes().toString().padStart(2, '0')} {trip.endDate.getHours() >= 12 ? 'PM' : 'AM'} */}
                 </Text>
               </View>
             </View>
+              <Text className="text-gray-800 text-base ml-8">{DateTime.local().zoneName}</Text>
             <View
               style={{
                 borderBottomWidth: 0.5,

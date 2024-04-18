@@ -71,7 +71,7 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
         value={radius}
         onValueChange={handleSliderChange}
       />
-      <Text>Select desired radius: {(radius * 0.000621371).toFixed(2)} miles</Text>
+      <Text className='font-semibold text-base'>Current radius: {(radius * 0.000621371).toFixed(2)} miles</Text>
       {centerCircle && <Text>Current area: {centerCircle}</Text>}
       <MapView
         ref={mapRef}
@@ -130,10 +130,10 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    borderWidth: 1,
-    borderColor: "navy",
-    borderRadius: 15,
-    padding: 3,
+    // borderWidth: 1,
+    // borderColor: "navy",
+    // borderRadius: 15,
+    // padding: 3,
   },
 });
 

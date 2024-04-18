@@ -1,9 +1,6 @@
+// format follow UTC
 export function formatDateTime(dateString: Date, hour: number, minute: number) {
   // "2024-04-01T07:00:00.000Z"
-  const year = dateString.getUTCFullYear(); // Get the year
-  const month = dateString.getUTCMonth() + 1; // Get the month (0-indexed, so add 1)
-  const day = dateString.getUTCDate();
-
   if (hour !== null) {
     dateString.setHours(hour);
   } else {

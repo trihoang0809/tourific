@@ -25,6 +25,22 @@ export const LocationSearch = ({ onLocationSelected }: { onLocationSelected: (lo
           key: GOOGLE_MAP_API_KEY,
           language: 'en',
         }}
+        styles={{
+          container: {
+            backgroundColor: 'gray',
+          },
+          textInputContainer: {
+            backgroundColor: 'gray',
+          },
+          textInput: {
+            height: 38,
+            color: '#5d5d5d',
+            fontSize: 16,
+          },
+          predefinedPlacesDescription: {
+            color: '#1faadb',
+          }
+        }}
       />
     },
   ];
