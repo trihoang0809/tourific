@@ -26,20 +26,23 @@ export const LocationSearch = ({ onLocationSelected }: { onLocationSelected: (lo
           language: 'en',
         }}
         styles={{
-          container: {
-            backgroundColor: 'gray',
-          },
-          textInputContainer: {
-            backgroundColor: 'gray',
-          },
+          // container: {
+          //   backgroundColor: 'E6E6E6',
+          // },
+          // textInputContainer: {
+          //   backgroundColor: 'E6E6E6',
+          // },
           textInput: {
-            height: 38,
-            color: '#5d5d5d',
-            fontSize: 16,
+            color: 'black',
+            fontSize: 15,
+            backgroundColor: '#E6E6E6',
+            padding: 15,
+            marginTop: 5,
+            borderRadius: 10
           },
-          predefinedPlacesDescription: {
-            color: '#1faadb',
-          }
+          // predefinedPlacesDescription: {
+          //   color: '#1faadb',
+          // }
         }}
       />
     },

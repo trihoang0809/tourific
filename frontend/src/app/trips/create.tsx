@@ -1,5 +1,6 @@
 import { View, ScrollView, Image, TouchableOpacity, TextInput, Button, Text, FlatList, StatusBar, Pressable, Modal, Alert } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useForm, SubmitHandler } from "react-hook-form"
 import favicon from "@/assets/favicon.png";
 import { AntDesign, Feather, Ionicons } from '@expo/vector-icons';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
@@ -11,36 +12,41 @@ import { Button as Buttons } from 'react-native-paper';
 import { number } from 'zod';
 import { formatDateTime } from '@/utils';
 import { DateTime } from 'luxon';
+import { TripSchema } from '@/validation/types';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {z} from 'zod'
 
 
 // CREATING: /trips/create
 // UPDATING: /trips/create?id=${id}
 
-
-const CreateTripScreen = () => {
+export default function CreateTripScreen() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setError
+  } = useForm({
+    resolver: zodResolver(TripSchema),
+  })
   const { id: idString } = useLocalSearchParams();
 
   // check if there's an id -> if there's id meaning trip has been created 
   const isUpdating = !!idString;
-
-  // more setting icon
-  const [modalEditVisible, setModalEditVisible] = useState(false);
 
   //trip data for form
   // fetch data from api
   const [formData, setFormData] = useState(isUpdating ? trips[0] : {
     name: '',
     startDate: new Date(),
-    startTime: '',
     startHour: number,
-    endHour: number,
     startMinute: number,
-    endMinute: number,
     endDate: new Date(),
-    endTime: '',
+    endHour: number,
+    endMinute: number,
     location: {},
   });
-
+  
   // for date range picker modal
   const [open, setOpen] = useState(false);
 
@@ -48,10 +54,18 @@ const CreateTripScreen = () => {
   const [visibleStart, setVisibleStart] = useState(false);
   const [visibleEnd, setVisibleEnd] = useState(false);
 
-  const createTrip = async () => {
+  const onSubmit = async () => {
     const { name, startDate, endDate, location, startHour, startMinute, endHour, endMinute } = formData;
     const isoStartDate = DateTime.fromISO(formatDateTime(startDate, startHour, startMinute)).setZone("system");
     const isoEndDate = DateTime.fromISO(formatDateTime(endDate, endHour, endMinute)).setZone("system");
+    const { success, data, error } = TripSchema.safeParse(FormData);
+    if (!success) {
+      // Handle validation errors
+      console.error(error);
+    } else {
+      // Continue with valid data
+      const validData = data;
+    }
     const req = { name, startDate: isoStartDate, endDate: isoEndDate, location };
     console.log("data bf4 submit", req);
     try {
@@ -81,14 +95,6 @@ const CreateTripScreen = () => {
   const handleChange = (key: keyof TripData, value: string | Date) => {
     setFormData({ ...formData, [key]: value });
   };
-
-
-  const handleSubmit = () => {
-    // Implement handleSubmit logic here
-    console.log(formData);
-    createTrip();
-  };
-
 
   // function for date picker
   const onDismiss = useCallback(() => {
@@ -138,18 +144,9 @@ const CreateTripScreen = () => {
     [setFormData]
   );
 
-  function chooseBannerCover(event: GestureResponderEvent): void {
+  function chooseBannerCover(): void {
     throw new Error('Function not implemented.');
   }
-
-  // showing more setting options
-  const showMoreSetting = () => {
-    setModalEditVisible(true);
-  };
-
-  const notShowMoreSetting = () => {
-    setModalEditVisible(false);
-  };
 
   return (
     <View>
@@ -157,17 +154,6 @@ const CreateTripScreen = () => {
         options={{
           title: '',
           headerShown: true,
-          headerRight: () => (
-            <>
-              <Feather
-                onPressIn={showMoreSetting}
-                onPressOut={notShowMoreSetting}
-                name="more-vertical"
-                size={24}
-                color="black" />
-
-            </>
-          ),
         }}
       />
       <ScrollView nestedScrollEnabled={true}>
@@ -192,6 +178,7 @@ const CreateTripScreen = () => {
                 placeholder="Enter trip name"
                 value={formData.name}
                 onChangeText={text => handleChange('name', text)}
+                {...register("name")}
               />
             </View>
             <View style={{ marginVertical: 10 }}>
@@ -203,6 +190,7 @@ const CreateTripScreen = () => {
                   value={`${formData.startDate?.toLocaleDateString()} - ${formData.endDate ? formData.endDate.toLocaleDateString() : 'None'}`}
                   onPressIn={() => setOpen(true)}
                   editable={false}
+                  {...register("startDate")}
                 />
               </TouchableOpacity>
               {<DatePickerModal
@@ -223,7 +211,7 @@ const CreateTripScreen = () => {
                 <Text className='font-semibold text-base'>Start time</Text>
                 <TouchableOpacity onPress={() => setVisibleStart(true)}>
                   <Text
-                    style={{ fontSize: 15, color: 'black', backgroundColor: '#E6E6E6', padding: 15, marginTop: 5, borderRadius: 10, }}
+                    style={{ fontSize: 15, color: 'black', backgroundColor: '#E6E6E6', padding: 15, marginTop: 5, borderRadius: 10, overflow: 'hidden'}}
                   >
                     {
                       typeof formData.startHour === 'number' && typeof formData.startMinute === 'number' ?
@@ -243,7 +231,7 @@ const CreateTripScreen = () => {
               <View style={{ flex: 1, marginLeft: 5 }}>
                 <Text className='font-semibold text-base'>End time</Text>
                 <TouchableOpacity onPress={() => setVisibleEnd(true)}>
-                  <Text style={{ fontSize: 15, color: 'black', backgroundColor: '#E6E6E6', padding: 15, marginTop: 5, borderRadius: 10, }}>
+                  <Text style={{ fontSize: 15, color: 'black', backgroundColor: '#E6E6E6', padding: 15, marginTop: 5, borderRadius: 10, overflow: 'hidden'}}>
                     {
                       typeof formData.endHour === 'number' && typeof formData.endMinute === 'number' ?
                         new Date(1970, 0, 1, formData.endHour, formData.endMinute).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '8:00'
@@ -266,13 +254,11 @@ const CreateTripScreen = () => {
               <GooglePlacesInput onLocationSelect={onLocationSelect} />
             </View>
             <Button
-              title={isUpdating ? 'Edit Trip' : 'Create Trip'} onPress={handleSubmit} />
+              title={isUpdating ? 'Edit Trip' : 'Create Trip'} onPress={handleSubmit(onSubmit)}/>
           </View>
         </View>
       </ScrollView >
     </View >
   );
 };
-
-export default CreateTripScreen;
 
