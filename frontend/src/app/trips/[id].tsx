@@ -1,15 +1,17 @@
 import { View, Text, ScrollView, Image, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
 import favicon from "@/assets/favicon.png";
-import { Link, useLocalSearchParams } from "expo-router";
+import { Link, Stack, useLocalSearchParams } from "expo-router";
 import { trips } from "@/mock-data/trips";
-import { Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from 'luxon';
 
 
 const TripDetailsScreen = () => {
   const { id } = useLocalSearchParams();
+  // const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
+
   // const trip = trips.find(trip => trip.id === id);
   const [trip, setTrip] = useState({
     name: "",
@@ -19,6 +21,10 @@ const TripDetailsScreen = () => {
     startHour: 0,
     startMinute: 0,
   });
+
+  // more setting icon
+  const [modalEditVisible, setModalEditVisible] = useState(false);
+
 
   const getTrip = async ({ id: text }: { id: string }) => {
     try {
@@ -42,34 +48,54 @@ const TripDetailsScreen = () => {
   };
 
   useEffect(() => {
+    console.log("id", id);
     getTrip({ id });
   }, []);
 
+    // showing more setting options
+    const showMoreSetting = () => {
+      setModalEditVisible(true);
+    };
+  
+    const notShowMoreSetting = () => {
+      setModalEditVisible(false);
+    };
+  
   return (
     <View style={{ height: Dimensions.get("window").height }}>
+      <Stack.Screen
+        options={{
+          title: '',
+          headerShown: true,
+          headerRight: () => (
+            <Link href={`/trip/create?id=${id}`}>
+              <Feather
+                onPressIn={showMoreSetting}
+                onPressOut={notShowMoreSetting}
+                name="edit-2"
+                size={24}
+                color="black" />
+            </Link>
+          ),
+        }}
+      />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View>
           <Image className="w-full h-52" source={favicon} />
-          <TouchableOpacity
-            onPress={() => <Link href="/trips" />}
-            className="absolute top-8 left-4 bg-gray-50 p-1 rounded-full boxshadow"
-          >
-            <Ionicons name="chevron-back-circle" size={40} color="navy" />
-          </TouchableOpacity>
         </View>
         <View
-          style={{ borderTopLeftRadius: 40, borderTopRightRadius: 40, flex: 1 }}
+          style={{ borderTopLeftRadius: 30, borderTopRightRadius: 30, flex: 1 }}
           className="bg-white -mt-12 pt-6"
         >
           <View
             style={{
               paddingHorizontal: 30,
-              paddingVertical: 20,
+              paddingVertical: 5,
               height: "auto",
             }}
           >
-            <Text className="font-bold text-3xl mb-3">{trip.name}</Text>
-            <View style={{ flexDirection: "row", alignItems: "start" }}>
+            <Text className="font-bold text-3xl mb-5">{trip.name}</Text>
+            <View className="mb-3" style={{ flexDirection: "row", alignItems: "start" }}>
               <Ionicons name="location" size={25} color="navy" />
               <View>
                 <Text className="ml-2 text-lg font-semibold">
@@ -109,6 +135,7 @@ const TripDetailsScreen = () => {
                 {/* {trip.endDate.getHours() % 12 || 12}:{trip.endDate.getMinutes().toString().padStart(2, '0')} {trip.endDate.getHours() >= 12 ? 'PM' : 'AM'} */}
                 </Text>
               </View>
+              
             </View>
               <Text className="text-gray-800 text-base ml-8">{DateTime.local().zoneName}</Text>
             <View
