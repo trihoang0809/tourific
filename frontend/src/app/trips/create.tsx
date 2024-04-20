@@ -1,7 +1,7 @@
-import { View, ScrollView, Image, TouchableOpacity, TextInput, Button, Text, FlatList, StatusBar } from 'react-native';
+import { View, ScrollView, Image, TouchableOpacity, TextInput, Button, Text, FlatList, StatusBar, Pressable, Modal, Alert } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import favicon from "@/assets/favicon.png";
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, Feather, Ionicons } from '@expo/vector-icons';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import trips from '@/mock-data/trips';
 import { DataItem, MapData, TripData } from '@/types';
@@ -22,6 +22,9 @@ const CreateTripScreen = () => {
 
   // check if there's an id -> if there's id meaning trip has been created 
   const isUpdating = !!idString;
+
+  // more setting icon
+  const [modalEditVisible, setModalEditVisible] = useState(false);
 
   //trip data for form
   // fetch data from api
@@ -49,8 +52,6 @@ const CreateTripScreen = () => {
     const { name, startDate, endDate, location, startHour, startMinute, endHour, endMinute } = formData;
     const isoStartDate = DateTime.fromISO(formatDateTime(startDate, startHour, startMinute)).setZone("system");
     const isoEndDate = DateTime.fromISO(formatDateTime(endDate, endHour, endMinute)).setZone("system");
-    // console.log("formatefunction local ", DateTime.fromISO(formatDateTime(startDate, startHour, startMinute)).setZone("system"));
-    // console.log("start ", startHour, startMinute);
     const req = { name, startDate: isoStartDate, endDate: isoEndDate, location };
     console.log("data bf4 submit", req);
     try {
@@ -68,6 +69,9 @@ const CreateTripScreen = () => {
       // Optionally, you can handle the response here
       const data = await response.json();
       console.log('Trip created:', data);
+      Alert.alert('Alert Title', 'My Alert Msg', [
+        { text: 'OK', onPress: () => console.log('OK Pressed') },
+      ]);
     } catch (error: any) {
       console.error('Error creating trip:', error.toString());
     }
@@ -134,48 +138,67 @@ const CreateTripScreen = () => {
     [setFormData]
   );
 
+  function chooseBannerCover(event: GestureResponderEvent): void {
+    throw new Error('Function not implemented.');
+  }
 
+  // showing more setting options
+  const showMoreSetting = () => {
+    setModalEditVisible(true);
+  };
+
+  const notShowMoreSetting = () => {
+    setModalEditVisible(false);
+  };
 
   return (
     <View>
       <Stack.Screen
-        options={{ title: isUpdating ? 'Update Product' : 'Create Product' }}
+        options={{
+          title: '',
+          headerShown: true,
+          headerRight: () => (
+            <>
+              <Feather
+                onPressIn={showMoreSetting}
+                onPressOut={notShowMoreSetting}
+                name="more-vertical"
+                size={24}
+                color="black" />
+
+            </>
+          ),
+        }}
       />
       <ScrollView nestedScrollEnabled={true}>
         {/* trips banner */}
         <View style={{ position: 'relative' }}>
-          <Image className="w-full h-32" source={favicon} />
-          <TouchableOpacity onPress={() => <Link href='/' />} style={{ position: 'absolute', top: 10, left: 4, backgroundColor: '#ccc', borderRadius: 20 }}>
-            <AntDesign name="leftcircle" size={40} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => <Link href='/trips/create?id=${id}' />}>
-            <AntDesign name="menu-fold" size={30} color="black" />
-          </TouchableOpacity>
+          <Image className="w-full h-40" source={favicon} />
+          <Pressable
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 10, right: 4, backgroundColor: '#ccc', borderRadius: 10, height: 35, width: 130, padding: 'auto' }}
+            onPress={() => { }} >
+            <Text>Change image</Text>
+          </Pressable>
         </View>
 
         {/* trip details */}
         <View style={{ borderTopLeftRadius: 40, borderTopRightRadius: 40, backgroundColor: '#fff', marginTop: -50, paddingTop: 20 }}>
           <View style={{ paddingHorizontal: 20, paddingVertical: 20, height: 'auto', flex: 1, justifyContent: 'space-evenly', flexDirection: 'column', alignItems: 'stretch' }}>
-            <Text className='font-bold text-3xl mb-5' style={{textAlign: 'center'}}>Create a new trip</Text>
+            <Text className='font-bold text-3xl mb-5' style={{ textAlign: 'center' }}>Create a new trip</Text>
             <View style={{ marginVertical: 10 }}>
               <Text className='font-semibold text-base'>Name</Text>
               <TextInput
-                style={{ fontSize: 15, color: 'black', backgroundColor: '#E6E6E6', padding: 15, marginTop: 5, borderRadius: 10}}
+                style={{ fontSize: 15, color: 'black', backgroundColor: '#E6E6E6', padding: 15, marginTop: 5, borderRadius: 10 }}
                 placeholder="Enter trip name"
                 value={formData.name}
                 onChangeText={text => handleChange('name', text)}
               />
             </View>
             <View style={{ marginVertical: 10 }}>
-              {/* <TouchableOpacity>
-                <Text>{formData.startDate ? formData.startDate.toString() : 'Start Date'} - {typeof formData.startHour === 'number' && typeof formData.startMinute === 'number' ?
-                  `${formData.startHour?.toLocaleString()}:${formData.startMinute?.toLocaleString()}` : '8:00'
-                }</Text> */}
-              {/* </TouchableOpacity> */}
               <Text className='font-semibold text-base'>Date</Text>
               <TouchableOpacity onPress={() => setOpen(true)}>
                 <TextInput
-                  style={{ fontSize: 15, color: 'black', backgroundColor: '#E6E6E6', padding: 15, marginTop: 5, borderRadius: 10}}
+                  style={{ fontSize: 15, color: 'black', backgroundColor: '#E6E6E6', padding: 15, marginTop: 5, borderRadius: 10 }}
                   placeholder="Start Date"
                   value={`${formData.startDate?.toLocaleDateString()} - ${formData.endDate ? formData.endDate.toLocaleDateString() : 'None'}`}
                   onPressIn={() => setOpen(true)}
@@ -196,26 +219,18 @@ const CreateTripScreen = () => {
               />}
             </View>
             <View style={{ justifyContent: 'space-around', flex: 1, alignItems: 'center', flexDirection: 'row', marginVertical: 10 }}>
-              <View style={{ flex: 1,  marginRight: 5 }}>
+              <View style={{ flex: 1, marginRight: 5 }}>
                 <Text className='font-semibold text-base'>Start time</Text>
-                {/* <Buttons onPress={() => setVisibleStart(true)} uppercase={false} mode="outlined">
-                  Start Time
-                </Buttons> */}
                 <TouchableOpacity onPress={() => setVisibleStart(true)}>
-                  <Text 
-                  style={{ fontSize: 15, color: 'black', backgroundColor: '#E6E6E6', padding: 15, marginTop: 5, borderRadius: 10, }}
-                  // onPress={() => setVisibleStart(true)}
-                  >                  
+                  <Text
+                    style={{ fontSize: 15, color: 'black', backgroundColor: '#E6E6E6', padding: 15, marginTop: 5, borderRadius: 10, }}
+                  >
                     {
                       typeof formData.startHour === 'number' && typeof formData.startMinute === 'number' ?
                         new Date(1970, 0, 1, formData.startHour, formData.startMinute).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '8:00'
-                    }                    
-                    {/* {typeof formData.startHour === 'number' && typeof formData.startMinute === 'number' ?
-                      `${formData.startHour?.toLocaleString()}:${formData.startMinute?.toLocaleString()}` : '8:00'
-                    } */}
+                    }
                   </Text>
                 </TouchableOpacity>
-                {/* <AntDesign name='clockcircleo' size={30} color="black" onPress={() => setVisibleStart(true)} /> */}
                 <TimePickerModal
                   visible={visibleStart}
                   onDismiss={() => onDismissTime('start')}
@@ -227,22 +242,14 @@ const CreateTripScreen = () => {
               </View>
               <View style={{ flex: 1, marginLeft: 5 }}>
                 <Text className='font-semibold text-base'>End time</Text>
-                {/* <Buttons onPress={() => setVisibleEnd(true)} uppercase={false} mode="outlined">
-                  End Time
-                </Buttons> */}
                 <TouchableOpacity onPress={() => setVisibleEnd(true)}>
                   <Text style={{ fontSize: 15, color: 'black', backgroundColor: '#E6E6E6', padding: 15, marginTop: 5, borderRadius: 10, }}>
                     {
                       typeof formData.endHour === 'number' && typeof formData.endMinute === 'number' ?
                         new Date(1970, 0, 1, formData.endHour, formData.endMinute).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '8:00'
                     }
-                    {/* {typeof formData.endHour === 'number' && typeof formData.endMinute === 'number'
-                      ? `${formData.endHour.toString().padStart(2, '0')}:${formData.endMinute.toString().padStart(2, '0')}`
-                      : '20:30'} */}
                   </Text>
                 </TouchableOpacity>
-                {/* <AntDesign name='calendar' size={30} color="black" onPress={() => setOpen(true)} /> */}
-
                 <TimePickerModal
                   visible={visibleEnd}
                   onDismiss={() => onDismissTime('end')}
@@ -252,62 +259,11 @@ const CreateTripScreen = () => {
                 />
               </View>
             </View>
-            {/* <DatePickerModal
-              locale="en"
-              mode="range"
-              visible={open}
-              onDismiss={onDismiss}
-              startDate={formData.startDate}
-              endDate={formData.endDate}
-              onConfirm={onConfirm}
-              disableStatusBarPadding
-              startYear={2023}
-              endYear={2030}
-            /> */}
-            {/* <TouchableOpacity onPress={() => setOpen(true)}>
-              <TextInput
-                className='text-black'
-                placeholder="Start Time"
-                value={formData.startHour && formData.startMinute ? `${formData.startHour.toLocaleString()}
-                :` : ''
-              }
-                onPressIn={() => setOpen(true)}
-                editable={false}
-              />
-            </TouchableOpacity>
-            <TimePickerModal
-              visible={visibleStart}
-              onDismiss={() => onDismissTime('start')}
-              onConfirm={onConfirmStartTime}
-              hours={12}
-              minutes={0}
-              use24HourClock={true}
-            /> */}
-            {/* <Text>{ } - {formData.endDate.toString() ? formData.endDate.toString() : 'End Date'}</Text> */}
 
-            {/* calendar component goes here */}
-              {/*modify here here <Text>{formData.startDate ? formData.startDate.toString() : 'Start Date'} - {formData.endDate.toString() ? formData.endDate.toString() : 'End Date'}</Text> */}
-          
-              {/* <AntDesign name='calendar' size={30} color="black" onPress={() => setOpen(true)} /> */}
-              {/* <DatePickerModal
-                locale="en"
-                mode="range"
-                visible={open}
-                onDismiss={onDismiss}
-                startDate={formData.startDate}
-                endDate={formData.endDate}
-                onConfirm={onConfirm}
-                disableStatusBarPadding
-                startYear={2023}
-                endYear={2030}
-              /> */}
-
-            {/* Time picker */}
-            
             {/* select location and showing map */}
             <View style={{ marginVertical: 10 }}>
               <Text className='font-semibold text-base'>Location name</Text>
-            <GooglePlacesInput onLocationSelect={onLocationSelect} />
+              <GooglePlacesInput onLocationSelect={onLocationSelect} />
             </View>
             <Button
               title={isUpdating ? 'Edit Trip' : 'Create Trip'} onPress={handleSubmit} />
