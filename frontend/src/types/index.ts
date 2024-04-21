@@ -4,15 +4,11 @@ export interface TripData {
   id: string;
   name: string;
   startDate: Date;
-  // startTime: string;
   startHour: number, // chu y cho nay
   endHour: number,
   startMinute: number,
   endMinute: number,
   endDate: Date;
-  // endTime: string;
-  // location: string;
-  // mapData: MapData;
   location: MapData,
 };
 
@@ -23,6 +19,10 @@ export type MapData = {
   longitude: number;
   radius: number;
 };
+
+export interface CreateTripForm {
+  formData: TripData,
+}
 
 export type DataItem = {
   id: string;
