@@ -1,9 +1,12 @@
+import { TripData } from "@/types";
 import { z, ZodType } from "zod";
 
-type FormData = {
+export type FormData = {
   name: string;
-  startDate: string;
-  endDate: string;
+  dateRange: {
+    startDate: string;
+    endDate: string;
+  };
   location: {
     address: string;
     citystate: string;
@@ -19,8 +22,10 @@ export const TripSchema: ZodType<FormData> = z
       .string()
       .min(5, { message: "Name is too short" })
       .max(30, { message: "Name is too long" }),
-    startDate: z.string().datetime({ message: "Invalid date format" }),
-    endDate: z.string().datetime({ message: "Invalid date format" }),
+    dateRange: z.object({
+      startDate: z.string().datetime({ message: "Invalid date format" }),
+      endDate: z.string().datetime({ message: "Invalid date format" })
+    }),
     location: z.object({
       address: z.string().min(0, { message: "Address is too short" }).max(50),
       citystate: z.string().min(1).max(30),
@@ -29,7 +34,7 @@ export const TripSchema: ZodType<FormData> = z
       radius: z.number(),
     }),
   })
-  .refine((data) => data.endDate > data.startDate, {
+  .refine((data) => data.dateRange.endDate > data.dateRange.startDate, {
     message: "datesReversed",
     path: ["endDate"],
   });

@@ -3,16 +3,14 @@
 export interface TripData {
   id: string;
   name: string;
-  startDate: Date;
-  // startTime: string;
+  dateRange: {
+    startDate: Date;
+    endDate: Date;
+  };
   startHour: number, // chu y cho nay
   endHour: number,
   startMinute: number,
   endMinute: number,
-  endDate: Date;
-  // endTime: string;
-  // location: string;
-  // mapData: MapData;
   location: MapData,
 };
 
