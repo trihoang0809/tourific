@@ -17,8 +17,8 @@ export const TripCard: React.FC<tripProps> = ({ trip }) => {
   const [tripImage, setTripImage] = useState(trip.image);
   const [tripLocation, setTripLocation] = useState(trip.location);
   const [tripName, setTripName] = useState(trip.name);
-  const [tripStartDate, setTripStartDate] = useState(trip.startDate);
-  const [tripEndDate, setTripEndDate] = useState(trip.endDate);
+  const [tripStartDate, setTripStartDate] = useState(new Date(trip.startDate));
+  const [tripEndDate, setTripEndDate] = useState(new Date(trip.endDate));
 
   const noImage =
     "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg";
@@ -29,8 +29,11 @@ export const TripCard: React.FC<tripProps> = ({ trip }) => {
   };
 
   const tripDate = (date: Date) => {
+    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+      return "Invalid date"; // Handle invalid dates
+    }
     const month = date.toLocaleString("default", { month: "short" });
-    return date.getDate() + " " + month + ", " + date.getFullYear();
+    return `${date.getDate()} ${month}, ${date.getFullYear()}`;
   };
 
   return (
