@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Button,
 } from "react-native";
 import { TripCard } from "../components/TripCard";
 import { HomeScreenHeader } from "../components/HomeScreenHeader";
@@ -55,7 +56,11 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
           <Text style={styles.buttonText}>Create a new trip</Text>
         </TouchableOpacity>
       </View>
-      <Text style={styles.title}>Upcoming Trips</Text>
+      <View style={styles.upcoming}>
+        <Text style={styles.title}>Upcoming Trips</Text>
+        <Button title="See all" />
+      </View>
+
       <ScrollView horizontal={true} style={styles.tripScroll}>
         {upcomingTrips.map((trip) => (
           <TripCard key={trip.id} trip={trip} />
@@ -100,5 +105,11 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  upcoming: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 10,
   },
 });
