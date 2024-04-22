@@ -1,9 +1,16 @@
-import { View, Text, Image, StyleSheet, 
-ScrollView, TextInput, TouchableHighlight,
-StatusBar, FlatList} from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  TouchableHighlight,
+  StatusBar,
+  FlatList,
+} from "react-native";
 import { useState, useEffect } from "react";
 import { TripCard } from "../components/TripCard";
-
 
 type Trip = {
   id: string;
@@ -22,14 +29,14 @@ type Trip = {
 };
 
 const onPressCategory = () => {
-  console.log("You pressed on this category")
+  console.log("You pressed on this category");
 };
 
-const Header = () => ( 
+const Header = () => (
   <View>
-    <StatusBar backgroundColor="#61dafb"/>
+    <StatusBar backgroundColor="#61dafb" />
     <View style={styles.headerConainner}>
-    <View style={{flexDirection: "row"}}>
+      <View style={{ flexDirection: "row" }}>
         <TouchableHighlight underlayColor="#BEC0F5" onPress={onPressCategory}>
           <Text style={styles.category}>Upcoming Trips</Text>
         </TouchableHighlight>
@@ -39,56 +46,53 @@ const Header = () => (
   </View>
 );
 
-
 export const ListFilteredCards: React.FC = () => {
   const [upcomingTrips, setUpcoming] = useState<Trip[]>([]);
-  const serverUrl = 'http://10.0.2.2:3000';
+  const serverUrl = "http://10.0.2.2:3000";
 
   //Fetching data
   useEffect(() => {
-      const cleanData = (data: Trip[]) => {
-        let cleanedData: Trip[] = [];
-        let index = 0;
-        for(let trip of data) {
-          let format : Trip = {
-            id: trip.id,
-            name: trip.name,
-            location: trip.location,
-            startDate: new Date(trip.startDate), 
-            endDate: new Date(trip.endDate),
-            image: trip.image,
-          };
-          
-          cleanedData.push(format);
-          
-        }
-        return cleanedData;
-      };
+    const cleanData = (data: Trip[]) => {
+      let cleanedData: Trip[] = [];
+      let index = 0;
+      for (let trip of data) {
+        let format: Trip = {
+          id: trip.id,
+          name: trip.name,
+          location: trip.location,
+          startDate: new Date(trip.startDate),
+          endDate: new Date(trip.endDate),
+          image: trip.image,
+        };
 
+        cleanedData.push(format);
+      }
+      return cleanedData;
+    };
 
-      const getData = async () => {
-        try{ 
-          const link = serverUrl + '/trips?upcoming=true';
-          const upcoming = await fetch(link);
-          let data = await upcoming.json();
-          data = cleanData(data);
-          setUpcoming(data);
-          // console.log(upcomingTrips[);
-        }
-        catch(error)
-        {
-          console.log(error);
-        }
-      };
+    const getData = async () => {
+      try {
+        const link = serverUrl + "/trips?upcoming=true";
+        const upcoming = await fetch(link);
+        let data = await upcoming.json();
+        data = cleanData(data);
+        setUpcoming(data);
+        // console.log(upcomingTrips[);
+      } catch (error) {
+        console.log(error);
+      }
+    };
     getData();
-  },[]);
+  }, []);
 
-
-  return(
-      <View style={{flex: 1}}>
-        <Header/>
-        <FlatList data={upcomingTrips} renderItem={({item}) => <TripCard trip={item}/>}/>
-      </View>
+  return (
+    <View style={{ flex: 1 }}>
+      <Header />
+      <FlatList
+        data={upcomingTrips}
+        renderItem={({ item }) => <TripCard trip={item} />}
+      />
+    </View>
   );
 };
 
@@ -105,7 +109,7 @@ const styles = StyleSheet.create({
   },
 
   category: {
-    fontSize: 25, 
+    fontSize: 25,
     marginBottom: 10,
     fontWeight: "bold",
     color: "blue",
