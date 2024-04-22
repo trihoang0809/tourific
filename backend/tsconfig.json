@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": ".",
+    "target": "esnext",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["**/*.ts", "**/*.tsx"]
+}

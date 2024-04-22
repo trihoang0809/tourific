@@ -5,7 +5,6 @@ import { PrismaClient } from "@prisma/client";
 const router = express.Router();
 const prisma = new PrismaClient();
 
-
 // Get all trips
 router.get("/", async (req, res) => {
   try {
@@ -142,7 +141,6 @@ router.delete("/:id", async (req, res) => {
     res.status(200).json(deletedTrip);
   } catch (error) {
     res.status(500).json({ error: "An error occurred while deleting the trip." });
-
   }
 });
 

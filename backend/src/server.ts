@@ -1,4 +1,4 @@
-import express = require("express");
+import express from "express";
 import { PrismaClient } from "@prisma/client";
 import TripRouter from "./routes/TripRouter";
 import { connect } from "./db";
