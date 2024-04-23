@@ -41,7 +41,9 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
       <Text style={styles.title}>Ongoing Trips</Text>
       <ScrollView horizontal={true} style={styles.tripScroll}>
         {ongoingTrips.length > 0 ? (
-          ongoingTrips.map((trip) => <TripCard key={trip.id} trip={trip} />)
+          ongoingTrips.map((trip) => (
+            <TripCard key={trip.id} trip={trip} height={250} width={400} />
+          ))
         ) : (
           <Text style={styles.noTrip}>No ongoing trips</Text>
         )}
@@ -63,7 +65,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
 
       <ScrollView horizontal={true} style={styles.tripScroll}>
         {upcomingTrips.map((trip) => (
-          <TripCard key={trip.id} trip={trip} />
+          <TripCard key={trip.id} trip={trip} height={200} width={200} />
         ))}
       </ScrollView>
     </ScrollView>
@@ -97,6 +99,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#007BFF",
     padding: 10,
     borderRadius: 5,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
     marginTop: 10,
     width: 200,
     alignItems: "center",
@@ -104,7 +113,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
   },
   upcoming: {
     flexDirection: "row",
