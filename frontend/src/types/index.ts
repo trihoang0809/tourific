@@ -3,7 +3,10 @@ export type Trip = {
   name: string;
   location: {
     address: string;
-    city: string;
+    citystate: string;
+    latitude: number;
+    longitude: number;
+    radius: number;
   };
   startDate: Date;
   endDate: Date;
