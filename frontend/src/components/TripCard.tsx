@@ -6,14 +6,19 @@ import {
   TouchableHighlight,
 } from "react-native";
 import { useState, useEffect } from "react";
-import { Float } from "react-native/Libraries/Types/CodegenTypes";
 import { Trip } from "../types";
 
 interface tripProps {
   trip: Trip;
+  height?: number; // Optional height prop
+  width?: number; // Optional width prop
 }
 
-export const TripCard: React.FC<tripProps> = ({ trip }) => {
+export const TripCard: React.FC<tripProps> = ({
+  trip,
+  height = 300,
+  width = 350,
+}) => {
   const [tripImage, setTripImage] = useState(trip.image);
   const [tripLocation, setTripLocation] = useState(trip.location);
   const [tripName, setTripName] = useState(trip.name);
@@ -25,7 +30,6 @@ export const TripCard: React.FC<tripProps> = ({ trip }) => {
 
   const onPressTripCard = () => {
     console.log("You pressed this card");
-    console.log(tripImage?.height);
   };
 
   const tripDate = (date: Date) => {
@@ -36,9 +40,13 @@ export const TripCard: React.FC<tripProps> = ({ trip }) => {
     return `${date.getDate()} ${month}, ${date.getFullYear()}`;
   };
 
+  // Calculate image height as 2/3 of the card's height
+  const imageHeight = (height * 2) / 3;
+  const textSize = height / 18;
+
   return (
     <TouchableHighlight
-      style={styles.card}
+      style={[styles.card, { height: height, width: width }]} // Apply dynamic height and width
       underlayColor="#BEC0F5"
       onPress={onPressTripCard}
     >
@@ -49,24 +57,18 @@ export const TripCard: React.FC<tripProps> = ({ trip }) => {
               ? { uri: noImage }
               : { uri: tripImage?.url }
           }
-          style={[
-            styles.image,
-            {
-              height: tripImage === null ? 250 : tripImage?.height,
-              width: "100%",
-            },
-          ]}
-        ></Image>
+          style={[styles.image, { height: imageHeight }]}
+        />
         <View style={styles.descriptionContainer}>
           <View>
-            <Text style={styles.TextLooks}>{tripName}</Text>
+            <Text style={[styles.TextLooks, { fontSize: textSize }]}>
+              {tripName}
+            </Text>
             <Text style={[styles.TextLooks, { color: "blue" }]}>
               {tripDate(tripStartDate)} - {tripDate(tripEndDate)}
             </Text>
-          </View>
-          <View>
             <Text style={[styles.TextLooks, { color: "blue", fontSize: 18 }]}>
-              {tripLocation?.city}
+              {tripLocation?.citystate}
             </Text>
           </View>
         </View>
@@ -82,24 +84,27 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     borderRadius: 16,
     borderWidth: 2,
+    overflow: "hidden", // Ensures that all content respects the border radius
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
   },
 
   image: {
     width: "100%",
-    height: 300,
-    marginBottom: 5,
-    borderTopRightRadius: 14,
-    borderTopLeftRadius: 14,
   },
 
   descriptionContainer: {
-    padding: 15,
+    padding: 20,
     flexDirection: "row",
     justifyContent: "space-between",
   },
 
   TextLooks: {
-    fontSize: 15,
     fontWeight: "bold",
   },
 });
