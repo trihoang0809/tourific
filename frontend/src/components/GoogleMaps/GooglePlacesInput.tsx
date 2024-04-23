@@ -49,12 +49,15 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
   useEffect(() => {
     try {
       setMapData({ address: query.address, citystate: query.citystate, latitude: coord.latitude, longitude: coord.longitude, radius: radius })
-      console.log("mapData", mapData);
+      
       onLocationSelect(mapData);
     } catch (error) {
       console.log("Error get location", error);
     }
   }, [query, coord, radius]);
+  
+  console.log("mapData 2", mapData);
+  console.log("coord 2", coord);
 
   return (
     <View>
@@ -102,7 +105,10 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
 
           const { latitude, longitude } = e.nativeEvent.coordinate;
           const response = await Geocoding.from({ latitude, longitude });
-
+          setQuery( {
+            address: "",
+            citystate: response.results[0].formatted_address,
+          } );
           if (response.results.length > 0) {
             const address = response.results[0].formatted_address;
             setCenterCircle(address);
