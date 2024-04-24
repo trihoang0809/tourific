@@ -6,23 +6,18 @@ import {
   TextInput,
   Button,
   Text,
-  FlatList,
-  StatusBar,
   Pressable,
-  Modal,
   Alert,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import favicon from "@/assets/favicon.png";
-import { AntDesign, Feather, Ionicons } from "@expo/vector-icons";
 import { Link, Stack, useLocalSearchParams } from "expo-router";
 import trips from "@/mock-data/trips";
-import { DataItem, MapData, TripData } from "@/types";
+import { MapData, TripData } from "@/types";
 import GooglePlacesInput from "@/components/GoogleMaps/GooglePlacesInput";
 import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
 import { Button as Buttons } from "react-native-paper";
-import { number } from "zod";
 import { formatDateTime } from "@/utils";
 import { DateTime } from "luxon";
 import { TripSchema } from "@/validation/types";
@@ -53,17 +48,17 @@ export default function CreateTripScreen() {
     isUpdating
       ? trips[0]
       : {
-          name: "",
-          dateRange: {
-            startDate: new Date(),
-            endDate: new Date(),
-          },
-          startHour: number,
-          startMinute: number,
-          endHour: number,
-          endMinute: number,
-          location: {},
+        name: "",
+        dateRange: {
+          startDate: new Date(),
+          endDate: new Date(),
         },
+        startHour: Number,
+        startMinute: Number,
+        endHour: Number,
+        endMinute: Number,
+        location: {},
+      },
   );
 
   // for date range picker modal
@@ -76,14 +71,15 @@ export default function CreateTripScreen() {
   const onSubmit = async (data: any) => {
     console.log(data);
     const {
-      name,
       dateRange,
-      location,
+      // location,
       startHour,
       startMinute,
       endHour,
       endMinute,
     } = formData;
+
+    const { name, location } = data;
     const isoStartDate = DateTime.fromISO(
       formatDateTime(dateRange.startDate, startHour, startMinute),
     ).setZone("system");
@@ -91,16 +87,11 @@ export default function CreateTripScreen() {
       formatDateTime(dateRange.endDate, endHour, endMinute),
     ).setZone("system");
     const req = {
-      name,
+      name: name,
       startDate: isoStartDate,
       endDate: isoEndDate,
       location,
     };
-    // const validated = TripSchema.safeParse(req);
-    // if (!validated.success) {
-    //   // Handle validation errors
-    //   console.error("error parsing", errors);
-    // }
 
     console.log("req", req);
     console.log("data bf4 submit", req);
@@ -138,21 +129,24 @@ export default function CreateTripScreen() {
   }, [setOpen]);
 
   const onConfirm = useCallback(
-    ({ startDate, endDate }: { startDate: Date; endDate: Date }) => {
+    ({ startDate, endDate }: { startDate: Date; endDate: Date; }) => {
       console.log("start date", startDate, endDate);
       setOpen(false);
-      setFormData(
-        (prevFormData) =>
-          ({
-            ...prevFormData,
-            dateRange: {
-              startDate: startDate,
-              endDate: endDate,
-            },
-          }) as TripData,
-      );
+      // Check if startDate and endDate are already set in formData
+      if (!formData.dateRange.startDate || !formData.dateRange.endDate) {
+        setFormData(
+          (prevFormData) =>
+            ({
+              ...prevFormData,
+              dateRange: {
+                startDate: startDate,
+                endDate: endDate,
+              },
+            }) as TripData,
+        );
+      }
     },
-    [setOpen],
+    [setOpen, formData],
   );
 
   console.log("daterange trg onconfirm", formData.dateRange);
@@ -171,7 +165,7 @@ export default function CreateTripScreen() {
   );
 
   const onConfirmStartTime = useCallback(
-    ({ hours, minutes }: { hours: number; minutes: number }) => {
+    ({ hours, minutes }: { hours: number; minutes: number; }) => {
       setFormData(
         (prevFormData) =>
           ({
@@ -186,7 +180,7 @@ export default function CreateTripScreen() {
   );
 
   const onConfirmEndTime = useCallback(
-    ({ hours, minutes }: { hours: number; minutes: number }) => {
+    ({ hours, minutes }: { hours: number; minutes: number; }) => {
       setFormData(
         (prevFormData) =>
           ({ ...prevFormData, endHour: hours, endMinute: minutes }) as TripData,
@@ -237,7 +231,7 @@ export default function CreateTripScreen() {
               width: 130,
               padding: "auto",
             }}
-            onPress={() => {}}
+            onPress={() => { }}
           >
             <Text>Change image</Text>
           </Pressable>
@@ -312,7 +306,7 @@ export default function CreateTripScreen() {
                   handleChange("name", value);
                 }}
               /> */}
-              {errors.name && <Text>{errors.name.message?.toString()}</Text>}
+              {errors.name && <Text className="text-red-500">{errors.name.message?.toString()}</Text>}
             </View>
             <View style={{ marginVertical: 10 }}>
               <Text className="font-semibold text-base">Date</Text>
@@ -332,9 +326,6 @@ export default function CreateTripScreen() {
                   editable={false}
                 />
               </TouchableOpacity>
-              {errors.startDate && (
-                <Text>{errors.startDate.message?.toString()}</Text>
-              )}
               <Controller
                 control={control}
                 name={"dateRange"}
@@ -355,6 +346,9 @@ export default function CreateTripScreen() {
                   />
                 )}
               />
+              {errors.dateRange && (
+                <Text className="text-red-500">{errors.dateRange.message?.toString()}</Text>
+              )}
             </View>
             <View
               style={{
@@ -380,17 +374,17 @@ export default function CreateTripScreen() {
                     }}
                   >
                     {typeof formData.startHour === "number" &&
-                    typeof formData.startMinute === "number"
+                      typeof formData.startMinute === "number"
                       ? new Date(
-                          1970,
-                          0,
-                          1,
-                          formData.startHour,
-                          formData.startMinute,
-                        ).toLocaleTimeString("en-US", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
+                        1970,
+                        0,
+                        1,
+                        formData.startHour,
+                        formData.startMinute,
+                      ).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
                       : "8:00"}
                   </Text>
                 </TouchableOpacity>
@@ -418,17 +412,17 @@ export default function CreateTripScreen() {
                     }}
                   >
                     {typeof formData.endHour === "number" &&
-                    typeof formData.endMinute === "number"
+                      typeof formData.endMinute === "number"
                       ? new Date(
-                          1970,
-                          0,
-                          1,
-                          formData.endHour,
-                          formData.endMinute,
-                        ).toLocaleTimeString("en-US", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
+                        1970,
+                        0,
+                        1,
+                        formData.endHour,
+                        formData.endMinute,
+                      ).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
                       : "8:00"}
                   </Text>
                 </TouchableOpacity>
@@ -450,35 +444,15 @@ export default function CreateTripScreen() {
                 control={control}
                 name={"location"}
                 render={({ field: { onChange } }) => (
-                  <GooglePlacesInput 
-                  onLocationSelect={(location) => {
-                    onLocationSelect(location);
-                    onChange(location);
-                  }}
+                  <GooglePlacesInput
+                    onLocationSelect={(location) => {
+                      onLocationSelect(location);
+                      onChange(location);
+                    }}
                   />
                 )}
               />
-              {errors && <Text>{errors.location?.message?.toString()}</Text>}
-              {/* <Controller
-                control={control}
-                name={"dateRange"}
-                render={({ field: { onChange } }) => (
-                  <DatePickerModal
-                    locale="en"
-                    mode="range"
-                    visible={open}
-                    onDismiss={onDismiss}
-                    startDate={formData.dateRange.startDate}
-                    endDate={formData.dateRange.endDate}
-                    onConfirm={onConfirm}
-                    disableStatusBarPadding
-                    startYear={2023}
-                    endYear={2030}
-                    // onChange={onChange}
-                    onChange={(dateRange) => onChange(dateRange)}
-                  />
-                )}
-              /> */}
+              {errors.location && <Text className="text-red-500">{errors.location?.message?.toString()}</Text>}
             </View>
             <Button
               title={isUpdating ? "Edit Trip" : "Create Trip"}
