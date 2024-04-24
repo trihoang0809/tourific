@@ -1,17 +1,16 @@
 import { View, Text, Image, StyleSheet, 
-ScrollView, TextInput, TouchableHighlight,
+TextInput, TouchableHighlight,
 StatusBar, FlatList, TouchableWithoutFeedback} from "react-native";
 import { useState, useEffect } from "react";
 import { TripCard } from "../components/TripCard";
-import { SvgUri } from 'react-native-svg';
 import { LinearGradient } from "expo-linear-gradient";
 import { Trip } from "../types";
 
 const onPressCategory = () => {
-  console.log("You pressed on this category")
+  console.log("You pressed on this category");
 };
 
-const Header = () => ( 
+const Header = () => (
   <View>
     <StatusBar backgroundColor="black"/>
     <View style={styles.headerConainner}>
@@ -31,98 +30,93 @@ const Header = () => (
   </View>
 );
 
-
 export const ListFilteredCards: React.FC = () => {
   const [upcomingTrips, setUpcoming] = useState<Trip[]>([]);
-  const serverUrl = 'http://10.0.2.2:3000';
+  const serverUrl = "http://10.0.2.2:3000";
 
   //Fetching data
   useEffect(() => {
-      const cleanData = (data: Trip[]) => {
-        let cleanedData: Trip[] = [];
-        let index = 0;
-        for(let trip of data) {
-          let format : Trip = {
-            id: trip.id,
-            name: trip.name,
-            location: trip.location,
-            startDate: new Date(trip.startDate), 
-            endDate: new Date(trip.endDate),
-            image: trip.image,
-          };
-          
-          cleanedData.push(format);
-          
-        }
-        return cleanedData;
-      };
+    const cleanData = (data: Trip[]) => {
+      let cleanedData: Trip[] = [];
+      let index = 0;
+      for (let trip of data) {
+        let format: Trip = {
+          id: trip.id,
+          name: trip.name,
+          location: trip.location,
+          startDate: new Date(trip.startDate),
+          endDate: new Date(trip.endDate),
+          image: trip.image,
+        };
 
+        cleanedData.push(format);
+      }
+      return cleanedData;
+    };
 
-      const getData = async () => {
-        try{ 
-          const link = serverUrl + '/trips?upcoming=true';
-          const upcoming = await fetch(link);
-          let data = await upcoming.json();
-          data = cleanData(data);
-          setUpcoming(data);
-          // console.log(upcomingTrips[);
-        }
-        catch(error)
-        {
-          console.log(error);
-        }
-      };
+    const getData = async () => {
+      try {
+        const link = serverUrl + "/trips?upcoming=true";
+        const upcoming = await fetch(link);
+        let data = await upcoming.json();
+        data = cleanData(data);
+        setUpcoming(data);
+        // console.log(upcomingTrips[);
+      } catch (error) {
+        console.log(error);
+      }
+    };
     getData();
-  },[]);
+  }, []);
 
 //Fake Data to test Flatlist
-const DATA: Trip[] = [
-  {
-    id: "1",
-    name: "Viettech Camping",
-    location: {
-      address: "11",
-      city: "Seattle",
-    },
-    startDate: new Date(2018, 0O5, 0O5, 17, 23, 42, 11),
-    endDate: new Date("2024-07-18"),
-    image: {
-      height: 200,
-      width: 200,
-      url: "https://www.amtrakvacations.ca/sites/amtrak/files/styles/hero/public/images/seattle.jpg?h=5a5fc591&itok=u7M-pblq",
-    }
-  },
-  {
-    id: "3",
-    name: "Viettech Camping",
-    location: {
-      address: "11",
-      city: "Seattle",
-    },
-    startDate: new Date("2024-07-16"),
-    endDate: new Date("2024-07-18"),
-    image: {
-      height: 200,
-      width: 200,
-      url: "https://www.amtrakvacations.ca/sites/amtrak/files/styles/hero/public/images/seattle.jpg?h=5a5fc591&itok=u7M-pblq",
-    }
-  },
-  {
-    id: "2",
-    name: "Viettech Camping",
-    location: {
-      address: "11",
-      city: "Seattle",
-    },
-    startDate: new Date("2024-07-16"),
-    endDate: new Date("2024-07-18"),
-    image: {
-      height: 200,
-      width: 200,
-      url: "https://www.amtrakvacations.ca/sites/amtrak/files/styles/hero/public/images/seattle.jpg?h=5a5fc591&itok=u7M-pblq",
-    }
-  },
-];
+// const DATA: Trip[] = [
+//   {
+//     id: "1",
+//     name: "Viettech Camping",
+//     location: {
+//       address: "11",
+//       city: "Seattle",
+//     },
+//     startDate: new Date(2018, 0O5, 0O5, 17, 23, 42, 11),
+//     endDate: new Date("2024-07-18"),
+//     image: {
+//       height: 200,
+//       width: 200,
+//       url: "https://www.amtrakvacations.ca/sites/amtrak/files/styles/hero/public/images/seattle.jpg?h=5a5fc591&itok=u7M-pblq",
+//     }
+//   },
+//   {
+//     id: "3",
+//     name: "Viettech Camping",
+//     location: {
+//       address: "11",
+//       city: "Seattle",
+//     },
+//     startDate: new Date("2024-07-16"),
+//     endDate: new Date("2024-07-18"),
+//     image: {
+//       height: 200,
+//       width: 200,
+//       url: "https://www.amtrakvacations.ca/sites/amtrak/files/styles/hero/public/images/seattle.jpg?h=5a5fc591&itok=u7M-pblq",
+//     }
+//   },
+//   {
+//     id: "2",
+//     name: "Viettech Camping",
+//     location: {
+//       address: "11",
+//       city: "Seattle",
+//     },
+//     startDate: new Date("2024-07-16"),
+//     endDate: new Date("2024-07-18"),
+//     image: {
+//       height: 200,
+//       width: 200,
+//       url: "https://www.amtrakvacations.ca/sites/amtrak/files/styles/hero/public/images/seattle.jpg?h=5a5fc591&itok=u7M-pblq",
+//     }
+//   },
+// ];
 
   return(
       <View style={styles.container}>
@@ -134,7 +128,7 @@ const DATA: Trip[] = [
           end={{x: 0, y: 1}}
           style={styles.content}
         >
-            <FlatList data={DATA} renderItem={({item}) => <TripCard trip={item}/>}/>
+            <FlatList data={upcomingTrips} renderItem={({item}) => <TripCard trip={item}/>}/>
           
         </LinearGradient>
         </View>
@@ -156,7 +150,7 @@ const styles = StyleSheet.create({
   },
 
   category: {
-    fontSize: 25, 
+    fontSize: 25,
     marginBottom: 10,
     fontWeight: "bold",
     color: "blue",

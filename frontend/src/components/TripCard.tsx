@@ -71,7 +71,7 @@ export const TripCard: React.FC<tripProps> = ({ trip }) => {
               <View style={{flexDirection: "row", marginRight: 18}}>
                 <Image style={{height: 15, width: 10}} source={require('../../assets/location_on_FILL0_wght400_GRAD0_opsz24.png')}/>
                 <Text style={[styles.TextLooks, { color: "blue", fontSize: 12, marginLeft: 6 }]}>
-                  {tripLocation?.city}
+                  {tripLocation?.citystate}
                 </Text>
               </View>
               <View style={{flexDirection: "row"}}>
