@@ -27,24 +27,22 @@ export const TripSchema: ZodType<FormData> = z
       startDate: z.date({
         required_error: "Please select a date and time",
         invalid_type_error: "That's not a date!",
-      }).refine((date) => {
-        return date >= new Date(Date.now());
-      }, "The date must not be in the past"),
+      }),
       endDate: z.date({
         required_error: "Please select a date and time",
         invalid_type_error: "That's not a date!",
       }),
-    }).refine((data) => data.endDate > data.startDate, {
-      message: "datesReversed",
-      path: ["dateRange"],
-    }),
-    startTime: z.object({
-      minute: z.number(),
-      hour: z.number(),
-    }),
+    }).refine((date) => {
+      return date.startDate >= new Date(Date.now())
+        || date.endDate >= new Date(Date.now());
+    }, "The date must not be in the past"),
+    // startTime: z.object({
+    //   minute: z.number(),
+    //   hour: z.number(),
+    // }),
     location: z.object({
-      address: z.string().min(0, { message: "Address is too short" }).max(100),
-      citystate: z.string().min(1).max(100),
+      address: z.string(),
+      citystate: z.string(),
       latitude: z.number(),
       longitude: z.number(),
       radius: z.number(),
