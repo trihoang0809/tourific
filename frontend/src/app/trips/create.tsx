@@ -22,7 +22,6 @@ import { formatDateTime } from "@/utils";
 import { DateTime } from "luxon";
 import { TripSchema } from "@/validation/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 
 // CREATING: /trips/create
 // UPDATING: /trips/create?id=${id}
@@ -37,10 +36,10 @@ export default function CreateTripScreen() {
   } = useForm({
     resolver: zodResolver(TripSchema),
   });
-  const { id: idString } = useLocalSearchParams();
+  const { id: id } = useLocalSearchParams();
 
   // check if there's an id -> if there's id meaning trip has been created
-  const isUpdating = !!idString;
+  const isUpdating = !!id; // id is type of string
 
   //trip data for form
   // fetch data from api
@@ -95,25 +94,52 @@ export default function CreateTripScreen() {
 
     console.log("req", req);
     console.log("data bf4 submit", req);
-    try {
-      const response = await fetch("http://localhost:3000/trips", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(req),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to create trip");
+
+    if (isUpdating) {
+      // UPDATING
+      try {
+        const response = await fetch(`http://localhost:3000/trips/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(req),
+        });
+        if (!response.ok) {
+          throw new Error("Failed to update trip");
+        }
+        // Optionally, you can handle the response here
+        const data = await response.json();
+        console.log("Trip created:", data);
+        Alert.alert("Alert Title", "My Alert Msg", [
+          { text: "OK", onPress: () => <Link href={"/"} /> },
+        ]);
+      } catch (error: any) {
+        console.error("Error creating trip:", error.toString());
       }
-      // Optionally, you can handle the response here
-      const data = await response.json();
-      console.log("Trip created:", data);
-      Alert.alert("Alert Title", "My Alert Msg", [
-        { text: "OK", onPress: () => <Link href={"/"} /> },
-      ]);
-    } catch (error: any) {
-      console.error("Error creating trip:", error.toString());
+    } else {
+
+      // CREATING
+      try {
+        const response = await fetch("http://localhost:3000/trips", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(req),
+        });
+        if (!response.ok) {
+          throw new Error("Failed to create trip");
+        }
+        // Optionally, you can handle the response here
+        const data = await response.json();
+        console.log("Trip created:", data);
+        Alert.alert("Alert Title", "Create Trip Successfully", [
+          { text: "Go back home page", onPress: () => <Link href={"/"} /> },
+        ]);
+      } catch (error: any) {
+        console.error("Error creating trip:", error.toString());
+      }
     }
   };
 
