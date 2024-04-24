@@ -45,7 +45,7 @@ router.get("/", async (req, res) => {
           },
         },
       };
-      console.log(now);
+      // console.log(now);
     }
 
     const trips = await prisma.trip.findMany(queryConditions);
