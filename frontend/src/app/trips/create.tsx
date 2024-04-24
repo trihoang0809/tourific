@@ -158,18 +158,16 @@ export default function CreateTripScreen() {
       console.log("start date", startDate, endDate);
       setOpen(false);
       // Check if startDate and endDate are already set in formData
-      if (!formData.dateRange.startDate || !formData.dateRange.endDate) {
-        setFormData(
-          (prevFormData) =>
-            ({
-              ...prevFormData,
-              dateRange: {
-                startDate: startDate,
-                endDate: endDate,
-              },
-            }) as TripData,
-        );
-      }
+      setFormData(
+        (prevFormData) =>
+          ({
+            ...prevFormData,
+            dateRange: {
+              startDate: startDate,
+              endDate: endDate,
+            },
+          }) as TripData,
+      );
     },
     [setOpen, formData],
   );
