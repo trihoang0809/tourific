@@ -112,6 +112,7 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
           if (response.results.length > 0) {
             const address = response.results[0].formatted_address;
             setCenterCircle(address);
+            setQuery({ ...query, address: address});
             // console.log("new address:", address, " lat long: ", { latitude, longitude });
           }
         }}
