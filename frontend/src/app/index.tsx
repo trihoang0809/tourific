@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Link } from 'expo-router';
-import PopupMenu from '@/components/PopupMenu/PopupMenu';
+// import PopupMenu from '@/components/PopupMenu/PopupMenu';
 
 export default function App() {
   return (
