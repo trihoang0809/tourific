@@ -1,5 +1,5 @@
 import { View, Text, Image, StyleSheet, 
-TextInput, TouchableHighlight,
+TextInput, TouchableHighlight, Dimensions,
 StatusBar, FlatList, TouchableWithoutFeedback} from "react-native";
 import { useState, useEffect } from "react";
 import { TripCard } from "../components/TripCard";
@@ -36,9 +36,25 @@ const Header = () => (
 export const ListFilteredCards: React.FC = () => {
   const [upcomingTrips, setUpcoming] = useState<Trip[]>([]);
   const serverUrl = "http://10.0.2.2:3000";
+  const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
+  const [windowHeight, setWindowHeight] = useState(Dimensions.get('window').height);
+  const [numCols, setNumCols] = useState(0);
+  const [tripCardWidth, setTripCardWidth] = useState(380);
+  const [tripCardHeight, setTripCardHeight] = useState(330);
 
   //Fetching data
   useEffect(() => {
+    Dimensions.addEventListener('change', ({window:{width,height}}) => {
+        //Get window size every render
+        setWindowHeight(height);
+        setWindowWidth(width);
+
+        //Adjust the number of columns of FlatList based on window size
+        //width of the window/(trip card width + horizontal margin)
+        setNumCols(Math.floor(width/(tripCardWidth + 40)));
+    });
+
+
     const cleanData = (data: Trip[]) => {
       let cleanedData: Trip[] = [];
       let index = 0;
@@ -64,12 +80,15 @@ export const ListFilteredCards: React.FC = () => {
         let data = await upcoming.json();
         data = cleanData(data);
         setUpcoming(data);
-        // console.log(upcomingTrips[);
       } catch (error) {
         console.log(error);
       }
     };
+
+    //Fetch Data + Format Data
     getData();
+
+
   }, []);
 
 
@@ -87,7 +106,9 @@ export const ListFilteredCards: React.FC = () => {
             <FlatList 
               style = {{width: "100%", alignContent: "center", flexWrap: "wrap"}} 
               data={upcomingTrips}
-              renderItem={({item}) => <TripCard height={330} width={380} trip={item}/>}
+              key={numCols}
+              numColumns={numCols}
+              renderItem={({item}) => <TripCard height={tripCardHeight} width={tripCardWidth} trip={item}/>}
             />
           </LinearGradient>
         </View>
