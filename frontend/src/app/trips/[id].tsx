@@ -149,7 +149,7 @@ const TripDetailsScreen = () => {
           </View>
         </View>
       </ScrollView>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => <Link href={`/trips/${id}/edit`} />}
         className="absolute p-2 rounded-full inset-x-8 radius-20"
         style={{
@@ -158,7 +158,7 @@ const TripDetailsScreen = () => {
         }}
       >
         <Text className="text-white text-base text-center">Edit</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };
