@@ -1,8 +1,16 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import ActivityRouter from "./ActivityRouter";
 
 const router = express.Router();
 const prisma = new PrismaClient();
+
+export interface TripParams {
+  tripId: string
+}
+
+// Activites of a trip
+router.use('/:tripId/activities', ActivityRouter);
 
 // Get all trips
 router.get("/", async (req, res) => {
