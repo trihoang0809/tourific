@@ -5,6 +5,10 @@ import { useState, useEffect } from "react";
 import { TripCard } from "../components/TripCard";
 import { LinearGradient } from "expo-linear-gradient";
 import { Trip } from "../types";
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+
+
+
 
 const onPressCategory = () => {
   console.log("You pressed on this category");
@@ -14,17 +18,16 @@ const Header = () => (
   <View>
     <StatusBar backgroundColor="black"/>
     <View style={styles.headerConainner}>
-    <View style={{flexDirection: "row", marginBottom: 18, alignContent: "center"}}>
-        <TouchableWithoutFeedback onPress={onPressCategory} >
-          <Image source={require('../../assets/arrow_back_ios_new_FILL0_wght400_GRAD0_opsz24.png')}/>
+    <View style={styles.headerTitle}>
+        <TouchableWithoutFeedback onPress={onPressCategory}>
+          <AntDesign name="left" size={24} color="blue" />
         </TouchableWithoutFeedback>
         <Text style={{fontSize: 22, marginLeft: 10}}>Upcoming Trips</Text>
     </View>
         
     <View style={styles.userInput}>
-        <Image source={require('../../assets/search_FILL0_wght400_GRAD0_opsz24.png')} 
-        style={{marginRight: 10, alignSelf: "center"}}/>
-        <TextInput placeholder="Hehe" style={{flex:1, padding: 2.5, fontSize: 16}}></TextInput>
+        <MaterialIcons name="search" size={24} color="black" />
+        <TextInput placeholder="Search" style={{flex:1, padding: 2.5, fontSize: 16}}></TextInput>
     </View>
     </View>
   </View>
@@ -69,68 +72,24 @@ export const ListFilteredCards: React.FC = () => {
     getData();
   }, []);
 
-//Fake Data to test Flatlist
-// const DATA: Trip[] = [
-//   {
-//     id: "1",
-//     name: "Viettech Camping",
-//     location: {
-//       address: "11",
-//       city: "Seattle",
-//     },
-//     startDate: new Date(2018, 0O5, 0O5, 17, 23, 42, 11),
-//     endDate: new Date("2024-07-18"),
-//     image: {
-//       height: 200,
-//       width: 200,
-//       url: "https://www.amtrakvacations.ca/sites/amtrak/files/styles/hero/public/images/seattle.jpg?h=5a5fc591&itok=u7M-pblq",
-//     }
-//   },
-//   {
-//     id: "3",
-//     name: "Viettech Camping",
-//     location: {
-//       address: "11",
-//       city: "Seattle",
-//     },
-//     startDate: new Date("2024-07-16"),
-//     endDate: new Date("2024-07-18"),
-//     image: {
-//       height: 200,
-//       width: 200,
-//       url: "https://www.amtrakvacations.ca/sites/amtrak/files/styles/hero/public/images/seattle.jpg?h=5a5fc591&itok=u7M-pblq",
-//     }
-//   },
-//   {
-//     id: "2",
-//     name: "Viettech Camping",
-//     location: {
-//       address: "11",
-//       city: "Seattle",
-//     },
-//     startDate: new Date("2024-07-16"),
-//     endDate: new Date("2024-07-18"),
-//     image: {
-//       height: 200,
-//       width: 200,
-//       url: "https://www.amtrakvacations.ca/sites/amtrak/files/styles/hero/public/images/seattle.jpg?h=5a5fc591&itok=u7M-pblq",
-//     }
-//   },
-// ];
+
 
   return(
       <View style={styles.container}>
         <Header/>
-        <View style={styles.content}>
-        <LinearGradient
-          colors={['#4c669f', '#5692F9', '#95BAF9']}
-          start={{x: 0, y: 0}}
-          end={{x: 0, y: 1}}
-          style={styles.content}
-        >
-            <FlatList data={upcomingTrips} renderItem={({item}) => <TripCard trip={item}/>}/>
-          
-        </LinearGradient>
+        <View style={{flex: 1}}>
+          <LinearGradient
+            colors={['#4c669f', '#5692F9', '#95BAF9']}
+            start={{x: 0, y: 0}}
+            end={{x: 0, y: 1}}
+            style={styles.content}
+          >
+            <FlatList 
+              style = {{width: "100%", alignContent: "center", flexWrap: "wrap"}} 
+              data={upcomingTrips}
+              renderItem={({item}) => <TripCard height={330} width={380} trip={item}/>}
+            />
+          </LinearGradient>
         </View>
       </View>
   );
@@ -144,7 +103,6 @@ const styles = StyleSheet.create({
 
   headerConainner: {
     width: "100%",
-    // backgroundColor: "red",
     marginBottom: 10,
     padding: 10,
   },
@@ -165,17 +123,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#ADC8F7",
     borderRadius: 20,
+    alignItems: "center"
   },
 
   content: {
     flex: 1,
-    // width: "100%",
+    alignItems: "center",
     borderTopRightRadius: 35,
-    borderTopLeftRadius: 35,
-    // borderWidth: 1,
-    backgroundColor: "red",
-    
+    borderTopLeftRadius: 35,   
   },
 
-
+  headerTitle: {
+    flexDirection: "row", 
+    marginBottom: 18, 
+    alignContent: "center", 
+    alignItems: "center"
+  },
 });

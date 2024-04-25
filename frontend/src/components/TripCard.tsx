@@ -8,13 +8,19 @@ import {
 import { useState, useEffect } from "react";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
 import { Trip } from "../types";
-
+import { Octicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 interface tripProps {
   trip: Trip;
+  height?: number; // Optional height prop
+  width?: number; // Optional width prop
 }
 
-export const TripCard: React.FC<tripProps> = ({ trip }) => {
+export const TripCard: React.FC<tripProps> = ({ 
+  trip,
+  height = 300,
+  width = 350,
+ }) => {
   const [tripImage, setTripImage] = useState(trip.image);
   const [tripLocation, setTripLocation] = useState(trip.location);
   const [tripName, setTripName] = useState(trip.name);
@@ -32,23 +38,29 @@ export const TripCard: React.FC<tripProps> = ({ trip }) => {
     console.log("You pressed this card");
   };
 
+  // Format the Date of Trip Card
   const tripDate = (date: Date) => {
+    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+      return "Invalid date"; // Handle invalid dates
+    }
     const month = date.toLocaleString("default", { month: "short" });
-    // console.log(date);
-    return date.getDate() + " " + month + ", " + date.getFullYear();
+    return `${date.getDate()} ${month}, ${date.getFullYear()}`;
   };
+
+  // Calculate image height as 2/3 of the card's height
+  const imageHeight = (height * 2) / 3;
+  const textSize = height / 18;
+  
 
   return (
 
     <View> 
-      <Image source={ {uri: defaultAvatar} } style={styles.HostAvatar} />
       <TouchableHighlight
-        style={styles.card}
+        style={[styles.card, { height: height, width: width }]} // Apply dynamic height and width
         underlayColor="#BEC0F5"
         onPress={onPressTripCard}
       >
         <View>
-        
           <Image
             source={
               tripImage?.url === undefined
@@ -68,15 +80,15 @@ export const TripCard: React.FC<tripProps> = ({ trip }) => {
               <Text style={{fontSize: 18}}>{tripName}</Text>
             </View>
             <View style={{flexDirection: "row"}}>
-              <View style={{flexDirection: "row", marginRight: 18}}>
-                <Image style={{height: 15, width: 10}} source={require('../../assets/location_on_FILL0_wght400_GRAD0_opsz24.png')}/>
-                <Text style={[styles.TextLooks, { color: "blue", fontSize: 12, marginLeft: 6 }]}>
+              <View style={styles.detail}>
+                <Octicons name="location" size={17} color="black" />
+                <Text style={[{ color: "blue", marginLeft: 6 }]}>
                   {tripLocation?.citystate}
                 </Text>
               </View>
-              <View style={{flexDirection: "row"}}>
-                <Image style={{height: 15, width: 10}} source={require('../../assets/calendar_clock_FILL0_wght400_GRAD0_opsz24.png')}/>
-                <Text style={[styles.TextLooks, { color: "blue", marginLeft: 6 }]}>
+              <View style={styles.detail}>
+                <MaterialCommunityIcons name="timetable" size={17} color="black" />
+                <Text style={[{ color: "blue", marginLeft: 6 }]}>
                   {tripDate(tripStartDate)}
                 </Text>
               </View>
@@ -90,12 +102,20 @@ export const TripCard: React.FC<tripProps> = ({ trip }) => {
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: "column",
+    // flexDirection: "column",
     marginVertical: 30,
     marginHorizontal: 20,
     borderRadius: 16,
     borderWidth: 2,
     backgroundColor: "#EBF2FF",
+    overflow: "hidden", // Ensures that all content respects the border radius
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
   },
 
   image: {
@@ -107,23 +127,12 @@ const styles = StyleSheet.create({
   descriptionContainer: {
     paddingLeft: 15,
     paddingBottom: 15,
-    // flexDirection: "row",
     justifyContent: "space-between",
   },
 
-  TextLooks: {
-    fontSize: 12,
-    fontWeight: "bold",
-  },
-
-  HostAvatar: {
-    position: 'absolute',
-    top: 5,
-    left: 40,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    zIndex: 1,
-    // backgroundColor: "red",
+  detail: {
+    flexDirection: "row", 
+    marginRight: 18,
+    alignItems: "center",
   },
 });
