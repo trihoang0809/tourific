@@ -70,7 +70,7 @@ model Activity {
   netUpvotes Int @default(0)
   isOnCalendar Boolean @default(false)
   category String[]
-  tripId String @db.ObjectId // Reference to Trip model
+  tripId String @db.ObjectId
   trip Trip @relation(fields: [tripId], references: [id])
 }
 

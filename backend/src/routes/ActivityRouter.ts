@@ -2,12 +2,13 @@ import express, { Request } from "express";
 import { PrismaClient } from "@prisma/client";
 import { TripParams } from "./TripRouter";
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 const prisma = new PrismaClient();
 
 interface ActivityParams extends TripParams {
   activityId: string;
 }
+
 //type ActivityParams = { activityId: string } & TripParams;
 
 // Get all activities
@@ -41,20 +42,29 @@ router.get("/:activityId", async (req: Request<ActivityParams>, res) => {
 
 // Create a new activity
 router.post("/", async (req: Request<ActivityParams>, res) => {
-  const { activityId, tripId } = req.params;
-  const { name, description, startTime, endTime, location, notes, trip } = req.body;
+  const { tripId } = req.params;
+  const { name, description, startTime, endTime, location, notes } = req.body;
+
+  if (!tripId) {
+    res.status(404).json({ error: "ID does not exist" });
+  }
   try {
-    const activity = await prisma.activity.create({
-      data: {
-        name,
-        description,
-        startTime,
-        endTime,
-        location,
-        notes,
-        tripId: tripId,
-        trip
+    const activity = await prisma.trip.update({
+      where: {
+        id: tripId,
       },
+      data: {
+        activities: {
+          create: {
+            name,
+            description,
+            startTime,
+            endTime,
+            location,
+            notes,
+          },
+        }
+      }
     });
     res.status(201).json(activity);
   } catch (error) {
