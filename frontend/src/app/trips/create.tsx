@@ -463,6 +463,7 @@ export default function CreateTripScreen() {
             <View style={{ marginVertical: 10 }}>
               <Text className="font-semibold text-base">Location name</Text>
               {/* <GooglePlacesInput onLocationSelect={onLocationSelect} /> */}
+              {errors.location && <Text className="text-red-500">{errors.location?.message?.toString()}</Text>}
               <Controller
                 control={control}
                 name={"location"}
@@ -475,7 +476,6 @@ export default function CreateTripScreen() {
                   />
                 )}
               />
-              {errors.location && <Text className="text-red-500">{errors.location?.message?.toString()}</Text>}
             </View>
             <Button
               title={isUpdating ? "Edit Trip" : "Create Trip"}
