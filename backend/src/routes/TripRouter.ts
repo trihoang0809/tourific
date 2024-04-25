@@ -6,7 +6,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 export interface TripParams {
-  tripId: string
+  tripId: string;
 }
 
 // Activites of a trip
@@ -15,7 +15,11 @@ router.use('/:tripId/activities', ActivityRouter);
 // Get all trips
 router.get("/", async (req, res) => {
   try {
-    const trips = await prisma.trip.findMany();
+    const trips = await prisma.trip.findMany({
+      include: {
+        activities: true, // Include activities associated with the trip
+      },
+    });
     res.json(trips);
   } catch (error) {
     res.status(500).json({ error: "An error occurred while fetching trips." });
