@@ -1,7 +1,7 @@
 import React from "react";
 import { HomeScreen } from "./screens/HomeScreen";
 import { ListFilteredCards } from "./screens/UpcomingList";
-import { User } from "./types";
+import { User, Trip } from "./types";
 
 const sampleUser: User = {
   id: "u1",
@@ -53,6 +53,7 @@ const sampleUser: User = {
 
 const App: React.FC = () => {
   return <HomeScreen user={sampleUser} />;
+  // return <ListFilteredCards/>
 };
 
 export default App;
