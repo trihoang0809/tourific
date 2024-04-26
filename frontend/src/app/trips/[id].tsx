@@ -2,7 +2,6 @@ import { View, Text, ScrollView, Image, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
 import favicon from "@/assets/favicon.png";
 import { Link, Stack, useLocalSearchParams } from "expo-router";
-import { trips } from "@/mock-data/trips";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from 'luxon';
@@ -26,7 +25,7 @@ const TripDetailsScreen = () => {
   const [modalEditVisible, setModalEditVisible] = useState(false);
 
 
-  const getTrip = async ({ id: text }: { id: string }) => {
+  const getTrip = async ({ id: text }: { id: string; }) => {
     try {
       const response = await fetch(`http://localhost:3000/trips/${id}`, {
         method: "GET",
@@ -52,15 +51,15 @@ const TripDetailsScreen = () => {
     getTrip({ id });
   }, []);
 
-    // showing more setting options
-    const showMoreSetting = () => {
-      setModalEditVisible(true);
-    };
-  
-    const notShowMoreSetting = () => {
-      setModalEditVisible(false);
-    };
-  
+  // showing more setting options
+  const showMoreSetting = () => {
+    setModalEditVisible(true);
+  };
+
+  const notShowMoreSetting = () => {
+    setModalEditVisible(false);
+  };
+
   return (
     <View style={{ height: Dimensions.get("window").height }}>
       <Stack.Screen
@@ -102,7 +101,7 @@ const TripDetailsScreen = () => {
                   {trip.location.address} {trip.location.citystate}
                 </Text>
                 <Text className='ml-2 text-gray-500 text-lg'>
-                + {(Number(trip.location.radius * 0.0006213712).toFixed(2))} miles
+                  + {(Number(trip.location.radius * 0.0006213712).toFixed(2))} miles
                 </Text>
               </View>
             </View>
@@ -117,8 +116,8 @@ const TripDetailsScreen = () => {
                   })}
                 </Text>
                 <Text className="text-gray-500 text-lg">
-                { DateTime.fromISO(trip.startDate.toString()).setZone("system").toLocaleString(DateTime.TIME_SIMPLE)}
-                {/* {trip.startDate.getHours() % 12 || 12}:{trip.startDate.getMinutes().toString().padStart(2, '0')} {trip.startDate.getHours() >= 12 ? 'PM' : 'AM'} */}
+                  {DateTime.fromISO(trip.startDate.toString()).setZone("system").toLocaleString(DateTime.TIME_SIMPLE)}
+                  {/* {trip.startDate.getHours() % 12 || 12}:{trip.startDate.getMinutes().toString().padStart(2, '0')} {trip.startDate.getHours() >= 12 ? 'PM' : 'AM'} */}
                 </Text>
               </View>
               <Ionicons name="arrow-forward-outline" size={25} color="navy" />
@@ -131,13 +130,13 @@ const TripDetailsScreen = () => {
                   })}
                 </Text>
                 <Text className="text-gray-500 text-lg">
-                { DateTime.fromISO(trip.endDate.toString()).setZone("system").toLocaleString(DateTime.TIME_SIMPLE)}
-                {/* {trip.endDate.getHours() % 12 || 12}:{trip.endDate.getMinutes().toString().padStart(2, '0')} {trip.endDate.getHours() >= 12 ? 'PM' : 'AM'} */}
+                  {DateTime.fromISO(trip.endDate.toString()).setZone("system").toLocaleString(DateTime.TIME_SIMPLE)}
+                  {/* {trip.endDate.getHours() % 12 || 12}:{trip.endDate.getMinutes().toString().padStart(2, '0')} {trip.endDate.getHours() >= 12 ? 'PM' : 'AM'} */}
                 </Text>
               </View>
-              
+
             </View>
-              <Text className="text-gray-800 text-base ml-8">{DateTime.local().zoneName}</Text>
+            <Text className="text-gray-800 text-base ml-8">{DateTime.local().zoneName}</Text>
             <View
               style={{
                 borderBottomWidth: 0.5,

@@ -36,10 +36,14 @@ export const TripSchema: ZodType<FormData> = z
       return date.startDate >= new Date(Date.now())
         || date.endDate >= new Date(Date.now());
     }, "The date must not be in the past"),
-    // startTime: z.object({
-    //   minute: z.number(),
-    //   hour: z.number(),
-    // }),
+    startTime: z.object({
+      hours: z.number(),
+      minutes: z.number(),
+    }),
+    endTime: z.object({
+      hours: z.number(),
+      minutes: z.number(),
+    }),
     location: z.object({
       address: z.string(),
       citystate: z.string(),
