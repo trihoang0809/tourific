@@ -52,8 +52,8 @@ const sampleUser: User = {
 };
 
 const App: React.FC = () => {
-  return <HomeScreen user={sampleUser} />;
-  // return <ListFilteredCards/>
+  // return <HomeScreen user={sampleUser} />;
+  return <ListFilteredCards/>
 };
 
 export default App;
