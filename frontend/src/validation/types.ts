@@ -16,6 +16,9 @@ export type FormData = {
   };
 };
 
+//regex for time
+const timeFormat = /^(0?[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/;
+
 export const TripSchema: ZodType<FormData> = z
   .object({
     name: z
@@ -36,10 +39,14 @@ export const TripSchema: ZodType<FormData> = z
       return date.startDate >= new Date(Date.now())
         || date.endDate >= new Date(Date.now());
     }, "The date must not be in the past"),
-    // startTime: z.object({
-    //   minute: z.number(),
-    //   hour: z.number(),
-    // }),
+    startTime: z.object({
+      hours: z.number(),
+      minutes: z.number(),
+    }),
+    endTime: z.object({
+      hours: z.number(),
+      minutes: z.number(),
+    }),
     location: z.object({
       address: z.string(),
       citystate: z.string(),

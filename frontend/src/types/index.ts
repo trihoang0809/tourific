@@ -7,10 +7,14 @@ export interface TripData {
     startDate: Date;
     endDate: Date;
   };
-  startHour: number, // chu y cho nay
-  endHour: number,
-  startMinute: number,
-  endMinute: number,
+  startTime: {
+    hours: number,
+    minutes: number,
+  };
+  endTime: {
+    hours: number,
+    minutes: number,
+  };
   location: MapData,
 };
 

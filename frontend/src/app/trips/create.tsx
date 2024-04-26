@@ -22,6 +22,7 @@ import { formatDateTime } from "@/utils";
 import { DateTime } from "luxon";
 import { TripSchema } from "@/validation/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 // CREATING: /trips/create
 // UPDATING: /trips/create?id=${id}
@@ -52,10 +53,14 @@ export default function CreateTripScreen() {
           startDate: new Date(),
           endDate: new Date(),
         },
-        startHour: Number,
-        startMinute: Number,
-        endHour: Number,
-        endMinute: Number,
+        startTime: {
+          hours: Number,
+          minutes: Number,
+        },
+        endTime: {
+          hours: Number,
+          minutes: Number,
+        },
         location: {},
       },
   );
@@ -69,21 +74,19 @@ export default function CreateTripScreen() {
 
   const onSubmit = async (data: any) => {
     console.log(data);
-    const {
-      dateRange,
-      // location,
-      startHour,
-      startMinute,
-      endHour,
-      endMinute,
-    } = formData;
+    // const {
+    // dateRange,
+    // location,
+    // startTime,
+    // endTime,
+    // } = formData;
 
-    const { name, location } = data;
+    const { name, location, startTime, endTime, dateRange } = data;
     const isoStartDate = DateTime.fromISO(
-      formatDateTime(dateRange.startDate, startHour, startMinute),
+      formatDateTime(dateRange.startDate, startTime.hours, startTime.minutes),
     ).setZone("system");
     const isoEndDate = DateTime.fromISO(
-      formatDateTime(dateRange.endDate, endHour, endMinute),
+      formatDateTime(dateRange.endDate, endTime.hours, endTime.minutes),
     ).setZone("system");
     const req = {
       name: name,
@@ -193,8 +196,10 @@ export default function CreateTripScreen() {
         (prevFormData) =>
           ({
             ...prevFormData,
-            startHour: hours,
-            startMinute: minutes,
+            startTime: {
+              hours: hours,
+              minutes: minutes,
+            }
           }) as TripData,
       );
       setVisibleStart(false);
@@ -206,7 +211,13 @@ export default function CreateTripScreen() {
     ({ hours, minutes }: { hours: number; minutes: number; }) => {
       setFormData(
         (prevFormData) =>
-          ({ ...prevFormData, endHour: hours, endMinute: minutes }) as TripData,
+          ({
+            ...prevFormData,
+            endTime: {
+              hours: hours,
+              minutes: minutes
+            }
+          }) as TripData,
       );
       setVisibleEnd(false);
     },
@@ -314,21 +325,6 @@ export default function CreateTripScreen() {
                   />
                 )}
               />
-              {/* <TextInput
-                style={{
-                  fontSize: 15,
-                  color: "black",
-                  backgroundColor: "#E6E6E6",
-                  padding: 15,
-                  marginTop: 5,
-                  borderRadius: 10,
-                }}
-                placeholder="Enter trip name"
-                value={formData.name}
-                onChangeText={(value) => {
-                  handleChange("name", value);
-                }}
-              /> */}
               {errors.name && <Text className="text-red-500">{errors.name.message?.toString()}</Text>}
             </View>
             <View style={{ marginVertical: 10 }}>
@@ -349,26 +345,27 @@ export default function CreateTripScreen() {
                   editable={false}
                 />
               </TouchableOpacity>
-              <Controller
-                control={control}
-                name={"dateRange"}
-                render={({ field: { onChange } }) => (
-                  <DatePickerModal
-                    locale="en"
-                    mode="range"
-                    visible={open}
-                    onDismiss={onDismiss}
-                    startDate={formData.dateRange.startDate}
-                    endDate={formData.dateRange.endDate}
-                    onConfirm={onConfirm}
-                    disableStatusBarPadding
-                    startYear={2023}
-                    endYear={2030}
-                    // onChange={onChange}
-                    onChange={(dateRange) => onChange(dateRange)}
-                  />
-                )}
-              />
+              <SafeAreaProvider>
+                <Controller
+                  control={control}
+                  name={"dateRange"}
+                  render={({ field: { onChange } }) => (
+                    <DatePickerModal
+                      locale="en"
+                      mode="range"
+                      visible={open}
+                      onDismiss={onDismiss}
+                      startDate={formData.dateRange.startDate}
+                      endDate={formData.dateRange.endDate}
+                      onConfirm={onConfirm}
+                      disableStatusBarPadding
+                      startYear={2023}
+                      endYear={2030}
+                      onChange={(dateRange) => onChange(dateRange)}
+                    />
+                  )}
+                />
+              </SafeAreaProvider>
               {errors.dateRange && (
                 <Text className="text-red-500">{errors.dateRange.message?.toString()}</Text>
               )}
@@ -382,7 +379,7 @@ export default function CreateTripScreen() {
                 marginVertical: 10,
               }}
             >
-              <View style={{ flex: 1, marginRight: 5 }}>
+              <View style={{ flex: 1, marginRight: 5, flexDirection: 'column' }}>
                 <Text className="font-semibold text-base">Start time</Text>
                 <TouchableOpacity onPress={() => setVisibleStart(true)}>
                   <Text
@@ -396,31 +393,53 @@ export default function CreateTripScreen() {
                       overflow: "hidden",
                     }}
                   >
-                    {typeof formData.startHour === "number" &&
-                      typeof formData.startMinute === "number"
+                    {typeof formData.startTime.hours === "number" &&
+                      typeof formData.startTime.minutes === "number"
                       ? new Date(
                         1970,
                         0,
                         1,
-                        formData.startHour,
-                        formData.startMinute,
+                        formData.startTime.hours,
+                        formData.startTime.minutes,
                       ).toLocaleTimeString("en-US", {
                         hour: "2-digit",
                         minute: "2-digit",
                       })
-                      : "8:00"}
+                      :
+                      new Date(
+                        1970,
+                        0,
+                        1,
+                        8,
+                        0,
+                      ).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                   </Text>
                 </TouchableOpacity>
-                <TimePickerModal
-                  visible={visibleStart}
-                  onDismiss={() => onDismissTime("start")}
-                  onConfirm={onConfirmStartTime}
-                  hours={12}
-                  minutes={0}
-                  use24HourClock={true}
+                <Controller
+                  control={control}
+                  name={"startTime"}
+                  render={({ field: { onChange } }) => (
+                    <TimePickerModal
+                      visible={visibleStart}
+                      onDismiss={() => {
+                        onDismissTime("start");
+                      }}
+                      onConfirm={(startTime) => {
+                        onChange(startTime);
+                        onConfirmStartTime(startTime);
+                      }}
+                      hours={12}
+                      minutes={0}
+                    />
+                  )}
                 />
+                {errors.startTime && <Text className="text-red-500">{errors.startTime.message?.toString()}</Text>}
               </View>
-              <View style={{ flex: 1, marginLeft: 5 }}>
+
+              <View style={{ flex: 1, marginLeft: 5, flexDirection: 'column' }}>
                 <Text className="font-semibold text-base">End time</Text>
                 <TouchableOpacity onPress={() => setVisibleEnd(true)}>
                   <Text
@@ -434,35 +453,57 @@ export default function CreateTripScreen() {
                       overflow: "hidden",
                     }}
                   >
-                    {typeof formData.endHour === "number" &&
-                      typeof formData.endMinute === "number"
+                    {typeof formData.endTime.hours === "number" &&
+                      typeof formData.endTime.minutes === "number"
                       ? new Date(
                         1970,
                         0,
                         1,
-                        formData.endHour,
-                        formData.endMinute,
+                        formData.endTime.hours,
+                        formData.endTime.minutes,
                       ).toLocaleTimeString("en-US", {
                         hour: "2-digit",
                         minute: "2-digit",
                       })
-                      : "8:00"}
+                      : new Date(
+                        1970,
+                        0,
+                        1,
+                        8,
+                        0,
+                      ).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                   </Text>
                 </TouchableOpacity>
-                <TimePickerModal
-                  visible={visibleEnd}
-                  onDismiss={() => onDismissTime("end")}
-                  onConfirm={onConfirmEndTime}
-                  hours={12}
-                  minutes={0}
+                <Controller
+                  control={control}
+                  name={"endTime"}
+                  render={({ field: { onChange } }) => (
+                    <TimePickerModal
+                      visible={visibleEnd}
+                      onDismiss={() => {
+                        onDismissTime("end");
+                      }}
+                      onConfirm={(endTime) => {
+                        console.log("endTime trong oncf", typeof endTime.hours);
+                        onConfirmEndTime(endTime);
+                        onChange(endTime);
+                      }}
+                      hours={12}
+                      minutes={0}
+                      locale="en"
+                    />
+                  )}
                 />
+                {errors.endTime && <Text className="text-red-500">{errors.endTime.message?.toString()}</Text>}
               </View>
             </View>
 
             {/* select location and showing map */}
             <View style={{ marginVertical: 10 }}>
               <Text className="font-semibold text-base">Location name</Text>
-              {/* <GooglePlacesInput onLocationSelect={onLocationSelect} /> */}
               <Controller
                 control={control}
                 name={"location"}
