@@ -1,6 +1,10 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import ActivityRouter from "./ActivityRouter";
+import { validateData } from "../middleware/validationMiddleware";
+import { tripCreateSchema } from "../schemas/tripSchema";
+import { createTrip } from "./tripController";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -10,7 +14,7 @@ export interface TripParams {
 }
 
 // Activites of a trip
-router.use('/:tripId/activities', ActivityRouter);
+router.use("/:tripId/activities", ActivityRouter);
 
 // Get all trips
 router.get("/", async (req, res) => {
@@ -42,7 +46,8 @@ router.get("/:id", async (req, res) => {
 });
 
 // Create a new trip
-router.post("/", async (req, res) => {
+// router.post("/", async (req, res) => {
+router.post("/", validateData(tripCreateSchema), async (req, res) => {
   const { name, startDate, endDate, location } = req.body;
   try {
     const trip = await prisma.trip.create({
@@ -55,6 +60,11 @@ router.post("/", async (req, res) => {
     });
     res.status(201).json(trip);
   } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        console.log("There is a unique constraint violation, a new user cannot be created with this email");
+      }
+    }
     console.log(error);
     res.status(500).json({ error: "An error occurred while creating the trip." });
   }

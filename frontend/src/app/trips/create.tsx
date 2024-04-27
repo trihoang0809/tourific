@@ -131,7 +131,7 @@ export default function CreateTripScreen() {
           body: JSON.stringify(req),
         });
         if (!response.ok) {
-          throw new Error("Failed to create trip");
+          throw new Error(`Failed to create trip: ${response.status} ${response.statusText}`);
         }
         // Optionally, you can handle the response here
         const data = await response.json();
