@@ -26,16 +26,6 @@
       "bundler": "metro"
     },
     "scheme": "tourific",
-    "plugins": [
-      "expo-router",
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "usesCleartextTraffic": true
-          }
-        }
-      ]
-    ]
+    "plugins": ["expo-router"]
   }
 }
