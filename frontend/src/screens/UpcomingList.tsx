@@ -7,10 +7,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Trip } from "../types";
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 
-
-
-
-const onPressCategory = () => {
+const onPressBack = () => {
   console.log("You pressed on this category");
 };
 
@@ -19,7 +16,7 @@ const Header = () => (
     <StatusBar backgroundColor="black"/>
     <View style={styles.headerConainner}>
     <View style={styles.headerTitle}>
-        <TouchableWithoutFeedback onPress={onPressCategory}>
+        <TouchableWithoutFeedback onPress={onPressBack}>
           <AntDesign name="left" size={24} color="blue" />
         </TouchableWithoutFeedback>
         <Text style={{fontSize: 22, marginLeft: 10}}>Upcoming Trips</Text>

@@ -2,6 +2,8 @@ import React from "react";
 import { HomeScreen } from "./screens/HomeScreen";
 import { ListFilteredCards } from "./screens/UpcomingList";
 import { User, Trip } from "./types";
+import { ProposedActivities } from "./screens/ProposedActivities";
+
 
 const sampleUser: User = {
   id: "u1",
@@ -53,7 +55,8 @@ const sampleUser: User = {
 
 const App: React.FC = () => {
   // return <HomeScreen user={sampleUser} />;
-  return <ListFilteredCards/>
+  // return <ListFilteredCards/>
+  return <ProposedActivities />;
 };
 
 export default App;
