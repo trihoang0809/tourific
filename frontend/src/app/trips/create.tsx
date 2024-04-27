@@ -81,9 +81,12 @@ export default function CreateTripScreen() {
     // } = formData;
 
     const { name, location, startTime, endTime, dateRange } = data;
+    console.log("type of startdate", dateRange.startDate instanceof Date);
     const isoStartDate = DateTime.fromISO(
       formatDateTime(dateRange.startDate, startTime.hours, startTime.minutes),
     ).setZone("system");
+    console.log("type of isoStartDate", isoStartDate instanceof DateTime);
+
     const isoEndDate = DateTime.fromISO(
       formatDateTime(dateRange.endDate, endTime.hours, endTime.minutes),
     ).setZone("system");
@@ -100,7 +103,7 @@ export default function CreateTripScreen() {
     if (isUpdating) {
       // UPDATING
       try {
-        const response = await fetch(`http://localhost:3000/trips/${id}`, {
+        const response = await fetch(`http://192.168.2.34:3000/trips/${id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -123,7 +126,7 @@ export default function CreateTripScreen() {
 
       // CREATING
       try {
-        const response = await fetch("http://localhost:3000/trips", {
+        const response = await fetch("http://192.168.2.34:3000/trips", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -295,7 +298,7 @@ export default function CreateTripScreen() {
               className="font-bold text-3xl mb-5"
               style={{ textAlign: "center" }}
             >
-              Create a new trip
+              {isUpdating ? "Update trip" : "Create a new trip"}
             </Text>
             <View style={{ marginVertical: 10 }}>
               <Text className="font-semibold text-base">Name</Text>
@@ -339,7 +342,7 @@ export default function CreateTripScreen() {
                     borderRadius: 10,
                   }}
                   placeholder="Start Date"
-                  value={`${formData.dateRange.startDate?.toLocaleDateString()} - ${formData.dateRange.endDate ? formData.dateRange.endDate.toLocaleDateString() : "None"}`}
+                  value={`${formData.dateRange.startDate && formData.dateRange.startDate.toLocaleDateString()} - ${formData.dateRange.endDate && formData.dateRange.endDate.toLocaleDateString() ? formData.dateRange.endDate.toLocaleDateString() : "None"}`}
                   onPressIn={() => setOpen(true)}
                   editable={false}
                 />

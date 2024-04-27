@@ -71,7 +71,7 @@ model Activity {
   isOnCalendar Boolean @default(false)
   category String[]
   tripId String @db.ObjectId
-  trip Trip @relation(fields: [tripId], references: [id])
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 type Photo {

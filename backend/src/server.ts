@@ -19,7 +19,7 @@ app.use('/trips', TripRouter);
 const startServer = async () => {
   await connect();
   app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+    console.log(`Server running at http://10.0.2.2:${port}`);
   });
 };
 

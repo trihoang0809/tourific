@@ -27,7 +27,7 @@ const TripDetailsScreen = () => {
 
   const getTrip = async ({ id: text }: { id: string; }) => {
     try {
-      const response = await fetch(`http://localhost:3000/trips/${id}`, {
+      const response = await fetch(`http://192.168.2.34:3000/trips/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -67,7 +67,7 @@ const TripDetailsScreen = () => {
           title: '',
           headerShown: true,
           headerRight: () => (
-            <Link href={`/trip/create?id=${id}`}>
+            <Link href={`/trips/create?id=${id}`}>
               <Feather
                 onPressIn={showMoreSetting}
                 onPressOut={notShowMoreSetting}
