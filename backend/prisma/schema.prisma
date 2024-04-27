@@ -18,7 +18,7 @@ model Trip {
   endDate DateTime?
   pendingInvitations String[]
   participants User[] @relation(fields: [participantsID], references: [id])
-  activities String[]
+  activities Activity[]
   participantsID String[] @db.ObjectId
   image Photo?
 }
@@ -28,7 +28,7 @@ type Location {
   citystate String @default("")
   latitude Float
   longitude Float
-  radius Float?
+  radius Float
 }
 
 model User {
@@ -70,6 +70,8 @@ model Activity {
   netUpvotes Int @default(0)
   isOnCalendar Boolean @default(false)
   category String[]
+  tripId String @db.ObjectId
+  trip Trip @relation(fields: [tripId], references: [id])
 }
 
 type Photo {

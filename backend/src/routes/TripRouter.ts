@@ -1,9 +1,17 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import ActivityRouter from "./ActivityRouter";
 
 // const express = require('express')
 const router = express.Router();
 const prisma = new PrismaClient();
+
+export interface TripParams {
+  tripId: string;
+}
+
+// Activites of a trip
+router.use('/:tripId/activities', ActivityRouter);
 
 // Get all trips
 router.get("/", async (req, res) => {
@@ -48,6 +56,11 @@ router.get("/", async (req, res) => {
     }
 
     const trips = await prisma.trip.findMany(queryConditions);
+    const activity = await prisma.trip.findMany({
+      include: {
+        activities: true, // Include activities associated with the trip
+      },
+    });
     res.json(trips);
   } catch (err) {
     console.log(err);
@@ -95,7 +108,7 @@ router.post("/", async (req, res) => {
   try {
     const trip = await prisma.trip.create({
       data: {
-        name,
+        name: name,
         startDate,
         endDate,
         location,
