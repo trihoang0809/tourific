@@ -71,6 +71,7 @@ model Activity {
   isOnCalendar Boolean @default(false)
   category String[]
   tripId String @db.ObjectId
+  image Photo
   trip Trip @relation(fields: [tripId], references: [id])
 }
 
