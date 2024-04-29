@@ -83,35 +83,38 @@ export const ProposedActivities: React.FC = () => {
     console.log(isFormFilled);
     if(isFormFilled)
     {
-      console.log("Fetching....");
-
-      const createActivity = await fetch('http://10.0.2.2:3000/trips/661f78b88c72a65f2f6e49d4/activities',{
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: activityName,
-          description: activityDescription,
-          startTime: activityStartDate,
-          endTime: activityEndDate,
-          location: {
-            "address": "name",
-            "citystate": "CA",
-            "latitude": 36.7783,
-            "longitude": -119.4179,
-            "radius": 20
-        },
-          notes: activityNote,
-        }),
-      });
-      setActivityName("");
-      setActivityDescription("");
-      setActivityNote("");
-      setActivityLocation("");
-      setActivityStartDate(new Date());
-      setActivityEndDate(new Date());
-      
+      try {
+        const createActivity = await fetch('http://10.0.2.2:3000/trips/661f78b88c72a65f2f6e49d4/activities',{
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: activityName,
+            description: activityDescription,
+            startTime: activityStartDate,
+            endTime: activityEndDate,
+            location: {
+              "address": "name",
+              "citystate": "CA",
+              "latitude": 36.7783,
+              "longitude": -119.4179,
+              "radius": 20
+          },
+            notes: activityNote,
+          }),
+        });
+        setActivityName("");
+        setActivityDescription("");
+        setActivityNote("");
+        setActivityLocation("");
+        setActivityStartDate(new Date());
+        setActivityEndDate(new Date());
+      }
+      catch(error)
+      {
+        console.log("An error occured while CREATING new Activity " + error);
+      }
     }
 
     setIsSaved(true);
