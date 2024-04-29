@@ -17,15 +17,17 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 export const ProposedActivities: React.FC = () => {
   //Declare useState
-  const [activityName, setActivityName] = useState("Undefined");
-  const [activityLocation, setActivityLocation] = useState("Undefined");
-  const [activityDescription, setActivityDescription] = useState("Undefined");
+  const [activityName, setActivityName] = useState("");
+  const [activityLocation, setActivityLocation] = useState("");
+  const [activityDescription, setActivityDescription] = useState("");
+  const [activityNote, setActivityNote] = useState("");
   const [activityStartDate, setActivityStartDate] = useState(new Date());
   const [activityEndDate, setActivityEndDate] = useState(new Date());
   const [isSaved, setIsSaved] = useState(false);
+  const [isFormFilled, setIsFormFilled] = useState(false);
   const [isStartDatePickerVisible, setStartDatePickerVisibility] = useState(false);
   const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
-
+ 
   //Header render + Return Button + Alert Pop up
   const alertUnSaved = () => {
     Alert.alert('Unsaved Changes', 'You have unsaved changes', [
@@ -54,7 +56,7 @@ export const ProposedActivities: React.FC = () => {
       <StatusBar backgroundColor="black"/>
       <View style={styles.headerContainer}>
   
-        <TouchableWithoutFeedback onPress={onPressBack}>
+        <TouchableWithoutFeedback onPress={onPressBack}  >
           <View style={styles.headerBack}>
             <AntDesign name="left" size={24} color="blue" />
             <Text style={[material.headline, {color: "black", marginLeft: 10}]}>Back</Text>
@@ -70,8 +72,48 @@ export const ProposedActivities: React.FC = () => {
 
 
   //Submit Button
-  const onPressSubmit = () => {
-    console.log("Submitting....");
+  const validateForm = () => {
+    if(activityDescription !== "")
+      setIsFormFilled(true);
+  };
+
+
+  const onPressSubmit = async () => {
+    validateForm();
+    console.log(isFormFilled);
+    if(isFormFilled)
+    {
+      console.log("Fetching....");
+
+      const createActivity = await fetch('http://10.0.2.2:3000/trips/661f78b88c72a65f2f6e49d4/activities',{
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: activityName,
+          description: activityDescription,
+          startTime: activityStartDate,
+          endTime: activityEndDate,
+          location: {
+            "address": "name",
+            "citystate": "CA",
+            "latitude": 36.7783,
+            "longitude": -119.4179,
+            "radius": 20
+        },
+          notes: activityNote,
+        }),
+      });
+      setActivityName("");
+      setActivityDescription("");
+      setActivityNote("");
+      setActivityLocation("");
+      setActivityStartDate(new Date());
+      setActivityEndDate(new Date());
+      
+    }
+
     setIsSaved(true);
   };
 
@@ -127,37 +169,57 @@ export const ProposedActivities: React.FC = () => {
     <ScrollView style={styles.formContainer}>
       <Header />
       
+      {/* Form */}
       <View>
+        {/* Activity Name input  */}
         <View style={styles.queInput}>
           <Text style={[material.headline, {color: "black", marginBottom: 10,}]}>Name:</Text>
           <TextInput 
             onChangeText={(value) => {setActivityName(value)}} 
             style={[material.title, styles.formInput]} 
             placeholder="Undefined" 
+            value={activityName}
           >
           </TextInput>
         </View>
 
+        {/* Activity Description input */}
         <View style={styles.queInput}>
           <Text style={[material.headline, {color: "black", marginBottom: 10,}]}>Tell me what you're gonna do:</Text>
           <TextInput 
             onChangeText={(value) => {setActivityDescription(value)}} 
             style={[material.title, styles.formInput]} 
             placeholder="Undefined" 
+            value={activityDescription}
           >
           </TextInput>
         </View>
 
+        {/* Activity Location input */}
         <View style={styles.queInput}>
           <Text style={[material.headline, {color: "black", marginBottom: 10,}]}>Location:</Text>
           <TextInput 
             onChangeText={(value) => {setActivityLocation(value)}} 
             style={[material.title, styles.formInput]} 
-            placeholder="Undefined" 
+            placeholder="Undefined"
+            value={activityLocation} 
           >
           </TextInput>
         </View>
 
+        {/* Activity Note input */}
+        <View style={styles.queInput}>
+          <Text style={[material.headline, {color: "black", marginBottom: 10,}]}>Note:</Text>
+          <TextInput 
+            onChangeText={(value) => {setActivityNote(value)}} 
+            style={[material.title, styles.formInput]} 
+            placeholder="Undefined" 
+            value={activityNote}
+          >
+          </TextInput>
+        </View>
+
+        {/* Start Date input using DateTimePickerModal */}
         <View style={styles.dateButtonContainer}>
           <View style={{flexDirection: "row"}}>
             <Text style={[material.headline, {color: "black"}]}>From: </Text>
@@ -175,8 +237,9 @@ export const ProposedActivities: React.FC = () => {
             onCancel={hideStartDatePicker}
           />
           
+          {/* End Date input using DateTimePickerModal */}
           <View style={{flexDirection: "row"}}>
-            <Text style={[material.headline, {color: "black"}]}>From: </Text>
+            <Text style={[material.headline, {color: "black"}]}>To: </Text>
             <TouchableWithoutFeedback onPress={onPressShowEndDatePicker}>
               <View style={styles.dateButton}>
                 <Text style={material.subheading}>{formatDate(activityEndDate)}</Text>
@@ -191,9 +254,12 @@ export const ProposedActivities: React.FC = () => {
             onCancel={hideEndDatePicker}
           />
         </View>
+
+
+
       </View>
 
-
+      {/* Submit Button to submit user's answer */}
       <SubmitButton />
     </ScrollView>
  
@@ -206,18 +272,18 @@ const styles = StyleSheet.create(
   {
     headerContainer: {
       width: "100%",
-      backgroundColor: "white",
-      borderBottomColor: "black",
-      // borderWidth: 0.5,
       padding: 5,
-
     },
 
     headerBack: {
       flexDirection: "row", 
       marginBottom: 18, 
       alignContent: "center", 
-      alignItems: "center"
+      alignItems: "center",
+      backgroundColor: "#64A0EE",
+      width: 100,
+      borderRadius: 200,
+
     },
 
     formInput: {
