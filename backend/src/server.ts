@@ -6,6 +6,7 @@ import { connect } from './db';
 const app = express();
 const cors = require('cors');
 const port = process.env.PORT || 3000;
+const LOCAL_HOST_URL = process.env.LOCAL_HOST_URL;
 const prisma = new PrismaClient();
 
 app.use(express.json());
@@ -19,7 +20,7 @@ app.use('/trips', TripRouter);
 const startServer = async () => {
   await connect();
   app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+    console.log(`Server running at http://${LOCAL_HOST_URL}:${port}`);
   });
 };
 
