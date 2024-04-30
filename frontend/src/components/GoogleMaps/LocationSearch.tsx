@@ -1,23 +1,26 @@
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import React from "react";
 import { View, Text, FlatList } from "react-native";
-const GOOGLE_MAP_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAP_API_KEY || "undefined"
+const GOOGLE_MAP_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAP_API_KEY || "undefined";
 import { DataItem } from '@/types';;
 
-export const LocationSearch = ({ onLocationSelected }: { onLocationSelected: (location: { address: string, citystate: string }) => void; }) => {
+export const LocationSearch = ({ onLocationSelected, value }: { onLocationSelected: (location: { address: string, citystate: string; }) => void; value: string; }) => {
 
   const data = [
     {
       id: "googlePlacesInput",
       component: <GooglePlacesAutocomplete
+        ref={ref => {
+          ref?.setAddressText(value);
+        }}
         placeholder='Search a location'
         onPress={(data, details = null) => {
-          console.log("location", data)
-          console.log("street", data.structured_formatting.main_text)
-          console.log("city-level location", data.structured_formatting.secondary_text)
+          console.log("location", data);
+          console.log("street", data.structured_formatting.main_text);
+          console.log("city-level location", data.structured_formatting.secondary_text);
           onLocationSelected({
-              address: data.structured_formatting.main_text,
-              citystate: data.structured_formatting.secondary_text,
+            address: data.structured_formatting.main_text,
+            citystate: data.structured_formatting.secondary_text,
           });
         }}
         keepResultsAfterBlur={true}
@@ -47,7 +50,7 @@ export const LocationSearch = ({ onLocationSelected }: { onLocationSelected: (lo
       />
     },
   ];
-  
+
   const renderItem = ({ item }: { item: DataItem; }) => {
     if (item.component) {
       return item.component;

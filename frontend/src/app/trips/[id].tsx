@@ -6,7 +6,7 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from 'luxon';
 
-
+const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 const TripDetailsScreen = () => {
   const { id } = useLocalSearchParams();
   // const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
@@ -27,7 +27,8 @@ const TripDetailsScreen = () => {
 
   const getTrip = async ({ id: text }: { id: string; }) => {
     try {
-      const response = await fetch(`http://localhost:3000/trips/${id}`, {
+      console.log(EXPO_PUBLIC_HOST_URL);
+      const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -67,7 +68,7 @@ const TripDetailsScreen = () => {
           title: '',
           headerShown: true,
           headerRight: () => (
-            <Link href={`/trip/create?id=${id}`}>
+            <Link href={`/trips/create?id=${id}`}>
               <Feather
                 onPressIn={showMoreSetting}
                 onPressOut={notShowMoreSetting}

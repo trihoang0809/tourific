@@ -13,9 +13,9 @@ import Geocoding from 'react-native-geocoding';
 const { width, height } = Dimensions.get("window");
 Geocoding.init(GOOGLE_MAP_API_KEY);
 
-const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
+const GooglePlacesInput = ({ onLocationSelect, value }: GooglePlacesInputProps) => {
   Geocoder.init(GOOGLE_MAP_API_KEY); // use a valid API key
-  const [query, setQuery] = useState({ address: "", citystate: ""});
+  const [query, setQuery] = useState({ address: "", citystate: "" });
   const [centerCircle, setCenterCircle] = useState("");
   const [coord, setCoord] = useState<{ latitude: number; longitude: number; }>({
     latitude: 37.733795,
@@ -26,12 +26,12 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
   const handleSliderChange = (value: number) => {
     setRadius(value);
   };
-  const [mapData, setMapData] = useState({ 
-    address: query.address, 
-    citystate: query.citystate, 
-    latitude: coord.latitude, 
-    longitude: coord.longitude, 
-    radius: radius 
+  const [mapData, setMapData] = useState({
+    address: query.address,
+    citystate: query.citystate,
+    latitude: coord.latitude,
+    longitude: coord.longitude,
+    radius: radius
   });
 
   useEffect(() => {
@@ -48,14 +48,14 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
 
   useEffect(() => {
     try {
-      setMapData({ address: query.address, citystate: query.citystate, latitude: coord.latitude, longitude: coord.longitude, radius: radius })
-      
+      setMapData({ address: query.address, citystate: query.citystate, latitude: coord.latitude, longitude: coord.longitude, radius: radius });
+
       onLocationSelect(mapData);
     } catch (error) {
       console.log("Error get location", error);
     }
   }, [query, coord, radius]);
-  
+
   console.log("mapData 2", mapData);
   console.log("coord 2", coord);
 
@@ -63,8 +63,10 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
     <View>
       <View style={styles.container}>
         <LocationSearch onLocationSelected={(location) => {
-          setQuery( {address: location.address, citystate: location.citystate} );
-        }} />
+          setQuery({ address: location.address, citystate: location.citystate });
+        }}
+          value={value}
+        />
 
       </View>
       <Slider
@@ -105,14 +107,14 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
 
           const { latitude, longitude } = e.nativeEvent.coordinate;
           const response = await Geocoding.from({ latitude, longitude });
-          setQuery( {
+          setQuery({
             address: "",
             citystate: response.results[0].formatted_address,
-          } );
+          });
           if (response.results.length > 0) {
             const address = response.results[0].formatted_address;
             setCenterCircle(address);
-            setQuery({ ...query, address: address});
+            setQuery({ ...query, address: address });
             // console.log("new address:", address, " lat long: ", { latitude, longitude });
           }
         }}
