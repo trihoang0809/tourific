@@ -16,11 +16,6 @@ router.use('/:tripId/activities', ActivityRouter);
 // Get all trips
 router.get("/", async (req, res) => {
   try {
-    const trips = await prisma.trip.findMany({
-      include: {
-        activities: true, // Include activities associated with the trip
-      },
-    });
     let queryConditions = {};
     const now = new Date();
 
