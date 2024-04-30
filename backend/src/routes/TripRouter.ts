@@ -56,11 +56,6 @@ router.get("/", async (req, res) => {
     }
 
     const trips = await prisma.trip.findMany(queryConditions);
-    const activity = await prisma.trip.findMany({
-      include: {
-        activities: true, // Include activities associated with the trip
-      },
-    });
     res.json(trips);
   } catch (err) {
     console.log(err);

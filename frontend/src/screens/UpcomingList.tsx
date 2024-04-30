@@ -6,9 +6,13 @@ import { TripCard } from "../components/TripCard";
 import { LinearGradient } from "expo-linear-gradient";
 import { Trip } from "../types";
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { Stack, router } from "expo-router";
+
+
 
 const onPressBack = () => {
   console.log("You pressed on this category");
+  router.replace("/");
 };
 
 const Header = () => (
@@ -16,10 +20,10 @@ const Header = () => (
     <StatusBar backgroundColor="black"/>
     <View style={styles.headerConainner}>
     <View style={styles.headerTitle}>
-        <TouchableWithoutFeedback onPress={onPressBack}>
-          <AntDesign name="left" size={24} color="blue" />
-        </TouchableWithoutFeedback>
-        <Text style={{fontSize: 22, marginLeft: 10}}>Upcoming Trips</Text>
+      <TouchableWithoutFeedback onPress={onPressBack}>
+        <AntDesign name="left" size={24} color="blue" />
+      </TouchableWithoutFeedback>
+      <Text style={{fontSize: 22, marginLeft: 10}}>Upcoming Trips</Text>
     </View>
         
     <View style={styles.userInput}>
@@ -91,7 +95,15 @@ export const ListFilteredCards: React.FC = () => {
 
 
   return(
+    <View>
+        <Stack.Screen
+          options={{
+            title: "",
+            headerShown: true,
+          }}
+        />
       <View style={styles.container}>
+
         <Header/>
         <View style={{flex: 1}}>
           <LinearGradient
@@ -109,6 +121,7 @@ export const ListFilteredCards: React.FC = () => {
             />
           </LinearGradient>
         </View>
+      </View>
       </View>
   );
 };
