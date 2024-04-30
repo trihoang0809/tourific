@@ -6,12 +6,13 @@ import { TripCard } from "../components/TripCard";
 import { LinearGradient } from "expo-linear-gradient";
 import { Trip } from "../types";
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
-import { Stack, Link } from "expo-router";
+import { Stack, router } from "expo-router";
 
 
 
 const onPressCategory = () => {
   console.log("You pressed on this category");
+  router.replace("/");
 };
 
 const Header = () => (
@@ -19,11 +20,9 @@ const Header = () => (
     <StatusBar backgroundColor="black"/>
     <View style={styles.headerConainner}>
     <View style={styles.headerTitle}>
-      <Link href="/index">
-        <TouchableWithoutFeedback onPress={onPressCategory}>
-          <AntDesign name="left" size={24} color="blue" />
-        </TouchableWithoutFeedback>
-      </Link>
+      <TouchableWithoutFeedback onPress={onPressCategory}>
+        <AntDesign name="left" size={24} color="blue" />
+      </TouchableWithoutFeedback>
       <Text style={{fontSize: 22, marginLeft: 10}}>Upcoming Trips</Text>
     </View>
         
