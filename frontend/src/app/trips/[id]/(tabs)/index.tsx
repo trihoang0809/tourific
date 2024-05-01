@@ -6,7 +6,6 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from 'luxon';
 
-
 const TripDetailsScreen = () => {
   const { id } = useLocalSearchParams();
   // const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
