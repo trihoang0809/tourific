@@ -3,8 +3,8 @@ import { PrismaClient } from "@prisma/client";
 import ActivityRouter from "./ActivityRouter";
 import { validateData } from "../middleware/validationMiddleware";
 import { tripCreateSchema } from "../schemas/tripSchema";
-import { createTrip } from "./tripController";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { ZodError } from "zod";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -62,11 +62,12 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
-        console.log("There is a unique constraint violation, a new user cannot be created with this email");
+        console.log("There is a unique constraint violation.");
       }
-    }
+    } else {
     console.log(error);
     res.status(500).json({ error: "An error occurred while creating the trip." });
+    }
   }
 });
 
