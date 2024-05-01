@@ -1,12 +1,8 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { Link, Stack } from 'expo-router';
-import PopupMenu from '@/components/PopupMenu/PopupMenu';
 import { HomeScreen } from "../screens/HomeScreen";
 import { User } from '@/types';
-// import { ProposedActivities } from '@/screens/ProposedActivities';
-
 
 const sampleUser: User = {
   id: "u1",
@@ -78,6 +74,7 @@ export default function App() {
         }}
       />
       <HomeScreen user={sampleUser} />
+      <Link href="/activity/create">Create Activity</Link>
     </View>
   );
 }

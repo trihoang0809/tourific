@@ -100,7 +100,7 @@ export default function CreateTripScreen() {
     if (isUpdating) {
       // UPDATING
       try {
-        const response = await fetch(`http://localhost:3000/trips/${id}`, {
+        const response = await fetch(`http://10.0.2.2:3000/trips/${id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -123,7 +123,7 @@ export default function CreateTripScreen() {
 
       // CREATING
       try {
-        const response = await fetch("http://localhost:3000/trips", {
+        const response = await fetch("http://10.0.2.2:3000/trips", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
