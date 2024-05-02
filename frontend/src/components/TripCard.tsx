@@ -9,7 +9,7 @@ import { useState, useEffect } from "react";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
 import { Trip } from "../types";
 import { Octicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Link, router } from "expo-router";
+import { Link, router, Stack } from "expo-router";
 
 interface tripProps {
   trip: Trip;
@@ -27,10 +27,11 @@ export const TripCard: React.FC<tripProps> = ({
   const [tripName, setTripName] = useState(trip.name);
   const [tripStartDate, setTripStartDate] = useState(trip.startDate);
   const [tripEndDate, setTripEndDate] = useState(trip.endDate);
-
+  const [fontTripName, setFontTripName] = useState(Math.max(18, (height*18)/300));
+  const [fontTripDetail, setFontTripDetail] = useState(Math.max(13, (height*14)/300));
+  const [location, setLocation] = useState(trip.location.citystate);
   const noImage =
     "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg";
-
 
   const defaultAvatar = 
     "https://static1.colliderimages.com/wordpress/wp-content/uploads/2022/02/avatar-the-last-airbender-7-essential-episodes.jpg";
@@ -38,7 +39,7 @@ export const TripCard: React.FC<tripProps> = ({
   const onPressTripCard = () => {
     // console.log("You pressed this card");
     const route = `/trips/${trip.id}`;
-    router.replace(route);
+    router.push(route);
   };
 
   // Format the Date of Trip Card
@@ -53,7 +54,15 @@ export const TripCard: React.FC<tripProps> = ({
   // Calculate image height as 2/3 of the card's height
   const imageHeight = (height * 2) / 3;
   const textSize = height / 18;
-  
+  const tripState = tripLocation.citystate.split(", ");
+
+  useEffect(() => {
+    //fontTripDetail == height of the text --> 0.75*fontTripDetail ~ width of the text
+    if(tripLocation.citystate.length*fontTripDetail*0.75 >= width)
+    if(tripState.length >= 2)
+      setLocation(tripState[tripState.length - 2] + ", " + tripState[tripState.length - 1]);
+
+  }, []);
 
   return (
 
@@ -73,25 +82,31 @@ export const TripCard: React.FC<tripProps> = ({
             style={[
               styles.image,
               {
-                height: tripImage === null ? 250 : tripImage?.height,
+                // height: tripImage === null ? 250 : imageHeight,
+                height: imageHeight,
                 width: "100%",
               },
             ]}
           ></Image>
           <View style={styles.descriptionContainer}>
             <View>
-              <Text style={{fontSize: 18}}>{tripName}</Text>
+              <Text numberOfLines={1} style={{fontSize: fontTripName, fontWeight: "bold"}}>{
+                tripName}
+              </Text>
             </View>
-            <View style={{flexDirection: "row"}}>
+
+            <View style={{flexDirection: "row", flexWrap: "wrap"}}>
               <View style={styles.detail}>
                 <Octicons name="location" size={17} color="black" />
-                <Text style={[{ color: "blue", marginLeft: 6 }]}>
-                  {tripLocation?.citystate}
+                <Text numberOfLines={1} style={[{ color: "blue", marginLeft: 6, fontSize: fontTripDetail, }]}>
+                  {
+                    location
+                  }
                 </Text>
               </View>
               <View style={styles.detail}>
                 <MaterialCommunityIcons name="timetable" size={17} color="black" />
-                <Text style={[{ color: "blue", marginLeft: 6 }]}>
+                <Text style={[{ color: "blue", marginLeft: 6, fontSize: fontTripDetail }]}>
                   {tripDate(tripStartDate)}
                 </Text>
               </View>
