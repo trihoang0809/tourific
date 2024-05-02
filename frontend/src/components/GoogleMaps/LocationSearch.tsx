@@ -1,17 +1,24 @@
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import React from "react";
-import { View, Text, FlatList } from "react-native";
+import React, { useRef, useState } from "react";
+import { View, Text, FlatList, TouchableOpacity } from "react-native";
 const GOOGLE_MAP_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAP_API_KEY || "undefined";
-import { DataItem } from '@/types';;
+import { DataItem } from '@/types'; import { AntDesign } from "@expo/vector-icons";
+;
 
-export const LocationSearch = ({ onLocationSelected, value }: { onLocationSelected: (location: { address: string, citystate: string; }) => void; value: string; }) => {
+export const LocationSearch = (
+  { onLocationSelected, value }:
+    {
+      onLocationSelected: (location: { address: string, citystate: string; }) => void;
+      value: string;
+    }) => {
 
   const data = [
     {
       id: "googlePlacesInput",
       component: <GooglePlacesAutocomplete
-        ref={ref => {
-          ref?.setAddressText(value);
+        textInputProps={{
+          clearButtonMode: 'never',
+          value: value,
         }}
         placeholder='Search a location'
         onPress={(data, details = null) => {

@@ -35,6 +35,7 @@ export default function CreateTripScreen() {
     control,
     setError,
     reset,
+    getValues,
   } = useForm({
     resolver: zodResolver(TripSchema),
   });
@@ -161,30 +162,29 @@ export default function CreateTripScreen() {
     if (isUpdating) {
       // UPDATING
       try {
-        const response = await fetch(`http://localhost:3000/trips/${idString}`, {
+        const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${idString}`, {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(req),
         });
+
         if (!response.ok) {
           throw new Error("Failed to update trip");
         }
-        // Optionally, you can handle the response here
+
         const data = await response.json();
         console.log("Trip updated:", data);
-        Alert.alert("Alert Title", "Successful", [
-          { text: "OK", onPress: () => <Link href={"/"} /> },
+        Alert.alert("Alert Title", "Successful update trip", [
+          { text: "Go back home", onPress: () => <Link href={"/trips"} /> },
         ]);
       } catch (error: any) {
-        console.error("Error creating trip:", error.toString());
+        console.error("Error updating trip:", error.toString());
       }
     } else {
 
       // CREATING
       try {
-        const response = await fetch("http://localhost:3000/trips", {
+        const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -198,7 +198,7 @@ export default function CreateTripScreen() {
         const data = await response.json();
         console.log("Trip created:", data);
         Alert.alert("Alert Title", "Create Trip Successfully", [
-          { text: "Go back home page", onPress: () => <Link href={"/"} /> },
+          { text: "Go back home page", onPress: () => <Link href={"/trips"} /> },
         ]);
       } catch (error: any) {
         console.error("Error creating trip:", error.toString());
@@ -340,6 +340,7 @@ export default function CreateTripScreen() {
             backgroundColor: "#fff",
             marginTop: -50,
             paddingTop: 20,
+            flex: 1,
           }}
         >
           <View
@@ -561,24 +562,32 @@ export default function CreateTripScreen() {
             {/* select location and showing map */}
             <View style={{ marginVertical: 10 }}>
               <Text className="font-semibold text-base">Location name</Text>
-              <Controller
-                control={control}
-                name={"location"}
-                render={({ field: { onChange } }) => (
-                  <GooglePlacesInput
-                    onLocationSelect={(location) => {
-                      onLocationSelect(location);
-                      onChange(location);
-                      console.log("loc", location);
-                    }}
-                    value={`${formData?.location.address ? formData.location.address + ', ' : ''}${formData?.location.citystate ? formData.location.citystate : ''}`}
-                  />
-                )}
-              />
+              {isUpdating ?
+                <TextInput
+                  value={`${formData?.location.address ? formData.location.address + ', ' : ''} ${formData?.location.citystate ? formData.location.citystate : ''}`}
+                  editable={false}
+                />
+                : <Controller
+                  control={control}
+                  name={"location"}
+                  defaultValue={`${formData?.location.address ? formData.location.address + ', ' : ''}${formData?.location.citystate ? formData.location.citystate : ''}`}
+                  render={({ field: { onChange, value } }) => (
+                    <GooglePlacesInput
+                      onLocationSelect={(value) => {
+                        onLocationSelect(value);
+                        onChange(value);
+                        console.log("loc", value);
+                      }}
+                      // value={`${getValues("location.address" + ', ')}${getValues("location.citystate")}`}
+                      value={`${formData?.location.address ? formData.location.address + ', ' : ''} ${formData?.location.citystate ? formData.location.citystate : ''}`}
+                    />
+                  )}
+                />
+              }
               {errors.location && <Text className="text-red-500">{errors.location?.message?.toString()}</Text>}
             </View>
             <Button
-              title={isUpdating ? "Edit Trip" : "Create Trip"}
+              title={isUpdating ? "Save edit" : "Create Trip"}
               onPress={handleSubmit(onSubmit)}
             />
           </View>
@@ -586,4 +595,4 @@ export default function CreateTripScreen() {
       </ScrollView>
     </View>
   );
-}
+};

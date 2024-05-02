@@ -34,8 +34,10 @@ const GooglePlacesInput = ({ onLocationSelect, value }: GooglePlacesInputProps) 
     radius: radius
   });
 
+  console.log("query useefect", query);
+
   useEffect(() => {
-    if (query.address !== "" && query.citystate !== "") {
+    if (query.address !== '' && query.citystate !== '') {
       Geocoder.from(query.address + " " + query.citystate)
         .then((json) => {
           const location = json.results[0].geometry.location;
@@ -49,7 +51,6 @@ const GooglePlacesInput = ({ onLocationSelect, value }: GooglePlacesInputProps) 
   useEffect(() => {
     try {
       setMapData({ address: query.address, citystate: query.citystate, latitude: coord.latitude, longitude: coord.longitude, radius: radius });
-
       onLocationSelect(mapData);
     } catch (error) {
       console.log("Error get location", error);

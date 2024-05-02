@@ -37,5 +37,5 @@ export interface DateRangePickerProps {
 
 export interface GooglePlacesInputProps {
   onLocationSelect: (location: MapData) => void;
-  value: string | "";
+  value: string;
 }

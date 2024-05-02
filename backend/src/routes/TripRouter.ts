@@ -63,15 +63,17 @@ router.post("/", async (req, res) => {
 // Update an existing trip
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
+  console.log("id", id);
   const { name, startDate, endDate, location } = req.body;
-  const isValidID = await prisma.activity.findUnique({
+  console.log(req.body);
+  const isValidID = await prisma.trip.findUnique({
     where: {
       id: id,
     },
   });
 
   if (!isValidID) {
-    res.status(404).json({ error: "Trip does not exist" });
+    return res.status(404).json({ error: "Trip does not exist" });
   }
 
   try {
@@ -86,9 +88,9 @@ router.put("/:id", async (req, res) => {
         location: location,
       },
     });
-    res.status(200).json(trip);
+    return res.status(200).json(trip);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while updating the trip." });
+    return res.status(500).json({ error: "An error occurred while updating the trip." });
   }
 });
 
