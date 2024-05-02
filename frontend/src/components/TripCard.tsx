@@ -30,6 +30,7 @@ export const TripCard: React.FC<tripProps> = ({
   const [fontTripName, setFontTripName] = useState(Math.max(18, (height*18)/300));
   const [fontTripDetail, setFontTripDetail] = useState(Math.max(13, (height*14)/300));
   const [location, setLocation] = useState(trip.location.citystate);
+  
   const noImage =
     "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg";
 
