@@ -94,18 +94,16 @@ export const TripCard: React.FC<tripProps> = ({
           ></Image>
           <View style={styles.descriptionContainer}>
             <View>
-              <Text numberOfLines={1} style={{fontSize: fontTripName, fontWeight: "bold"}}>{
-                tripName}
+              <Text numberOfLines={1} style={{fontSize: fontTripName, fontWeight: "bold"}}>
+                {tripName}
               </Text>
             </View>
 
             <View style={{flexDirection: "row", flexWrap: "wrap"}}>
               <View style={styles.detail}>
                 <Octicons name="location" size={17} color="black" />
-                <Text numberOfLines={1} style={[{ color: "blue", marginLeft: 6, fontSize: fontTripDetail, }]}>
-                  {
-                    location
-                  }
+                <Text numberOfLines={1} style={[{ color: "blue", marginLeft: 6, fontSize: fontTripDetail, width: 100}]}>
+                  {location}
                 </Text>
               </View>
               <View style={styles.detail}>
