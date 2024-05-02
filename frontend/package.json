@@ -38,7 +38,6 @@
     "react-native-use-form": "^0.16.8",
     "react-native-web": "~0.19.6",
     "react-redux": "^9.1.1",
-    "twrnc": "^4.2.0",
     "zeego": "^1.10.0",
     "zod": "^3.22.4"
   },
