@@ -4,7 +4,8 @@ import ActivityRouter from "./ActivityRouter";
 import { validateData } from "../middleware/validationMiddleware";
 import { tripCreateSchema } from "../schemas/tripSchema";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { ZodError } from "zod";
+import { z } from "zod";
+import { StatusCodes } from 'http-status-codes'
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -39,15 +40,15 @@ router.get("/:id", async (req, res) => {
         id,
       },
     });
-    res.status(200).json(trip);
+    res.status(StatusCodes.OK).json(trip);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while fetching a trip." });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while fetching a trip." });
   }
 });
 
 // Create a new trip
-// router.post("/", async (req, res) => {
-router.post("/", validateData(tripCreateSchema), async (req, res) => {
+type TripCreateSchema = z.infer<typeof tripCreateSchema>;
+router.post("/", validateData<TripCreateSchema>(tripCreateSchema), async (req, res) => {
   const { name, startDate, endDate, location } = req.body;
   try {
     const trip = await prisma.trip.create({
@@ -58,15 +59,15 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
         location,
       },
     });
-    res.status(201).json(trip);
+    res.status(StatusCodes.CREATED).json(trip);
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
-        console.log("There is a unique constraint violation.");
+        res.status(StatusCodes.CONFLICT).json({ error: "A trip with the same details already exists." });
       }
     } else {
-    console.log(error);
-    res.status(500).json({ error: "An error occurred while creating the trip." });
+      console.log(error);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while creating the trip." });
     }
   }
 });
@@ -87,9 +88,9 @@ router.put("/:id", async (req, res) => {
         location,
       },
     });
-    res.status(200).json(trip);
+    res.status(StatusCodes.OK).json(trip);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while updating the trip." });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while updating the trip." });
   }
 });
 
@@ -101,9 +102,9 @@ router.delete("/:id", async (req, res) => {
         id,
       },
     });
-    res.status(200).json(deletedTrip);
+    res.status(StatusCodes.OK).json(deletedTrip);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while deleting the trip." });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while deleting the trip." });
   }
 });
 
