@@ -9,9 +9,7 @@ import { DateTime } from 'luxon';
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 const TripDetailsScreen = () => {
   const { id } = useLocalSearchParams();
-  // const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
 
-  // const trip = trips.find(trip => trip.id === id);
   const [trip, setTrip] = useState({
     name: "",
     location: { address: "", citystate: "", radius: 0 },
@@ -67,16 +65,16 @@ const TripDetailsScreen = () => {
         options={{
           title: '',
           headerShown: true,
-          headerRight: () => (
-            <Link href={`/trips/create?id=${id}`}>
-              <Feather
-                onPressIn={showMoreSetting}
-                onPressOut={notShowMoreSetting}
-                name="edit-2"
-                size={24}
-                color="black" />
-            </Link>
-          ),
+          // headerRight: () => (
+          //   <Link href={`/trips/create?id=${id}`}>
+          //     <Feather
+          //       onPressIn={showMoreSetting}
+          //       onPressOut={notShowMoreSetting}
+          //       name="edit-2"
+          //       size={24}
+          //       color="black" />
+          //   </Link>
+          // ),
         }}
       />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>

@@ -304,8 +304,8 @@ export default function CreateTripScreen() {
     <View>
       <Stack.Screen
         options={{
-          title: "",
           headerShown: true,
+          title: ' ',
         }}
       />
       <ScrollView nestedScrollEnabled={true}>
@@ -578,8 +578,8 @@ export default function CreateTripScreen() {
                         onChange(value);
                         console.log("loc", value);
                       }}
-                      // value={`${getValues("location.address" + ', ')}${getValues("location.citystate")}`}
-                      value={`${formData?.location.address ? formData.location.address + ', ' : ''} ${formData?.location.citystate ? formData.location.citystate : ''}`}
+                      value={`${getValues("location.address" + ', ')}${getValues("location.citystate")}`}
+                    // value={`${formData?.location.address ? formData.location.address + ', ' : ''} ${formData?.location.citystate ? formData.location.citystate : ''}`}
                     />
                   )}
                 />

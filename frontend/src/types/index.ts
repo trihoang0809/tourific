@@ -39,3 +39,17 @@ export interface GooglePlacesInputProps {
   onLocationSelect: (location: MapData) => void;
   value: string;
 }
+
+export interface ActivityProps {
+  name: string;
+  description: string;
+  imageUrl: string;
+  startTime: Date;
+  endTime: Date;
+  location: MapData;
+  notes: string;
+  netUpvotes: number;
+  isOnCalendar: boolean;
+  category: string[];
+  rating?: number;
+}

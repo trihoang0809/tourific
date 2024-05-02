@@ -15,46 +15,46 @@ export const LocationSearch = (
   const data = [
     {
       id: "googlePlacesInput",
-      component: <GooglePlacesAutocomplete
-        textInputProps={{
-          clearButtonMode: 'never',
-          value: value,
-        }}
-        placeholder='Search a location'
-        onPress={(data, details = null) => {
-          console.log("location", data);
-          console.log("street", data.structured_formatting.main_text);
-          console.log("city-level location", data.structured_formatting.secondary_text);
-          onLocationSelected({
-            address: data.structured_formatting.main_text,
-            citystate: data.structured_formatting.secondary_text,
-          });
-        }}
-        keepResultsAfterBlur={true}
-        query={{
-          key: GOOGLE_MAP_API_KEY,
-          language: 'en',
-        }}
-        styles={{
-          // container: {
-          //   backgroundColor: 'E6E6E6',
-          // },
-          // textInputContainer: {
-          //   backgroundColor: 'E6E6E6',
-          // },
-          textInput: {
-            color: 'black',
-            fontSize: 15,
-            backgroundColor: '#E6E6E6',
-            padding: 15,
-            marginTop: 5,
-            borderRadius: 10
-          },
-          // predefinedPlacesDescription: {
-          //   color: '#1faadb',
-          // }
-        }}
-      />
+      component:
+        <GooglePlacesAutocomplete
+          textInputProps={{
+            value: value === 'undefined' ? null : value,
+          }}
+          placeholder='Search a location'
+          onPress={(data, details = null) => {
+            console.log("location", data);
+            console.log("street", data.structured_formatting.main_text);
+            console.log("city-level location", data.structured_formatting.secondary_text);
+            onLocationSelected({
+              address: data.structured_formatting.main_text,
+              citystate: data.structured_formatting.secondary_text,
+            });
+          }}
+          keepResultsAfterBlur={true}
+          query={{
+            key: GOOGLE_MAP_API_KEY,
+            language: 'en',
+          }}
+          styles={{
+            // container: {
+            //   backgroundColor: 'E6E6E6',
+            // },
+            // textInputContainer: {
+            //   backgroundColor: 'E6E6E6',
+            // },
+            textInput: {
+              color: 'black',
+              fontSize: 15,
+              backgroundColor: '#E6E6E6',
+              padding: 15,
+              marginTop: 5,
+              borderRadius: 10
+            },
+            // predefinedPlacesDescription: {
+            //   color: '#1faadb',
+            // }
+          }}
+        />
     },
   ];
 
