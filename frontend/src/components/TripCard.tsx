@@ -57,6 +57,10 @@ export const TripCard: React.FC<tripProps> = ({
   const tripState = tripLocation.citystate.split(", ");
 
   useEffect(() => {
+
+    
+
+
     //fontTripDetail == height of the text --> 0.75*fontTripDetail ~ width of the text
     if(tripLocation.citystate.length*fontTripDetail*0.75 >= width)
     if(tripState.length >= 2)
@@ -107,7 +111,7 @@ export const TripCard: React.FC<tripProps> = ({
               <View style={styles.detail}>
                 <MaterialCommunityIcons name="timetable" size={17} color="black" />
                 <Text style={[{ color: "blue", marginLeft: 6, fontSize: fontTripDetail }]}>
-                  {tripDate(tripStartDate)}
+                  {tripDate(new Date(tripStartDate))}
                 </Text>
               </View>
             </View>

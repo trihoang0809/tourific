@@ -56,30 +56,29 @@ import { View, Text, Image, StyleSheet,
       });
   
   
-      const cleanData = (data: Trip[]) => {
-        let cleanedData: Trip[] = [];
-        let index = 0;
-        for (let trip of data) {
-          let format: Trip = {
-            id: trip.id,
-            name: trip.name,
-            location: trip.location,
-            startDate: new Date(trip.startDate),
-            endDate: new Date(trip.endDate),
-            image: trip.image,
-          };
+      // const cleanData = (data: Trip[]) => {
+      //   let cleanedData: Trip[] = [];
+      //   let index = 0;
+      //   for (let trip of data) {
+      //     let format: Trip = {
+      //       id: trip.id,
+      //       name: trip.name,
+      //       location: trip.location,
+      //       startDate: new Date(trip.startDate),
+      //       endDate: new Date(trip.endDate),
+      //       image: trip.image,
+      //     };
   
-          cleanedData.push(format);
-        }
-        return cleanedData;
-      };
+      //     cleanedData.push(format);
+      //   }
+      //   return cleanedData;
+      // };
   
       const getData = async () => {
         try {
           const link = serverUrl + "/trips?upcoming=true";
           const upcoming = await fetch(link);
           let data = await upcoming.json();
-          data = cleanData(data);
           setUpcoming(data);
         } catch (error) {
           console.log(error);
@@ -96,12 +95,6 @@ import { View, Text, Image, StyleSheet,
   
     return(
       <View>
-          <Stack.Screen
-            options={{
-              title: "",
-              headerShown: true,
-            }}
-          />
         <View style={styles.container}>
   
           <Header/>
