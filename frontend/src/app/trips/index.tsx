@@ -9,12 +9,7 @@ import { User } from '@/types';
 const TripHomePage = () => {
   return (
     <View className="flex-1 bg-white">
-      <Stack.Screen
-        options={{
-          title: "Hehe",
-          headerShown: false,
-        }}
-      />
+      <Text>Haha</Text>
     </View>
   );
 };

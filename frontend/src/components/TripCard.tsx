@@ -9,7 +9,7 @@ import { useState, useEffect } from "react";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
 import { Trip } from "../types";
 import { Octicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Link, router } from "expo-router";
+import { Link, router, Stack } from "expo-router";
 
 interface tripProps {
   trip: Trip;
@@ -38,7 +38,7 @@ export const TripCard: React.FC<tripProps> = ({
   const onPressTripCard = () => {
     // console.log("You pressed this card");
     const route = `/trips/${trip.id}`;
-    router.replace(route);
+    router.push(route);
   };
 
   // Format the Date of Trip Card
@@ -73,7 +73,8 @@ export const TripCard: React.FC<tripProps> = ({
             style={[
               styles.image,
               {
-                height: tripImage === null ? 250 : tripImage?.height,
+                // height: tripImage === null ? 250 : imageHeight,
+                height: imageHeight,
                 width: "100%",
               },
             ]}

@@ -61,7 +61,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
 
       <View style={styles.upcoming}>
         <Text style={styles.title}>Upcoming Trips</Text>
-        <Button title="See all" onPress={() => {router.replace('/trips/upcoming');}}/>
+        <Button title="See all" onPress={() => {router.push('/trips/upcoming');}}/>
       </View>
 
       <ScrollView horizontal={true} style={styles.tripScroll}>

@@ -1,7 +1,7 @@
-import { View, Text, ScrollView, Image, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, Image, TouchableOpacity, Pressable } from "react-native";
 import React, { useState, useEffect } from "react";
 import favicon from "@/assets/favicon.png";
-import { Link, Stack, useLocalSearchParams } from "expo-router";
+import { Link, Stack, useLocalSearchParams, router } from "expo-router";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from 'luxon';
@@ -62,12 +62,12 @@ const TripDetailsScreen = () => {
 
   return (
     <View style={{ height: Dimensions.get("window").height }}>
-      <Stack.Screen
+      {/* <Stack.Screen
         options={{
           title: '',
           headerShown: true,
           headerRight: () => (
-            <Link href={`/trip/create?id=${id}`}>
+            <Link href={`/trips/create?id=${id}`}>
               <Feather
                 onPressIn={showMoreSetting}
                 onPressOut={notShowMoreSetting}
@@ -76,8 +76,19 @@ const TripDetailsScreen = () => {
                 color="black" />
             </Link>
           ),
+          // headerLeft: () => router.back();
+        
+          // headerBackTitle: 'Back',
+          // headerBackTitleStyle: { fontSize: 30 },
         }}
-      />
+      /> */}
+      {/* <Stack.Screen
+        name="trips/[id]"
+        options={{
+          title: "",
+          headerShown: true,
+        }}
+      /> */}
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View>
           <Image className="w-full h-52" source={favicon} />

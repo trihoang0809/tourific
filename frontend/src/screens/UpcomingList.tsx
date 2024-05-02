@@ -12,24 +12,16 @@ import { Stack, router } from "expo-router";
 
 const onPressBack = () => {
   console.log("You pressed on this category");
-  router.replace("/");
+  router.push("/");
 };
 
 const Header = () => (
   <View>
-    <StatusBar backgroundColor="black"/>
     <View style={styles.headerConainner}>
-    <View style={styles.headerTitle}>
-      <TouchableWithoutFeedback onPress={onPressBack}>
-        <AntDesign name="left" size={24} color="blue" />
-      </TouchableWithoutFeedback>
-      <Text style={{fontSize: 22, marginLeft: 10}}>Upcoming Trips</Text>
-    </View>
-        
-    <View style={styles.userInput}>
-        <MaterialIcons name="search" size={24} color="black" />
-        <TextInput placeholder="Search" style={{flex:1, padding: 2.5, fontSize: 16}}></TextInput>
-    </View>
+      <View style={styles.userInput}>
+          <MaterialIcons name="search" size={24} color="black" />
+          <TextInput placeholder="Search" style={{flex:1, padding: 2.5, fontSize: 16}}></TextInput>
+      </View>
     </View>
   </View>
 );
@@ -96,12 +88,6 @@ export const ListFilteredCards: React.FC = () => {
 
   return(
     <View>
-        <Stack.Screen
-          options={{
-            title: "",
-            headerShown: true,
-          }}
-        />
       <View style={styles.container}>
 
         <Header/>

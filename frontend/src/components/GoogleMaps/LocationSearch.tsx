@@ -44,6 +44,17 @@ export const LocationSearch = ({ onLocationSelected }: { onLocationSelected: (lo
           //   color: '#1faadb',
           // }
         }}
+        listEmptyComponent={() => (
+          <View style={{flex: 1}}>
+            <Text>No results were found</Text>
+          </View>
+        )}
+        disableScroll={false}
+        enablePoweredByContainer={false}
+        textInputProps={{
+          // onChangeText: {},
+          // value: lo
+        }}
       />
     },
   ];

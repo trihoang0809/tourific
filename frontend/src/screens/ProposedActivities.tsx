@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
   Alert,
+  Button
 }  from "react-native";
 import { styled } from 'nativewind';
 import { withExpoSnack } from 'nativewind';
@@ -14,13 +15,15 @@ import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { material } from 'react-native-typography'
 import { useState, useEffect } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import GoogleMapInput from "@/components/GoogleMaps/GoogleMapInput";
+import GooglePlacesInput from "@/components/GoogleMaps/GooglePlacesInput";
 
 export const ProposedActivities: React.FC = () => {
   //Declare useState
   const [activityName, setActivityName] = useState("");
-  const [activityLocation, setActivityLocation] = useState("");
   const [activityDescription, setActivityDescription] = useState("");
   const [activityNote, setActivityNote] = useState("");
+  const [activityLocation, setActivityLocation] = useState({ address: "", citystate: "", longitude: 0, latitude: 0,});
   const [activityStartDate, setActivityStartDate] = useState(new Date());
   const [activityEndDate, setActivityEndDate] = useState(new Date());
   const [isSaved, setIsSaved] = useState(false);
@@ -73,6 +76,7 @@ export const ProposedActivities: React.FC = () => {
 
   //Submit Button
   const validateForm = () => {
+    // console.log(activityDescription);
     if(activityDescription !== "")
       setIsFormFilled(true);
   };
@@ -80,7 +84,8 @@ export const ProposedActivities: React.FC = () => {
 
   const onPressSubmit = async () => {
     validateForm();
-    console.log(isFormFilled);
+    console.log("Submit: " + activityLocation.address);
+    // console.log(ad)
     if(isFormFilled)
     {
       try {
@@ -95,11 +100,10 @@ export const ProposedActivities: React.FC = () => {
             startTime: activityStartDate,
             endTime: activityEndDate,
             location: {
-              "address": "name",
-              "citystate": "CA",
-              "latitude": 36.7783,
-              "longitude": -119.4179,
-              "radius": 20
+              "address": activityLocation.address !== "" ? activityLocation.address : "Hehe",
+              "citystate": activityLocation.citystate,
+              "latitude": activityLocation.latitude,
+              "longitude": activityLocation.longitude,
           },
             notes: activityNote,
           }),
@@ -107,7 +111,7 @@ export const ProposedActivities: React.FC = () => {
         setActivityName("");
         setActivityDescription("");
         setActivityNote("");
-        setActivityLocation("");
+        setActivityLocation({address:"", citystate:"", longitude: 0, latitude: 0});
         setActivityStartDate(new Date());
         setActivityEndDate(new Date());
       }
@@ -173,7 +177,7 @@ export const ProposedActivities: React.FC = () => {
       <Header />
       
       {/* Form */}
-      <View>
+      <View style={styles.formInputContainer}>
         {/* Activity Name input  */}
         <View style={styles.queInput}>
           <Text style={[material.headline, {color: "black", marginBottom: 10,}]}>Name:</Text>
@@ -194,18 +198,6 @@ export const ProposedActivities: React.FC = () => {
             style={[material.title, styles.formInput]} 
             placeholder="Undefined" 
             value={activityDescription}
-          >
-          </TextInput>
-        </View>
-
-        {/* Activity Location input */}
-        <View style={styles.queInput}>
-          <Text style={[material.headline, {color: "black", marginBottom: 10,}]}>Location:</Text>
-          <TextInput 
-            onChangeText={(value) => {setActivityLocation(value)}} 
-            style={[material.title, styles.formInput]} 
-            placeholder="Undefined"
-            value={activityLocation} 
           >
           </TextInput>
         </View>
@@ -256,14 +248,34 @@ export const ProposedActivities: React.FC = () => {
             onConfirm={handleEndConfirm}
             onCancel={hideEndDatePicker}
           />
+          
         </View>
 
 
+          {/* <GoogleMapInput 
 
+            onLocationSelect={(location) => {
+              setActivityLocation({address: String(location.address), citystate: String(location.citystate), 
+                longitude: location.longitude, latitude: location.latitude})
+              console.log("loc Proposed Activity: " + activityLocation.address);
+            }}
+
+          /> */}
+          <GooglePlacesInput onLocationSelect={(location) => {
+              setActivityLocation({address: String(location.address), citystate: String(location.citystate), 
+                longitude: location.longitude, latitude: location.latitude})
+              console.log("------------------------------");
+              console.log("loc Proposed Activity: " + location.address);
+            }}/>
+          <SubmitButton />
+
+        
       </View>
 
       {/* Submit Button to submit user's answer */}
-      <SubmitButton />
+      
+      
+      
     </ScrollView>
  
     
@@ -304,6 +316,7 @@ const styles = StyleSheet.create(
       flex: 1,
       padding: 10,
       // backgroundColor: "red",
+      // marginBottom: 100,
     },
 
     submitButton: {
@@ -328,6 +341,11 @@ const styles = StyleSheet.create(
       justifyContent: "space-between",
       // alignItems: "center",
       // backgroundColor: "red",
-    }
+    },
+
+    formInputContainer: {
+      marginBottom: 50,
+      // backgroundColor: "red",
+    },
   }
 );
