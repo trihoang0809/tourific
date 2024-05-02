@@ -56,7 +56,7 @@ export default function App() {
   return (
     <View className="flex-1 bg-white">
       <HomeScreen user={sampleUser} />
-      <Link href="/activity/create">Create Activity</Link>
+      <Link href="activity/create">Create Activity</Link>
     </View>
   );
 }
