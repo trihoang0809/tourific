@@ -34,8 +34,8 @@ const ActivitiesScreen = () => {
   // };
 
   return (
-    <View style={{ height: Dimensions.get("window").height }}>
-      <Stack.Screen
+    <View style={{flex: 1, height: Dimensions.get("window").height }}>
+      {/* <Stack.Screen
         options={{
           title: '',
           headerShown: true,
@@ -43,7 +43,7 @@ const ActivitiesScreen = () => {
           headerBackTitleStyle: { fontSize: 10 },
           
         }}
-      />
+      /> */}
       <ScrollView contentContainerStyle={{ flexGrow: 1, flexDirection: 'row', flexWrap: 'wrap', padding: 5 }}>
         {/* <TouchableOpacity style={{ backgroundColor: '#fff', borderRadius: 10, alignItems: 'center', justifyContent: 'center', width: '50%',height: 250, padding: 10}} 
           onPress={() => { }}>
@@ -58,6 +58,25 @@ const ActivitiesScreen = () => {
                   </View>
         )) }
       </ScrollView>
+      <TouchableOpacity 
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 60,
+          height: 60,
+          position: 'absolute',
+          bottom: 10,
+          right: 10,
+          borderRadius: 35,
+          backgroundColor: '#ff5b77',
+          shadowOffset: { width: 1, height: 1 },
+          shadowColor: '#333',
+          shadowOpacity: 0.3,
+          shadowRadius: 2,
+        }}
+        onPress={() => { /* Handle the button press */ }}
+      ><Ionicons name="add" size={40} color="black" />
+      </TouchableOpacity>
     </View>
   );
 };
