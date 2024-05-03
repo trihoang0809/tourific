@@ -49,7 +49,7 @@ export default class AgendaList extends Component<State> {
         testID={testIDs.agenda.CONTAINER}
         items={this.state.items}
         loadItemsForMonth={this.loadItems}
-        selected={'2017-05-16'}
+        selected={this.props.startDate}
         // selected={'2017-05-16'}
         renderItem={this.renderItem}
         renderEmptyDate={this.renderEmptyDate}

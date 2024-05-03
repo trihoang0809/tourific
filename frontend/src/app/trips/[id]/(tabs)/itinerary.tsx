@@ -40,9 +40,7 @@ const Itinerary = () => {
   }, []);
 
   return (
-    <View>
-      <Text>Itinerary</Text>
-    </View>
+    <AgendaList />
   );
 }
 
