@@ -1,8 +1,8 @@
 import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import React, { useState, useEffect } from "react";
 import favicon from "@/assets/favicon.png";
-import { Link, Stack, router, useLocalSearchParams } from "expo-router";
-import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Link, Stack, Link, Stack, router, useGlobalSearchParams } from "expo-router";
+import { Feather, Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from 'luxon';
 
@@ -11,7 +11,8 @@ const width = Dimensions.get('window').width; //full width
 const height = Dimensions.get('window').height; //full height
 
 const TripDetailsScreen = () => {
-  const { id } = useLocalSearchParams();
+  const { id } = useGlobalSearchParams();
+  // const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
 
   const [trip, setTrip] = useState({
     name: "",
