@@ -34,6 +34,6 @@ const Itinerary = () => {
       </SafeAreaView>
     </View>
   );
-};
+}
 
 export default Itinerary;
