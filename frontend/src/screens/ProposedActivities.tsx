@@ -58,13 +58,7 @@ export const ProposedActivities: React.FC = () => {
     <View>
       <StatusBar backgroundColor="black"/>
       <View style={styles.headerContainer}>
-  
-        <TouchableWithoutFeedback onPress={onPressBack}  >
-          <View style={styles.headerBack}>
-            <AntDesign name="left" size={24} color="blue" />
-            <Text style={[material.headline, {color: "black", marginLeft: 10}]}>Back</Text>
-          </View>
-        </TouchableWithoutFeedback>
+
             
         <Text style={[material.display1, {alignSelf: "center"}]}>Create New Activity</Text>
   
@@ -100,10 +94,11 @@ export const ProposedActivities: React.FC = () => {
             startTime: activityStartDate,
             endTime: activityEndDate,
             location: {
-              "address": activityLocation.address !== "" ? activityLocation.address : "Hehe",
-              "citystate": activityLocation.citystate,
-              "latitude": activityLocation.latitude,
-              "longitude": activityLocation.longitude,
+              address: activityLocation.address,
+              citystate: activityLocation.citystate,
+              latitude: activityLocation.latitude,
+              longitude: activityLocation.longitude,
+              radius: 0,
           },
             notes: activityNote,
           }),
@@ -252,7 +247,7 @@ export const ProposedActivities: React.FC = () => {
         </View>
 
 
-          {/* <GoogleMapInput 
+          <GoogleMapInput 
 
             onLocationSelect={(location) => {
               setActivityLocation({address: String(location.address), citystate: String(location.citystate), 
@@ -260,13 +255,13 @@ export const ProposedActivities: React.FC = () => {
               console.log("loc Proposed Activity: " + activityLocation.address);
             }}
 
-          /> */}
-          <GooglePlacesInput onLocationSelect={(location) => {
+          />
+          {/* <GooglePlacesInput onLocationSelect={(location) => {
               setActivityLocation({address: String(location.address), citystate: String(location.citystate), 
                 longitude: location.longitude, latitude: location.latitude})
               console.log("------------------------------");
               console.log("loc Proposed Activity: " + location.address);
-            }}/>
+            }}/> */}
           <SubmitButton />
 
         

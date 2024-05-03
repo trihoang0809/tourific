@@ -56,7 +56,8 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
     }
   }, [query, coord, radius]);
   
-  console.log("mapData 2", mapData);
+  console.log("----------------")
+  console.log("mapData 2", mapData.citystate);
   console.log("coord 2", coord);
 
   return (
@@ -118,8 +119,8 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
           <Marker
             coordinate={{latitude: coord.latitude,
             longitude: coord.longitude}}
-            title={mapData.citystate}
-            description={mapData.address}
+            title="Address"
+            description={String(mapData.address)}
          />
       </MapView>
     </View>
