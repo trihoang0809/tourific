@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text } from 'react-native';
 
 const Itinerary = () => {
   return (
@@ -6,6 +6,6 @@ const Itinerary = () => {
       <Text>Itinerary</Text>
     </View>
   );
-};
+}
 
 export default Itinerary;
