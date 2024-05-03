@@ -1,9 +1,9 @@
 export const mockData = [
   {
-    name: "Hiking in the mountains with friends that you know and love and care about",
-    description: "Hiking in the mountains",
-    startTime: new Date("2022-01-01T10:00:00Z"),
-    endTime: new Date("2022-01-01T14:00:00Z"),
+    name: 'Hiking in the mountains with friends',
+    description: 'Hiking in the mountains',
+    startTime: new Date('2024-08-04T10:00:00Z'),
+    endTime: new Date('2022-08-05T14:00:00Z'),
     location: {
       citystate:
         "Mountain City, MT 12212 a very long city name that spans multiple lines but will end eventually when the line ends",
@@ -20,10 +20,10 @@ export const mockData = [
     rating: 2,
   },
   {
-    name: "Swimming at the local pool",
-    description: "Swimming at the local pool",
-    startTime: new Date("2022-01-02T10:00:00Z"),
-    endTime: new Date("2022-01-02T12:00:00Z"),
+    name: 'Swimming at the local pool near the park',
+    description: 'Swimming at the local pool',
+    startTime: new Date('2022-01-02T10:00:00Z'),
+    endTime: new Date('2022-01-02T12:00:00Z'),
     location: {
       citystate: "Pool City, MT, 1212u1212",
       address: "456 Pool Rd",
@@ -39,10 +39,10 @@ export const mockData = [
     rating: 4.5,
   },
   {
-    name: "Swimming",
-    description: "Swimming at the local pool",
-    startTime: new Date("2022-01-02T10:00:00Z"),
-    endTime: new Date("2022-01-02T12:00:00Z"),
+    name: 'Swimming',
+    description: 'Swimming at the local pool',
+    startTime: new Date('2022-01-02T10:00:00Z'),
+    endTime: new Date('2022-01-02T12:00:00Z'),
     location: {
       citystate: "Pool City, MT 83772228",
       address: "456 Pool Rd",

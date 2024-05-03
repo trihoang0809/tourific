@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Alert, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import {Agenda, DateData, AgendaEntry, AgendaSchedule} from 'react-native-calendars';
 // import testIDs from '../testIDs';
+import { mockData } from '@/mock-data/activities';
 
 interface State {
   items?: AgendaSchedule;
@@ -35,9 +36,37 @@ const testIDs = {
 }
 
 export default class AgendaList extends Component<State> {
-  state: State = {
-    items: undefined
-  };
+  // state: State = {
+  //   items: undefined
+  // };
+
+  constructor(props: {}) {
+    super(props);
+    this.state = {
+      items: this.transformData(mockData),
+    };
+  }
+
+  transformData = (data: any[]) => {
+    const items: AgendaSchedule = {};
+
+    data.forEach((item) => {
+      const date = item.startTime.toISOString().split('T')[0];
+
+      if (!items[date]) {
+        items[date] = [];
+      }
+
+      items[date].push({
+        name: item.name,
+        height: 50, // Adjust this value as needed
+        day: item.startTime.toISOString().split('T')[0],
+        // Add any other properties you want to display
+      });
+    });
+    console.log(items);
+    return items;
+  }
 
   // reservationsKeyExtractor = (item, index) => {
   //   return `${item?.reservation?.day}${index}`;
@@ -89,7 +118,7 @@ export default class AgendaList extends Component<State> {
           const numItems = Math.floor(Math.random() * 3 + 1);
           for (let j = 0; j < numItems; j++) {
             items[strTime].push({
-              name: 'Item for ' + strTime + ' #' + j,
+              name: 'Item for ' + strTime + ' #' + j + items[j].name,
               height: Math.max(50, Math.floor(Math.random() * 150)),
               day: strTime
             });
