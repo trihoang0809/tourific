@@ -34,7 +34,7 @@ const ActivitiesScreen = () => {
   // };
 
   return (
-    <View style={{flex: 1, height: Dimensions.get("window").height }}>
+    <View style={{ flex: 1, height: Dimensions.get("window").height }}>
       {/* <Stack.Screen
         options={{
           title: '',
@@ -49,16 +49,16 @@ const ActivitiesScreen = () => {
           onPress={() => { }}>
           <Text>Add</Text>
         </TouchableOpacity> */}
-        { mockData.map((activity: ActivityProps, index: number) => (
+        {mockData.map((activity: ActivityProps, index: number) => (
           <View style={{ width: '50%', padding: 10 }}>
-          <ActivityThumbnail
-            key={index}
-            {...activity}
-          />
-                  </View>
-        )) }
+            <ActivityThumbnail
+              key={index}
+              {...activity}
+            />
+          </View>
+        ))}
       </ScrollView>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={{
           alignItems: 'center',
           justifyContent: 'center',

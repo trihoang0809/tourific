@@ -175,7 +175,7 @@ export default function CreateTripScreen() {
         const data = await response.json();
         console.log("Trip updated:", data);
         Alert.alert("Alert Title", "Successful update trip", [
-          { text: "Go back home", onPress: () => <Link href={"/trips"} /> },
+          { text: "Go back home", onPress: () => <Link href={"/"} /> },
         ]);
       } catch (error: any) {
         console.error("Error updating trip:", error.toString());

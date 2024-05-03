@@ -42,3 +42,5 @@ export function extractDateTime(timestamp: string) {
 
   return extractedDateTime;
 }
+
+export const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;

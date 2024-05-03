@@ -13,7 +13,6 @@ const ActivityThumbnail = (activity: ActivityProps) => {
     setLiked(!liked);
   };
 
-  
   return (
     <View style={styles.card}>
       <View style={styles.imageContainer}>
@@ -28,11 +27,11 @@ const ActivityThumbnail = (activity: ActivityProps) => {
       <Text numberOfLines={2} style={styles.title}>{activity.name}</Text>
       <Text style={styles.time}>
         {DateTime.fromISO(activity.startTime.toISOString()).setZone("system").toLocaleString(DateTime.TIME_SIMPLE)}
-         - {DateTime.fromISO(activity.endTime.toISOString()).setZone("system").toLocaleString(DateTime.TIME_SIMPLE)}
+        - {DateTime.fromISO(activity.endTime.toISOString()).setZone("system").toLocaleString(DateTime.TIME_SIMPLE)}
       </Text>
       <View style={styles.lineContainer}>
         <Ionicons name="location" size={24} color="black" />
-        <Text numberOfLines={1} style={{flex: 1, overflow: 'hidden'}}>{activity.location.citystate}</Text>
+        <Text numberOfLines={1} style={{ flex: 1, overflow: 'hidden' }}>{activity.location.citystate}</Text>
       </View>
       <View style={styles.lineContainer}>
         <Ionicons name="star" size={24} color="#FFC501" />
@@ -40,7 +39,7 @@ const ActivityThumbnail = (activity: ActivityProps) => {
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   card: {
@@ -71,7 +70,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    padding: 5, 
+    padding: 5,
     borderRadius: 5,
   },
   heartIcon: {

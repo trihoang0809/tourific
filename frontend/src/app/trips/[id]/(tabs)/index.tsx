@@ -1,12 +1,16 @@
 import { View, Text, ScrollView, Image, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
 import favicon from "@/assets/favicon.png";
-import { Link, Stack, useLocalSearchParams } from "expo-router";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Link, Stack, router, useLocalSearchParams } from "expo-router";
+import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from 'luxon';
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
+const width = Dimensions.get('window').width; //full width
+const height = Dimensions.get('window').height; //full height
+
 const TripDetailsScreen = () => {
   const { id } = useLocalSearchParams();
 
@@ -60,36 +64,53 @@ const TripDetailsScreen = () => {
   };
 
   return (
-    <View style={{ height: Dimensions.get("window").height }}>
+    <View>
       <Stack.Screen
         options={{
-          title: '',
+          title: 'Home',
           headerShown: true,
-          // headerRight: () => (
-          //   <Link href={`/trips/create?id=${id}`}>
-          //     <Feather
-          //       onPressIn={showMoreSetting}
-          //       onPressOut={notShowMoreSetting}
-          //       name="edit-2"
-          //       size={24}
-          //       color="black" />
-          //   </Link>
-          // ),
+          headerStyle: {
+            backgroundColor: 'white',
+          },
+          headerTransparent: false,
+          headerRight: () => (
+            <Link href={`/trips/create?id=${id}`}>
+              <Feather
+                onPressIn={showMoreSetting}
+                onPressOut={notShowMoreSetting}
+                name="edit-2"
+                size={20}
+                color="black"
+                style={{ marginRight: 10 }}
+              />
+            </Link>
+          ),
+          headerLeft: () => (
+            <MaterialIcons
+              name="arrow-back"
+              size={24}
+              color="black"
+              style={{ marginLeft: 10 }}
+              onPress={() => router.navigate('/')}
+            />
+          ),
         }}
       />
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <ScrollView style={{ width: width, height: height }}>
         <View>
-          <Image className="w-full h-52" source={favicon} />
+          <Image
+            style={{ width: width, height: 200 }}
+            source={favicon} />
         </View>
         <View
-          style={{ borderTopLeftRadius: 30, borderTopRightRadius: 30, flex: 1 }}
-          className="bg-white -mt-12 pt-6"
+          style={{ borderTopLeftRadius: 30, borderTopRightRadius: 30, flex: 1, marginTop: -50 }}
+          className="bg-white h-full"
         >
           <View
             style={{
               paddingHorizontal: 30,
-              paddingVertical: 5,
-              height: "auto",
+              paddingVertical: 19,
+              height: height,
             }}
           >
             <Text className="font-bold text-3xl mb-5">{trip.name}</Text>
@@ -157,7 +178,7 @@ const TripDetailsScreen = () => {
       >
         <Text className="text-white text-base text-center">Edit</Text>
       </TouchableOpacity> */}
-    </View>
+    </View >
   );
 };
 
