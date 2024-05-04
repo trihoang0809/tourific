@@ -50,7 +50,7 @@ const ActivitiesScreen = () => {
           <Text>Add</Text>
         </TouchableOpacity> */}
         { mockData.map((activity: ActivityProps, index: number) => (
-          <View style={{ width: '50%', padding: 10 }}>
+          <View style={{ width: '100%', padding: 15 }}>
           <ActivityThumbnail
             key={index}
             {...activity}
@@ -68,14 +68,14 @@ const ActivitiesScreen = () => {
           bottom: 10,
           right: 10,
           borderRadius: 35,
-          backgroundColor: '#ff5b77',
+          backgroundColor: '#006ee6',
           shadowOffset: { width: 1, height: 1 },
           shadowColor: '#333',
           shadowOpacity: 0.3,
           shadowRadius: 2,
         }}
         onPress={() => { /* Handle the button press */ }}
-      ><Ionicons name="add" size={40} color="black" />
+      ><Ionicons name="add" size={40} color="white" />
       </TouchableOpacity>
     </View>
   );
