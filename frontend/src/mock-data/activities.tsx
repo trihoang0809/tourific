@@ -1,11 +1,11 @@
 export const mockData = [
   {
-    name: 'Hiking in the mountains with friends',
+    name: 'Hiking in the mountains with friends that you know and love and care about',
     description: 'Hiking in the mountains',
     startTime: new Date('2022-01-01T10:00:00Z'),
     endTime: new Date('2022-01-01T14:00:00Z'),
     location: {
-      citystate: 'Mountain City, MT 12212',
+      citystate: 'Mountain City, MT 12212 a very long city name that spans multiple lines but will end eventually when the line ends',
       address: '123 Mountain Rd',
       latitude: 12.3456,
       longitude: -12.3456,
@@ -19,7 +19,7 @@ export const mockData = [
     rating: 2,
   },
   {
-    name: 'Swimming at the local pool near the park',
+    name: 'Swimming at the local pool',
     description: 'Swimming at the local pool',
     startTime: new Date('2022-01-02T10:00:00Z'),
     endTime: new Date('2022-01-02T12:00:00Z'),
