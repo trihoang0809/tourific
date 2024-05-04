@@ -94,7 +94,7 @@ const TripDetailsScreen = () => {
           >
             <Text style={[styles.h1, {marginTop: 20}]}>{trip.name}</Text>
             <View style={styles.row}>
-              <Ionicons name="location" size={25} color="navy" />
+              <Ionicons name="location-outline" size={25} color="#006ee6" />
               <View>
                 <Text style={[styles.h3, {marginLeft: 10}]}>
                   {trip.location.address} {trip.location.citystate}
@@ -105,7 +105,7 @@ const TripDetailsScreen = () => {
               </View>
             </View>
             <View style={styles.row}>
-              <Ionicons name="calendar" size={25} color="navy" />
+              <Ionicons name="calendar-outline" size={25} color="#006ee6" />
               <View style={styles.dateContainer}>
                 <Text style={[styles.h3, {marginHorizontal: 10}]}>
                   {new Date(trip.startDate).toLocaleString("en-US", {
@@ -119,7 +119,7 @@ const TripDetailsScreen = () => {
                   {/* {trip.startDate.getHours() % 12 || 12}:{trip.startDate.getMinutes().toString().padStart(2, '0')} {trip.startDate.getHours() >= 12 ? 'PM' : 'AM'} */}
                 </Text>
               </View>
-              <Ionicons name="arrow-forward-outline" size={25} color="navy" />
+              <Ionicons name="arrow-forward-outline" size={25} color="#006ee6" />
               <View style={styles.dateContainer}>
                 <Text style={[styles.h3, {marginLeft: 10}]}>
                   {new Date(trip.endDate).toLocaleString("en-US", {
@@ -139,7 +139,7 @@ const TripDetailsScreen = () => {
             <View
               style={{
                 borderBottomWidth: 0.5,
-                borderColor: "navy",
+                borderColor: "#001833",
                 marginVertical: 20,
               }}
             ></View>
@@ -173,22 +173,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   h1: {
-    fontWeight: 'bold',
-    fontSize: 28,
+    fontWeight: '600',
+    fontSize: 26,
     lineHeight: 35,
   },
   h2: {
-    fontWeight: 'bold',
-    fontSize: 26,
+    fontWeight: '400',
+    fontSize: 24,
   },
   h3: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '500',
     lineHeight: 25,
   },
   h4: {
     color: '#676765',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '500',
   },
   dateContainer: {
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
 
   row: {
     flexDirection: 'row',
-    marginTop: 15,
+    marginTop: 20,
   },
 
 });
