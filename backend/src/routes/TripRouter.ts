@@ -4,8 +4,7 @@ import ActivityRouter from "./ActivityRouter";
 import { validateData } from "../middleware/validationMiddleware";
 import { tripCreateSchema } from "../schemas/tripSchema";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { z } from "zod";
-import { StatusCodes } from 'http-status-codes'
+import { StatusCodes } from "http-status-codes";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -47,8 +46,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Create a new trip
-type TripCreateSchema = z.infer<typeof tripCreateSchema>;
-router.post("/", validateData<TripCreateSchema>(tripCreateSchema), async (req, res) => {
+router.post("/", validateData(tripCreateSchema), async (req, res) => {
   const { name, startDate, endDate, location } = req.body;
   try {
     const trip = await prisma.trip.create({

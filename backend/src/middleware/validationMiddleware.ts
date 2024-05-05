@@ -3,12 +3,15 @@ import { Request, Response, NextFunction } from "express";
 import { z, ZodType } from "zod";
 import { StatusCodes } from "http-status-codes";
 
+interface TypedRequest<T> extends Request {
+  body: T;
+}
+
 export const validateData = <T>(schema: ZodType<T>) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: TypedRequest<T>, res: Response, next: NextFunction) => {
     const parsed = schema.safeParse(req.body);
 
     if (parsed.success) {
-      req.body = parsed.data as T;
       next();
     } else {
       console.log("Zod error", parsed.error);
@@ -22,4 +25,4 @@ export const validateData = <T>(schema: ZodType<T>) => {
       }
     }
   };
-}
+};
