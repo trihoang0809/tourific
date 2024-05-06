@@ -7,11 +7,14 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
   Alert,
-  Button
+  Button,
+  Image,
+  Pressable
 }  from "react-native";
 import { material } from 'react-native-typography';
 import { useState, useEffect } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import * as ImagePicker from 'expo-image-picker';
 
 export const UserProfileCreate: React.FC = () => {
   //Declare useState
@@ -20,7 +23,7 @@ export const UserProfileCreate: React.FC = () => {
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [DOB, setDOB] = useState(new Date());
-  const [avatar, setAvatar] = useState({height: 200, width: 200, url: ""})
+  const [avatar, setAvatar] = useState({height: 200, width: 200, url: "https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg"})
   const [isSaved, setIsSaved] = useState(false);
   const [isDOBDatePickerVisible, setDOBDatePickerVisibility] = useState(false);
   const [isFormFilled, setIsFormFilled] = useState(false);
@@ -87,7 +90,7 @@ export const UserProfileCreate: React.FC = () => {
               height: avatar.height,
               width: avatar.width,
               url: avatar.url,
-          },
+            },
           }),
         });
         setUserName("");
@@ -95,7 +98,7 @@ export const UserProfileCreate: React.FC = () => {
         setLastName("");
         setDOB(new Date());
         setPassword("");
-        setAvatar({height: 200, width: 200, url: ""});
+        setAvatar({height: 200, width: 200, url: "https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg"});
       }
       catch(error)
       {
@@ -141,12 +144,36 @@ export const UserProfileCreate: React.FC = () => {
   };
   
 
+  // Upload photo
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setAvatar({height: 200, width: 200, url: result.assets[0].uri});
+    }
+  };
+
   return(
     <ScrollView style={styles.formContainer}>
       <Header />
       
       {/* Form */}
       <View style={styles.formInputContainer}>
+        {/* Upload avatar */}
+        <View>
+          <Pressable onPress={pickImage}>
+            <Image source={{ uri: avatar.url }} style={styles.avatar} />
+          </Pressable>
+        </View>
+
         {/* userName input  */}
         <View style={styles.queInput}>
           <Text style={[material.headline, {color: "black", marginBottom: 10,}]}>User Name:</Text>
@@ -213,7 +240,8 @@ export const UserProfileCreate: React.FC = () => {
             onCancel={hideDOBDatePicker}
           />
         </View>
-      
+
+
         {/* Submit Button to submit user's answer */}
         <SubmitButton />
 
@@ -288,6 +316,14 @@ const styles = StyleSheet.create(
     formInputContainer: {
       marginBottom: 50,
       // backgroundColor: "red",
+    },
+
+    avatar: {
+      overflow: "hidden",
+      width: 200,
+      height: 200,
+      borderRadius: 100,
+      alignSelf: "center",
     },
   }
 );

@@ -55,25 +55,6 @@ import { View, Text, Image, StyleSheet,
           setNumCols(Math.floor(width/(tripCardWidth + 40)));
       });
   
-  
-      // const cleanData = (data: Trip[]) => {
-      //   let cleanedData: Trip[] = [];
-      //   let index = 0;
-      //   for (let trip of data) {
-      //     let format: Trip = {
-      //       id: trip.id,
-      //       name: trip.name,
-      //       location: trip.location,
-      //       startDate: new Date(trip.startDate),
-      //       endDate: new Date(trip.endDate),
-      //       image: trip.image,
-      //     };
-  
-      //     cleanedData.push(format);
-      //   }
-      //   return cleanedData;
-      // };
-  
       const getData = async () => {
         try {
           const link = serverUrl + "/trips?upcoming=true";

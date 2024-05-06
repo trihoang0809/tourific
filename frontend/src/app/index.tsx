@@ -28,7 +28,8 @@ export default function App() {
         }}
       />
       <HomeScreen user={sampleUser} />
-      <Link href="userProfile/create">userProfile</Link>
+      <Link href="userProfile/create">Create user profile</Link>
+      <Link href="userProfile/userProfileUI">User Profile</Link>
     </View>
   );
 }

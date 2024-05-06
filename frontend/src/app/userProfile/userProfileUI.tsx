@@ -1,11 +1,10 @@
 import { View } from "react-native";
-import UserProfile from "@/screens/UserProfile/UserProfileView";
 import UserProfileView from "@/screens/UserProfile/UserProfileView";
 const userProfileUI = () => {
   return (
-    <View>
-      <UserProfileView></UserProfileView>
-    </View>
+
+      <UserProfileView userID="663965ad325de4616021409b"></UserProfileView>
+
   );
 }
  
