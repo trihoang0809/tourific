@@ -7,14 +7,17 @@ import {
   ScrollView,
   Button,
   Pressable,
+  Dimensions,
 } from "react-native";
-import { TripCard } from "../components/TripCard";
+import { TripCard } from "../components/TripCard/TripCard";
 import { HomeScreenHeader } from "../components/HomeScreenHeader";
 import { useState, useEffect } from "react";
 import { UserProps, Trip } from "../types";
 import { Link, router } from 'expo-router';
 import { EXPO_PUBLIC_HOST_URL } from "@/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import TripCardRect from "@/components/TripCard/TripCardRect";
 
 export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [ongoingTrips, setOngoingTrips] = useState<Trip[]>([]);
@@ -41,39 +44,49 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   }, []);
 
   return (
-    <ScrollView style={styles.container}>
-      <SafeAreaView>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView style={styles.container}>
         <HomeScreenHeader user={user} />
-        <Text style={styles.greeting}>Welcome back, {user.firstName}!</Text>
-        <Text style={styles.title}>Ongoing Trips</Text>
-        <ScrollView horizontal={true} style={styles.tripScroll}>
-          {ongoingTrips.length > 0 ? (
-            ongoingTrips.map((trip) => (
-              <TripCard key={trip.id} trip={trip} height={250} width={400} />
-            ))
-          ) : (
-            <Text style={styles.noTrip}>No ongoing trips</Text>
-          )}
-        </ScrollView>
+        <Text style={styles.greeting}>Continue planning your trip, {user.firstName}!</Text>
+        <View>
+          <View style={styles.inline}>
+            <Text style={styles.title}>Ongoing Trips</Text>
+            <Text onPress={() => { router.replace('/trips/ongoing'); }} >See all</Text>
+          </View>
 
-        <Pressable style={styles.buttonContainer}>
-          <Link href="/trips/create" style={styles.button}>
-            <Text style={styles.buttonText}>Create a new trip</Text>
-          </Link>
-        </Pressable>
-
-        <View style={styles.upcoming}>
-          <Text style={styles.title}>Upcoming Trips</Text>
-          <Button title="See all" onPress={() => { router.replace('/trips/upcoming'); }} />
+          <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            style={styles.tripScroll}>
+            {ongoingTrips.length > 0 ? (
+              ongoingTrips.map((trip) => (
+                <TripCard key={trip.id} trip={trip} height={250} width={300} />
+              ))
+            ) : (
+              <Text style={styles.noTrip}>No ongoing trips</Text>
+            )}
+          </ScrollView>
         </View>
+        <View>
+          <View style={styles.inline}>
+            <Text style={styles.title}>Upcoming Trips</Text>
+            <Text onPress={() => { router.replace('/trips/upcoming'); }} >See all</Text>
+          </View>
 
-        <ScrollView horizontal={true} style={styles.tripScroll}>
-          {upcomingTrips.map((trip) => (
-            <TripCard key={trip.id} trip={trip} height={200} width={200} />
-          ))}
-        </ScrollView>
-      </SafeAreaView>
-    </ScrollView>
+          <ScrollView horizontal={true} style={styles.tripScroll}>
+            {upcomingTrips.map((trip) => (
+              <TripCard key={trip.id} trip={trip} height={200} width={200} />
+            ))}
+          </ScrollView>
+        </View>
+      </ScrollView>
+      <TripCardRect />
+      <Pressable style={{ zIndex: 99, position: 'absolute', bottom: 25, right: 7 }}>
+        <Link href="/trips/create">
+          <Ionicons name="add-circle-sharp" size={55} color="black" />
+        </Link>
+      </Pressable>
+    </SafeAreaView>
   );
 };
 
@@ -91,7 +104,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     padding: 10,
   },
-  tripScroll: {},
+  tripScroll: {
+    marginVertical: 5
+  },
   noTrip: {
     fontSize: 16,
     color: "red",
@@ -121,7 +136,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-  upcoming: {
+  inline: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

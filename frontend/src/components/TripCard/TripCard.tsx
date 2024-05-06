@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
-import { Trip } from "../types";
+import { Trip } from "../../types";
 import { Octicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Link, router, Stack } from "expo-router";
 
@@ -19,7 +19,7 @@ interface tripProps {
 
 export const TripCard: React.FC<tripProps> = ({
   trip,
-  height = 300,
+  height = 200,
   width = 350,
 }) => {
   const [tripImage, setTripImage] = useState(trip.image);
@@ -30,6 +30,7 @@ export const TripCard: React.FC<tripProps> = ({
   const [fontTripName, setFontTripName] = useState(Math.max(18, (height * 18) / 300));
   const [fontTripDetail, setFontTripDetail] = useState(Math.max(13, (height * 14) / 300));
   const [location, setLocation] = useState(trip.location.citystate);
+
   const noImage =
     "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg";
 
@@ -71,21 +72,25 @@ export const TripCard: React.FC<tripProps> = ({
         onPress={onPressTripCard}
       >
         <View>
-          <Image
-            source={
-              tripImage?.url === undefined
-                ? { uri: noImage }
-                : { uri: tripImage?.url }
-            }
-            style={[
-              styles.image,
-              {
-                // height: tripImage === null ? 250 : imageHeight,
-                height: imageHeight,
-                width: "100%",
-              },
-            ]}
-          ></Image>
+          <View style={{
+            padding: 8
+          }}>
+            <Image
+              source={
+                tripImage?.url === undefined
+                  ? { uri: noImage }
+                  : { uri: tripImage?.url }
+              }
+              style={[
+                styles.image,
+                {
+                  // height: tripImage === null ? 250 : imageHeight,
+                  height: imageHeight,
+                  width: "100%",
+                },
+              ]}
+            />
+          </View>
           <View style={styles.descriptionContainer}>
             <View>
               <Text numberOfLines={1} style={{ fontSize: fontTripName, fontWeight: "bold" }}>
@@ -117,30 +122,26 @@ export const TripCard: React.FC<tripProps> = ({
 const styles = StyleSheet.create({
   card: {
     // flexDirection: "column",
-    marginVertical: 30,
     marginHorizontal: 20,
     borderRadius: 16,
-    borderWidth: 2,
+    // borderWidth: 1,
     backgroundColor: "#EBF2FF",
-    overflow: "hidden", // Ensures that all content respects the border radius
+    overflow: "hidden",
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
   },
 
   image: {
-    marginBottom: 5,
-    borderTopRightRadius: 14,
-    borderTopLeftRadius: 14,
+    borderRadius: 14
   },
 
   descriptionContainer: {
-    paddingLeft: 15,
-    paddingBottom: 15,
+    paddingLeft: 10,
+    paddingVertical: 5,
+    textAlign: 'center',
     justifyContent: "space-between",
   },
 

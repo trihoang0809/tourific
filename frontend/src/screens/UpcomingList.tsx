@@ -4,7 +4,7 @@ import {
   StatusBar, FlatList, TouchableWithoutFeedback
 } from "react-native";
 import { useState, useEffect } from "react";
-import { TripCard } from "../components/TripCard";
+import { TripCard } from "../components/TripCard/TripCard";
 import { LinearGradient } from "expo-linear-gradient";
 import { Trip } from "../types";
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
