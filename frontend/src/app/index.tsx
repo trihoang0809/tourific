@@ -28,6 +28,7 @@ export default function App() {
         }}
       />
       <HomeScreen user={sampleUser} />
+      <Link href="userProfile/userProfileUI">userProfile</Link>
     </View>
   );
 }
