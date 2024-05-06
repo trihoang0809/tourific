@@ -1,7 +1,6 @@
 import { View, Text } from 'react-native';
 import React from 'react';
 import { Trip } from '@/types';
-import { he } from 'react-native-paper-dates';
 
 interface tripProps {
   trip: Trip;
@@ -13,7 +12,7 @@ const TripCardRect = ({ trip, width = 300, height = 100 }: tripProps) => {
     <View style={{ width: width, height: height, backgroundColor: 'grey' }}>
       <View>
         <View>
-          <Image
+          {/* <Image
             source={
               trip.image?.url === undefined
                 ? { uri: noImage }
@@ -27,7 +26,7 @@ const TripCardRect = ({ trip, width = 300, height = 100 }: tripProps) => {
                 width: "100%",
               },
             ]}
-          ></Image>
+          /> */}
         </View>
         <View></View>
       </View>

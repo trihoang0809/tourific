@@ -6,10 +6,10 @@ import {
   TouchableHighlight,
 } from "react-native";
 import { useState, useEffect } from "react";
-import { Float } from "react-native/Libraries/Types/CodegenTypes";
 import { Trip } from "../../types";
 import { Octicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Link, router, Stack } from "expo-router";
+import { noImage, defaultAvatar } from "@/utils/constants";
 
 interface tripProps {
   trip: Trip;
@@ -26,19 +26,11 @@ export const TripCard: React.FC<tripProps> = ({
   const [tripLocation, setTripLocation] = useState(trip.location);
   const [tripName, setTripName] = useState(trip.name);
   const [tripStartDate, setTripStartDate] = useState(trip.startDate);
-  const [tripEndDate, setTripEndDate] = useState(trip.endDate);
   const [fontTripName, setFontTripName] = useState(Math.max(18, (height * 18) / 300));
   const [fontTripDetail, setFontTripDetail] = useState(Math.max(13, (height * 14) / 300));
   const [location, setLocation] = useState(trip.location.citystate);
 
-  const noImage =
-    "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg";
-
-  const defaultAvatar =
-    "https://static1.colliderimages.com/wordpress/wp-content/uploads/2022/02/avatar-the-last-airbender-7-essential-episodes.jpg";
-
   const onPressTripCard = () => {
-    // console.log("You pressed this card");
     const route = `/trips/${trip.id}`;
     router.push(route);
   };
@@ -58,7 +50,6 @@ export const TripCard: React.FC<tripProps> = ({
   const tripState = tripLocation.citystate.split(", ");
 
   useEffect(() => {
-    //fontTripDetail == height of the text --> 0.75*fontTripDetail ~ width of the text
     if (tripLocation.citystate.length * fontTripDetail * 0.75 >= width)
       if (tripState.length >= 2)
         setLocation(tripState[tripState.length - 2] + ", " + tripState[tripState.length - 1]);
