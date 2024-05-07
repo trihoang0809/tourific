@@ -5,10 +5,11 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
+  Pressable,
 } from "react-native";
 import { UserProps } from "../types";
 import { Ionicons } from "@expo/vector-icons";
-
+import { router } from "expo-router";
 export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
     <SafeAreaView style={styles.container}>
@@ -21,7 +22,9 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
         >
           <Ionicons name="notifications-outline" size={24} color="black" />
         </TouchableOpacity>
-        <Image style={styles.avatar} source={{ uri: user.avatar.url }} />
+        <Pressable onPress={()=>router.push("userProfile/userProfileUI")}>
+          <Image style={styles.avatar} source={{ uri: user.avatar.url }} />
+        </Pressable>
       </View>
     </SafeAreaView>
   );

@@ -1,9 +1,9 @@
 import { User } from "@/types";
 import { useEffect, useState } from "react";
-import { Platform, ScrollView, View, StyleSheet, Text, Image } from "react-native";
+import { Platform, ScrollView, View, StyleSheet, Text, Image, Pressable } from "react-native";
 import { material } from "react-native-typography";
-
-
+import { Feather } from '@expo/vector-icons';
+import { router } from "expo-router";
 interface userIDProps {
   userID: string,
 }
@@ -50,10 +50,15 @@ const UserProfileView = (userID: userIDProps) => {
 
   return (  
     <ScrollView style={styles.infoContainer}>
-      <View style={styles.detailContainer}>
-          <Image source={{ uri: userProfile?.avatar.url }} style={styles.avatar} />
-      </View>
+      <View style={{flexDirection: "column"}}>
+        <Pressable style={{alignSelf:"flex-end"}} onPress={()=>router.push("userProfile/update")}>
+          <Feather name="edit" size={24} color="black" />
+        </Pressable>
+        <View style={styles.detailContainer}>
+            <Image source={{ uri: userProfile?.avatar.url }} style={styles.avatar} />
+        </View>
 
+      </View>
       <View style={styles.detailContainer}>
           <Text style={[material.headline, {color: "black", marginBottom: 10,}]}>User Name: {userProfile?.userName}</Text>
       </View>

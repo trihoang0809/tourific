@@ -1,11 +1,12 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Link, Stack } from 'expo-router';
+import { Link, Stack, router } from 'expo-router';
 import PopupMenu from '@/components/PopupMenu/PopupMenu';
 import { HomeScreen } from "../screens/HomeScreen";
 import sampleUser from '@/mock-data/userNickDoan';
-
+import UserProfileCreate from './userProfile/create';
+import UpdatePage from './userProfile/update';
 export default function App() {
   // return (
   //   <View className="flex-1 bg-white items-center justify-center">
@@ -29,7 +30,7 @@ export default function App() {
       />
       <HomeScreen user={sampleUser} />
       <Link href="userProfile/create">Create user profile</Link>
-      <Link href="userProfile/userProfileUI">User Profile</Link>
+      <Pressable onPress={()=>router.push("userProfile/update")}><Text>Update User Profile</Text></Pressable>
     </View>
   );
 }

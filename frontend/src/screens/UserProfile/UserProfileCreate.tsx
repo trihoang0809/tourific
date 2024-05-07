@@ -9,14 +9,24 @@ import {
   Alert,
   Button,
   Image,
-  Pressable
+  Pressable,
+  Platform
 }  from "react-native";
 import { material } from 'react-native-typography';
 import { useState, useEffect } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import * as ImagePicker from 'expo-image-picker';
+import { User } from "@/types";
 
-export const UserProfileCreate: React.FC = () => {
+interface editProps {
+  method: string;
+  id?: string;
+}
+
+export const UserProfileCreate: React.FC<editProps> = ({
+  method,
+  id = "",
+}) => {
   //Declare useState
   const [userName, setUserName] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -27,6 +37,40 @@ export const UserProfileCreate: React.FC = () => {
   const [isSaved, setIsSaved] = useState(false);
   const [isDOBDatePickerVisible, setDOBDatePickerVisibility] = useState(false);
   const [isFormFilled, setIsFormFilled] = useState(false);
+  const [userProfile, setUserProfile] = useState<User>();
+
+  // Determine method
+  useEffect(() => {
+    // Let ios as default
+    let serverUrl = 'http://localhost:3000';
+
+    if(Platform.OS === 'android')
+      serverUrl = 'http://10.0.2.2:3000'
+
+    if(method === "PUT"){
+      const getData = async () => {
+        try {
+          const link = serverUrl + "/" + id;
+          const profile = await fetch(link);
+          let data = await profile.json();
+          
+          setUserName(String(data.userName));
+          setFirstName(String(data.firstName));
+          setLastName(String(data.lastName));
+          setDOB(new Date(String(data.dateOfBirth)));
+          setPassword(String(data.password));
+          setAvatar({height: 200, width: 200, url: String(data.avatar.url)});
+        } catch (error) {
+          console.log("An error happen while fetching data");
+          console.log(error);
+        }
+      };
+  
+      //Fetch Data + Format Data
+      getData();
+    }
+  }, []);
+
 
   //Header render + Return Button + Alert Pop up
   const alertUnSaved = () => {
@@ -75,8 +119,8 @@ export const UserProfileCreate: React.FC = () => {
     if(isFormFilled)
     {
       try {
-        const createActivity = await fetch('http://10.0.2.2:3000/',{
-          method: "POST",
+        const createUserProfile = await fetch('http://10.0.2.2:3000/' + id,{
+          method: method,
           headers: {
             "Content-Type": "application/json",
           },
