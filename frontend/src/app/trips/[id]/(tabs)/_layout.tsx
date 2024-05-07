@@ -6,7 +6,6 @@ import { Link, useLocalSearchParams } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { View, Text } from "react-native";
 
-
 export default function TabLayout() {
   const { id } = useLocalSearchParams();
 
@@ -15,7 +14,7 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: "#006ee6",
         headerShown: false,
-        tabBarStyle : {
+        tabBarStyle: {
           height: 80,
           paddingTop: 12,
         },
@@ -32,7 +31,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: "Home",
           // tabBarLabel:() => {return null},
           tabBarIcon: ({ color }) => (
             <FontAwesome size={28} name="home" color={color} />
@@ -67,7 +66,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="activities"
         options={{
-          title: 'Suggestions',
+          title: "Suggestions",
           tabBarIcon: ({ color }) => (
             <AntDesign name="find" size={28} color={color} />
           ),
@@ -77,7 +76,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="itinerary"
         options={{
-          title: 'Itinerary',
+          title: "Itinerary",
           tabBarIcon: ({ color }) => (
             <AntDesign name="calendar" size={28} color={color} />
           ),

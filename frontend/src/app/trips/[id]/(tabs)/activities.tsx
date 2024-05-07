@@ -4,7 +4,7 @@ import { useGlobalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import ActivityThumbnail from "@/components/ActivityThumbnail";
-import { mockData } from '../../../../mock-data/activities';
+import { mockData } from "../../../../mock-data/activities";
 import { ActivityProps } from "@/types";
 
 const ActivitiesScreen = () => {
@@ -32,7 +32,7 @@ const ActivitiesScreen = () => {
   // };
 
   return (
-    <View style={{flex: 1, height: Dimensions.get("window").height }}>
+    <View style={{ flex: 1, height: Dimensions.get("window").height }}>
       {/* <Stack.Screen
         options={{
           title: '',
@@ -42,38 +42,45 @@ const ActivitiesScreen = () => {
           
         }}
       /> */}
-      <ScrollView contentContainerStyle={{ flexGrow: 1, flexDirection: 'row', flexWrap: 'wrap', padding: 5 }}>
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+          flexDirection: "row",
+          flexWrap: "wrap",
+          padding: 5,
+        }}
+      >
         {/* <TouchableOpacity style={{ backgroundColor: '#fff', borderRadius: 10, alignItems: 'center', justifyContent: 'center', width: '50%',height: 250, padding: 10}} 
           onPress={() => { }}>
           <Text>Add</Text>
         </TouchableOpacity> */}
-        { mockData.map((activity: ActivityProps, index: number) => (
-          <View style={{ width: '100%', padding: 15 }}>
-          <ActivityThumbnail
-            key={index}
-            {...activity}
-          />
-                  </View>
-        )) }
+        {mockData.map((activity: ActivityProps, index: number) => (
+          <View style={{ width: "100%", padding: 15 }}>
+            <ActivityThumbnail key={index} {...activity} />
+          </View>
+        ))}
       </ScrollView>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={{
-          alignItems: 'center',
-          justifyContent: 'center',
+          alignItems: "center",
+          justifyContent: "center",
           width: 60,
           height: 60,
-          position: 'absolute',
+          position: "absolute",
           bottom: 10,
           right: 10,
           borderRadius: 35,
-          backgroundColor: '#006ee6',
+          backgroundColor: "#006ee6",
           shadowOffset: { width: 1, height: 1 },
-          shadowColor: '#333',
+          shadowColor: "#333",
           shadowOpacity: 0.3,
           shadowRadius: 2,
         }}
-        onPress={() => { /* Handle the button press */ }}
-      ><Ionicons name="add" size={40} color="white" />
+        onPress={() => {
+          /* Handle the button press */
+        }}
+      >
+        <Ionicons name="add" size={40} color="white" />
       </TouchableOpacity>
     </View>
   );
