@@ -50,15 +50,18 @@ const UserProfileView = (userID: userIDProps) => {
 
   return (  
     <ScrollView style={styles.infoContainer}>
-      <View style={{flexDirection: "column"}}>
-        <Pressable style={{alignSelf:"flex-end"}} onPress={()=>router.push("userProfile/update")}>
-          <Feather name="edit" size={24} color="black" />
-        </Pressable>
-        <View style={styles.detailContainer}>
-            <Image source={{ uri: userProfile?.avatar.url }} style={styles.avatar} />
-        </View>
+      <View style={[{flexDirection: "column"}, styles.header]}>
+
+          <Pressable style={{alignSelf:"flex-end"}} onPress={()=>router.push("userProfile/update")}>
+            <Feather name="edit" size={24} color="black" />
+          </Pressable>
+
+          <View style={styles.detailContainer}>
+              <Image source={{ uri: userProfile?.avatar.url }} style={styles.avatar} />
+          </View>
 
       </View>
+
       <View style={styles.detailContainer}>
           <Text style={[material.headline, {color: "black", marginBottom: 10,}]}>User Name: {userProfile?.userName}</Text>
       </View>
@@ -79,7 +82,6 @@ const UserProfileView = (userID: userIDProps) => {
 const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
-    padding: 10,
     // backgroundColor: "red",
   },
 
@@ -94,6 +96,10 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignSelf: "center",
   },
+
+  header: {
+    backgroundColor: "blue",
+  }
 });
 
 export default UserProfileView;

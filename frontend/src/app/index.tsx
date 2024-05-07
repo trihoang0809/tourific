@@ -30,7 +30,6 @@ export default function App() {
       />
       <HomeScreen user={sampleUser} />
       <Link href="userProfile/create">Create user profile</Link>
-      <Pressable onPress={()=>router.push("userProfile/update")}><Text>Update User Profile</Text></Pressable>
     </View>
   );
 }
