@@ -13,7 +13,8 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
     <SafeAreaView style={styles.content}>
       <View>
-        <Text style={styles.appName}>tourific</Text>
+        {/* <Text style={styles.appName}>tourific</Text> */}
+        <Text style={styles.appName}>Hey 👋, {user.firstName}!</Text>
       </View>
       <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
         <TouchableOpacity
@@ -45,10 +46,10 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   appName: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
     flex: 1,
-    textAlign: "center", // Ensures the text is centered in the available space
+    textAlign: "center",
   },
   avatar: {
     width: 30,

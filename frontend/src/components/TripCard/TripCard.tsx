@@ -10,6 +10,7 @@ import { Trip } from "../../types";
 import { Octicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Link, router, Stack } from "expo-router";
 import { noImage, defaultAvatar } from "@/utils/constants";
+import { tripDate } from "@/utils";
 
 interface tripProps {
   trip: Trip;
@@ -22,12 +23,13 @@ export const TripCard: React.FC<tripProps> = ({
   height = 200,
   width = 350,
 }) => {
-  const [tripImage, setTripImage] = useState(trip.image);
-  const [tripLocation, setTripLocation] = useState(trip.location);
-  const [tripName, setTripName] = useState(trip.name);
-  const [tripStartDate, setTripStartDate] = useState(trip.startDate);
-  const [fontTripName, setFontTripName] = useState(Math.max(18, (height * 18) / 300));
-  const [fontTripDetail, setFontTripDetail] = useState(Math.max(13, (height * 14) / 300));
+  const tripImage = trip.image;
+  const tripLocation = trip.location;
+  const tripName = trip.name;
+  const tripStartDate = trip.startDate;
+  const tripEndDate = trip.endDate;
+  const fontTripName = Math.max(18, (height * 18) / 300);
+  const fontTripDetail = Math.max(13, (height * 14) / 300);
   const [location, setLocation] = useState(trip.location.citystate);
 
   const onPressTripCard = () => {
@@ -36,13 +38,13 @@ export const TripCard: React.FC<tripProps> = ({
   };
 
   // Format the Date of Trip Card
-  const tripDate = (date: Date) => {
-    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
-      return "Invalid date"; // Handle invalid dates
-    }
-    const month = date.toLocaleString("default", { month: "short" });
-    return `${date.getDate()} ${month}, ${date.getFullYear()}`;
-  };
+  // const tripDate = (date: Date) => {
+  //   if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+  //     return "Invalid date"; // Handle invalid dates
+  //   }
+  //   const month = date.toLocaleString("default", { month: "short" });
+  //   return `${date.getDate()} ${month}, ${date.getFullYear()}`;
+  // };
 
   // Calculate image height as 2/3 of the card's height
   const imageHeight = (height * 2) / 3;
@@ -50,9 +52,11 @@ export const TripCard: React.FC<tripProps> = ({
   const tripState = tripLocation.citystate.split(", ");
 
   useEffect(() => {
+    //fontTripDetail == height of the text --> 0.75*fontTripDetail ~ width of the text
     if (tripLocation.citystate.length * fontTripDetail * 0.75 >= width)
       if (tripState.length >= 2)
         setLocation(tripState[tripState.length - 2] + ", " + tripState[tripState.length - 1]);
+
   }, []);
 
   return (
@@ -112,10 +116,8 @@ export const TripCard: React.FC<tripProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    // flexDirection: "column",
     marginHorizontal: 20,
     borderRadius: 16,
-    // borderWidth: 1,
     backgroundColor: "#EBF2FF",
     overflow: "hidden",
     shadowColor: "#000",

@@ -1,24 +1,29 @@
 import {
-  View, Text, Image, StyleSheet,
-  TextInput, TouchableHighlight, Dimensions,
-  StatusBar, FlatList, TouchableWithoutFeedback
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TextInput,
+  TouchableHighlight,
+  Dimensions,
+  StatusBar,
+  FlatList,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useState, useEffect } from "react";
-import { TripCard } from "../components/TripCard/TripCard";
+import { TripCard } from "@/components/TripCard/TripCard";
 import { LinearGradient } from "expo-linear-gradient";
 import { Trip } from "../types";
-import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { Stack, router } from "expo-router";
-import { EXPO_PUBLIC_HOST_URL } from "@/utils";
-
-
+import { boolean } from "zod";
 
 const onPressCategory = () => {
   console.log("You pressed on this category");
   router.replace("/");
 };
 
-const Header = () => (
+const Header = ({ isUpcoming }: listprops) => (
   <View>
     <StatusBar backgroundColor="black" />
     <View style={styles.headerConainner}>
@@ -26,29 +31,42 @@ const Header = () => (
         <TouchableWithoutFeedback onPress={onPressCategory}>
           <AntDesign name="left" size={24} color="blue" />
         </TouchableWithoutFeedback>
-        <Text style={{ fontSize: 22, marginLeft: 10 }}>Upcoming Trips</Text>
+        <Text style={{ fontSize: 22, marginLeft: 10 }}>
+          {isUpcoming ? "Upcoming Trips" : "Ongoing Trips"}
+        </Text>
       </View>
 
       <View style={styles.userInput}>
         <MaterialIcons name="search" size={24} color="black" />
-        <TextInput placeholder="Search" style={{ flex: 1, padding: 2.5, fontSize: 16 }}></TextInput>
+        <TextInput
+          placeholder="Search"
+          style={{ flex: 1, padding: 2.5, fontSize: 16 }}
+        ></TextInput>
       </View>
     </View>
   </View>
 );
 
-export const ListFilteredCards: React.FC = () => {
+export interface listprops {
+  isUpcoming: boolean;
+}
+
+export const ListFilteredCards = ({ isUpcoming }: listprops) => {
   const [upcomingTrips, setUpcoming] = useState<Trip[]>([]);
-  const serverUrl = EXPO_PUBLIC_HOST_URL;
-  const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
-  const [windowHeight, setWindowHeight] = useState(Dimensions.get('window').height);
+  const serverUrl = process.env.EXPO_PUBLIC_HOST_URL;
+  const [windowWidth, setWindowWidth] = useState(
+    Dimensions.get("window").width,
+  );
+  const [windowHeight, setWindowHeight] = useState(
+    Dimensions.get("window").height,
+  );
   const [numCols, setNumCols] = useState(0);
   const [tripCardWidth, setTripCardWidth] = useState(380);
   const [tripCardHeight, setTripCardHeight] = useState(330);
 
   //Fetching data
   useEffect(() => {
-    Dimensions.addEventListener('change', ({ window: { width, height } }) => {
+    Dimensions.addEventListener("change", ({ window: { width, height } }) => {
       //Get window size every render
       setWindowHeight(height);
       setWindowWidth(width);
@@ -58,28 +76,9 @@ export const ListFilteredCards: React.FC = () => {
       setNumCols(Math.floor(width / (tripCardWidth + 40)));
     });
 
-
-    // const cleanData = (data: Trip[]) => {
-    //   let cleanedData: Trip[] = [];
-    //   let index = 0;
-    //   for (let trip of data) {
-    //     let format: Trip = {
-    //       id: trip.id,
-    //       name: trip.name,
-    //       location: trip.location,
-    //       startDate: new Date(trip.startDate),
-    //       endDate: new Date(trip.endDate),
-    //       image: trip.image,
-    //     };
-
-    //     cleanedData.push(format);
-    //   }
-    //   return cleanedData;
-    // };
-
     const getData = async () => {
       try {
-        const link = serverUrl + "/trips?upcoming=true";
+        const link = isUpcoming ? `http://${serverUrl}:3000/trips?ongoing=true` : `http://${serverUrl}:3000/trips?ongoing=true`;
         const upcoming = await fetch(link);
         let data = await upcoming.json();
         setUpcoming(data);
@@ -90,32 +89,32 @@ export const ListFilteredCards: React.FC = () => {
 
     //Fetch Data + Format Data
     getData();
-
-
   }, []);
-
-
 
   return (
     <View>
       <View style={styles.container}>
-
-        <Header />
+        <Header isUpcoming={isUpcoming} />
         <View style={{ flex: 1 }}>
-          <LinearGradient
-            colors={['#4c669f', '#5692F9', '#95BAF9']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            style={styles.content}
-          >
-            <FlatList
-              style={{ width: "100%", alignContent: "center", flexWrap: "wrap" }}
-              data={upcomingTrips}
-              key={numCols}
-              numColumns={numCols}
-              renderItem={({ item }) => <TripCard height={tripCardHeight} width={tripCardWidth} trip={item} />}
-            />
-          </LinearGradient>
+          <FlatList
+            style={{
+              width: "100%",
+              alignContent: "center",
+              flexWrap: "wrap",
+            }}
+            data={upcomingTrips}
+            key={numCols}
+            numColumns={numCols}
+            renderItem={({ item }) => (
+              <View style={{ marginVertical: 5 }}>
+                <TripCard
+                  height={tripCardHeight}
+                  width={tripCardWidth}
+                  trip={item}
+                />
+              </View>
+            )}
+          />
         </View>
       </View>
     </View>
@@ -125,9 +124,7 @@ export const ListFilteredCards: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     height: "100%",
-    backgroundColor: "#CADBFA",
   },
-
   headerConainner: {
     width: "100%",
     marginBottom: 10,
@@ -148,9 +145,8 @@ const styles = StyleSheet.create({
     padding: 5,
     paddingLeft: 20,
     flexDirection: "row",
-    backgroundColor: "#ADC8F7",
     borderRadius: 20,
-    alignItems: "center"
+    alignItems: "center",
   },
 
   content: {
@@ -164,6 +160,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 18,
     alignContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
 });

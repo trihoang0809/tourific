@@ -43,4 +43,12 @@ export function extractDateTime(timestamp: string) {
   return extractedDateTime;
 }
 
+export const tripDate = (date: Date) => {
+  if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+    return "Invalid date"; // Handle invalid dates
+  }
+  const month = date.toLocaleString("default", { month: "short" });
+  return `${date.getDate()} ${month}, ${date.getFullYear()}`;
+};
+
 export const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;

@@ -3,11 +3,10 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
-  Button,
   Pressable,
-  Dimensions,
+  TouchableOpacity,
+  Image,
 } from "react-native";
 import { TripCard } from "../components/TripCard/TripCard";
 import { HomeScreenHeader } from "../components/HomeScreenHeader";
@@ -18,6 +17,9 @@ import { EXPO_PUBLIC_HOST_URL } from "@/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import TripCardRect from "@/components/TripCard/TripCardRect";
+import { LinearGradient } from "expo-linear-gradient";
+import { homeheader } from '@/assets/homeheader.jpg';
+import { headerImage } from "@/utils/constants";
 
 export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [ongoingTrips, setOngoingTrips] = useState<Trip[]>([]);
@@ -25,10 +27,8 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   useEffect(() => {
     const fetchTrips = async () => {
       try {
-        // const ongoing = await fetch("http://localhost:3000/trips?ongoing=true");
         const ongoing = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`);
         const upcoming = await fetch(
-          // "http://localhost:3000/trips?upcoming=true",
           `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?upcoming=true`,
         );
         const ongoingData = await ongoing.json();
@@ -47,13 +47,20 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
         <HomeScreenHeader user={user} />
-        <Text style={styles.greeting}>Continue planning your trip, {user.firstName}!</Text>
-        <View>
+        <View style={{ height: 180, zIndex: -99 }}>
+          <Image
+            source={{
+              uri: headerImage,
+            }}
+            style={{ height: 180, position: 'absolute', width: '100%', top: 0 }} // Image is positioned absolutely and aligned to the top
+            resizeMode="cover"
+          />
+        </View>
+        <View style={{ marginTop: -5 }}>
           <View style={styles.inline}>
             <Text style={styles.title}>Ongoing Trips</Text>
             <Text onPress={() => { router.replace('/trips/ongoing'); }} >See all</Text>
           </View>
-
           <ScrollView
             horizontal={true}
             showsHorizontalScrollIndicator={false}
@@ -73,19 +80,20 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             <Text onPress={() => { router.replace('/trips/upcoming'); }} >See all</Text>
           </View>
 
-          <ScrollView horizontal={true} style={styles.tripScroll}>
-            {upcomingTrips.map((trip) => (
-              <TripCard key={trip.id} trip={trip} height={200} width={200} />
+          <ScrollView style={{ padding: 10 }}>
+            {upcomingTrips.slice(0, 3).map((trip) => (
+              <View style={{ padding: 5 }}>
+                <TripCardRect key={trip.id} trip={trip} height={100} width={500} />
+              </View>
             ))}
           </ScrollView>
         </View>
       </ScrollView>
-      <TripCardRect />
-      <Pressable style={{ zIndex: 99, position: 'absolute', bottom: 25, right: 7 }}>
+      <TouchableOpacity style={{ zIndex: 99, position: 'absolute', bottom: 25, right: 7 }}>
         <Link href="/trips/create">
           <Ionicons name="add-circle-sharp" size={55} color="black" />
         </Link>
-      </Pressable>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -100,16 +108,17 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
     padding: 10,
   },
   tripScroll: {
-    marginVertical: 5
+    marginVertical: 4,
   },
   noTrip: {
     fontSize: 16,
     color: "red",
+    textAlign: 'center'
   },
   buttonContainer: {
     width: "100%",
@@ -140,6 +149,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 10,
+    marginTop: 20,
+    padding: 5,
   },
 });

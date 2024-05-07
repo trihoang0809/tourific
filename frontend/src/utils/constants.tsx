@@ -3,3 +3,6 @@ export const noImage =
 
 export const defaultAvatar =
   "https://static1.colliderimages.com/wordpress/wp-content/uploads/2022/02/avatar-the-last-airbender-7-essential-episodes.jpg";
+
+export const headerImage =
+  "https://media.baamboozle.com/uploads/images/859995/1662108310_156635.jpeg";

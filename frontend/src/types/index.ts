@@ -15,6 +15,11 @@ export interface TripData {
     minutes: Number,
   };
   location: MapData,
+  image?: {
+    height: number;
+    width: number;
+    url: string;
+  };
 };
 
 export type MapData = {
