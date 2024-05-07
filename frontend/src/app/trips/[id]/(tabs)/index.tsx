@@ -92,7 +92,7 @@ const TripDetailsScreen = () => {
               height: "auto",
             }}
           >
-            <Text style={[styles.h1, {marginTop: 20}]}>{trip.name}</Text>
+            <Text style={[styles.h1, {marginTop: 18}]}>{trip.name}</Text>
             <View style={styles.row}>
               <Ionicons name="location-outline" size={25} color="#006ee6" />
               <View>
@@ -136,13 +136,13 @@ const TripDetailsScreen = () => {
 
             </View>
             <Text style={[styles.h4, {marginLeft: 35}]}>{DateTime.local().zoneName}</Text>
-            <View
+            {/* <View
               style={{
                 borderBottomWidth: 0.5,
                 borderColor: "#001833",
                 marginVertical: 20,
               }}
-            ></View>
+            ></View> */}
             <Text style={styles.h2}>Participants</Text>
           </View>
         </View>
@@ -168,28 +168,29 @@ const styles = StyleSheet.create({
   //   flex-direction: 'column',
   // },
   container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    // flex: 1,
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
   h1: {
     fontWeight: '600',
     fontSize: 26,
-    lineHeight: 35,
   },
   h2: {
     fontWeight: '400',
     fontSize: 24,
+    marginTop: 20,
   },
   h3: {
     fontSize: 18,
     fontWeight: '500',
-    lineHeight: 25,
+    lineHeight: 22,
   },
   h4: {
     color: '#676765',
     fontSize: 16,
     fontWeight: '500',
+    lineHeight: 22,
   },
   dateContainer: {
     marginLeft: 2,
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
 
   row: {
     flexDirection: 'row',
-    marginTop: 20,
+    marginTop: 18,
   },
 
 });
