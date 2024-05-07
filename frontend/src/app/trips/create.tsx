@@ -9,7 +9,7 @@ import {
   Pressable,
   Alert,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import favicon from "@/assets/favicon.png";
 import { Link, Stack, useLocalSearchParams } from "expo-router";

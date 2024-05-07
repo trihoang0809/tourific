@@ -1,6 +1,5 @@
 import React from 'react'; // This import is often required for JSX transformation.
-import { Redirect, Stack, Tabs } from 'expo-router';
-import { ScrollView, View } from 'react-native';
+import { Stack } from 'expo-router';
 
 // this should be our home page, list all the trips that we have
 const Layout = () => {

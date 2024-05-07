@@ -1,16 +1,14 @@
-import { View, Text, ScrollView, Image, TouchableOpacity, Button } from "react-native";
-import React, { useState, useEffect } from "react";
-import favicon from "@/assets/favicon.png";
-import { Link, Stack, useLocalSearchParams } from "expo-router";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { View, ScrollView, TouchableOpacity } from "react-native";
+import React from "react";
+import { useGlobalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
-import { DateTime } from 'luxon';
 import ActivityThumbnail from "@/components/ActivityThumbnail";
 import { mockData } from '../../../../mock-data/activities';
 import { ActivityProps } from "@/types";
 
 const ActivitiesScreen = () => {
-  const { id } = useLocalSearchParams();
+  const { id } = useGlobalSearchParams();
 
   // const getActivities = async ({ id: text }: { id: string; }) => {
   //   try {

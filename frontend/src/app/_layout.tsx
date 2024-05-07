@@ -1,5 +1,5 @@
 import React from 'react';
-import { SplashScreen, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 
 const RootNavigation = () => {
   return (
