@@ -84,6 +84,11 @@ router.put("/:id", async (req, res) => {
 // Delete a user profile
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
+
+  if (!id) {
+    res.status(StatusCodes.NOT_FOUND).json({ error: "ID does not exist" });
+  }
+
   try {
     const user = await prisma.user.delete({
       where: {
