@@ -19,6 +19,25 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
   useEffect(() => {
     const fetchTrips = async () => {
+      const cleanData = (data: Trip[]) => {
+        let cleanedData: Trip[] = [];
+        let index = 0;
+        for (let trip of data) {
+          let format: Trip = {
+            id: trip.id,
+            name: trip.name,
+            location: trip.location,
+            startDate: new Date(trip.startDate),
+            endDate: new Date(trip.endDate),
+            image: trip.image,
+          };
+  
+          cleanedData.push(format);
+        }
+        return cleanedData;
+      };
+
+
       try {
         // const ongoing = await fetch("http://localhost:3000/trips?ongoing=true");
         const ongoing = await fetch("http://10.0.2.2:3000/trips?ongoing=true");
@@ -28,9 +47,9 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
         );
         const ongoingData = await ongoing.json();
         const upcomingData = await upcoming.json();
-
-        setOngoingTrips(ongoingData);
-        setUpcomingTrips(upcomingData);
+        
+        setOngoingTrips(cleanData(ongoingData));
+        setUpcomingTrips(cleanData(upcomingData));
       } catch (error) {
         console.error("Failed to fetch trips:", error);
       }

@@ -9,7 +9,7 @@ import {
   Alert,
   Button
 }  from "react-native";
-import { styled } from 'nativewind';
+import { fontScale, styled } from 'nativewind';
 import { withExpoSnack } from 'nativewind';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { material } from 'react-native-typography'
@@ -58,13 +58,7 @@ export const ProposedActivities: React.FC = () => {
     <View>
       <StatusBar backgroundColor="black"/>
       <View style={styles.headerContainer}>
-  
-        <TouchableWithoutFeedback onPress={onPressBack}  >
-          <View style={styles.headerBack}>
-            <AntDesign name="left" size={24} color="blue" />
-            <Text style={[material.headline, {color: "black", marginLeft: 10}]}>Back</Text>
-          </View>
-        </TouchableWithoutFeedback>
+
             
         <Text style={[material.display1, {alignSelf: "center"}]}>Create New Activity</Text>
   
@@ -100,10 +94,11 @@ export const ProposedActivities: React.FC = () => {
             startTime: activityStartDate,
             endTime: activityEndDate,
             location: {
-              "address": activityLocation.address !== "" ? activityLocation.address : "Hehe",
-              "citystate": activityLocation.citystate,
-              "latitude": activityLocation.latitude,
-              "longitude": activityLocation.longitude,
+              address: activityLocation.address,
+              citystate: activityLocation.citystate,
+              latitude: activityLocation.latitude,
+              longitude: activityLocation.longitude,
+              radius: 0,
           },
             notes: activityNote,
           }),
@@ -174,17 +169,18 @@ export const ProposedActivities: React.FC = () => {
 
   return(
     <ScrollView style={styles.formContainer}>
-      <Header />
+      {/* <Header /> */}
       
       {/* Form */}
       <View style={styles.formInputContainer}>
         {/* Activity Name input  */}
         <View style={styles.queInput}>
-          <Text style={[material.headline, {color: "black", marginBottom: 10,}]}>Name:</Text>
+          {/* <Text style={[material.headline, {color: "grey", marginBottom: 10,}]}>Add a Title</Text> */}
           <TextInput 
             onChangeText={(value) => {setActivityName(value)}} 
-            style={[material.title, styles.formInput]} 
-            placeholder="Undefined" 
+            style={[material.title, {fontSize: 25, fontStyle: "italic"}]} 
+            placeholder="Add a title" 
+            placeholderTextColor={"grey"}
             value={activityName}
           >
           </TextInput>
@@ -252,7 +248,7 @@ export const ProposedActivities: React.FC = () => {
         </View>
 
 
-          {/* <GoogleMapInput 
+          <GoogleMapInput 
 
             onLocationSelect={(location) => {
               setActivityLocation({address: String(location.address), citystate: String(location.citystate), 
@@ -260,13 +256,13 @@ export const ProposedActivities: React.FC = () => {
               console.log("loc Proposed Activity: " + activityLocation.address);
             }}
 
-          /> */}
-          <GooglePlacesInput onLocationSelect={(location) => {
+          />
+          {/* <GooglePlacesInput onLocationSelect={(location) => {
               setActivityLocation({address: String(location.address), citystate: String(location.citystate), 
                 longitude: location.longitude, latitude: location.latitude})
               console.log("------------------------------");
               console.log("loc Proposed Activity: " + location.address);
-            }}/>
+            }}/> */}
           <SubmitButton />
 
         

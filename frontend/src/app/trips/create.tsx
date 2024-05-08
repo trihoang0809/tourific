@@ -513,7 +513,7 @@ export default function CreateTripScreen() {
                     onLocationSelect={(location) => {
                       onLocationSelect(location);
                       onChange(location);
-                      console.log("loc", location);
+                      console.log("loc", location.address);
                     }}
                   />
                 )}
