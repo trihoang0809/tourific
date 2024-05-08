@@ -12,6 +12,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
     "@hookform/resolvers": "^3.3.4",
+    "@react-native-community/datetimepicker": "^8.0.0",
     "@react-native-community/slider": "^4.4.2",
     "@react-native-menu/menu": "^1.0.0",
     "@reduxjs/toolkit": "^2.2.3",
@@ -29,6 +30,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.51.3",
     "react-native": "^0.73.6",
+    "react-native-date-picker": "^5.0.2",
     "react-native-geocoding": "^0.5.0",
     "react-native-google-places-autocomplete": "^2.5.6",
     "react-native-ios-context-menu": "^2.5.1",

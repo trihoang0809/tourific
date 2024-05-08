@@ -13,11 +13,14 @@ import {
   Platform
 }  from "react-native";
 import { material } from 'react-native-typography';
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import * as ImagePicker from 'expo-image-picker';
 import { User } from "@/types";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
+import { date } from "zod";
+import DateTimePicker from "react-native-modal-datetime-picker";
+import DatePicker from 'react-native-date-picker';
 
 interface editProps {
   method: string;
@@ -103,7 +106,6 @@ export const UserProfileCreate: React.FC<editProps> = ({
   
   const Header = () => (
     <View>
-      <StatusBar backgroundColor="black"/>
       <View style={styles.headerContainer}>
         <Text style={[material.display1, {alignSelf: "center"}]}>{title}</Text>
       </View>
@@ -269,11 +271,13 @@ export const UserProfileCreate: React.FC<editProps> = ({
                 {
                   userNameValid === "green"?
                   <AntDesign name="checkcircleo" size={24} color="green" style={{position: "absolute", alignSelf: "flex-end"}}/>
+                  
                   :
                   <View/>
                 }
             </View>
           </View>
+          {userNameValid === "red" && <Text style={{color: "red"}}>*Username should contain at least 5 characters</Text>}
         </View>
 
         {/* first name input */}
@@ -350,16 +354,25 @@ export const UserProfileCreate: React.FC<editProps> = ({
               }
             </Pressable>
           </View>
+          {passwordValid === "red" && <Text style={{color: "red"}}>*password should contain at least 8 characters</Text>}
         </View>
 
         {/* Date of Birth input using DateTimePickerModal */}
         <View style={styles.dateButtonContainer}>
-          <View style={{flexDirection: "row"}}>
-            <Text style={[material.headline, {color: "grey"}]}>Date of Birth </Text>
-            <TouchableWithoutFeedback onPress={onPressShowDOBDatePicker}>
-              <View style={styles.dateButton}>
-                <Text style={material.subheading}>{formatDate(DOB)}</Text>
-              </View>
+          <Text style={[material.title, {color: "grey", marginBottom: 20,}]}>Birth Date (Optional)</Text>
+          <View style={styles.dateButton}>
+            
+            <View style={styles.dateStyle}>
+              <Text style={[material.title]}>{ DOB.getDay() }</Text>
+            </View>
+            <View style={styles.dateStyle}>
+              <Text style={[material.title]}>{ DOB.toLocaleString("default", { month: "short" }) }</Text>
+            </View>
+            <View style={styles.dateStyle}>
+              <Text style={[material.title]}>{ DOB.getFullYear() }</Text>
+            </View>
+            <TouchableWithoutFeedback onPress={ onPressShowDOBDatePicker }>
+              <Entypo name="calendar" size={24} color="black" />
             </TouchableWithoutFeedback>
           </View>
 
@@ -369,6 +382,7 @@ export const UserProfileCreate: React.FC<editProps> = ({
             onConfirm={handleDOBConfirm}
             onCancel={hideDOBDatePicker}
           />
+
         </View>
 
 
@@ -423,17 +437,17 @@ const styles = StyleSheet.create(
     },
 
     dateButton: {
-      borderWidth: 1,
-      paddingHorizontal: 14,
-      paddingVertical: 3,
-      borderRadius: 4,
+
       marginBottom: 50,
+      flex: 1,
+      flexDirection: "row",
+      columnGap: 12,
+      alignContent: "space-around"
       // backgroundColor: "#569AF3"
     },
 
     dateButtonContainer: {
-      flexDirection: "row",
-      justifyContent: "space-between",
+      flex: 1,
       // alignItems: "center",
       // backgroundColor: "red",
     },
@@ -449,6 +463,13 @@ const styles = StyleSheet.create(
       height: 120,
       borderRadius: 60,
       alignSelf: "center",
+    },
+
+    dateStyle: {
+      flex: 1,
+      borderWidth: 1,
+      borderRadius: 12,
+      alignItems: "center"
     },
   }
 );
