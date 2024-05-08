@@ -1,66 +1,101 @@
-import React, {Component, useState, useEffect} from 'react';
-import {Alert, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
-import {Agenda, DateData, AgendaEntry, AgendaSchedule} from 'react-native-calendars';
+import React, { Component, useState, useEffect } from "react";
+import { View } from "react-native";
 // import testIDs from '../testIDs';
-import AgendaList from './../../../../components/Agenda';
-import { useRoute } from '@react-navigation/native';
 import { Link, Stack, useGlobalSearchParams } from "expo-router";
-import { Calendar } from 'react-native-big-calendar';
+import { Calendar } from "react-native-big-calendar";
+import { mockData } from "@/mock-data/activities";
+
+// import { EventRenderer, ICalendarEventBase } from '../src/interfaces'
+
+// const Itinerary = () => {
+//   const { id } = useGlobalSearchParams();
+//   console.log("id (initerary page):", id);
+
+//   // const [trip, setTrip] = useState({
+//   //   startDate: new Date(),
+//   //   endDate: new Date(),
+//   //   startHour: 0,
+//   //   startMinute: 0,
+//   // });
+
+//   // const getTrip = async ({ id: text }: { id: string; }) => {
+//   //   try {
+//   //     const response = await fetch(`http://localhost:3000/trips/${id}`, {
+//   //       method: "GET",
+//   //       headers: {
+//   //         "Content-Type": "application/json",
+//   //       },
+//   //     });
+//   //     if (!response.ok) {
+//   //       throw new Error("Failed to fetch trip");
+//   //     }
+//   //     const data = await response.json();
+//   //     setTrip(data);
+//   //     console.log("Trip fetch (initerary page):", data);
+//   //   } catch (error: any) {
+//   //     console.error("Error fetching trip (initerary page):", error.toString());
+//   //   }
+//   // };
+
+//   // useEffect(() => {
+//   //   getTrip({ id });
+//   // }, []);
+
+const events = mockData
+  ? mockData
+      .filter((activity) => activity.isOnCalendar)
+      .map((activity) => {
+        return {
+          title: activity.name,
+          start: activity.startTime,
+          end: activity.endTime,
+        };
+      })
+  : [];
+
+// const events = [
+//   {
+//     title: 'Meeting',
+//     start: new Date(2024, 4, 7, 10, 0),
+//     end: new Date(2024, 4, 7, 10, 30),
+//   },
+//   {
+//     title: 'Coffee break',
+//     start: new Date(2024, 4, 8, 15, 45),
+//     end: new Date(2024, 4, 8, 16, 30),
+//   },
+//   {
+//     title: 'Repair my car',
+//     start: new Date(2024, 4, 20, 7, 45),
+//     end: new Date(2024, 4, 20, 13, 30),
+//   },
+// ]
 
 const Itinerary = () => {
-  const { id } = useGlobalSearchParams();
-  console.log("id (initerary page):", id);
-  const [trip, setTrip] = useState({
-    startDate: new Date(),
-    endDate: new Date(),
-    startHour: 0,
-    startMinute: 0,
-  });
-
-  const getTrip = async ({ id: text }: { id: string; }) => {
-    try {
-      const response = await fetch(`http://localhost:3000/trips/${id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch trip");
-      }
-      const data = await response.json();
-      setTrip(data);
-      console.log("Trip fetch (initerary page):", data);
-    } catch (error: any) {
-      console.error("Error fetching trip (initerary page):", error.toString());
-    }
-  };
-
-  useEffect(() => {
-    getTrip({ id });
-  }, []);
-
-  const events = [
-    {
-      title: 'Meeting',
-      start: new Date(2024, 5, 3, 10, 0, 0),
-      end: new Date(2024, 5, 4, 12, 30, 0),
-    },
-    {
-      title: 'Coffee break',
-      start: new Date(2024, 5, 4, 15, 45),
-      end: new Date(2024, 5, 6, 16, 30),
-    },
-    // {
-    //   title: 'all day event',
-    //   start: "2024-05-05T00:00:00.000Z",
-    //   end: "2024-05-06T00:00:00.000Z",
-    // }
-  ]
-
+  console.log("logged by phuognn start: ", new Date(2020, 5, 20, 10, 0));
+  console.log("logged by phuognn end: ", new Date(2020, 5, 20, 22, 30));
   return (
-    <AgendaList startDate={trip.startDate}/>
+    <View style={{ flex: 1 }}>
+      <View></View>
+      <Calendar
+        // height={Dimensions.get('window').height}
+        // style={styles.calendar}
+        events={events}
+        height={600}
+        mode={'3days'}
+        // eventCellStyle={{ backgroundColor: 'blue' }}
+      />
+    </View>
   );
-}
+};
 
 export default Itinerary;
+
+// export default class Itinerary extends React.Component {
+//   render() {
+//       return (
+//           <AgendaList />
+//       )
+//   }
+// }
+
