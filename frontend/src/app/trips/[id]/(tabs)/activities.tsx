@@ -23,6 +23,7 @@ const ActivitiesScreen = () => {
     startHour: 0,
     startMinute: 0,
   });
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const getTrip = async ({ id: text }: { id: string }) => {
@@ -50,10 +51,17 @@ const ActivitiesScreen = () => {
     trip.location.longitude,
     trip.location.radius,
   );
-  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSubmit = () => {}; // to be implemented for filtering
 
   return (
-    <View style={{ flex: 1, height: Dimensions.get("window").height }}>
+    <View
+      style={{
+        flex: 1,
+        height: Dimensions.get("window").height,
+        backgroundColor: "white",
+      }}
+    >
       {/* <Stack.Screen
         options={{
           title: '',
@@ -79,6 +87,7 @@ const ActivitiesScreen = () => {
           placeholder="Search activities..."
           value={searchTerm}
           onChangeText={setSearchTerm}
+          onSubmitEditing={handleSubmit}
           style={{
             padding: 5,
             flex: 1,
