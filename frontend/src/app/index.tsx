@@ -1,10 +1,9 @@
-import React from 'react';
-import { Text, View } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { Link, Stack } from 'expo-router';
-import PopupMenu from '@/components/PopupMenu/PopupMenu';
+import React from "react";
+import { SafeAreaView } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { Link, Stack } from "expo-router";
 import { HomeScreen } from "../screens/HomeScreen";
-import sampleUser from '@/mock-data/userNickDoan';
+import sampleUser from "@/mock-data/userNickDoan";
 
 export default function App() {
   // return (
@@ -16,11 +15,11 @@ export default function App() {
   //     <StatusBar style="auto" />
   //     {/* <App /> */}
   //   </View>
-    
+
   // );
 
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white">
       <Stack.Screen
         options={{
           title: "",
@@ -28,6 +27,11 @@ export default function App() {
         }}
       />
       <HomeScreen user={sampleUser} />
-    </View>
+      <Link href="/trips/661f78b88c72a65f2f6e49d4">
+        Go to trip at the beach
+      </Link>
+      <Link href="/trips/create">Go to trip create</Link>
+      <StatusBar style="auto" />
+    </SafeAreaView>
   );
 }
