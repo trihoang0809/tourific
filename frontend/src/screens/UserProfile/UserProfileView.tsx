@@ -1,6 +1,6 @@
 import { User } from "@/types";
 import { useEffect, useState } from "react";
-import { Platform, ScrollView, View, StyleSheet, Text, Image, Pressable } from "react-native";
+import { Platform, ScrollView, View, StyleSheet, Text, Image, Pressable, TouchableOpacity } from "react-native";
 import { material } from "react-native-typography";
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from "expo-router";
@@ -11,7 +11,7 @@ interface userIDProps {
 
 const UserProfileView = (userID: userIDProps) => {
   const [userProfile, setUserProfile] = useState<User>();
-
+  const [selectedValue, setSelectedValue] = useState("Trips");
 
   // Format the Date 
   const formatDate = (date: Date) => {
@@ -49,6 +49,8 @@ const UserProfileView = (userID: userIDProps) => {
   }, []);
 
 
+
+
   return (  
     <ScrollView style={styles.infoContainer}>
       <View style={[{flexDirection: "column"}, styles.header]}>
@@ -67,11 +69,21 @@ const UserProfileView = (userID: userIDProps) => {
 
       <View style={{flexDirection: "row", justifyContent: "space-around", columnGap: 10, padding: 10,}}>
         <Pressable style={styles.editContainer} onPress={()=>router.push("userProfile/update")}>
-              <Text style={{fontSize: 20}}>Edit Profile</Text>
+          <Text style={{fontSize: 20, fontWeight: "bold"}}>Edit Profile</Text>
         </Pressable>
 
         <Pressable style={styles.editContainer} onPress={()=>{}}>
-              <Text style={{fontSize: 20}}>Share Profile</Text>
+          <Text style={{fontSize: 20, fontWeight: "bold"}}>Share Profile</Text>
+        </Pressable>
+      </View>
+
+      <View style={{flexDirection: "row", justifyContent: "space-around", columnGap: 10, padding: 10,}}>
+        <Pressable style={[styles.sectionPhoto, selectedValue === "Trips" && { borderBottomColor: "#3945E9"}]} onPress={()=>{setSelectedValue("Trips")}}>
+          <Text style={[{fontSize: 20, fontWeight: "bold"}, selectedValue === "Trips" && {color: "#3945E9"}]}>Trips</Text>
+        </Pressable>
+
+        <Pressable style={[styles.sectionPhoto, selectedValue === "Photos" && { borderBottomColor: "#3945E9"}]} onPress={()=>{setSelectedValue("Photos")}}>
+          <Text style={[{fontSize: 20, fontWeight: "bold"}, selectedValue === "Photos" && {color: "#3945E9"}]}>Photos</Text>
         </Pressable>
       </View>
     </ScrollView>
@@ -82,7 +94,7 @@ const UserProfileView = (userID: userIDProps) => {
 const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
-    // backgroundColor: "red",
+    backgroundColor: "white",
   },
 
   detailContainer: {
@@ -104,7 +116,7 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    backgroundColor: "#7567F0",
+    backgroundColor: "#3945E9",
     marginBottom: 50,
     height: 150,
   },
@@ -117,13 +129,22 @@ const styles = StyleSheet.create({
   editContainer: {
     // width: 150,
     // height: 40,
-    borderWidth: 2,
-    borderRadius: 5,
+    borderWidth: 1,
+    borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#D7D7DF",
+    backgroundColor: "white",
+    borderColor: "#3945E9",
     flex: 1,
-  
+    marginVertical: 40,
+  },
+
+  sectionPhoto: {
+    borderBottomWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "white",
+    flex: 1,
   },
 });
 
