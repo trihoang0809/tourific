@@ -9,7 +9,7 @@ import {
   Pressable,
   Alert,
 } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import favicon from "@/assets/favicon.png";
 import { Link, Stack, useLocalSearchParams } from "expo-router";
@@ -47,21 +47,21 @@ export default function CreateTripScreen() {
     isUpdating
       ? trips[0]
       : {
-        name: "",
-        dateRange: {
-          startDate: new Date(),
-          endDate: new Date(),
+          name: "",
+          dateRange: {
+            startDate: new Date(),
+            endDate: new Date(),
+          },
+          startTime: {
+            hours: Number,
+            minutes: Number,
+          },
+          endTime: {
+            hours: Number,
+            minutes: Number,
+          },
+          location: {},
         },
-        startTime: {
-          hours: Number,
-          minutes: Number,
-        },
-        endTime: {
-          hours: Number,
-          minutes: Number,
-        },
-        location: {},
-      },
   );
 
   // for date range picker modal
@@ -120,7 +120,6 @@ export default function CreateTripScreen() {
         console.error("Error creating trip:", error.toString());
       }
     } else {
-
       // CREATING
       try {
         const response = await fetch("http://localhost:3000/trips", {
@@ -156,7 +155,7 @@ export default function CreateTripScreen() {
   }, [setOpen]);
 
   const onConfirm = useCallback(
-    ({ startDate, endDate }: { startDate: Date; endDate: Date; }) => {
+    ({ startDate, endDate }: { startDate: Date; endDate: Date }) => {
       console.log("start date", startDate, endDate);
       setOpen(false);
       // Check if startDate and endDate are already set in formData
@@ -190,7 +189,7 @@ export default function CreateTripScreen() {
   );
 
   const onConfirmStartTime = useCallback(
-    ({ hours, minutes }: { hours: number; minutes: number; }) => {
+    ({ hours, minutes }: { hours: number; minutes: number }) => {
       setFormData(
         (prevFormData) =>
           ({
@@ -198,7 +197,7 @@ export default function CreateTripScreen() {
             startTime: {
               hours: hours,
               minutes: minutes,
-            }
+            },
           }) as TripData,
       );
       setVisibleStart(false);
@@ -207,15 +206,15 @@ export default function CreateTripScreen() {
   );
 
   const onConfirmEndTime = useCallback(
-    ({ hours, minutes }: { hours: number; minutes: number; }) => {
+    ({ hours, minutes }: { hours: number; minutes: number }) => {
       setFormData(
         (prevFormData) =>
           ({
             ...prevFormData,
             endTime: {
               hours: hours,
-              minutes: minutes
-            }
+              minutes: minutes,
+            },
           }) as TripData,
       );
       setVisibleEnd(false);
@@ -264,7 +263,7 @@ export default function CreateTripScreen() {
               width: 130,
               padding: "auto",
             }}
-            onPress={() => { }}
+            onPress={() => {}}
           >
             <Text>Change image</Text>
           </Pressable>
@@ -324,7 +323,11 @@ export default function CreateTripScreen() {
                   />
                 )}
               />
-              {errors.name && <Text className="text-red-500">{errors.name.message?.toString()}</Text>}
+              {errors.name && (
+                <Text className="text-red-500">
+                  {errors.name.message?.toString()}
+                </Text>
+              )}
             </View>
             <View style={{ marginVertical: 10 }}>
               <Text className="font-semibold text-base">Date</Text>
@@ -366,7 +369,9 @@ export default function CreateTripScreen() {
                 />
               </SafeAreaProvider>
               {errors.dateRange && (
-                <Text className="text-red-500">{errors.dateRange.message?.toString()}</Text>
+                <Text className="text-red-500">
+                  {errors.dateRange.message?.toString()}
+                </Text>
               )}
             </View>
             <View
@@ -378,7 +383,9 @@ export default function CreateTripScreen() {
                 marginVertical: 10,
               }}
             >
-              <View style={{ flex: 1, marginRight: 5, flexDirection: 'column' }}>
+              <View
+                style={{ flex: 1, marginRight: 5, flexDirection: "column" }}
+              >
                 <Text className="font-semibold text-base">Start time</Text>
                 <TouchableOpacity onPress={() => setVisibleStart(true)}>
                   <Text
@@ -393,28 +400,21 @@ export default function CreateTripScreen() {
                     }}
                   >
                     {typeof formData.startTime.hours === "number" &&
-                      typeof formData.startTime.minutes === "number"
+                    typeof formData.startTime.minutes === "number"
                       ? new Date(
-                        1970,
-                        0,
-                        1,
-                        formData.startTime.hours,
-                        formData.startTime.minutes,
-                      ).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                      :
-                      new Date(
-                        1970,
-                        0,
-                        1,
-                        8,
-                        0,
-                      ).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                          1970,
+                          0,
+                          1,
+                          formData.startTime.hours,
+                          formData.startTime.minutes,
+                        ).toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : new Date(1970, 0, 1, 8, 0).toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                   </Text>
                 </TouchableOpacity>
                 <Controller
@@ -435,10 +435,14 @@ export default function CreateTripScreen() {
                     />
                   )}
                 />
-                {errors.startTime && <Text className="text-red-500">{errors.startTime.message?.toString()}</Text>}
+                {errors.startTime && (
+                  <Text className="text-red-500">
+                    {errors.startTime.message?.toString()}
+                  </Text>
+                )}
               </View>
 
-              <View style={{ flex: 1, marginLeft: 5, flexDirection: 'column' }}>
+              <View style={{ flex: 1, marginLeft: 5, flexDirection: "column" }}>
                 <Text className="font-semibold text-base">End time</Text>
                 <TouchableOpacity onPress={() => setVisibleEnd(true)}>
                   <Text
@@ -453,27 +457,21 @@ export default function CreateTripScreen() {
                     }}
                   >
                     {typeof formData.endTime.hours === "number" &&
-                      typeof formData.endTime.minutes === "number"
+                    typeof formData.endTime.minutes === "number"
                       ? new Date(
-                        1970,
-                        0,
-                        1,
-                        formData.endTime.hours,
-                        formData.endTime.minutes,
-                      ).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                      : new Date(
-                        1970,
-                        0,
-                        1,
-                        8,
-                        0,
-                      ).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                          1970,
+                          0,
+                          1,
+                          formData.endTime.hours,
+                          formData.endTime.minutes,
+                        ).toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : new Date(1970, 0, 1, 8, 0).toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                   </Text>
                 </TouchableOpacity>
                 <Controller
@@ -496,7 +494,11 @@ export default function CreateTripScreen() {
                     />
                   )}
                 />
-                {errors.endTime && <Text className="text-red-500">{errors.endTime.message?.toString()}</Text>}
+                {errors.endTime && (
+                  <Text className="text-red-500">
+                    {errors.endTime.message?.toString()}
+                  </Text>
+                )}
               </View>
             </View>
 
@@ -516,7 +518,11 @@ export default function CreateTripScreen() {
                   />
                 )}
               />
-              {errors.location && <Text className="text-red-500">{errors.location?.message?.toString()}</Text>}
+              {errors.location && (
+                <Text className="text-red-500">
+                  {errors.location?.message?.toString()}
+                </Text>
+              )}
             </View>
             <Button
               title={isUpdating ? "Edit Trip" : "Create Trip"}
