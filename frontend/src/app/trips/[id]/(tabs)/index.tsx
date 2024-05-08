@@ -26,7 +26,8 @@ const TripDetailsScreen = () => {
 
   const getTrip = async ({ id: text }: { id: string }) => {
     try {
-      const response = await fetch(`http://localhost:3000/trips/${id}`, {
+      // const response = await fetch(`http://localhost:3000/trips/${id}`, {
+      const response = await fetch(`http://10.0.2.2:3000/trips/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
