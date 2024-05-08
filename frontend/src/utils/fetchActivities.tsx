@@ -1,68 +1,45 @@
 import { useState, useEffect } from "react";
-import { MapData } from "@/types";
+import { ActivityProps } from "@/types";
 
-export type ActivityData = {
-  id: string;
-  name: string;
-  description: string;
-  startTime: {
-    hours: number;
-    minutes: number;
-  };
-  endTime: {
-    hours: number;
-    minutes: number;
-  };
-  location: MapData;
-  notes: string;
-  netUpvotes: number;
-  isOnCalendar: boolean;
-  category: string[];
-};
-
-type ActivitiesProps = {
-  latitude: string;
-  longitude: string;
-  radius: number;
-};
-
-export const useFetchActivities = ({
-  latitude,
-  longitude,
-  radius,
-}: ActivitiesProps): ActivityData[] => {
-  const [activities, setActivities] = useState<ActivityData[]>([]);
+export const fetchActivities = (
+  latitude: number,
+  longitude: number,
+  radius: number,
+): ActivityProps[] => {
+  const [activities, setActivities] = useState<ActivityProps[]>([]);
   const GOOGLE_PLACES_API_KEY =
-    process.env.REACT_APP_GOOGLE_PLACES_API_KEY || "";
+    process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY || "undefined";
+
+  const getImageUrl = (photos: any, apiKey: any) => {
+    if (photos && photos.length > 0) {
+      const photoReference = photos[0].photo_reference;
+      return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${photoReference}&key=${apiKey}`;
+    }
+    return "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0";
+  };
 
   useEffect(() => {
-    const fetchActivities = async () => {
+    const doFetch = async () => {
       try {
-        const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json`;
-        const response = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            location: `${latitude},${longitude}`,
-            radius: radius,
-            key: GOOGLE_PLACES_API_KEY,
-          }),
-        });
+        const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude}%2C${longitude}&radius=${radius}&key=${GOOGLE_PLACES_API_KEY}`;
+        const response = await fetch(url);
         const data = await response.json();
 
-        const activitiesData: ActivityData[] = data.results.map(
+        const activitiesData: ActivityProps[] = data.results.map(
           (place: any) => ({
-            id: place.place_id,
             name: place.name,
+            description: "",
+            imageUrl: getImageUrl(place.photos, GOOGLE_PLACES_API_KEY),
             location: {
+              citystate: place.vicinity,
               latitude: place.geometry.location.lat,
               longitude: place.geometry.location.lng,
             },
+            notes: "",
             netUpvotes: 0,
             isOnCalendar: false,
             category: place.types,
+            rating: place.rating,
           }),
         );
 
@@ -72,7 +49,7 @@ export const useFetchActivities = ({
       }
     };
 
-    fetchActivities();
+    doFetch();
   }, [latitude, longitude, radius]);
 
   return activities;

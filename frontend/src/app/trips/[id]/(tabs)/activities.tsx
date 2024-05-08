@@ -1,35 +1,56 @@
-import { View, ScrollView, TouchableOpacity } from "react-native";
-import React from "react";
+import { View, ScrollView, TouchableOpacity, TextInput } from "react-native";
+import { useState, useEffect } from "react";
 import { useGlobalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, Feather } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import ActivityThumbnail from "@/components/ActivityThumbnail";
-import { mockData } from "../../../../mock-data/activities";
 import { ActivityProps } from "@/types";
+import { fetchActivities } from "@/utils/fetchActivities";
 
 const ActivitiesScreen = () => {
   const { id } = useGlobalSearchParams();
+  const [trip, setTrip] = useState({
+    name: "",
+    location: {
+      address: "",
+      citystate: "",
+      latitude: 0,
+      longitude: 0,
+      radius: 0,
+    },
+    startDate: new Date(),
+    endDate: new Date(),
+    startHour: 0,
+    startMinute: 0,
+  });
 
-  // const getActivities = async ({ id: text }: { id: string; }) => {
-  //   try {
-  //     const response = await fetch(`http://localhost:3000/trips/${id}`, {
-  //       method: "GET",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       // body: JSON.stringify(req),
-  //     });
-  //     if (!response.ok) {
-  //       throw new Error("Failed to fetch trip");
-  //     }
-  //     // Optionally, you can handle the response here
-  //     const data = await response.json();
-  //     setTrip(data);
-  //     console.log("Trip fetch:", data);
-  //   } catch (error: any) {
-  //     console.error("Error fetching trip:", error.toString());
-  //   }
-  // };
+  useEffect(() => {
+    const getTrip = async ({ id: text }: { id: string }) => {
+      try {
+        const response = await fetch(`http://localhost:3000/trips/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if (!response.ok) {
+          throw new Error("Failed to fetch trip");
+        }
+        const data = await response.json();
+        setTrip(data);
+      } catch (error: any) {
+        console.error("Error fetching trip:", error.toString());
+      }
+    };
+    getTrip({ id });
+  }, []);
+
+  const activities = fetchActivities(
+    trip.location.latitude,
+    trip.location.longitude,
+    trip.location.radius,
+  );
+  const [searchTerm, setSearchTerm] = useState("");
 
   return (
     <View style={{ flex: 1, height: Dimensions.get("window").height }}>
@@ -42,6 +63,31 @@ const ActivitiesScreen = () => {
           
         }}
       /> */}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: "#E6E6E6",
+          borderRadius: 20,
+          borderWidth: 1,
+          padding: 10,
+          margin: 10,
+        }}
+      >
+        <Feather name="search" size={20} color="black" />
+        <TextInput
+          placeholder="Search activities..."
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+          style={{
+            padding: 5,
+            flex: 1,
+            height: 30,
+            fontSize: 16,
+            color: "black",
+          }}
+        />
+      </View>
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -54,7 +100,7 @@ const ActivitiesScreen = () => {
           onPress={() => { }}>
           <Text>Add</Text>
         </TouchableOpacity> */}
-        {mockData.map((activity: ActivityProps, index: number) => (
+        {activities.map((activity: ActivityProps, index: number) => (
           <View style={{ width: "100%", padding: 15 }}>
             <ActivityThumbnail key={index} {...activity} />
           </View>
