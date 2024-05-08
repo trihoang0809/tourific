@@ -1,15 +1,13 @@
-import { View, Text } from 'react-native';
-import React from 'react';
-import { HomeScreen } from '../../screens/HomeScreen';
-import { Link, Stack } from 'expo-router';
-import { User } from '@/types';
-
+import { View, Text } from "react-native";
+import React from "react";
 
 // route is /trips
+// this should be our home page, list all the trips that we have
+
 const TripHomePage = () => {
   return (
-    <View className="flex-1 bg-white">
-      <Text>Haha</Text>
+    <View>
+      <Text>TripHomePage</Text>
     </View>
   );
 };
