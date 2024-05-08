@@ -2,8 +2,9 @@ import { User } from "@/types";
 import { useEffect, useState } from "react";
 import { Platform, ScrollView, View, StyleSheet, Text, Image, Pressable } from "react-native";
 import { material } from "react-native-typography";
-import { Feather } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from "expo-router";
+
 interface userIDProps {
   userID: string,
 }
@@ -51,28 +52,27 @@ const UserProfileView = (userID: userIDProps) => {
   return (  
     <ScrollView style={styles.infoContainer}>
       <View style={[{flexDirection: "column"}, styles.header]}>
+          <MaterialCommunityIcons name="menu" size={40} color="white" style={{alignSelf:"flex-end"}}/>
 
-          <Pressable style={{alignSelf:"flex-end"}} onPress={()=>router.push("userProfile/update")}>
-            <Feather name="edit" size={24} color="black" />
-          </Pressable>
 
-          <View style={styles.detailContainer}>
+          <View style={styles.avatarContainer}>
               <Image source={{ uri: userProfile?.avatar.url }} style={styles.avatar} />
           </View>
 
       </View>
 
-      <View style={styles.detailContainer}>
-          <Text style={[material.headline, {color: "black", marginBottom: 10,}]}>User Name: {userProfile?.userName}</Text>
+      <View style={styles.username}>
+          <Text style={[material.headline, {color: "black", marginBottom: 10, fontWeight: "bold"}]}>{userProfile?.userName}</Text>
       </View>
-      <View style={styles.detailContainer}>
-          <Text style={[material.headline, {color: "black", marginBottom: 10,}]}>First Name: {userProfile?.firstName}</Text>
-      </View>
-      <View style={styles.detailContainer}>
-          <Text style={[material.headline, {color: "black", marginBottom: 10,}]}>Last Name: {userProfile?.lastName}</Text>
-      </View>
-      <View style={styles.detailContainer}>
-          <Text style={[material.headline, {color: "black", marginBottom: 10,}]}>DOB: {formatDate(new Date(String(userProfile?.dateOfBirth)))}</Text>
+
+      <View style={{flexDirection: "row", justifyContent: "space-around", columnGap: 10, padding: 10,}}>
+        <Pressable style={styles.editContainer} onPress={()=>router.push("userProfile/update")}>
+              <Text style={{fontSize: 20}}>Edit Profile</Text>
+        </Pressable>
+
+        <Pressable style={styles.editContainer} onPress={()=>{}}>
+              <Text style={{fontSize: 20}}>Share Profile</Text>
+        </Pressable>
       </View>
     </ScrollView>
   );
@@ -97,9 +97,34 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
 
+  avatarContainer: {
+    position: "absolute",
+    alignSelf: "center",
+    bottom: -50,
+  },
+
   header: {
-    backgroundColor: "blue",
-  }
+    backgroundColor: "#7567F0",
+    marginBottom: 50,
+    height: 150,
+  },
+
+  username: {
+    alignSelf: "center",
+    marginTop: 10,
+  },
+
+  editContainer: {
+    // width: 150,
+    // height: 40,
+    borderWidth: 2,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#D7D7DF",
+    flex: 1,
+  
+  },
 });
 
 export default UserProfileView;
