@@ -2,8 +2,8 @@ export const mockData = [
   {
     name: 'Hiking in the mountains with friends',
     description: 'Hiking in the mountains',
-    startTime: new Date('2024-08-04T10:00:00Z'),
-    endTime: new Date('2022-08-05T14:00:00Z'),
+    startTime: new Date('2024-05-04T10:00:00Z'),
+    endTime: new Date('2024-05-05T14:00:00Z'),
     location: {
       citystate:
         "Mountain City, MT 12212 a very long city name that spans multiple lines but will end eventually when the line ends",
@@ -22,8 +22,8 @@ export const mockData = [
   {
     name: 'Swimming at the local pool near the park',
     description: 'Swimming at the local pool',
-    startTime: new Date('2022-01-02T10:00:00Z'),
-    endTime: new Date('2022-01-02T12:00:00Z'),
+    startTime: new Date('2024-05-06T10:00:00Z'),
+    endTime: new Date('2022-05-07T12:00:00Z'),
     location: {
       citystate: "Pool City, MT, 1212u1212",
       address: "456 Pool Rd",
@@ -33,16 +33,16 @@ export const mockData = [
     },
     notes: "Bring swimsuit and towel",
     netUpvotes: 3,
-    isOnCalendar: false,
-    category: ["Exercise"],
-    imageUrl: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0",
+    isOnCalendar: true,
+    category: ['Exercise'],
+    imageUrl: 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0',
     rating: 4.5,
   },
   {
     name: 'Swimming',
     description: 'Swimming at the local pool',
-    startTime: new Date('2022-01-02T10:00:00Z'),
-    endTime: new Date('2022-01-02T12:00:00Z'),
+    startTime: new Date('2024-05-08T10:00:00Z'),
+    endTime: new Date('2024-05-08T12:00:00Z'),
     location: {
       citystate: "Pool City, MT 83772228",
       address: "456 Pool Rd",
@@ -52,9 +52,9 @@ export const mockData = [
     },
     notes: "Bring swimsuit and towel",
     netUpvotes: 3,
-    isOnCalendar: false,
-    category: ["Exercise"],
-    imageUrl: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0",
+    isOnCalendar: true,
+    category: ['Exercise'],
+    imageUrl: 'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0',
     rating: 4.5,
   },
   {
