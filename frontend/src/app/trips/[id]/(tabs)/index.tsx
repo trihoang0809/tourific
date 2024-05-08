@@ -1,16 +1,8 @@
-<<<<<<< HEAD:frontend/src/app/trips/[id].tsx
-import { View, Text, ScrollView, Image, TouchableOpacity, Pressable } from "react-native";
-import React, { useState, useEffect } from "react";
-import favicon from "@/assets/favicon.png";
-import { Link, Stack, useLocalSearchParams, router } from "expo-router";
-import { Feather, Ionicons } from "@expo/vector-icons";
-=======
 import { View, Text, ScrollView, Image } from "react-native";
 import React, { useState, useEffect } from "react";
 import favicon from "@/assets/favicon.png";
 import { useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
->>>>>>> main:frontend/src/app/trips/[id]/(tabs)/index.tsx
 import { Dimensions } from "react-native";
 import { DateTime } from "luxon";
 import { StyleSheet } from "react-native";
@@ -89,16 +81,6 @@ const TripDetailsScreen = () => {
           // headerBackTitleStyle: { fontSize: 30 },
         }}
       /> */}
-<<<<<<< HEAD:frontend/src/app/trips/[id].tsx
-      {/* <Stack.Screen
-        name="trips/[id]"
-        options={{
-          title: "",
-          headerShown: true,
-        }}
-      /> */}
-=======
->>>>>>> main:frontend/src/app/trips/[id]/(tabs)/index.tsx
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View>
           <Image style={styles.image} source={favicon} />
