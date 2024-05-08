@@ -20,11 +20,11 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   useEffect(() => {
     const fetchTrips = async () => {
       try {
-        const ongoing = await fetch("http://localhost:3000/trips?ongoing=true");
-        // const ongoing = await fetch("http://10.0.2.2:3000/trips?ongoing=true");
+        // const ongoing = await fetch("http://localhost:3000/trips?ongoing=true");
+        const ongoing = await fetch("http://10.0.2.2:3000/trips?ongoing=true");
         const upcoming = await fetch(
-          "http://localhost:3000/trips?upcoming=true",
-          //"http://10.0.2.2:3000/trips?upcoming=true",
+          // "http://localhost:3000/trips?upcoming=true",
+          "http://10.0.2.2:3000/trips?upcoming=true",
         );
         const ongoingData = await ongoing.json();
         const upcomingData = await upcoming.json();
