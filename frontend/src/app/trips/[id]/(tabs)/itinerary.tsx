@@ -4,6 +4,8 @@ import { View } from "react-native";
 import { Link, Stack, useGlobalSearchParams } from "expo-router";
 import { Calendar } from "react-native-big-calendar";
 import { mockData } from "@/mock-data/activities";
+import DropDown from "@/components/DropDown";
+import { Mode } from "react-native-big-calendar/build/interfaces";
 
 // import { EventRenderer, ICalendarEventBase } from '../src/interfaces'
 
@@ -72,17 +74,27 @@ const events = mockData
 // ]
 
 const Itinerary = () => {
-  console.log("logged by phuognn start: ", new Date(2020, 5, 20, 10, 0));
-  console.log("logged by phuognn end: ", new Date(2020, 5, 20, 22, 30));
+  const [calendarMode, setCalendarMode] = useState<Mode>('3days');
+  console.log("logged by start: ", new Date(2020, 5, 20, 10, 0));
+  console.log("logged by end: ", new Date(2020, 5, 20, 22, 30));
+  const labels = [
+    { label: 'Schedule', value: 'schedule' },
+    { label: 'Day', value: 'day' },
+    { label: '3 days', value: '3days' },
+    { label: 'Week', value: 'week' },
+    { label: 'Month', value: 'month' },
+  ];
+
   return (
     <View style={{ flex: 1 }}>
-      <View></View>
+      <DropDown labels={labels}
+      onChange={(mode: Mode) => setCalendarMode(mode)}/>
       <Calendar
         // height={Dimensions.get('window').height}
         // style={styles.calendar}
         events={events}
         height={600}
-        mode={'3days'}
+        mode={calendarMode}
         // eventCellStyle={{ backgroundColor: 'blue' }}
       />
     </View>
