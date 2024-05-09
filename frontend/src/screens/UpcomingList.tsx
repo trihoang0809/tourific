@@ -14,12 +14,8 @@ import { useState, useEffect } from "react";
 import { TripCard } from "../components/TripCard";
 import { LinearGradient } from "expo-linear-gradient";
 import { Trip } from "../types";
-import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { Stack, router } from "expo-router";
-
-
-
-
 
 const Header = () => (
   <View>
@@ -56,16 +52,15 @@ export const ListFilteredCards: React.FC = () => {
 
   //Fetching data
   useEffect(() => {
-    Dimensions.addEventListener('change', ({window:{width,height}}) => {
-        //Get window size every render
-        setWindowHeight(height);
-        setWindowWidth(width);
+    Dimensions.addEventListener("change", ({ window: { width, height } }) => {
+      //Get window size every render
+      setWindowHeight(height);
+      setWindowWidth(width);
 
-        //Adjust the number of columns of FlatList based on window size
-        //width of the window/(trip card width + horizontal margin)
-        setNumCols(Math.floor(width/(tripCardWidth + 40)));
+      //Adjust the number of columns of FlatList based on window size
+      //width of the window/(trip card width + horizontal margin)
+      setNumCols(Math.floor(width / (tripCardWidth + 40)));
     });
-
 
     const cleanData = (data: Trip[]) => {
       let cleanedData: Trip[] = [];

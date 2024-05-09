@@ -31,12 +31,11 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             endDate: new Date(trip.endDate),
             image: trip.image,
           };
-  
+
           cleanedData.push(format);
         }
         return cleanedData;
       };
-
 
       try {
         // const ongoing = await fetch("http://localhost:3000/trips?ongoing=true");
@@ -47,7 +46,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
         );
         const ongoingData = await ongoing.json();
         const upcomingData = await upcoming.json();
-        
+
         setOngoingTrips(cleanData(ongoingData));
         setUpcomingTrips(cleanData(upcomingData));
       } catch (error) {
@@ -80,7 +79,12 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
 
       <View style={styles.upcoming}>
         <Text style={styles.title}>Upcoming Trips</Text>
-        <Button title="See all" onPress={() => {router.push('/trips/upcoming');}}/>
+        <Button
+          title="See all"
+          onPress={() => {
+            router.push("/trips/upcoming");
+          }}
+        />
       </View>
 
       <ScrollView horizontal={true} style={styles.tripScroll}>
