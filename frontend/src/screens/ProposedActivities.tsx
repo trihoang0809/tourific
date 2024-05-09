@@ -121,15 +121,21 @@ export const ProposedActivities: React.FC = () => {
             }),
           },
         );
-        console.log(activityNote);
-        setActivityName("");
-        setActivityNote([]);
-        setActivityLocation({
-          address: "",
-          citystate: "",
-          longitude: 0,
-          latitude: 0,
-        });
+
+        if (createActivity.status === 201) {
+          console.log("success");
+          setActivityName("");
+          setActivityNote([""]);
+          setNoteIndex([{ id: 0, value: 0 }]);
+          setNoteSelected([false]);
+          setActivityLocation({
+            address: "",
+            citystate: "",
+            longitude: 0,
+            latitude: 0,
+          });
+        }
+        // console.log(activityNote);
       } catch (error) {
         console.log("An error occured while CREATING new Activity " + error);
       }
