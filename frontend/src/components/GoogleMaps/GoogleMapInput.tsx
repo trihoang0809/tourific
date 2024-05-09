@@ -22,7 +22,7 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
     longitude: -122.446747,
   });
   const mapRef = useRef(null);
-  const [radius, setRadius] = useState(30000);
+  const [radius, setRadius] = useState(1400);
   const handleSliderChange = (value: number) => {
     setRadius(value);
   };
@@ -62,15 +62,13 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
 
   return (
     <View>
-      <View style={styles.container}>
+      <View style={[styles.container, {margin: 30,}]}>
         <LocationSearch onLocationSelected={(location) => {
           setQuery( {address: location.address, citystate: location.citystate} );
         }} />
 
       </View>
 
-      <Text className='font-semibold text-base'>Current radius: {(radius * 0.000621371).toFixed(2)} miles</Text>
-      {centerCircle && <Text>Current area: {centerCircle}</Text>}
       <MapView
         ref={mapRef}
         // onRegionChangeComplete={async (val) => {
@@ -87,8 +85,8 @@ const GooglePlacesInput = ({ onLocationSelect }: GooglePlacesInputProps) => {
           // longitudeDelta: 0.03,
         }}
         style={{
-          width: width - 40,
-          height: width - 40,
+          width: "100%",
+          height: "100%",
         }}
         provider={PROVIDER_GOOGLE}
         onPress={async (e) => {

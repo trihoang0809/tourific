@@ -7,16 +7,21 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
   Alert,
-  Button
+  Button,
+  Pressable,
+  Modal,
+  ImageBackground
 }  from "react-native";
 import { fontScale, styled } from 'nativewind';
 import { withExpoSnack } from 'nativewind';
-import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { AntDesign, FontAwesome5, MaterialIcons, Entypo, FontAwesome6 } from '@expo/vector-icons';
 import { material } from 'react-native-typography'
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import GoogleMapInput from "@/components/GoogleMaps/GoogleMapInput";
 import GooglePlacesInput from "@/components/GoogleMaps/GooglePlacesInput";
+import { Dropdown } from 'react-native-element-dropdown';
+
 
 export const ProposedActivities: React.FC = () => {
   //Declare useState
@@ -30,7 +35,9 @@ export const ProposedActivities: React.FC = () => {
   const [isFormFilled, setIsFormFilled] = useState(false);
   const [isStartDatePickerVisible, setStartDatePickerVisibility] = useState(false);
   const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
- 
+  const [noteEditable, setNoteEditable] = useState(false);
+  const [isNoteSelected, setNoteSelected] = useState(false);
+  const [mapVisible, setMapVisible] = useState(false);
   //Header render + Return Button + Alert Pop up
   const alertUnSaved = () => {
     Alert.alert('Unsaved Changes', 'You have unsaved changes', [
@@ -188,29 +195,44 @@ export const ProposedActivities: React.FC = () => {
 
         {/* Activity Description input */}
         <View style={styles.queInput}>
-          <Text style={[material.headline, {color: "black", marginBottom: 10,}]}>Tell me what you're gonna do:</Text>
           <TextInput 
             onChangeText={(value) => {setActivityDescription(value)}} 
-            style={[material.title, styles.formInput]} 
-            placeholder="Undefined" 
+            style={[material.title, styles.noteInput]} 
+            placeholder="Tell us what you're gonna do" 
             value={activityDescription}
           >
           </TextInput>
         </View>
 
         {/* Activity Note input */}
-        <View style={styles.queInput}>
-          <Text style={[material.headline, {color: "black", marginBottom: 10,}]}>Note:</Text>
-          <TextInput 
-            onChangeText={(value) => {setActivityNote(value)}} 
-            style={[material.title, styles.formInput]} 
-            placeholder="Undefined" 
-            value={activityNote}
-          >
-          </TextInput>
-        </View>
+        <Pressable style={[styles.queInput, {backgroundColor: "white", flex: 1}]} onPress={() => {setNoteSelected(true)}}>
+          { 
+            !isNoteSelected?          
+              <Text style={[material.title, styles.noteInput, {fontStyle: "italic", color:"grey"}]}>{activityNote === "" ? "Add your notes here" : activityNote}
+              </Text>
+            :
+            <View style={styles.noteInputFocus}>
+              <View style={{flexDirection: "row"}}>
+                <FontAwesome5 name="sticky-note" size={24} color="black"/>
+                <TextInput 
+                  onChangeText={(value) => {setActivityNote(value)}} 
+                  style={[material.title, {fontStyle: "italic", marginLeft: 10}]} 
+                  placeholder="Add your notes here" 
+                  value={activityNote}
+                  multiline={true}>
+                
+                </TextInput>
+              </View>
+              <Pressable onPress={() => setNoteSelected(false)} style={{alignSelf: "flex-end"}}>
+                <AntDesign name="up" size={24} color="black" />
+                </Pressable>
+              </View>
+          }
+          
+        </Pressable>
 
-        {/* Start Date input using DateTimePickerModal */}
+
+        {/* Start Date input using DateTimePickerModal
         <View style={styles.dateButtonContainer}>
           <View style={{flexDirection: "row"}}>
             <Text style={[material.headline, {color: "black"}]}>From: </Text>
@@ -227,8 +249,8 @@ export const ProposedActivities: React.FC = () => {
             onConfirm={handleStartConfirm}
             onCancel={hideStartDatePicker}
           />
-          
-          {/* End Date input using DateTimePickerModal */}
+           */}
+          {/* End Date input using DateTimePickerModal
           <View style={{flexDirection: "row"}}>
             <Text style={[material.headline, {color: "black"}]}>To: </Text>
             <TouchableWithoutFeedback onPress={onPressShowEndDatePicker}>
@@ -245,24 +267,36 @@ export const ProposedActivities: React.FC = () => {
             onCancel={hideEndDatePicker}
           />
           
-        </View>
+        </View> */}
 
-
-          <GoogleMapInput 
-
-            onLocationSelect={(location) => {
-              setActivityLocation({address: String(location.address), citystate: String(location.citystate), 
-                longitude: location.longitude, latitude: location.latitude})
-              console.log("loc Proposed Activity: " + activityLocation.address);
-            }}
-
-          />
-          {/* <GooglePlacesInput onLocationSelect={(location) => {
-              setActivityLocation({address: String(location.address), citystate: String(location.citystate), 
-                longitude: location.longitude, latitude: location.latitude})
-              console.log("------------------------------");
-              console.log("loc Proposed Activity: " + location.address);
-            }}/> */}
+          <Modal
+           animationType="slide"
+           transparent={true}
+           visible={mapVisible}
+           onRequestClose={() => setMapVisible(false)}
+           >
+           <View style={{flex:1, backgroundColor: 'rgba(0,0,0,0.5)'}}>
+              <Pressable style={{height: "20%"}} onPress={() => setMapVisible(false)}></Pressable>
+              <View style={[styles.modalMapView, {rowGap: 0,}]}>
+                <Text style={[material.title, {alignSelf: "center"}]}>Add a Place</Text>
+                <GoogleMapInput 
+                  onLocationSelect={(location) => {
+                    setActivityLocation({address: String(location.address), citystate: String(location.citystate), 
+                    longitude: location.longitude, latitude: location.latitude})
+                  }}
+                />
+              </View>
+          </View>
+          </Modal>
+          <View style={{flexDirection: "row", columnGap: 10, alignItems: "center"}}>
+            <Pressable style={[styles.noteInputFocus, {flexDirection: "row", flex: 1}]} onPress={() => setMapVisible(true)}>
+                <Entypo name="location-pin" size={24} color="black" />
+                <Text style={[material.title, {color: "grey"}]}>Add a place</Text>
+            </Pressable>
+            <Pressable style={styles.noteIcon}>
+                <FontAwesome6 name="note-sticky" size={30} color="black" />
+            </Pressable>
+          </View>
           <SubmitButton />
 
         
@@ -297,11 +331,21 @@ const styles = StyleSheet.create(
 
     },
 
-    formInput: {
-      borderWidth: 1,
+    noteInput: {
+      // borderWidth: 1,
+      borderBottomWidth: 1,
       padding: 10,
       borderRadius: 4,
+      backgroundColor: "white",
       // color: "red",
+    },
+
+    noteInputFocus: {
+      backgroundColor: "#F6F5F5",
+      padding: 10,
+      borderRadius: 4,
+      borderWidth: 1,
+      borderCurve: "circular",
     },
 
     queInput: {
@@ -311,7 +355,7 @@ const styles = StyleSheet.create(
     formContainer: {
       flex: 1,
       padding: 10,
-      // backgroundColor: "red",
+      backgroundColor: "white",
       // marginBottom: 100,
     },
 
@@ -343,5 +387,33 @@ const styles = StyleSheet.create(
       marginBottom: 50,
       // backgroundColor: "red",
     },
+
+    modalMapView: {
+      backgroundColor: "white",
+      borderTopLeftRadius: 14,
+      borderTopRightRadius: 14,
+      flex: 1,
+      paddingTop: 30,
+      borderWidth: 1,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+
+    },
+
+    noteIcon: {
+      borderWidth: 1, 
+      backgroundColor: "#EBEBEB",
+      borderRadius: 20,
+      width: 40,
+      height: 40,
+      justifyContent: "center",
+      alignItems: "center"
+    }
+
   }
 );

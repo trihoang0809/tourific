@@ -10,7 +10,7 @@ export const LocationSearch = ({ onLocationSelected }: { onLocationSelected: (lo
     {
       id: "googlePlacesInput",
       component: <GooglePlacesAutocomplete
-        placeholder='Search a location'
+        placeholder='Search by name or address'
         onPress={(data, details = null) => {
           console.log("location", data)
           console.log("street", data.structured_formatting.main_text)
