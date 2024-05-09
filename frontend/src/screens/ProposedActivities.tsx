@@ -89,13 +89,13 @@ export const ProposedActivities: React.FC = () => {
   //Submit Button
   const validateForm = () => {
     // console.log(activityDescription);
-    if (activityDescription !== "") setIsFormFilled(true);
+    setIsFormFilled(true);
   };
 
   const onPressSubmit = async () => {
     validateForm();
-    console.log("Submit: " + activityLocation.address);
-    // console.log(ad)
+    console.log("Submit: " + activityNote);
+    console.log(isFormFilled);
     if (isFormFilled) {
       try {
         const createActivity = await fetch(
@@ -121,8 +121,8 @@ export const ProposedActivities: React.FC = () => {
             }),
           },
         );
+        console.log(activityNote);
         setActivityName("");
-        setActivityDescription("");
         setActivityNote([]);
         setActivityLocation({
           address: "",
@@ -130,8 +130,6 @@ export const ProposedActivities: React.FC = () => {
           longitude: 0,
           latitude: 0,
         });
-        setActivityStartDate(new Date());
-        setActivityEndDate(new Date());
       } catch (error) {
         console.log("An error occured while CREATING new Activity " + error);
       }
@@ -160,7 +158,7 @@ export const ProposedActivities: React.FC = () => {
   //Note input
   const NoteInput = ({ index }: { index: number }) => {
     const [note, setNote] = useState(activityNote[index].toString());
-    // console.log(isNoteSelected);
+    console.log(index);
     return (
       <Pressable
         style={[styles.queInput, { backgroundColor: "white", flex: 1 }]}
@@ -168,7 +166,7 @@ export const ProposedActivities: React.FC = () => {
           isNoteSelected[index] = true;
           setNoteSelected(isNoteSelected);
           forceUpdate();
-          console.log(isNoteSelected);
+          console.log(activityNote);
         }}
       >
         {!isNoteSelected[index] ? (
@@ -295,7 +293,6 @@ export const ProposedActivities: React.FC = () => {
               noteIndex.push({ id: noteIndex.length, value: noteIndex.length });
               isNoteSelected.push(false);
               setNoteSelected(isNoteSelected);
-              console.log(isNoteSelected);
               forceUpdate();
             }}
           >
