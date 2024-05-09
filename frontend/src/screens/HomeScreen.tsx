@@ -7,6 +7,7 @@ import {
   Pressable,
   TouchableOpacity,
   Image,
+  Dimensions,
 } from "react-native";
 import { TripCard } from "../components/TripCard/TripCard";
 import { HomeScreenHeader } from "../components/HomeScreenHeader";
@@ -19,8 +20,11 @@ import { Ionicons } from "@expo/vector-icons";
 import TripCardRect from "@/components/TripCard/TripCardRect";
 import { LinearGradient } from "expo-linear-gradient";
 import { homeheader } from '@/assets/homeheader.jpg';
-import { headerImage } from "@/utils/constants";
+import { headerImage, randomizeCover } from "@/utils/constants";
+import Style from "Style";
 
+const screenw = Dimensions.get("window").width;
+const titleWidth = screenw - (screenw * 0.96);
 export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [ongoingTrips, setOngoingTrips] = useState<Trip[]>([]);
   const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
@@ -47,10 +51,11 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
         <HomeScreenHeader user={user} />
-        <View style={{ height: 180, zIndex: -99 }}>
+        <Text style={styles.greeting}>Hey 👋, {user.firstName}!</Text>
+        <View style={{ height: 180 }}>
           <Image
             source={{
-              uri: headerImage,
+              uri: randomizeCover(headerImage),
             }}
             style={{ height: 180, position: 'absolute', width: '100%', top: 0 }} // Image is positioned absolutely and aligned to the top
             resizeMode="cover"
@@ -59,7 +64,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
         <View style={{ marginTop: -5 }}>
           <View style={styles.inline}>
             <Text style={styles.title}>Ongoing Trips</Text>
-            <Text onPress={() => { router.replace('/trips/ongoing'); }} >See all</Text>
+            <Text onPress={() => { router.replace('/trips/ongoing'); }}>See all</Text>
           </View>
           <ScrollView
             horizontal={true}
@@ -80,18 +85,20 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             <Text onPress={() => { router.replace('/trips/upcoming'); }} >See all</Text>
           </View>
 
-          <ScrollView style={{ padding: 10 }}>
+          <ScrollView style={{ paddingHorizontal: 10 }}>
             {upcomingTrips.slice(0, 3).map((trip) => (
-              <View style={{ padding: 5 }}>
-                <TripCardRect key={trip.id} trip={trip} height={100} width={500} />
+              <View style={{ padding: 5, alignItems: 'center' }}>
+                <TripCardRect key={trip.id} trip={trip} height={100} />
               </View>
             ))}
           </ScrollView>
         </View>
       </ScrollView>
-      <TouchableOpacity style={{ zIndex: 99, position: 'absolute', bottom: 25, right: 7 }}>
+      <TouchableOpacity
+        style={Style.addIcon}
+      >
         <Link href="/trips/create">
-          <Ionicons name="add-circle-sharp" size={55} color="black" />
+          <Ionicons name="add" size={40} color="white" />
         </Link>
       </TouchableOpacity>
     </SafeAreaView>
@@ -103,14 +110,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   greeting: {
-    justifyContent: "flex-start",
-    fontSize: 18,
-    marginBottom: 20,
+    marginLeft: 20,
+    fontSize: 15,
+    marginBottom: 10,
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    padding: 10,
+    marginBottom: 5
   },
   tripScroll: {
     marginVertical: 4,
@@ -150,6 +157,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: 20,
-    padding: 5,
+    marginHorizontal: titleWidth,
   },
 });

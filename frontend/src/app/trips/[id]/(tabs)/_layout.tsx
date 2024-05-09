@@ -1,16 +1,31 @@
-import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { AntDesign } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
-import { Link, Stack, useLocalSearchParams } from "expo-router";
-import { Feather, Ionicons } from "@expo/vector-icons";
-import { View } from 'react-native';
+import React from "react";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { AntDesign } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
+import { Link, useLocalSearchParams } from "expo-router";
+import { Feather } from "@expo/vector-icons";
+import { View, Text } from "react-native";;
 
 export default function TabLayout() {
   const { id } = useLocalSearchParams();
 
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: 'navy', headerShown: false }}>
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: "#006ee6",
+        headerShown: false,
+        tabBarStyle: {
+          height: 80,
+          paddingTop: 12,
+        },
+        tabBarItemStyle: {
+          height: 50,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
@@ -40,15 +55,22 @@ export default function TabLayout() {
       <Tabs.Screen
         name="activities"
         options={{
-          title: 'Suggestions',
-          tabBarIcon: ({ color }) => <AntDesign name="find" size={28} color={color} />,
+          title: "Suggestions",
+          tabBarIcon: ({ color }) => (
+            <AntDesign name="find" size={28} color={color} />
+          ),
+          // tabBarLabel:() => {return null},
         }}
       />
       <Tabs.Screen
         name="itinerary"
         options={{
-          title: 'Itinerary',
-          tabBarIcon: ({ color }) => <AntDesign name="calendar" size={24} color={color} />,
+          title: "Itinerary",
+          tabBarIcon: ({ color }) => (
+            <AntDesign name="calendar" size={28} color={color} />
+          ),
+          // tabBarShowLabel: false,
+          // tabBarLabel:() => {return null},
         }}
       />
     </Tabs>

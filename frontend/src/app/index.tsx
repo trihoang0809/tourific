@@ -1,8 +1,7 @@
 import React from 'react';
-import { Dimensions, View } from 'react-native';
-import { Link, Stack } from 'expo-router';
+import { View } from 'react-native';
 import { HomeScreen } from "../screens/HomeScreen";
-import { sampleUser } from '@/mock-data/user';
+import { sampleUser } from "@/mock-data/user";
 
 export default function App() {
 

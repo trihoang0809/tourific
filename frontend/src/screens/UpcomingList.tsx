@@ -1,10 +1,8 @@
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   TextInput,
-  TouchableHighlight,
   Dimensions,
   StatusBar,
   FlatList,
@@ -12,11 +10,9 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import { TripCard } from "@/components/TripCard/TripCard";
-import { LinearGradient } from "expo-linear-gradient";
 import { Trip } from "../types";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
-import { Stack, router } from "expo-router";
-import { boolean } from "zod";
+import { router } from "expo-router";
 
 const onPressCategory = () => {
   console.log("You pressed on this category");
@@ -54,28 +50,12 @@ export interface listprops {
 export const ListFilteredCards = ({ isUpcoming }: listprops) => {
   const [upcomingTrips, setUpcoming] = useState<Trip[]>([]);
   const serverUrl = process.env.EXPO_PUBLIC_HOST_URL;
-  const [windowWidth, setWindowWidth] = useState(
-    Dimensions.get("window").width,
-  );
-  const [windowHeight, setWindowHeight] = useState(
-    Dimensions.get("window").height,
-  );
-  const [numCols, setNumCols] = useState(0);
-  const [tripCardWidth, setTripCardWidth] = useState(380);
-  const [tripCardHeight, setTripCardHeight] = useState(330);
+  const windowWidth = Dimensions.get("window").width;
+  const tripCardWidth = windowWidth - (windowWidth * 0.12);
+  const tripCardHeight = 280;
 
   //Fetching data
   useEffect(() => {
-    Dimensions.addEventListener("change", ({ window: { width, height } }) => {
-      //Get window size every render
-      setWindowHeight(height);
-      setWindowWidth(width);
-
-      //Adjust the number of columns of FlatList based on window size
-      //width of the window/(trip card width + horizontal margin)
-      setNumCols(Math.floor(width / (tripCardWidth + 40)));
-    });
-
     const getData = async () => {
       try {
         const link = isUpcoming ? `http://${serverUrl}:3000/trips?ongoing=true` : `http://${serverUrl}:3000/trips?ongoing=true`;
@@ -103,10 +83,8 @@ export const ListFilteredCards = ({ isUpcoming }: listprops) => {
               flexWrap: "wrap",
             }}
             data={upcomingTrips}
-            key={numCols}
-            numColumns={numCols}
             renderItem={({ item }) => (
-              <View style={{ marginVertical: 5 }}>
+              <View style={{ marginVertical: 8, }}>
                 <TripCard
                   height={tripCardHeight}
                   width={tripCardWidth}
@@ -127,17 +105,8 @@ const styles = StyleSheet.create({
   },
   headerConainner: {
     width: "100%",
-    marginBottom: 10,
     padding: 10,
   },
-
-  category: {
-    fontSize: 25,
-    marginBottom: 10,
-    fontWeight: "bold",
-    color: "blue",
-  },
-
   userInput: {
     borderWidth: 2,
     alignContent: "center",
@@ -148,7 +117,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
   },
-
   content: {
     flex: 1,
     alignItems: "center",

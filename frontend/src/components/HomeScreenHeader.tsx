@@ -14,7 +14,7 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
     <SafeAreaView style={styles.content}>
       <View>
         {/* <Text style={styles.appName}>tourific</Text> */}
-        <Text style={styles.appName}>Hey 👋, {user.firstName}!</Text>
+        <Text style={styles.appName}>tourific</Text>
       </View>
       <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
         <TouchableOpacity

@@ -7,10 +7,11 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Trip } from "../../types";
-import { Octicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Octicons, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { Link, router, Stack } from "expo-router";
 import { noImage, defaultAvatar } from "@/utils/constants";
 import { tripDate } from "@/utils";
+import Style from "Style";
 
 interface tripProps {
   trip: Trip;
@@ -48,7 +49,6 @@ export const TripCard: React.FC<tripProps> = ({
 
   // Calculate image height as 2/3 of the card's height
   const imageHeight = (height * 2) / 3;
-  const textSize = height / 18;
   const tripState = tripLocation.citystate.split(", ");
 
   useEffect(() => {
@@ -60,57 +60,55 @@ export const TripCard: React.FC<tripProps> = ({
   }, []);
 
   return (
-    <View>
-      <TouchableHighlight
-        style={[styles.card, { height: height, width: width }]} // Apply dynamic height and width
-        underlayColor="#BEC0F5"
-        onPress={onPressTripCard}
-      >
-        <View>
-          <View style={{
-            padding: 8
-          }}>
-            <Image
-              source={
-                tripImage?.url === undefined
-                  ? { uri: noImage }
-                  : { uri: tripImage?.url }
-              }
-              style={[
-                styles.image,
-                {
-                  // height: tripImage === null ? 250 : imageHeight,
-                  height: imageHeight,
-                  width: "100%",
-                },
-              ]}
-            />
+    <TouchableHighlight
+      style={[Style.card, { height: height, width: width, marginHorizontal: 20, marginBottom: 5 }]} // Apply dynamic height and width
+      underlayColor="#fffcab"
+      onPress={onPressTripCard}
+    >
+      <View style={{ flexDirection: 'column', justifyContent: 'space-between' }}>
+        <View style={{
+          padding: 8
+        }}>
+          <Image
+            source={
+              tripImage?.url === undefined
+                ? { uri: noImage }
+                : { uri: tripImage?.url }
+            }
+            style={[
+              styles.image,
+              {
+                // height: tripImage === null ? 250 : imageHeight,
+                height: imageHeight,
+                width: "100%",
+              },
+            ]}
+          />
+        </View>
+        <View style={styles.descriptionContainer}>
+          <View>
+            <Text numberOfLines={1} style={{ fontSize: fontTripName, fontWeight: "bold" }}>
+              {tripName}
+            </Text>
           </View>
-          <View style={styles.descriptionContainer}>
-            <View>
-              <Text numberOfLines={1} style={{ fontSize: fontTripName, fontWeight: "bold" }}>
-                {tripName}
+
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            <View style={styles.detail}>
+              <Ionicons name="location-outline" size={18} color="#696e6e" />
+              <Text numberOfLines={1} style={[Style.tripCardSecondaryText, { marginLeft: 4 }]}>
+                {location}
               </Text>
             </View>
-
-            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-              <View style={styles.detail}>
-                <Octicons name="location" size={17} color="black" />
-                <Text numberOfLines={1} style={[{ color: "blue", marginLeft: 6, fontSize: fontTripDetail, width: 100 }]}>
-                  {location}
-                </Text>
-              </View>
-              <View style={styles.detail}>
-                <MaterialCommunityIcons name="timetable" size={17} color="black" />
-                <Text style={[{ color: "blue", marginLeft: 6, fontSize: fontTripDetail }]}>
-                  {tripDate(new Date(tripStartDate))}
-                </Text>
-              </View>
+            <View style={styles.detail}>
+              <MaterialCommunityIcons name="timetable" size={17} color="#696e6e" />
+              <Text style={[Style.tripCardSecondaryText, { marginLeft: 4 }]}>
+                {tripDate(new Date(tripStartDate))}
+              </Text>
             </View>
           </View>
         </View>
-      </TouchableHighlight>
-    </View>
+      </View>
+    </TouchableHighlight>
   );
 };
 
@@ -133,7 +131,7 @@ const styles = StyleSheet.create({
 
   descriptionContainer: {
     paddingLeft: 10,
-    paddingVertical: 5,
+    // paddingVertical: 10,
     textAlign: 'center',
     justifyContent: "space-between",
   },

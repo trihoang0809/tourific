@@ -7,12 +7,12 @@ export interface TripData {
     endDate: Date;
   };
   startTime: {
-    hours: Number,
-    minutes: Number,
+    hours: number;
+    minutes: number;
   };
   endTime: {
-    hours: Number,
-    minutes: Number,
+    hours: number;
+    minutes: number;
   };
   location: MapData,
   image?: {
@@ -23,8 +23,8 @@ export interface TripData {
 };
 
 export type MapData = {
-  address: String,
-  citystate: String,
+  address: String;
+  citystate: String;
   latitude: number;
   longitude: number;
   radius: number;
@@ -37,7 +37,10 @@ export type DataItem = {
 };
 
 export interface DateRangePickerProps {
-  onSelectRange: (startDate: Date | undefined, endDate: Date | undefined) => void;
+  onSelectRange: (
+    startDate: Date | undefined,
+    endDate: Date | undefined,
+  ) => void;
 }
 
 export interface GooglePlacesInputProps {
@@ -58,6 +61,7 @@ export interface ActivityProps {
   category: string[];
   rating?: number;
 }
+
 export type Trip = {
   id: string;
   name: string;
