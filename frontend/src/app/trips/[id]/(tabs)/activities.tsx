@@ -52,6 +52,45 @@ const ActivitiesScreen = () => {
     trip.location.radius,
   );
 
+  const saveActivitiesToBackend = async (activities: ActivityProps[]) => {
+    console.log("start saving");
+    activities.forEach(async (activity) => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/trips/${id}/activities`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: activity.name,
+              description: activity.description,
+              startTime: new Date(),
+              endTime: new Date(),
+              location: {
+                citystate: activity.location.citystate,
+                latitude: activity.location.latitude,
+                longitude: activity.location.longitude,
+              },
+              notes: activity.notes,
+              netUpvotes: activity.netUpvotes,
+              isOnCalendar: activity.isOnCalendar,
+              category: activity.category,
+              rating: activity.rating,
+            }),
+          },
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  };
+
+  useEffect(() => {
+    saveActivitiesToBackend(activities);
+  }, [[activities]]);
+
   const handleSubmit = () => {}; // to be implemented for filtering
 
   return (

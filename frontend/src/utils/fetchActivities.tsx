@@ -27,6 +27,7 @@ export const fetchActivities = (
 
         const activitiesData: ActivityProps[] = data.results.map(
           (place: any) => ({
+            id: place.place_id,
             name: place.name,
             description: "",
             imageUrl: getImageUrl(place.photos, GOOGLE_PLACES_API_KEY),
