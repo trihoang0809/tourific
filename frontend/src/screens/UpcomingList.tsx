@@ -17,19 +17,11 @@ import { Trip } from "../types";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { Stack, router } from "expo-router";
 
-const onPressCategory = () => {
-  console.log("You pressed on this category");
-  router.replace("/");
-};
-
 const Header = () => (
   <View>
     <StatusBar backgroundColor="black" />
     <View style={styles.headerConainner}>
       <View style={styles.headerTitle}>
-        <TouchableWithoutFeedback onPress={onPressCategory}>
-          <AntDesign name="left" size={24} color="blue" />
-        </TouchableWithoutFeedback>
         <Text style={{ fontSize: 22, marginLeft: 10 }}>Upcoming Trips</Text>
       </View>
 
@@ -46,7 +38,8 @@ const Header = () => (
 
 export const ListFilteredCards: React.FC = () => {
   const [upcomingTrips, setUpcoming] = useState<Trip[]>([]);
-  const serverUrl = "http://localhost:3000";
+  // const serverUrl = "http://localhost:3000";
+  const serverUrl = "http://10.0.2.2:3000";
   const [windowWidth, setWindowWidth] = useState(
     Dimensions.get("window").width,
   );
