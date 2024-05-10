@@ -6,6 +6,8 @@ import { Calendar } from "react-native-big-calendar";
 import { mockData } from "@/mock-data/activities";
 import DropDown from "@/components/DropDown";
 import { Mode } from "react-native-big-calendar/build/interfaces";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+
 
 // import { EventRenderer, ICalendarEventBase } from '../src/interfaces'
 
@@ -88,7 +90,9 @@ const Itinerary = () => {
   return (
     <View style={{ flex: 1 }}>
       <DropDown labels={labels}
-      onChange={(mode: Mode) => setCalendarMode(mode)}/>
+      onChange={(mode: Mode) => setCalendarMode(mode)}
+      name="Calendar View"
+      icon={<MaterialIcons name="calendar-view-week" size={24} color="black" />}/>
       <Calendar
         // height={Dimensions.get('window').height}
         // style={styles.calendar}
