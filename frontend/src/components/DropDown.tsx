@@ -18,9 +18,11 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 type DropDownProps = {
   labels: { label: string; value: string }[]
   onChange: (value: any) => void;
+  name: string;
+  icon: React.ReactNode;
 };
 
-const DropDown = ({labels, onChange}: DropDownProps) => {
+const DropDown = ({labels, onChange, name, icon}: DropDownProps) => {
   const [value, setValue] = useState<string | null>(null);
   const [isFocus, setIsFocus] = useState(false);
 
@@ -28,7 +30,7 @@ const DropDown = ({labels, onChange}: DropDownProps) => {
     if (value || isFocus) {
       return (
         <Text style={[styles.label, isFocus && { color: 'blue' }]}>
-          Dropdown label
+          {name}
         </Text>
       );
     }
@@ -59,14 +61,15 @@ const DropDown = ({labels, onChange}: DropDownProps) => {
           setIsFocus(false);
           onChange(item.value);
         }}
-        renderLeftIcon={() => (
-          <AntDesign
-            style={styles.icon}
-            color={isFocus ? 'blue' : 'black'}
-            name="Safety"
-            size={20}
-          />
-        )}
+        renderLeftIcon={() => 
+          // <AntDesign
+          //   style={styles.icon}
+          //   color={isFocus ? 'blue' : 'black'}
+          //   name="Safety"
+          //   size={20}
+          // />
+          <>{icon}</>
+        }
       />
     </View>
   );
