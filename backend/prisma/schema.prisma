@@ -24,11 +24,11 @@ model Trip {
 }
 
 type Location {
-  address String
+  address String?
   citystate String @default("")
   latitude Float
   longitude Float
-  radius Float
+  radius Float?
 }
 
 model User {
@@ -70,6 +70,7 @@ model Activity {
   netUpvotes Int @default(0)
   isOnCalendar Boolean @default(false)
   category String[]
+  rating Int?
   tripId String @db.ObjectId
   trip Trip @relation(fields: [tripId], references: [id])
 }

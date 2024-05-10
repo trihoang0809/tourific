@@ -44,6 +44,7 @@ export interface GooglePlacesInputProps {
 }
 
 export interface ActivityProps {
+  id: string;
   name: string;
   description: string;
   imageUrl: string;
