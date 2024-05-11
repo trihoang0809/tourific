@@ -7,7 +7,6 @@ import { mockData } from "@/mock-data/activities";
 import DropDown from "@/components/DropDown";
 import { Mode } from "react-native-big-calendar/build/interfaces";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import viewEvent from "./[activity]";
 
 // const { activityid } = useGlobalSearchParams();
 // console.log("activity-id (initerary), activity-id");
