@@ -64,7 +64,7 @@ const ActivitiesScreen = () => {
         search: `?id=${id}`
       }}>Create a new activity</Link> */}
         <Link href={`trips/${id}/(activities)/663ed3689464d811386b288f`}>
-          Click here
+          Click here to see an activity example
         </Link>
         {/* <TouchableOpacity style={{ backgroundColor: '#fff', borderRadius: 10, alignItems: 'center', justifyContent: 'center', width: '50%',height: 250, padding: 10}} 
           onPress={() => { }}>
@@ -72,21 +72,10 @@ const ActivitiesScreen = () => {
         </TouchableOpacity> */}
         {mockData.map((activity: ActivityProps, index: number) => (
           <View style={{ width: "50%", padding: 10 }}>
-            <TouchableOpacity
-              onPress={() =>
-                this.props.navigation.navigate(
-                  `trips/${id}/activities/663ed3689464d811386b288f`,
-                )
-              }
-            >
               <ActivityThumbnail
                 key={index}
                 {...activity}
-                // onClick={() => <Link href={`trips/${id}/activities/663ed3689464d811386b288f`}></Link>})}
-                // onClick={(event) => {
-                //   return <Link href={`trips/${id}/activities/663ed3689464d811386b288f`}></Link>}}
               />
-            </TouchableOpacity>
           </View>
         ))}
       </ScrollView>
