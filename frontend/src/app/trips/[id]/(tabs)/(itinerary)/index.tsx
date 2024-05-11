@@ -8,45 +8,6 @@ import DropDown from "@/components/DropDown";
 import { Mode } from "react-native-big-calendar/build/interfaces";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-// const { activityid } = useGlobalSearchParams();
-// console.log("activity-id (initerary), activity-id");
-
-// import { EventRenderer, ICalendarEventBase } from '../src/interfaces'
-
-// const Itinerary = () => {
-//   const { id } = useGlobalSearchParams();
-//   console.log("id (initerary page):", id);
-
-//   // const [trip, setTrip] = useState({
-//   //   startDate: new Date(),
-//   //   endDate: new Date(),
-//   //   startHour: 0,
-//   //   startMinute: 0,
-//   // });
-
-//   // const getTrip = async ({ id: text }: { id: string; }) => {
-//   //   try {
-//   //     const response = await fetch(`http://localhost:3000/trips/${id}`, {
-//   //       method: "GET",
-//   //       headers: {
-//   //         "Content-Type": "application/json",
-//   //       },
-//   //     });
-//   //     if (!response.ok) {
-//   //       throw new Error("Failed to fetch trip");
-//   //     }
-//   //     const data = await response.json();
-//   //     setTrip(data);
-//   //     console.log("Trip fetch (initerary page):", data);
-//   //   } catch (error: any) {
-//   //     console.error("Error fetching trip (initerary page):", error.toString());
-//   //   }
-//   // };
-
-//   // useEffect(() => {
-//   //   getTrip({ id });
-//   // }, []);
-
 const eventNotes = (
   <View style={{ marginTop: 3 }}>
     <Text style={{ fontSize: 10, color: "white" }}>
@@ -94,6 +55,41 @@ const events = mockData
 const Itinerary = () => {
   const { id } = useGlobalSearchParams();
   console.log("id (initerary page):", id);
+
+  const [activities, setActivities] = useState(null);
+
+  const getActivities = async ({
+    id,
+  }: {
+    id: string;
+  }) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/trips/${id}/activities/`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          // body: JSON.stringify(req),
+        },
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch activities");
+      }
+      const data = await response.json();
+      setActivities(data);
+      console.log("Activities fetch:", data);
+    } catch (error: any) {
+      console.error("Error fetching activities:", error.toString());
+    }
+  };
+
+  useEffect(() => {
+    getActivities({ id });
+  }, []);
+
+
 
   const [calendarMode, setCalendarMode] = useState<Mode>("3days");
   console.log("logged by start: ", new Date(2020, 5, 20, 10, 0));
