@@ -111,7 +111,6 @@ const ViewActivity = () => {
                 type="star"
                 ratingCount={5}
                 imageSize={20}
-                onFinishRating={this.ratingCompleted}
                 readonly
                 startingValue={3}
               />
@@ -220,6 +219,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
     padding: 5, 
     borderRadius: 5,
+  },
+  heartIcon: {
+    marginLeft: 5,
   },
   h1: {
     fontWeight: "600",
