@@ -2,7 +2,11 @@ import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { AntDesign } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { useLocalSearchParams } from "expo-router";
+import { Link, Stack, useLocalSearchParams } from "expo-router";
+import { Feather, Ionicons } from "@expo/vector-icons";
+import { View } from "react-native";
+import { useRoute } from "@react-navigation/native";
+import index from "./(itinerary)/index";
 
 export default function TabLayout() {
   const { id } = useLocalSearchParams();
@@ -33,7 +37,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="activities"
+        name="(activities)"
         options={{
           title: "Suggestions",
           tabBarIcon: ({ color }) => (
@@ -42,7 +46,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="itinerary"
+        name="(itinerary)"
         options={{
           title: "Itinerary",
           tabBarIcon: ({ color }) => (
