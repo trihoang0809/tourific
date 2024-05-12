@@ -4,7 +4,7 @@ import TripRouter from "./routes/TripRouter";
 import { connect } from "./db";
 import UserProfile from "./routes/UserProfile";
 const app = express();
-const cors = require('cors');
+const cors = require("cors");
 const port = process.env.PORT || 3000;
 const prisma = new PrismaClient();
 
@@ -15,7 +15,7 @@ app.use(cors());
 app.use("/trips", TripRouter);
 
 // User Profile
-app.use("/", UserProfile);
+app.use("/user", UserProfile);
 
 // Connect to MongoDB via Prisma and start the server
 const startServer = async () => {

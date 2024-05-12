@@ -13,19 +13,17 @@ import { HomeScreenHeader } from "../components/HomeScreenHeader";
 import { useState, useEffect } from "react";
 import { UserProps, Trip } from "../types";
 import { Link, router } from "expo-router";
+import { serverURL } from "@/utils";
 
 export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [ongoingTrips, setOngoingTrips] = useState<Trip[]>([]);
   const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
+  const serverUrl = serverURL();
   useEffect(() => {
     const fetchTrips = async () => {
       try {
-        // const ongoing = await fetch("http://localhost:3000/trips?ongoing=true");
-        const ongoing = await fetch("http://10.0.2.2:3000/trips?ongoing=true");
-        const upcoming = await fetch(
-          // "http://localhost:3000/trips?upcoming=true",
-          "http://10.0.2.2:3000/trips?upcoming=true",
-        );
+        const ongoing = await fetch(serverUrl + "trips?ongoing=true");
+        const upcoming = await fetch(serverUrl + "trips?upcoming=true");
         const ongoingData = await ongoing.json();
         const upcomingData = await upcoming.json();
 

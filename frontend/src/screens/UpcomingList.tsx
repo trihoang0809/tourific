@@ -16,6 +16,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Trip } from "../types";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { Stack, router } from "expo-router";
+import { serverURL } from "@/utils";
 
 const Header = () => (
   <View>
@@ -38,8 +39,7 @@ const Header = () => (
 
 export const ListFilteredCards: React.FC = () => {
   const [upcomingTrips, setUpcoming] = useState<Trip[]>([]);
-  // const serverUrl = "http://localhost:3000";
-  const serverUrl = "http://10.0.2.2:3000";
+  const serverUrl = serverURL();
   const [windowWidth, setWindowWidth] = useState(
     Dimensions.get("window").width,
   );

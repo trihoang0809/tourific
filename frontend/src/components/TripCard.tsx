@@ -8,7 +8,7 @@ import {
 import { useState, useEffect } from "react";
 import { Float } from "react-native/Libraries/Types/CodegenTypes";
 import { Trip } from "../types";
-import { Octicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Octicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link, router, Stack } from "expo-router";
 
 interface tripProps {
@@ -17,25 +17,22 @@ interface tripProps {
   width?: number; // Optional width prop
 }
 
-export const TripCard: React.FC<tripProps> = ({ 
+export const TripCard: React.FC<tripProps> = ({
   trip,
   height = 300,
   width = 350,
- }) => {
+}) => {
   const tripImage = trip.image;
   const tripLocation = trip.location;
   const tripName = trip.name;
   const tripStartDate = trip.startDate;
   const tripEndDate = trip.endDate;
-  const fontTripName = Math.max(18, (height*18)/300);
-  const fontTripDetail = Math.max(13, (height*14)/300);
+  const fontTripName = Math.max(18, (height * 18) / 300);
+  const fontTripDetail = Math.max(13, (height * 14) / 300);
   const [location, setLocation] = useState(trip.location.citystate);
-  
+
   const noImage =
     "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg";
-
-  const defaultAvatar = 
-    "https://static1.colliderimages.com/wordpress/wp-content/uploads/2022/02/avatar-the-last-airbender-7-essential-episodes.jpg";
 
   const onPressTripCard = () => {
     // console.log("You pressed this card");
@@ -59,15 +56,17 @@ export const TripCard: React.FC<tripProps> = ({
 
   useEffect(() => {
     //fontTripDetail == height of the text --> 0.75*fontTripDetail ~ width of the text
-    if(tripLocation.citystate.length*fontTripDetail*0.75 >= width)
-    if(tripState.length >= 2)
-      setLocation(tripState[tripState.length - 2] + ", " + tripState[tripState.length - 1]);
-
+    if (tripLocation.citystate.length * fontTripDetail * 0.75 >= width)
+      if (tripState.length >= 2)
+        setLocation(
+          tripState[tripState.length - 2] +
+            ", " +
+            tripState[tripState.length - 1],
+        );
   }, []);
 
   return (
-
-    <View> 
+    <View>
       <TouchableHighlight
         style={[styles.card, { height: height, width: width }]} // Apply dynamic height and width
         underlayColor="#BEC0F5"
@@ -91,21 +90,42 @@ export const TripCard: React.FC<tripProps> = ({
           ></Image>
           <View style={styles.descriptionContainer}>
             <View>
-              <Text numberOfLines={1} style={{fontSize: fontTripName, fontWeight: "bold"}}>
+              <Text
+                numberOfLines={1}
+                style={{ fontSize: fontTripName, fontWeight: "bold" }}
+              >
                 {tripName}
               </Text>
             </View>
 
-            <View style={{flexDirection: "row", flexWrap: "wrap"}}>
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
               <View style={styles.detail}>
                 <Octicons name="location" size={17} color="black" />
-                <Text numberOfLines={1} style={[{ color: "blue", marginLeft: 6, fontSize: fontTripDetail, width: 100}]}>
+                <Text
+                  numberOfLines={1}
+                  style={[
+                    {
+                      color: "blue",
+                      marginLeft: 6,
+                      fontSize: fontTripDetail,
+                      width: 100,
+                    },
+                  ]}
+                >
                   {location}
                 </Text>
               </View>
               <View style={styles.detail}>
-                <MaterialCommunityIcons name="timetable" size={17} color="black" />
-                <Text style={[{ color: "blue", marginLeft: 6, fontSize: fontTripDetail }]}>
+                <MaterialCommunityIcons
+                  name="timetable"
+                  size={17}
+                  color="black"
+                />
+                <Text
+                  style={[
+                    { color: "blue", marginLeft: 6, fontSize: fontTripDetail },
+                  ]}
+                >
                   {tripDate(new Date(tripStartDate))}
                 </Text>
               </View>
@@ -113,7 +133,7 @@ export const TripCard: React.FC<tripProps> = ({
           </View>
         </View>
       </TouchableHighlight>
-    </View> 
+    </View>
   );
 };
 
@@ -148,7 +168,7 @@ const styles = StyleSheet.create({
   },
 
   detail: {
-    flexDirection: "row", 
+    flexDirection: "row",
     marginRight: 18,
     alignItems: "center",
   },

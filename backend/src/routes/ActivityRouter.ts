@@ -43,7 +43,7 @@ router.get("/:activityId", async (req: Request<ActivityParams>, res) => {
 // Create a new activity
 router.post("/", async (req: Request<ActivityParams>, res) => {
   const { tripId } = req.params;
-  const { name, description, startTime, endTime, location, notes, image } = req.body;
+  const { name, description, startTime, endTime, location, notes } = req.body;
 
   if (!tripId) {
     res.status(404).json({ error: "ID does not exist" });
@@ -62,10 +62,9 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
             endTime,
             location,
             notes,
-            image,
           },
-        }
-      }
+        },
+      },
     });
     res.status(201).json(activity);
   } catch (error) {
@@ -77,12 +76,12 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
 // Update an activity
 router.put("/:activityId", async (req: Request<ActivityParams>, res) => {
   const { activityId: activityId, tripId } = req.params;
-  const { name, description, startTime, endTime, location, notes, image } = req.body;
+  const { name, description, startTime, endTime, location, notes } = req.body;
 
   const isValidID = await prisma.activity.findUnique({
     where: {
       id: activityId,
-      tripId: tripId
+      tripId: tripId,
     },
   });
 
@@ -102,7 +101,6 @@ router.put("/:activityId", async (req: Request<ActivityParams>, res) => {
         endTime,
         location,
         notes,
-        image,
       },
     });
     res.status(200).json(activity);
