@@ -9,9 +9,9 @@ export const tripCreateSchema = z.object({
     offset: true,
   }),
   endDate: z.string().datetime({
-      message: "Please select a date and time",
-      offset: true,
-    }),
+    message: "Please select a date and time",
+    offset: true,
+  }),
   location: z
     .object({
       address: z.string(),
@@ -23,4 +23,9 @@ export const tripCreateSchema = z.object({
     .refine((data) => {
       return data.address || data.citystate;
     }, "Please choose a destination"),
+  image: z.object({
+    height: z.number(),
+    width: z.number(),
+    url: z.string()
+  }).optional()
 });

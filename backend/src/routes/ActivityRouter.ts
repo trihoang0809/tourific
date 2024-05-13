@@ -9,7 +9,7 @@ interface ActivityParams extends TripParams {
   activityId: string;
 }
 
-//type ActivityParams = { activityId: string } & TripParams;
+// type ActivityParams = { activityId: string } & TripParams;
 
 // Get all activities
 router.get("/", async (req, res) => {
