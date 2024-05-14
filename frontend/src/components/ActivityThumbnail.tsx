@@ -1,17 +1,54 @@
 import { ActivityProps } from "@/types";
-import { DateTime } from "luxon";
 import { Text, View, Image, StyleSheet, TouchableOpacity } from "react-native";
-import React from "react";
+import { useState } from "react";
 import { Dimensions } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Rating } from "react-native-ratings";
 
 const screenWidth = Dimensions.get("window").width;
 
-const ActivityThumbnail = (activity: ActivityProps) => {
-  const [liked, setLiked] = React.useState(false);
-  const toggleLike = () => {
-    setLiked(!liked);
+interface ActivityThumbnailProps {
+  activity: ActivityProps;
+  tripId: string | string[] | undefined;
+}
+
+const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
+  const [liked, setLiked] = useState(false);
+  const [upvotes, setUpvotes] = useState(activity.netUpvotes);
+
+  const toggleLike = async () => {
+    try {
+      //console.log("abc", tripId);
+      const newLikedState = !liked;
+      const newUpvotes = newLikedState ? upvotes + 1 : upvotes - 1;
+      //console.log(newLikedState, newUpvotes);
+      console.log(activity);
+      const url = `http://localhost:3000/trips/${tripId}/activities/${activity.id}`;
+      console.log(url);
+      // Send PUT request to backend
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...activity,
+          netUpvotes: newUpvotes, // Update the netUpvotes in the request
+        }),
+      });
+
+      const data = await response.json();
+      console.log("data: ", data);
+
+      if (response.ok) {
+        setLiked(newLikedState);
+        setUpvotes(data.netUpvotes); // Update the state based on the response
+      } else {
+        throw new Error(data.error || "Failed to update the activity");
+      }
+    } catch (error) {
+      console.error("Error updating activity:", error);
+    }
   };
 
   return (
@@ -19,7 +56,7 @@ const ActivityThumbnail = (activity: ActivityProps) => {
       <View style={styles.imageContainer}>
         <Image source={{ uri: activity.imageUrl }} style={styles.image} />
         <View style={styles.likeContainer}>
-          <Text>{activity.netUpvotes}</Text>
+          <Text>{upvotes}</Text>
           <TouchableOpacity style={styles.heartIcon} onPress={toggleLike}>
             <Ionicons
               name={liked ? "heart" : "heart-outline"}
