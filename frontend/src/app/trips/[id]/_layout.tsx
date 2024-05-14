@@ -1,7 +1,6 @@
 import React from 'react';
 import { Stack, router } from 'expo-router';
-import { Button } from 'react-native';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function TripLayout({ }) {
   return (

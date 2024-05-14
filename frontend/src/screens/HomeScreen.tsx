@@ -22,10 +22,8 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   useEffect(() => {
     const fetchTrips = async () => {
       try {
-        // const ongoing = await fetch("http://localhost:3000/trips?ongoing=true");
         const ongoing = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`);
         const upcoming = await fetch(
-          // "http://localhost:3000/trips?upcoming=true",
           `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?upcoming=true`,
         );
         const ongoingData = await ongoing.json();
@@ -64,7 +62,12 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
 
         <View style={styles.upcoming}>
           <Text style={styles.title}>Upcoming Trips</Text>
-          <Button title="See all" onPress={() => { router.replace('/trips/upcoming'); }} />
+          <Button
+            title="See all"
+            onPress={() => {
+              router.replace("/trips/upcoming");
+            }}
+          />
         </View>
 
         <ScrollView horizontal={true} style={styles.tripScroll}>

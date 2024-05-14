@@ -21,15 +21,16 @@ export const TripCard: React.FC<tripProps> = ({
   trip,
   height = 300,
   width = 350,
-}) => {
-  const [tripImage, setTripImage] = useState(trip.image);
-  const [tripLocation, setTripLocation] = useState(trip.location);
-  const [tripName, setTripName] = useState(trip.name);
-  const [tripStartDate, setTripStartDate] = useState(trip.startDate);
-  const [tripEndDate, setTripEndDate] = useState(trip.endDate);
-  const [fontTripName, setFontTripName] = useState(Math.max(18, (height * 18) / 300));
-  const [fontTripDetail, setFontTripDetail] = useState(Math.max(13, (height * 14) / 300));
+ }) => {
+  const tripImage = trip.image;
+  const tripLocation = trip.location;
+  const tripName = trip.name;
+  const tripStartDate = trip.startDate;
+  const tripEndDate = trip.endDate;
+  const fontTripName = Math.max(18, (height*18)/300);
+  const fontTripDetail = Math.max(13, (height*14)/300);
   const [location, setLocation] = useState(trip.location.citystate);
+  
   const noImage =
     "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg";
 

@@ -12,8 +12,7 @@ import {
 import React, { useCallback, useEffect, useState } from "react";
 import { useForm, Controller, useFormState } from "react-hook-form";
 import favicon from "@/assets/favicon.png";
-import { Link, Stack, useLocalSearchParams } from "expo-router";
-import trips from "@/mock-data/trips";
+import { Link, Stack, router, useLocalSearchParams } from "expo-router";
 import { MapData, TripData } from "@/types";
 import GooglePlacesInput from "@/components/GoogleMaps/GooglePlacesInput";
 import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
@@ -29,11 +28,9 @@ const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
 export default function CreateTripScreen() {
   const {
-    register,
     handleSubmit,
-    formState: { isDirty, dirtyFields, errors },
+    formState: { errors },
     control,
-    setError,
     reset,
     getValues,
   } = useForm({
@@ -115,10 +112,8 @@ export default function CreateTripScreen() {
   );
 
   useEffect(() => {
-    console.log("id", idString);
     if (isUpdating) {
       setTripIfExist(idString);
-      console.log("form sau settrip", formData);
     }
   }, []);
 
@@ -134,14 +129,6 @@ export default function CreateTripScreen() {
   const [visibleEnd, setVisibleEnd] = useState(false);
 
   const onSubmit = async (data: any) => {
-    console.log("changed fields", dirtyFields);
-    // const {
-    // dateRange,
-    // location,
-    // startTime,
-    // endTime,
-    // } = formData;
-
     const { name, location, startTime, endTime, dateRange } = data;
     const isoStartDate = DateTime.fromISO(
       formatDateTime(dateRange.startDate, startTime.hours, startTime.minutes),
@@ -156,9 +143,6 @@ export default function CreateTripScreen() {
       location,
     };
 
-    console.log("req", req);
-    console.log("data bf4 submit", req);
-
     if (isUpdating) {
       // UPDATING
       try {
@@ -172,16 +156,18 @@ export default function CreateTripScreen() {
           throw new Error("Failed to update trip");
         }
 
-        const data = await response.json();
-        console.log("Trip updated:", data);
-        Alert.alert("Alert Title", "Successful update trip", [
-          { text: "Go back home", onPress: () => <Link href={"/"} /> },
+        Alert.alert("", "Successful update trip", [
+          {
+            text: "Go back home",
+            onPress: () => {
+              router.push("/");
+            }
+          }
         ]);
       } catch (error: any) {
         console.error("Error updating trip:", error.toString());
       }
     } else {
-
       // CREATING
       try {
         const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips`, {
@@ -192,7 +178,7 @@ export default function CreateTripScreen() {
           body: JSON.stringify(req),
         });
         if (!response.ok) {
-          throw new Error("Failed to create trip");
+          throw new Error(`Failed to create trip: ${response.status} ${response.statusText}`);
         }
         // Optionally, you can handle the response here
         const data = await response.json();
@@ -235,10 +221,6 @@ export default function CreateTripScreen() {
     [setOpen, formData],
   );
 
-  console.log("form data trong onconfirm", formData);
-  console.log("daterange trg onconfirm", formData.dateRange);
-  console.log(errors);
-
   //functions for time picker
   const onDismissTime = useCallback(
     (type: String) => {
@@ -260,7 +242,7 @@ export default function CreateTripScreen() {
             startTime: {
               hours: hours,
               minutes: minutes,
-            }
+            },
           }) as TripData,
       );
       setVisibleStart(false);
@@ -276,8 +258,8 @@ export default function CreateTripScreen() {
             ...prevFormData,
             endTime: {
               hours: hours,
-              minutes: minutes
-            }
+              minutes: minutes,
+            },
           }) as TripData,
       );
       setVisibleEnd(false);
@@ -384,7 +366,11 @@ export default function CreateTripScreen() {
                   />
                 )}
               />
-              {errors.name && <Text className="text-red-500">{errors.name.message?.toString()}</Text>}
+              {errors.name && (
+                <Text className="text-red-500">
+                  {errors.name.message?.toString()}
+                </Text>
+              )}
             </View>
             <View style={{ marginVertical: 10 }}>
               <Text className="font-semibold text-base">Date</Text>
@@ -426,7 +412,9 @@ export default function CreateTripScreen() {
                 />
               </SafeAreaProvider>
               {errors.dateRange && (
-                <Text className="text-red-500">{errors.dateRange.message?.toString()}</Text>
+                <Text className="text-red-500">
+                  {errors.dateRange.message?.toString()}
+                </Text>
               )}
             </View>
             <View
@@ -438,7 +426,9 @@ export default function CreateTripScreen() {
                 marginVertical: 10,
               }}
             >
-              <View style={{ flex: 1, marginRight: 5, flexDirection: 'column' }}>
+              <View
+                style={{ flex: 1, marginRight: 5, flexDirection: "column" }}
+              >
                 <Text className="font-semibold text-base">Start time</Text>
                 <TouchableOpacity onPress={() => setVisibleStart(true)}>
                   <Text
@@ -464,14 +454,7 @@ export default function CreateTripScreen() {
                         hour: "2-digit",
                         minute: "2-digit",
                       })
-                      :
-                      new Date(
-                        1970,
-                        0,
-                        1,
-                        8,
-                        0,
-                      ).toLocaleTimeString("en-US", {
+                      : new Date(1970, 0, 1, 8, 0).toLocaleTimeString("en-US", {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
@@ -495,10 +478,13 @@ export default function CreateTripScreen() {
                     />
                   )}
                 />
-                {errors.startTime && <Text className="text-red-500">{errors.startTime.message?.toString()}</Text>}
+                {errors.startTime && (
+                  <Text className="text-red-500">
+                    {errors.startTime.message?.toString()}
+                  </Text>
+                )}
               </View>
-
-              <View style={{ flex: 1, marginLeft: 5, flexDirection: 'column' }}>
+              <View style={{ flex: 1, marginLeft: 5, flexDirection: "column" }}>
                 <Text className="font-semibold text-base">End time</Text>
                 <TouchableOpacity onPress={() => setVisibleEnd(true)}>
                   <Text
@@ -524,13 +510,7 @@ export default function CreateTripScreen() {
                         hour: "2-digit",
                         minute: "2-digit",
                       })
-                      : new Date(
-                        1970,
-                        0,
-                        1,
-                        8,
-                        0,
-                      ).toLocaleTimeString("en-US", {
+                      : new Date(1970, 0, 1, 8, 0).toLocaleTimeString("en-US", {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
@@ -555,7 +535,11 @@ export default function CreateTripScreen() {
                     />
                   )}
                 />
-                {errors.endTime && <Text className="text-red-500">{errors.endTime.message?.toString()}</Text>}
+                {errors.endTime && (
+                  <Text className="text-red-500">
+                    {errors.endTime.message?.toString()}
+                  </Text>
+                )}
               </View>
             </View>
 

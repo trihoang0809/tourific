@@ -1,6 +1,6 @@
 import {
-  View, Text, Image, StyleSheet,
-  TextInput, TouchableHighlight, Dimensions,
+  View, Text, StyleSheet,
+  TextInput, Dimensions,
   StatusBar, FlatList, TouchableWithoutFeedback
 } from "react-native";
 import { useState, useEffect } from "react";
@@ -8,10 +8,8 @@ import { TripCard } from "../components/TripCard";
 import { LinearGradient } from "expo-linear-gradient";
 import { Trip } from "../types";
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
-import { Stack, router } from "expo-router";
+import { router } from "expo-router";
 import { EXPO_PUBLIC_HOST_URL } from "@/utils";
-
-
 
 const onPressCategory = () => {
   console.log("You pressed on this category");
@@ -27,8 +25,8 @@ const Header = () => (
           <AntDesign name="left" size={24} color="blue" />
         </TouchableWithoutFeedback>
         <Text style={{ fontSize: 22, marginLeft: 10 }}>Upcoming Trips</Text>
+        <Text style={{ fontSize: 22, marginLeft: 10 }}>Upcoming Trips</Text>
       </View>
-
       <View style={styles.userInput}>
         <MaterialIcons name="search" size={24} color="black" />
         <TextInput placeholder="Search" style={{ flex: 1, padding: 2.5, fontSize: 16 }}></TextInput>
@@ -58,25 +56,6 @@ export const ListFilteredCards: React.FC = () => {
       setNumCols(Math.floor(width / (tripCardWidth + 40)));
     });
 
-
-    // const cleanData = (data: Trip[]) => {
-    //   let cleanedData: Trip[] = [];
-    //   let index = 0;
-    //   for (let trip of data) {
-    //     let format: Trip = {
-    //       id: trip.id,
-    //       name: trip.name,
-    //       location: trip.location,
-    //       startDate: new Date(trip.startDate),
-    //       endDate: new Date(trip.endDate),
-    //       image: trip.image,
-    //     };
-
-    //     cleanedData.push(format);
-    //   }
-    //   return cleanedData;
-    // };
-
     const getData = async () => {
       try {
         const link = serverUrl + "/trips?upcoming=true";
@@ -87,19 +66,13 @@ export const ListFilteredCards: React.FC = () => {
         console.log(error);
       }
     };
-
     //Fetch Data + Format Data
     getData();
-
-
   }, []);
-
-
 
   return (
     <View>
       <View style={styles.container}>
-
         <Header />
         <View style={{ flex: 1 }}>
           <LinearGradient
