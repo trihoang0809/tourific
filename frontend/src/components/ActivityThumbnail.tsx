@@ -86,7 +86,7 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
         <View style={styles.lineContainer}>
           {/* <Ionicons name="location-outline" size={24} color="#006ee6" style={{marginRight: 10}}/> */}
           <Text numberOfLines={2} style={{ flex: 1, overflow: "hidden" }}>
-            {activity.location.citystate}
+            {activity.location.address}
           </Text>
         </View>
       </View>

@@ -26,7 +26,7 @@ export const fetchActivities = async (
       description: "",
       imageUrl: getImageUrl(place.photos, GOOGLE_PLACES_API_KEY),
       location: {
-        citystate: place.vicinity,
+        address: place.vicinity,
         latitude: place.geometry.location.lat,
         longitude: place.geometry.location.lng,
       },
