@@ -71,11 +71,9 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
         },
       },
     });
-    console.log("success");
     res.status(201).json(activity);
   } catch (error) {
-    console.log(error);
-    //res.status(500).json({ error: "An error occurred while creating the activity." });
+    res.status(500).json({ error: "An error occurred while creating the activity." });
   }
 });
 
