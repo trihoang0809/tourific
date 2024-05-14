@@ -131,6 +131,7 @@ const ActivitiesScreen = () => {
     [],
   );
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   useEffect(() => {
     const getTripAndActivities = async () => {
@@ -167,44 +168,45 @@ const ActivitiesScreen = () => {
     getTripAndActivities();
   }, [id]);
 
-  const saveActivitiesToBackend = async (activities: ActivityProps[]) => {
-    const promises = activities.map(async (activity) => {
-      const response = await fetch(
-        `http://localhost:3000/trips/${id}/activities`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: activity.name,
-            description: activity.description,
-            startTime: new Date(),
-            endTime: new Date(),
-            location: {
-              citystate: activity.location.citystate,
-              latitude: activity.location.latitude,
-              longitude: activity.location.longitude,
-            },
-            notes: activity.notes,
-            netUpvotes: activity.netUpvotes,
-            isOnCalendar: activity.isOnCalendar,
-            category: activity.category,
-            rating: activity.rating,
-          }),
-        },
-      );
-      return response.json();
-    });
-    try {
-      //const newActivities = await Promise.all(promises);
-      //setActivities(newActivities); // Update the activities state with new data including IDs
-    } catch (error) {
-      console.error("Error saving activities:", error);
-    }
-  };
+  // const saveActivitiesToBackend = async (activities: ActivityProps[]) => {
+  //   const promises = activities.map(async (activity) => {
+  //     const response = await fetch(
+  //       `http://localhost:3000/trips/${id}/activities`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           name: activity.name,
+  //           description: activity.description,
+  //           startTime: new Date(),
+  //           endTime: new Date(),
+  //           location: {
+  //             citystate: activity.location.citystate,
+  //             latitude: activity.location.latitude,
+  //             longitude: activity.location.longitude,
+  //           },
+  //           notes: activity.notes,
+  //           netUpvotes: activity.netUpvotes,
+  //           isOnCalendar: activity.isOnCalendar,
+  //           category: activity.category,
+  //           rating: activity.rating,
+  //         }),
+  //       },
+  //     );
+  //     return response.json();
+  //   });
+  //   try {
+  //     //const newActivities = await Promise.all(promises);
+  //     //setActivities(newActivities); // Update the activities state with new data including IDs
+  //   } catch (error) {
+  //     console.error("Error saving activities:", error);
+  //   }
+  // };
 
   const handleSelectCategory = (category: CategoryKeys | "All") => {
+    setSelectedCategory(category);
     if (category === "All") {
       setFilteredActivities(activities);
     } else {
@@ -218,7 +220,7 @@ const ActivitiesScreen = () => {
   const handleSearch = (text: string) => {
     setSearchTerm(text);
     if (text) {
-      const searchedActivities = activities.filter((activity) =>
+      const searchedActivities = filteredActivities.filter((activity) =>
         activity.name.toLowerCase().includes(text.toLowerCase()),
       );
       setFilteredActivities(searchedActivities);
@@ -235,83 +237,96 @@ const ActivitiesScreen = () => {
         backgroundColor: "white",
       }}
     >
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: "#E6E6E6",
-          borderRadius: 20,
-          borderWidth: 1,
-          padding: 10,
-          margin: 10,
-        }}
-      >
+      <View style={styles.searchContainer}>
         <Feather name="search" size={20} color="black" />
         <TextInput
           placeholder="Search activities..."
           value={searchTerm}
           onChangeText={handleSearch}
-          style={{
-            padding: 5,
-            flex: 1,
-            height: 30,
-            fontSize: 16,
-            color: "black",
-          }}
+          style={styles.searchInput}
         />
       </View>
-      <ScrollView horizontal contentContainerStyle={styles.categoryContainer}>
+      <ScrollView
+        horizontal
+        contentContainerStyle={styles.categoryContainer}
+        showsHorizontalScrollIndicator={false}
+        alwaysBounceVertical={false}
+      >
         <TouchableOpacity
-          style={styles.categoryItem}
+          style={[
+            styles.categoryItem,
+            selectedCategory === "All" && styles.selectedCategory,
+          ]}
           onPress={() => handleSelectCategory("All")}
         >
           <Ionicons name="apps-outline" size={24} color="black" />
           <Text>All</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.categoryItem}
+          style={[
+            styles.categoryItem,
+            selectedCategory === "Dining" && styles.selectedCategory,
+          ]}
           onPress={() => handleSelectCategory("Dining")}
         >
           <Ionicons name="restaurant-outline" size={24} color="black" />
           <Text>Dining</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.categoryItem}
+          style={[
+            styles.categoryItem,
+            selectedCategory === "Entertainment" && styles.selectedCategory,
+          ]}
           onPress={() => handleSelectCategory("Entertainment")}
         >
           <Ionicons name="film-outline" size={24} color="black" />
           <Text>Entertainment</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.categoryItem}
+          style={[
+            styles.categoryItem,
+            selectedCategory === "OutdoorRecreation" && styles.selectedCategory,
+          ]}
           onPress={() => handleSelectCategory("OutdoorRecreation")}
         >
           <Ionicons name="partly-sunny-outline" size={24} color="black" />
           <Text>Outdoor</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.categoryItem}
+          style={[
+            styles.categoryItem,
+            selectedCategory === "Shopping" && styles.selectedCategory,
+          ]}
           onPress={() => handleSelectCategory("Shopping")}
         >
           <Feather name="shopping-cart" size={24} color="black" />
           <Text>Shopping</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.categoryItem}
+          style={[
+            styles.categoryItem,
+            selectedCategory === "Transportation" && styles.selectedCategory,
+          ]}
           onPress={() => handleSelectCategory("Transportation")}
         >
           <Ionicons name="bus-outline" size={24} color="black" />
           <Text>Transportation</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.categoryItem}
+          style={[
+            styles.categoryItem,
+            selectedCategory === "Services" && styles.selectedCategory,
+          ]}
           onPress={() => handleSelectCategory("Services")}
         >
           <Ionicons name="settings-outline" size={24} color="black" />
           <Text>Services</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.categoryItem}
+          style={[
+            styles.categoryItem,
+            selectedCategory === "Wellness" && styles.selectedCategory,
+          ]}
           onPress={() => handleSelectCategory("Wellness")}
         >
           <Feather name="activity" size={24} color="black" />
@@ -319,12 +334,12 @@ const ActivitiesScreen = () => {
         </TouchableOpacity>
       </ScrollView>
       <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          flexDirection: "row",
-          flexWrap: "wrap",
-          padding: 5,
-        }}
+      // contentContainerStyle={{
+      //   flexGrow: 1,
+      //   flexDirection: "row",
+      //   flexWrap: "wrap",
+      //   padding: 5,
+      // }}
       >
         {filteredActivities.length > 0 ? (
           <ScrollView
@@ -344,8 +359,8 @@ const ActivitiesScreen = () => {
             )}
           </ScrollView>
         ) : (
-          <View style={{ flex: 1, alignItems: "center" }}>
-            <Text style={{ fontSize: 18, color: "#666" }}>
+          <View style={styles.noActivitiesView}>
+            <Text style={styles.noActivitiesText}>
               No activities found for this category.
             </Text>
           </View>
@@ -395,13 +410,26 @@ const styles = StyleSheet.create({
     color: "black",
   },
   categoryContainer: {
+    height: 70,
     justifyContent: "space-between",
     paddingVertical: 3,
     paddingHorizontal: 3,
   },
   categoryItem: {
+    height: 55,
     alignItems: "center",
     padding: 15,
+  },
+  selectedCategory: {
+    transform: [{ translateY: -5 }],
+  },
+  noActivitiesView: {
+    flex: 1,
+    alignItems: "center",
+  },
+  noActivitiesText: {
+    fontSize: 18,
+    color: "#666",
   },
 });
 
