@@ -18,11 +18,8 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
 
   const toggleLike = async () => {
     try {
-      //console.log("abc", tripId);
       const newLikedState = !liked;
       const newUpvotes = newLikedState ? upvotes + 1 : upvotes - 1;
-      //console.log(newLikedState, newUpvotes);
-      console.log(activity);
       const url = `http://localhost:3000/trips/${tripId}/activities/${activity.id}`;
       console.log(url);
       // Send PUT request to backend

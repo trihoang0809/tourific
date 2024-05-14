@@ -112,20 +112,6 @@ const categories: Record<CategoryKeys, string[]> = {
 
 const ActivitiesScreen = () => {
   const { id } = useGlobalSearchParams();
-  const [trip, setTrip] = useState({
-    name: "",
-    location: {
-      address: "",
-      citystate: "",
-      latitude: 0,
-      longitude: 0,
-      radius: 0,
-    },
-    startDate: new Date(),
-    endDate: new Date(),
-    startHour: 0,
-    startMinute: 0,
-  });
   const [activities, setActivities] = useState<ActivityProps[]>([]);
   const [filteredActivities, setFilteredActivities] = useState<ActivityProps[]>(
     [],
@@ -146,7 +132,6 @@ const ActivitiesScreen = () => {
           throw new Error("Failed to fetch trip");
         }
         const data = await response.json();
-        setTrip(data);
         if (
           data.location.latitude &&
           data.location.longitude &&
@@ -240,7 +225,7 @@ const ActivitiesScreen = () => {
       <View style={styles.searchContainer}>
         <Feather name="search" size={20} color="black" />
         <TextInput
-          placeholder="Search activities..."
+          placeholder="Search for activities..."
           value={searchTerm}
           onChangeText={handleSearch}
           style={styles.searchInput}
@@ -334,12 +319,12 @@ const ActivitiesScreen = () => {
         </TouchableOpacity>
       </ScrollView>
       <ScrollView
-      // contentContainerStyle={{
-      //   flexGrow: 1,
-      //   flexDirection: "row",
-      //   flexWrap: "wrap",
-      //   padding: 5,
-      // }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          flexDirection: "row",
+          flexWrap: "wrap",
+          padding: 5,
+        }}
       >
         {filteredActivities.length > 0 ? (
           <ScrollView
@@ -418,7 +403,7 @@ const styles = StyleSheet.create({
   categoryItem: {
     height: 55,
     alignItems: "center",
-    padding: 15,
+    padding: 10,
   },
   selectedCategory: {
     transform: [{ translateY: -5 }],
