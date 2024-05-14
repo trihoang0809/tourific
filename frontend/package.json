@@ -17,7 +17,7 @@
     "@reduxjs/toolkit": "^2.2.3",
     "@tanstack/react-query": "^5.28.8",
     "expo": "^50.0.17",
-    "expo-constants": "^15.4.6",
+    "expo-constants": "~15.4.6",
     "expo-linear-gradient": "^12.7.2",
     "expo-linking": "~6.2.2",
     "expo-router": "^3.4.10",
@@ -43,7 +43,9 @@
     "react-native-web": "~0.19.6",
     "react-redux": "^9.1.1",
     "zeego": "^1.10.0",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "expo-notifications": "~0.27.7",
+    "expo-device": "~5.9.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
