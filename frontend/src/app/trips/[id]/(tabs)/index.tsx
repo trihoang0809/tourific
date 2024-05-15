@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from "luxon";
 import { StyleSheet } from "react-native";
+import { serverURL } from "@/utils";
 
 const TripDetailsScreen = () => {
   const { id } = useLocalSearchParams();
@@ -20,14 +21,13 @@ const TripDetailsScreen = () => {
     startHour: 0,
     startMinute: 0,
   });
-
+  const serverUrl = serverURL();
   // more setting icon
   const [modalEditVisible, setModalEditVisible] = useState(false);
 
   const getTrip = async ({ id: text }: { id: string }) => {
     try {
-      // const response = await fetch(`http://localhost:3000/trips/${id}`, {
-      const response = await fetch(`http://10.0.2.2:3000/trips/${id}`, {
+      const response = await fetch(serverUrl + `trips/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

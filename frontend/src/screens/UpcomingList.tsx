@@ -4,18 +4,15 @@ import {
   Image,
   StyleSheet,
   TextInput,
-  TouchableHighlight,
   Dimensions,
   StatusBar,
   FlatList,
-  TouchableWithoutFeedback,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { TripCard } from "../components/TripCard";
 import { LinearGradient } from "expo-linear-gradient";
 import { Trip } from "../types";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
-import { Stack, router } from "expo-router";
+import { MaterialIcons } from "@expo/vector-icons";
 import { serverURL } from "@/utils";
 
 const Header = () => (
@@ -40,31 +37,15 @@ const Header = () => (
 export const ListFilteredCards: React.FC = () => {
   const [upcomingTrips, setUpcoming] = useState<Trip[]>([]);
   const serverUrl = serverURL();
-  const [windowWidth, setWindowWidth] = useState(
-    Dimensions.get("window").width,
-  );
-  const [windowHeight, setWindowHeight] = useState(
-    Dimensions.get("window").height,
-  );
   const [numCols, setNumCols] = useState(0);
-  const [tripCardWidth, setTripCardWidth] = useState(380);
-  const [tripCardHeight, setTripCardHeight] = useState(330);
+  const tripCardWidth = 380;
+  const tripCardHeight = 330;
 
   //Fetching data
   useEffect(() => {
-    Dimensions.addEventListener("change", ({ window: { width, height } }) => {
-      //Get window size every render
-      setWindowHeight(height);
-      setWindowWidth(width);
-
-      //Adjust the number of columns of FlatList based on window size
-      //width of the window/(trip card width + horizontal margin)
-      setNumCols(Math.floor(width / (tripCardWidth + 40)));
-    });
-
     const getData = async () => {
       try {
-        const link = serverUrl + "/trips?upcoming=true";
+        const link = serverUrl + "trips?upcoming=true";
         const upcoming = await fetch(link);
         let data = await upcoming.json();
         setUpcoming(data);
