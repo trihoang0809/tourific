@@ -1,6 +1,6 @@
 import { View, ScrollView, TouchableOpacity } from "react-native";
 import React from "react";
-import { useGlobalSearchParams } from "expo-router";
+import { Link, router, useGlobalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import ActivityThumbnail from "@/components/ActivityThumbnail";
@@ -78,6 +78,7 @@ const ActivitiesScreen = () => {
         }}
         onPress={() => {
           /* Handle the button press */
+          router.push("../activity/create");
         }}
       >
         <Ionicons name="add" size={40} color="white" />

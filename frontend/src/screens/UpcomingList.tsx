@@ -82,7 +82,7 @@ export const ListFilteredCards: React.FC = () => {
 
     const getData = async () => {
       try {
-        const link = serverUrl + "/trips?upcoming=true";
+        const link = serverUrl + "trips?upcoming=true";
         const upcoming = await fetch(link);
         let data = await upcoming.json();
         data = cleanData(data);

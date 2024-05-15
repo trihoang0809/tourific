@@ -1,19 +1,14 @@
 import {
   View,
   Text,
-  StatusBar,
   TextInput,
   StyleSheet,
   TouchableWithoutFeedback,
   ScrollView,
   Alert,
-  Button,
   Pressable,
   Modal,
-  ImageBackground,
 } from "react-native";
-import { fontScale, styled } from "nativewind";
-import { withExpoSnack } from "nativewind";
 import {
   AntDesign,
   FontAwesome5,
@@ -24,32 +19,24 @@ import {
 import { material } from "react-native-typography";
 import React, { useState, useEffect } from "react";
 import GoogleMapInput from "@/components/GoogleMaps/GoogleMapInput";
+import { formatDate, serverURL } from "@/utils";
+import { Trip } from "@/types";
 
-function useForceUpdate() {
-  const [state, setState] = useState(0);
-  return () => setState((state) => state + 1);
-}
+export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
+  const serverUrl = serverURL();
 
-export const ProposedActivities: React.FC = () => {
   //Declare useState
   const [activityName, setActivityName] = useState("");
   const [activityDescription, setActivityDescription] = useState("");
-  const [activityNote, setActivityNote] = useState<String[]>([""]);
-  const [noteIndex, setNoteIndex] = useState([{ id: 0, value: 0 }]);
-  const [activityLocation, setActivityLocation] = useState({
-    address: "",
-    citystate: "",
-    longitude: 0,
-    latitude: 0,
-  });
-  const forceUpdate = useForceUpdate();
-  const [activityStartDate, setActivityStartDate] = useState(new Date());
-  const [activityEndDate, setActivityEndDate] = useState(new Date());
+  const [activityNote, setActivityNote] = useState("");
+  const [activityLocation, setActivityLocation] = useState(trip.location);
+  const activityStartDate = trip.startDate;
+  const activityEndDate = trip.endDate;
   const [isSaved, setIsSaved] = useState(false);
   const [isFormFilled, setIsFormFilled] = useState(false);
-  const [isNoteSelected, setNoteSelected] = useState<Boolean[]>([false]);
+  const [isNoteSelected, setNoteSelected] = useState(false);
   const [mapVisible, setMapVisible] = useState(false);
-
+  const [underlineTitle, setUnderlineTitle] = useState("black");
   //Header render + Return Button + Alert Pop up
   const alertUnSaved = () => {
     Alert.alert("Unsaved Changes", "You have unsaved changes", [
@@ -68,24 +55,6 @@ export const ProposedActivities: React.FC = () => {
     ]);
   };
 
-  const onPressBack = () => {
-    console.log("You pressed on Return Button");
-    if (!isSaved) {
-      alertUnSaved();
-    }
-  };
-
-  const Header = () => (
-    <View>
-      <StatusBar backgroundColor="black" />
-      <View style={styles.headerContainer}>
-        <Text style={[material.display1, { alignSelf: "center" }]}>
-          Create New Activity
-        </Text>
-      </View>
-    </View>
-  );
-
   //Submit Button
   const validateForm = () => {
     // console.log(activityDescription);
@@ -96,10 +65,11 @@ export const ProposedActivities: React.FC = () => {
     validateForm();
     console.log("Submit: " + activityNote);
     console.log(isFormFilled);
+    console.log(activityLocation.address);
     if (isFormFilled) {
       try {
         const createActivity = await fetch(
-          "http://10.0.2.2:3000/trips/661f78b88c72a65f2f6e49d4/activities",
+          serverUrl + "trips/" + trip.id + "/activities",
           {
             method: "POST",
             headers: {
@@ -124,116 +94,39 @@ export const ProposedActivities: React.FC = () => {
 
         if (createActivity.status === 201) {
           console.log("success");
-          setActivityName("");
-          setActivityNote([""]);
-          setNoteIndex([{ id: 0, value: 0 }]);
-          setNoteSelected([false]);
-          setActivityLocation({
-            address: "",
-            citystate: "",
-            longitude: 0,
-            latitude: 0,
-          });
+          setNoteSelected(false);
         }
         // console.log(activityNote);
       } catch (error) {
         console.log("An error occured while CREATING new Activity " + error);
       }
     }
-
     setIsSaved(true);
   };
 
   const SubmitButton = () => (
     <TouchableWithoutFeedback onPress={onPressSubmit}>
       <View style={styles.submitButton}>
-        <Text style={[material.headline, { color: "black" }]}>Submit</Text>
+        <Text style={[material.headline, { color: "black" }]}>Save</Text>
       </View>
     </TouchableWithoutFeedback>
   );
 
-  // Format the Date
-  const formatDate = (date: Date) => {
-    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
-      return "Invalid date"; // Handle invalid dates
-    }
-    const month = date.toLocaleString("default", { month: "short" });
-    return `${date.getDate()} ${month}, ${date.getFullYear()}`;
-  };
-
-  //Note input
-  const NoteInput = ({ index }: { index: number }) => {
-    const [note, setNote] = useState(activityNote[index].toString());
-    console.log(index);
-    return (
-      <Pressable
-        style={[styles.queInput, { backgroundColor: "white", flex: 1 }]}
-        onPress={() => {
-          isNoteSelected[index] = true;
-          setNoteSelected(isNoteSelected);
-          forceUpdate();
-          console.log(activityNote);
-        }}
-      >
-        {!isNoteSelected[index] ? (
-          <Text
-            style={[
-              material.title,
-              styles.noteInput,
-              { fontStyle: "italic", color: "grey" },
-            ]}
-          >
-            {activityNote[index] === ""
-              ? "Add your notes here"
-              : activityNote[index]}
-          </Text>
-        ) : (
-          <View style={styles.noteInputFocus}>
-            <View style={{ flexDirection: "row" }}>
-              <FontAwesome5 name="sticky-note" size={24} color="black" />
-              <TextInput
-                onChangeText={(value) => {
-                  activityNote[index] = value;
-                  // console.log(activityNote[index]);
-                  setActivityNote(activityNote);
-                  setNote(activityNote[index].toString());
-                }}
-                style={[
-                  material.title,
-                  { fontStyle: "italic", marginLeft: 10 },
-                ]}
-                placeholder="Add your notes here"
-                value={note}
-                // value="eh"
-                multiline={true}
-              ></TextInput>
-            </View>
-            <Pressable
-              onPress={() => {
-                isNoteSelected[index] = false;
-                setNoteSelected(isNoteSelected);
-                forceUpdate();
-              }}
-              style={{ alignSelf: "flex-end" }}
-            >
-              <AntDesign name="up" size={24} color="black" />
-            </Pressable>
-          </View>
-        )}
-      </Pressable>
-    );
-  };
-
   return (
     <ScrollView style={styles.formContainer}>
       {/* Form */}
-      <Text>{activityName}</Text>
       <View style={styles.formInputContainer}>
         {/* Activity Title input  */}
-        <View style={styles.queInput}>
+        <View
+          style={[
+            styles.queInput,
+            { borderBottomWidth: 0.5, borderBottomColor: underlineTitle },
+          ]}
+        >
           <TextInput
             onChangeText={(value) => {
               setActivityName(value);
+              console.log(activityName);
             }}
             style={[material.title, { fontSize: 25, fontStyle: "italic" }]}
             placeholder="Add a title"
@@ -243,13 +136,54 @@ export const ProposedActivities: React.FC = () => {
         </View>
 
         {/* Activity Note input */}
+        <Pressable
+          style={[styles.queInput, { backgroundColor: "white", flex: 1 }]}
+          onPress={() => {
+            setNoteSelected(true);
+          }}
+        >
+          {!isNoteSelected ? (
+            <Text
+              style={[
+                material.title,
+                styles.noteInput,
+                { fontStyle: "italic", color: "grey" },
+              ]}
+            >
+              {activityNote === "" ? "Add your notes here" : activityNote}
+            </Text>
+          ) : (
+            <View style={styles.noteInputFocus}>
+              <View style={{ flexDirection: "row" }}>
+                <FontAwesome5 name="sticky-note" size={24} color="black" />
+                <TextInput
+                  onChangeText={(value) => {
+                    console.log(value);
+                    setActivityNote(value);
+                  }}
+                  style={[
+                    material.title,
+                    { fontStyle: "italic", marginLeft: 10 },
+                  ]}
+                  placeholder="Add your notes here"
+                  value={activityNote}
+                  multiline={true}
+                ></TextInput>
+              </View>
 
-        <View>
-          {noteIndex.map((index) => (
-            <NoteInput key={index.id} index={index.value}></NoteInput>
-          ))}
-          {/* <NoteInput index={0}></NoteInput> */}
-        </View>
+              {/* Closing the Note */}
+              <Pressable
+                onPress={() => {
+                  setNoteSelected(false);
+                }}
+                style={{ alignSelf: "flex-end" }}
+              >
+                <AntDesign name="up" size={24} color="black" />
+              </Pressable>
+            </View>
+          )}
+        </Pressable>
+
         {/* Map Input */}
         <Modal
           animationType="slide"
@@ -273,6 +207,7 @@ export const ProposedActivities: React.FC = () => {
                     citystate: String(location.citystate),
                     longitude: location.longitude,
                     latitude: location.latitude,
+                    radius: 0,
                   });
                 }}
               />
@@ -290,19 +225,6 @@ export const ProposedActivities: React.FC = () => {
           >
             <Entypo name="location-pin" size={24} color="black" />
             <Text style={[material.title, { color: "grey" }]}>Add a place</Text>
-          </Pressable>
-          <Pressable
-            style={styles.noteIcon}
-            onPress={() => {
-              activityNote.push("");
-              setActivityNote(activityNote);
-              noteIndex.push({ id: noteIndex.length, value: noteIndex.length });
-              isNoteSelected.push(false);
-              setNoteSelected(isNoteSelected);
-              forceUpdate();
-            }}
-          >
-            <FontAwesome6 name="note-sticky" size={30} color="black" />
           </Pressable>
         </View>
         <SubmitButton />

@@ -28,3 +28,12 @@ export function serverURL() {
   if (Platform.OS === "android") server = "http://10.0.2.2:3000/";
   return server;
 }
+
+// Format the Date (DD MM, YYYY)
+export const formatDate = (date: Date) => {
+  if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+    return "Invalid date"; // Handle invalid dates
+  }
+  const month = date.toLocaleString("default", { month: "short" });
+  return `${date.getDate()} ${month}, ${date.getFullYear()}`;
+};
