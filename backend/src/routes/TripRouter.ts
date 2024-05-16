@@ -94,6 +94,9 @@ router.get("/:id", async (req, res) => {
       where: {
         id,
       },
+      include: {
+        activities: true, // Include activities associated with the trip
+      },
     });
     res.status(StatusCodes.OK).json(trip);
   } catch (error) {
