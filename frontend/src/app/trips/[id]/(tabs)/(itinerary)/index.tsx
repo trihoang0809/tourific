@@ -65,15 +65,18 @@ const Itinerary = () => {
       .map((activity) => {
         const eventNotes = activity.location ? (
           <View style={{ marginTop: 3 }}>
-            <Text style={{ fontSize: 10, color: "white" }}>
-              {activity.location.address}
-            </Text>
-            <Text style={{ fontSize: 10, color: "white" }}>
-              {activity.location.citystate}
-            </Text>
+            {activity.location.address ? (
+              <Text style={{ fontSize: 10, color: "white" }}>
+                {activity.location.address}
+              </Text>
+            ) : null}
+            {activity.location.citystate ? (
+              <Text style={{ fontSize: 10, color: "white" }}>
+                {activity.location.citystate}
+              </Text>
+            ) : null}
           </View>
         ) : null;
-
         return {
           title: activity.name,
           start: new Date(activity.startTime),
@@ -385,4 +388,3 @@ export default Itinerary;
 //       )
 //   }
 // }
-
