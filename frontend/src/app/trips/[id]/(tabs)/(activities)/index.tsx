@@ -18,39 +18,8 @@ import { ActivityProps } from "@/types";
 
 const ActivitiesScreen = () => {
   const { id } = useLocalSearchParams();
-
-  // const getActivities = async ({ id: text }: { id: string; }) => {
-  //   try {
-  //     const response = await fetch(`http://localhost:3000/trips/${id}`, {
-  //       method: "GET",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       // body: JSON.stringify(req),
-  //     });
-  //     if (!response.ok) {
-  //       throw new Error("Failed to fetch trip");
-  //     }
-  //     // Optionally, you can handle the response here
-  //     const data = await response.json();
-  //     setTrip(data);
-  //     console.log("Trip fetch:", data);
-  //   } catch (error: any) {
-  //     console.error("Error fetching trip:", error.toString());
-  //   }
-  // };
-
   return (
     <View style={{ flex: 1, height: Dimensions.get("window").height }}>
-      {/* <Stack.Screen
-        options={{
-          title: '',
-          headerShown: true,
-          headerBackTitle: 'Back',
-          headerBackTitleStyle: { fontSize: 10 },
-          
-        }}
-      /> */}
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -59,23 +28,9 @@ const ActivitiesScreen = () => {
           padding: 5,
         }}
       >
-        {/* <Link href={{
-        pathname: '/trips/create',
-        search: `?id=${id}`
-      }}>Create a new activity</Link> */}
-        <Link href={`trips/${id}/(activities)/663ed3689464d811386b288f`}>
-          Click here to see an activity example
-        </Link>
-        {/* <TouchableOpacity style={{ backgroundColor: '#fff', borderRadius: 10, alignItems: 'center', justifyContent: 'center', width: '50%',height: 250, padding: 10}} 
-          onPress={() => { }}>
-          <Text>Add</Text>
-        </TouchableOpacity> */}
         {mockData.map((activity: ActivityProps, index: number) => (
           <View style={{ width: "50%", padding: 10 }}>
-              <ActivityThumbnail
-                key={index}
-                {...activity}
-              />
+            <ActivityThumbnail key={index} {...activity} />
           </View>
         ))}
       </ScrollView>
