@@ -6,7 +6,6 @@ import { Link, Stack, useLocalSearchParams } from "expo-router";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { View } from "react-native";
 import { useRoute } from "@react-navigation/native";
-import index from "./(itinerary)/index";
 
 export default function TabLayout() {
   const { id } = useLocalSearchParams();
