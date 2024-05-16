@@ -47,13 +47,11 @@ const ViewActivity = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          // body: JSON.stringify(req),
         },
       );
       if (!response.ok) {
         throw new Error("Failed to fetch activity");
       }
-      // Optionally, you can handle the response here
       const data = await response.json();
       setActivity(data);
       console.log("Activity fetch:", data);
@@ -69,22 +67,6 @@ const ViewActivity = () => {
 
   return (
     <View style={{ height: Dimensions.get("window").height }}>
-      {/* <Stack.Screen
-    options={{
-      title: '',
-      headerShown: true,
-      headerRight: () => (
-        <Link href={`/trip/create?id=${id}`}>
-          <Feather
-            onPressIn={showMoreSetting}
-            onPressOut={notShowMoreSetting}
-            name="edit-2"
-            size={24}
-            color="black" />
-        </Link>
-      ),
-    }}
-  /> */}
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.imageContainer}>
           <Image style={styles.image} source={favicon} />
@@ -110,7 +92,6 @@ const ViewActivity = () => {
             <Text style={[styles.h1, { marginTop: 18 }]}>{activity.name}</Text>
             <View style={styles.row}>
               <Text style={[styles.h3, { marginRight: 5 }]}>3</Text>
-              {/* <Ionicons name="star" size={24} color="#FFC501" /> */}
               <Rating
                 type="star"
                 ratingCount={5}
@@ -141,7 +122,6 @@ const ViewActivity = () => {
                   {DateTime.fromISO(activity.startTime.toString())
                     .setZone("system")
                     .toLocaleString(DateTime.TIME_SIMPLE)}
-                  {/* {trip.startDate.getHours() % 12 || 12}:{trip.startDate.getMinutes().toString().padStart(2, '0')} {trip.startDate.getHours() >= 12 ? 'PM' : 'AM'} */}
                 </Text>
               </View>
               <Ionicons
@@ -161,7 +141,6 @@ const ViewActivity = () => {
                   {DateTime.fromISO(activity.endTime.toString())
                     .setZone("system")
                     .toLocaleString(DateTime.TIME_SIMPLE)}
-                  {/* {trip.endDate.getHours() % 12 || 12}:{trip.endDate.getMinutes().toString().padStart(2, '0')} {trip.endDate.getHours() >= 12 ? 'PM' : 'AM'} */}
                 </Text>
               </View>
             </View>
@@ -208,15 +187,6 @@ const ViewActivity = () => {
 };
 
 const styles = StyleSheet.create({
-  // scrollContainer: {
-  //   display: 'flex',
-  //   flex-direction: 'column',
-  // },
-  container: {
-    // flex: 1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
-  },
   imageContainer: {
     position: "relative",
   },
@@ -270,12 +240,6 @@ const styles = StyleSheet.create({
     marginTop: -12,
     paddingTop: 6,
   },
-  // innerView: {
-  //   paddingHorizontal: 30,
-  //   paddingVertical: 5,
-  //   height: 'auto',
-  // },
-
   row: {
     flexDirection: "row",
     marginTop: 18,
