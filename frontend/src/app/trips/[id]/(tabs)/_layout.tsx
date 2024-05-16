@@ -2,10 +2,9 @@ import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { AntDesign } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { Link, Stack, useLocalSearchParams } from "expo-router";
-import { Feather, Ionicons } from "@expo/vector-icons";
-import { View } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import { Link, useLocalSearchParams } from "expo-router";
+import { Feather } from "@expo/vector-icons";
+import { View, Text } from "react-native";
 
 export default function TabLayout() {
   const { id } = useLocalSearchParams();
