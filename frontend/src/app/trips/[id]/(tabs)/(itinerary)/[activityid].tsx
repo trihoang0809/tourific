@@ -103,9 +103,16 @@ const ViewActivity = () => {
             <View style={styles.row}>
               <Ionicons name="location" size={25} color="#006ee6" />
               <View>
-                <Text style={[styles.h3, { marginLeft: 10 }]}>
-                  {activity.location.address} {activity.location.citystate}
-                </Text>
+                {activity.location.address ? (
+                  <Text style={[styles.h3, { marginLeft: 10 }]}>
+                    {activity.location.address}
+                  </Text>
+                ) : null}
+                {activity.location.citystate ? (
+                  <Text style={[styles.h3, { marginLeft: 10 }]}>
+                    {activity.location.citystate}
+                  </Text>
+                ) : null}
               </View>
             </View>
             <View style={styles.row}>
