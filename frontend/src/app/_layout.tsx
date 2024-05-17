@@ -5,9 +5,10 @@ const RootNavigation = () => {
   return (
     <Stack>
       <Stack.Screen
-        name="trips"
-        options={{ title: "Trip", headerShown: true }}
+        name='trips'
+        options={{ title: 'Trip', headerShown: false }}
       />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
     </Stack>
   );
 };

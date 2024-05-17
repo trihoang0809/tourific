@@ -127,4 +127,64 @@ router.delete("/:activityId", async (req: Request<ActivityParams>, res) => {
   }
 });
 
+// Upvote an activity
+router.put("/:activityId/upvote", async (req: Request<ActivityParams>, res) => {
+  const { activityId: activityId } = req.params;
+
+  const isValidID = await prisma.activity.findUnique({
+    where: {
+      id: activityId,
+    },
+  });
+
+  if (!isValidID) {
+    res.status(404).json({ error: "Activity does not exist" });
+  }
+
+  try {
+    const upVoteActivity = prisma.activity.update({
+      where: {
+        id: activityId
+      },
+      data: {
+        netUpvotes: { increment: 1 }
+      }
+    });
+
+    res.status(200).json(upVoteActivity);
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred while like the activity." });
+  }
+});
+
+// Downvote an activity
+router.put("/:activityId/downvote", async (req: Request<ActivityParams>, res) => {
+  const { activityId: activityId } = req.params;
+
+  const isValidID = await prisma.activity.findUnique({
+    where: {
+      id: activityId,
+    },
+  });
+
+  if (!isValidID) {
+    res.status(404).json({ error: "Activity does not exist" });
+  }
+
+  try {
+    const downVoteActivity = prisma.activity.update({
+      where: {
+        id: activityId
+      },
+      data: {
+        netUpvotes: { decrement: 1 }
+      }
+    });
+
+    res.status(200).json(downVoteActivity);
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred while dislike the activity." });
+  }
+});
+
 export default router;

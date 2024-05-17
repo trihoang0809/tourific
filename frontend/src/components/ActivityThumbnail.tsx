@@ -1,5 +1,4 @@
 import { ActivityProps } from "@/types";
-import { DateTime } from "luxon";
 import { Text, View, Image, StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
 import { Dimensions } from "react-native";
@@ -62,7 +61,6 @@ const ActivityThumbnail = (activity: ActivityProps) => {
 
 const styles = StyleSheet.create({
   card: {
-    // width: screenWidth / 2 - 10,
     backgroundColor: "#fff",
     borderRadius: 15,
     elevation: 3,
@@ -95,9 +93,6 @@ const styles = StyleSheet.create({
   },
   heartIcon: {
     marginLeft: 5,
-    // position: 'absolute',
-    // top: 10,
-    // right: 10,
   },
   title: {
     fontSize: 20,

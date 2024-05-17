@@ -3,19 +3,18 @@
 import { DimensionValue } from "react-native";
 
 export interface TripData {
-  id: string;
   name: string;
   dateRange: {
     startDate: Date;
     endDate: Date;
   };
   startTime: {
-    hours: number;
-    minutes: number;
+    hours: Number,
+    minutes: Number,
   };
   endTime: {
-    hours: number;
-    minutes: number;
+    hours: Number,
+    minutes: Number,
   };
   location: MapData;
 }
@@ -43,6 +42,7 @@ export interface DateRangePickerProps {
 
 export interface GooglePlacesInputProps {
   onLocationSelect: (location: MapData) => void;
+  value: string;
 }
 
 export interface ActivityProps {
@@ -58,7 +58,6 @@ export interface ActivityProps {
   category: string[];
   rating?: number;
 }
-
 export type Trip = {
   id: string;
   name: string;
