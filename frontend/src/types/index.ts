@@ -1,5 +1,7 @@
 // this file is for declaring types
 
+import { DimensionValue } from "react-native";
+
 export interface TripData {
   id: string;
   name: string;
@@ -95,4 +97,13 @@ export type User = {
 
 export interface UserProps {
   user: User;
+}
+
+export interface AvatarCardProps extends UserProps {
+  size?: DimensionValue;
+}
+
+export interface AvatarGroupProps {
+  users: User[];
+  size?: DimensionValue;
 }

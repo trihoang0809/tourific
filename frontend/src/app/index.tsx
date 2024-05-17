@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { Link, Stack } from "expo-router";
 import { HomeScreen } from "../screens/HomeScreen";
 import sampleUser from "@/mock-data/userNickDoan";
+import AvatarCard from "@/components/Avatar/AvatarCard";
 
 export default function App() {
   // return (
@@ -31,7 +32,6 @@ export default function App() {
         Go to trip at the beach
       </Link>
       <Link href="/trips/create">Go to trip create</Link>
-      <StatusBar style="auto" />
     </SafeAreaView>
   );
 }

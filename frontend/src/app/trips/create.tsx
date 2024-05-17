@@ -47,21 +47,21 @@ export default function CreateTripScreen() {
     isUpdating
       ? trips[0]
       : {
-          name: "",
-          dateRange: {
-            startDate: new Date(),
-            endDate: new Date(),
-          },
-          startTime: {
-            hours: Number,
-            minutes: Number,
-          },
-          endTime: {
-            hours: Number,
-            minutes: Number,
-          },
-          location: {},
+        name: "",
+        dateRange: {
+          startDate: new Date(),
+          endDate: new Date(),
         },
+        startTime: {
+          hours: Number,
+          minutes: Number,
+        },
+        endTime: {
+          hours: Number,
+          minutes: Number,
+        },
+        location: {},
+      },
   );
 
   // for date range picker modal
@@ -122,7 +122,7 @@ export default function CreateTripScreen() {
     } else {
       // CREATING
       try {
-        const response = await fetch("http://localhost:3000/trips", {
+        const response = await fetch("http://192.168.2.12:3000/trips", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -155,7 +155,7 @@ export default function CreateTripScreen() {
   }, [setOpen]);
 
   const onConfirm = useCallback(
-    ({ startDate, endDate }: { startDate: Date; endDate: Date }) => {
+    ({ startDate, endDate }: { startDate: Date; endDate: Date; }) => {
       console.log("start date", startDate, endDate);
       setOpen(false);
       // Check if startDate and endDate are already set in formData
@@ -189,7 +189,7 @@ export default function CreateTripScreen() {
   );
 
   const onConfirmStartTime = useCallback(
-    ({ hours, minutes }: { hours: number; minutes: number }) => {
+    ({ hours, minutes }: { hours: number; minutes: number; }) => {
       setFormData(
         (prevFormData) =>
           ({
@@ -206,7 +206,7 @@ export default function CreateTripScreen() {
   );
 
   const onConfirmEndTime = useCallback(
-    ({ hours, minutes }: { hours: number; minutes: number }) => {
+    ({ hours, minutes }: { hours: number; minutes: number; }) => {
       setFormData(
         (prevFormData) =>
           ({
@@ -263,7 +263,7 @@ export default function CreateTripScreen() {
               width: 130,
               padding: "auto",
             }}
-            onPress={() => {}}
+            onPress={() => { }}
           >
             <Text>Change image</Text>
           </Pressable>
@@ -400,21 +400,21 @@ export default function CreateTripScreen() {
                     }}
                   >
                     {typeof formData.startTime.hours === "number" &&
-                    typeof formData.startTime.minutes === "number"
+                      typeof formData.startTime.minutes === "number"
                       ? new Date(
-                          1970,
-                          0,
-                          1,
-                          formData.startTime.hours,
-                          formData.startTime.minutes,
-                        ).toLocaleTimeString("en-US", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
+                        1970,
+                        0,
+                        1,
+                        formData.startTime.hours,
+                        formData.startTime.minutes,
+                      ).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
                       : new Date(1970, 0, 1, 8, 0).toLocaleTimeString("en-US", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                   </Text>
                 </TouchableOpacity>
                 <Controller
@@ -457,21 +457,21 @@ export default function CreateTripScreen() {
                     }}
                   >
                     {typeof formData.endTime.hours === "number" &&
-                    typeof formData.endTime.minutes === "number"
+                      typeof formData.endTime.minutes === "number"
                       ? new Date(
-                          1970,
-                          0,
-                          1,
-                          formData.endTime.hours,
-                          formData.endTime.minutes,
-                        ).toLocaleTimeString("en-US", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
+                        1970,
+                        0,
+                        1,
+                        formData.endTime.hours,
+                        formData.endTime.minutes,
+                      ).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
                       : new Date(1970, 0, 1, 8, 0).toLocaleTimeString("en-US", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                   </Text>
                 </TouchableOpacity>
                 <Controller
