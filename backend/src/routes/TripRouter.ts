@@ -5,7 +5,7 @@ import { validateData } from "../middleware/validationMiddleware";
 import { tripCreateSchema } from "../schemas/tripSchema";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { StatusCodes } from "http-status-codes";
-import InvitationRouter from "./InvitationRouter";
+// import InvitationRouter from "./InvitationRouter";
 
 // const express = require('express')
 const router = express.Router();
@@ -27,28 +27,18 @@ const userID = "664023f929694f249f1a4c86";
 router.use("/:tripId/activities", ActivityRouter);
 
 // Invitation route
-router.use("/invitation", InvitationRouter);
+// router.use("/invitation", InvitationRouter);
 
 // Get all trips of a user
 router.get("/", async (req: Request<TripParams>, res) => {
   try {
-    const userId = userID;
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId
-      }
-    });
-
-    if (!user) {
-      return res.status(StatusCodes.NOT_FOUND).json({ message: "User does not exists!" });
-    }
-
     let queryConditions = {};
     const now = new Date();
 
     if (req.query.ongoing === "true") {
       queryConditions = {
         where: {
+          userID: userID,
           AND: [
             {
               startDate: {
@@ -66,6 +56,7 @@ router.get("/", async (req: Request<TripParams>, res) => {
     } else if (req.query.past === "true") {
       queryConditions = {
         where: {
+          userID: userID,
           endDate: {
             lt: now,
           },
@@ -74,6 +65,7 @@ router.get("/", async (req: Request<TripParams>, res) => {
     } else if (req.query.upcoming === "true") {
       queryConditions = {
         where: {
+          userID: userID,
           startDate: {
             gt: now,
           },

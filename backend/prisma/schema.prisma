@@ -14,9 +14,9 @@ model Trip {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   participantsID String[] @db.ObjectId
   name String
-  location Location?
-  startDate DateTime? @default(now())
-  endDate DateTime?
+  location Location
+  startDate DateTime @default(now())
+  endDate DateTime
   image Photo?
   activities Activity[]
 
@@ -29,8 +29,7 @@ model TripInvitation {
   tripId   String @db.ObjectId
   inviteeId   String @db.ObjectId
   inviterId String @db.ObjectId
-  code     String @unique
-  status   Status @default(INIT)
+  status   Status @default(PENDING)
   
   trip     Trip @relation(fields: [tripId], references: [id])
   invitee  User @relation("InviteeToTripInvitations", fields: [inviteeId], references: [id])
@@ -77,7 +76,6 @@ enum Status {
   ACCEPTED
   PENDING
   REJECTED
-  INIT
 }
 
 model Activity {
