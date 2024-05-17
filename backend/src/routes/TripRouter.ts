@@ -127,7 +127,7 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
 });
 
 // Update an existing trip
-router.put("/:id", async (req, res) => {
+router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
   const { id } = req.params;
   console.log("id", id);
   const { name, startDate, endDate, location } = req.body;
