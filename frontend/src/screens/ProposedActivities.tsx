@@ -136,53 +136,21 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
         </View>
 
         {/* Activity Note input */}
-        <Pressable
-          style={[styles.queInput, { backgroundColor: "white", flex: 1 }]}
-          onPress={() => {
-            setNoteSelected(true);
-          }}
-        >
-          {!isNoteSelected ? (
-            <Text
-              style={[
-                material.title,
-                styles.noteInput,
-                { fontStyle: "italic", color: "grey" },
-              ]}
-            >
-              {activityNote === "" ? "Add your notes here" : activityNote}
-            </Text>
-          ) : (
-            <View style={styles.noteInputFocus}>
-              <View style={{ flexDirection: "row" }}>
-                <FontAwesome5 name="sticky-note" size={24} color="black" />
-                <TextInput
-                  onChangeText={(value) => {
-                    console.log(value);
-                    setActivityNote(value);
-                  }}
-                  style={[
-                    material.title,
-                    { fontStyle: "italic", marginLeft: 10 },
-                  ]}
-                  placeholder="Add your notes here"
-                  value={activityNote}
-                  multiline={true}
-                ></TextInput>
-              </View>
-
-              {/* Closing the Note */}
-              <Pressable
-                onPress={() => {
-                  setNoteSelected(false);
-                }}
-                style={{ alignSelf: "flex-end" }}
-              >
-                <AntDesign name="up" size={24} color="black" />
-              </Pressable>
-            </View>
-          )}
-        </Pressable>
+        <View style={styles.noteInputFocus}>
+          <View style={{ flexDirection: "row" }}>
+            <FontAwesome5 name="sticky-note" size={24} color="black" />
+            <TextInput
+              onChangeText={(value) => {
+                console.log(value);
+                setActivityNote(value);
+              }}
+              style={[material.title, { fontStyle: "italic", marginLeft: 10 }]}
+              placeholder="Add your notes here"
+              value={activityNote}
+              multiline={true}
+            ></TextInput>
+          </View>
+        </View>
 
         {/* Map Input */}
         <Modal
@@ -281,26 +249,14 @@ const styles = StyleSheet.create({
 
   submitButton: {
     alignSelf: "center",
+    alignItems: "center",
     borderWidth: 1,
-    padding: 10,
-    borderRadius: 30,
-    backgroundColor: "#569AF3",
-  },
-
-  dateButton: {
-    borderWidth: 1,
-    paddingHorizontal: 14,
-    paddingVertical: 3,
-    borderRadius: 4,
-    marginBottom: 50,
-    // backgroundColor: "#569AF3"
-  },
-
-  dateButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    // alignItems: "center",
-    // backgroundColor: "red",
+    borderStyle: "dashed",
+    borderRadius: 10,
+    backgroundColor: "grey",
+    width: "100%",
+    marginTop: 50,
+    padding: 5,
   },
 
   formInputContainer: {
