@@ -5,7 +5,7 @@ import { validateData } from "../middleware/validationMiddleware";
 import { tripCreateSchema } from "../schemas/tripSchema";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { StatusCodes } from "http-status-codes";
-// import InvitationRouter from "./InvitationRouter";
+import InvitationRouter from "./InvitationRouter";
 
 // const express = require('express')
 const router = express.Router();
@@ -17,7 +17,6 @@ const PORT = process.env.PORT || 3000;
 export interface TripParams {
   tripId: string;
   userId: string;
-  code?: string;
 }
 
 // temporary for testing until auth done
@@ -27,7 +26,7 @@ const userID = "664023f929694f249f1a4c86";
 router.use("/:tripId/activities", ActivityRouter);
 
 // Invitation route
-// router.use("/invitation", InvitationRouter);
+router.use("/invite", InvitationRouter);
 
 // Get all trips of a user
 router.get("/", async (req: Request<TripParams>, res) => {
@@ -38,7 +37,6 @@ router.get("/", async (req: Request<TripParams>, res) => {
     if (req.query.ongoing === "true") {
       queryConditions = {
         where: {
-          userID: userID,
           AND: [
             {
               startDate: {
@@ -56,7 +54,6 @@ router.get("/", async (req: Request<TripParams>, res) => {
     } else if (req.query.past === "true") {
       queryConditions = {
         where: {
-          userID: userID,
           endDate: {
             lt: now,
           },
@@ -65,7 +62,6 @@ router.get("/", async (req: Request<TripParams>, res) => {
     } else if (req.query.upcoming === "true") {
       queryConditions = {
         where: {
-          userID: userID,
           startDate: {
             gt: now,
           },
@@ -74,7 +70,14 @@ router.get("/", async (req: Request<TripParams>, res) => {
       // console.log(now);
     }
 
-    const trips = await prisma.trip.findMany(queryConditions);
+    const trips = await prisma.tripMember.findMany({
+      where: {
+        status: 'ACCEPTED'
+      },
+      select: {
+        trip: queryConditions
+      }
+    });
     res.json(trips);
   } catch (err) {
     console.log(err);
@@ -82,19 +85,9 @@ router.get("/", async (req: Request<TripParams>, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+// create a trip
+router.post("/", validateData(tripCreateSchema), async (req, res) => {
   try {
-    const userId = userID;
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId
-      }
-    });
-
-    if (!user) {
-      return res.status(StatusCodes.NOT_FOUND).json({ message: "User does not exists!" });
-    }
-
     const { name, startDate, endDate, location, image } = req.body;
     const trip = await prisma.trip.create({
       data: {
@@ -104,16 +97,24 @@ router.post("/", async (req, res) => {
         location,
         image,
         participants: {
-          connect: {
-            id: userID
+          create: {
+            inviteeId: userID,
+            inviterId: userID,
+            status: 'ACCEPTED'
           }
         }
       },
     });
     res.status(201).json(trip);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "An error occurred while creating the trip." });
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        res.status(StatusCodes.CONFLICT).json({ error: "A trip with the same details already exists." });
+      }
+    } else {
+      console.log(error);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while creating the trip." });
+    }
   }
 });
 
@@ -129,43 +130,6 @@ router.get("/:id", async (req, res) => {
     res.status(StatusCodes.OK).json(trip);
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while fetching a trip." });
-  }
-});
-
-// Create a new trip
-router.post("/", validateData(tripCreateSchema), async (req, res) => {
-  try {
-    const userId = userID;
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId
-      }
-    });
-
-    if (!user) {
-      return res.status(StatusCodes.NOT_FOUND).json({ message: "User does not exists!" });
-    }
-
-    const { name, startDate, endDate, location, image } = req.body;
-    const trip = await prisma.trip.create({
-      data: {
-        name: name,
-        startDate,
-        endDate,
-        location,
-        image,
-      },
-    });
-    res.status(StatusCodes.CREATED).json(trip);
-  } catch (error) {
-    if (error instanceof PrismaClientKnownRequestError) {
-      if (error.code === "P2002") {
-        res.status(StatusCodes.CONFLICT).json({ error: "A trip with the same details already exists." });
-      }
-    } else {
-      console.log(error);
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while creating the trip." });
-    }
   }
 });
 
@@ -225,6 +189,8 @@ router.delete("/:id", async (req, res) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while deleting the trip." });
   }
 });
+
+// GET all participant in a group
 
 // DELETE PARTICIPANT OUT OF TRIPS
 

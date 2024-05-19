@@ -12,19 +12,16 @@ datasource db {
 
 model Trip {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-  participantsID String[] @db.ObjectId
   name String
   location Location
   startDate DateTime @default(now())
   endDate DateTime
   image Photo?
   activities Activity[]
-
-  participants User[] @relation(fields: [participantsID], references: [id])
-  invitations TripInvitation[]
+  participants TripMember[]
 }
 
-model TripInvitation {
+model TripMember {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
   tripId   String @db.ObjectId
   inviteeId   String @db.ObjectId
@@ -49,7 +46,6 @@ type Location {
 
 model User {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-  tripID String[] @db.ObjectId
   userName String @unique
   password String
   firstName String
@@ -57,10 +53,9 @@ model User {
   dateOfBirth DateTime
   avatar Photo
 
-  inviteeTripInvitations TripInvitation[] @relation("InviteeToTripInvitations")
-  inviterTripInvitations TripInvitation[] @relation("InviterToTripInvitations")  
+  inviteeTripInvitations TripMember[] @relation("InviteeToTripInvitations")
+  inviterTripInvitations TripMember[] @relation("InviterToTripInvitations")  
   friendRequestReceived   Friendship[]   @relation("friendRequestReceived")
-  trips Trip[] @relation(fields: [tripID], references: [id])
 }
 
 model Friendship {

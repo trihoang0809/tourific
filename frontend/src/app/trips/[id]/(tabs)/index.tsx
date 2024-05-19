@@ -5,6 +5,7 @@ import { Link, Stack, router, useLocalSearchParams } from "expo-router";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from 'luxon';
+import AvatarGroup from "@/components/Avatar/AvatarGroup";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 const width = Dimensions.get('window').width; //full width
@@ -163,6 +164,7 @@ const TripDetailsScreen = () => {
               {DateTime.local().zoneName}
             </Text>
             <Text style={styles.h2}>Participants</Text>
+            {/* <AvatarGroup /> */}
           </View>
         </View>
       </ScrollView>

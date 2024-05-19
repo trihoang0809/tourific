@@ -1,72 +1,77 @@
-// import express, { Request } from "express";
-// import { PrismaClient } from "@prisma/client";
-// import { StatusCodes } from "http-status-codes";
-// import { createHash } from "crypto";
-// import { TripParams } from "./TripRouter";
+import express, { Request } from "express";
+import { PrismaClient } from "@prisma/client";
+import { StatusCodes } from "http-status-codes";
+import { createHash } from "crypto";
+import { TripParams } from "./TripRouter";
 
-// const router = express.Router({ mergeParams: true });
-// const prisma = new PrismaClient();
+const router = express.Router({ mergeParams: true });
+const prisma = new PrismaClient();
 
-// export interface InvitationParams extends TripParams {
-//   invitationId: string,
-//   code: string;
-// }
+export interface InvitationParams extends TripParams {
+  invitationId: string,
+  code?: string;
+  status?: string;
+}
 
-// // temporary for testing until auth done
-// const userID = "664038e4c21dfa644ef2a453";
+// temporary for testing until auth done
+const userID = "664038e4c21dfa644ef2a453";
 
-// // get all invitations of a user, including trip details
-// router.get("/", async (req: Request, res) => {
-//   try {
-//     const trips = await prisma.user.findMany({
-//       where: {
-//         id: userID
-//       },
-//       include: {
-//         inviterTripInvitations: true
-//       }
-//     });
+// get all received invitations of a user, including trip details
+router.get("/", async (req: Request, res) => {
+  try {
+    const trips = await prisma.tripMember.findMany({
+      where: {
+        inviteeId: userID,
+      },
+      include: {
+        trip: true
+      }
+    });
 
-//     res.status(StatusCodes.OK).json(trips);
-//   } catch (error) {
-//     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting invitatiion." });
-//   }
-// });
+    res.status(StatusCodes.OK).json(trips);
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting invitatiion." });
+  }
+});
 
-// // get an invitation
-// router.get("/:code", async (req: Request<InvitationParams>, res) => {
-//   const { code } = req.params;
-//   try {
-//     const invitation = await prisma.tripInvitation.findUnique({
-//       where: {
-//         code: code,
-//       },
-//       include: {
-//         trip: true  // maybe we need to retrieve trip name for notifciation
-//       }
-//     });
+// get all sent invitations of a user, including trip details
+router.get("/", async (req: Request, res) => {
+  try {
+    const trips = await prisma.tripMember.findMany({
+      where: {
+        inviterId: userID,
+      },
+      include: {
+        trip: true
+      }
+    });
 
-//     if (!invitation) {
-//       return res.status(StatusCodes.NOT_FOUND).send("Invitation not found");
-//     }
+    res.status(StatusCodes.OK).json(trips);
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting invitatiion." });
+  }
+});
 
-//     res.status(StatusCodes.OK).json(invitation);
-//   } catch (error) {
-//     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting invitatiion." });
-//   }
-// });
+// get an invitation by status
+router.get("/", async (req: Request<InvitationParams>, res) => {
+  const { status } = req.body;
+  try {
+    const trips = await prisma.tripMember.findMany({
+      where: {
+        inviteeId: userID,
+        status: status
+      },
+    });
 
-// // DELETE an invitation
+    res.status(StatusCodes.OK).json(trips);
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting invitatiion." });
+  }
+});
 
-// // CANCEL AN INVITATION
-// router.get("/:tripId", async (req: Request<InvitationParams>, res) => {
-//   const { tripId } = req.params;
-//   const inviteeIds = req.body.inviteeIds; // array of user ids
-//   const inviterId = userID;
-
-//   // delete trip invitation from invitation list in user model
-
-// });
+// DELETE/CANCEL an invitation
+// Cannot delete an invitation, but we can kick members 
+// out of the trip
 
 
 // // INVITE MULTIPLE USERS, ACCEPTING LIST OF USERS
@@ -135,121 +140,78 @@
 //   }
 // });
 
-// // accept or decline invite to join group
-// // endpoint: /trips/tripId?accept=true
-// // endpoint: /trips/tripId?accept=false
-// router.put("/:tripId", async (req: Request<InvitationParams>, res) => {
-//   const inviteeId = userID;
-//   const { tripId } = req.params;
-//   const { accept } = req.query;
+// accept or decline invite to join group
+// endpoint: /trips/tripId/accept
+router.patch("/:tripId/accept", async (req: Request<InvitationParams>, res) => {
+  const inviteeId = userID;
+  const { tripId, accept } = req.params;
 
-//   try {
-//     // check user and trip id
-//     const [user, trip] = await Promise.all([
-//       prisma.user.findUnique({ where: { id: inviteeId } }),
-//       prisma.trip.findUnique({ where: { id: tripId } })
-//     ]);
+  try {
+    // check if already joined the group for case multiple users sending invitation
+    const isJoined = await prisma.trip.findFirst({
+      where: {
+        participantsID: {
+          has: inviteeId
+        }
+      }
+    });
 
-//     if (!user || !trip) {
-//       return res.status(StatusCodes.NOT_FOUND).send("Not found");
-//     }
+    if (isJoined) {
+      res.sendStatus(StatusCodes.BAD_REQUEST).json({ error: "You already in the trip" });
+    }
 
-//     // check if already joined the group for case multiple users sending invitation
-//     const isJoined = await prisma.trip.findFirst({
-//       where: {
-//         participantsID: {
-//           has: inviteeId
-//         }
-//       }
-//     });
+    // user accepts invitation
+    // Add user to trip participants
+    await prisma.trip.update({
+      where: {
+        id: tripId,
+      },
+      data: {
+        participantsID: {
+          push: inviteeId // adds user ID to the participantsID array
+        }
+      }
+    });
 
-//     if (isJoined) {
-//       res.sendStatus(StatusCodes.BAD_REQUEST).json({ error: "You already in the trip" });
-//     }
+    // Add trip to user's trip list
+    await prisma.user.update({
+      where: {
+        id: inviteeId,
+      },
+      data: {
+        tripID: {
+          push: tripId // adds the trip ID to the user's tripID array
+        }
+      }
+    });
 
-//     // user accepts invitation
-//     if (accept === "true") {
-//       // Add user to trip participants
-//       await prisma.trip.update({
-//         where: {
-//           id: tripId,
-//         },
-//         data: {
-//           participantsID: {
-//             push: inviteeId // adds user ID to the participantsID array
-//           }
-//         }
-//       });
+    const accepted = await prisma.tripInvitation.update({
+      where: {
+        tripId_inviteeId: {
+          tripId: tripId,
+          inviteeId: inviteeId
+        }
+      },
+      data: {
+        status: 'ACCEPTED'
+      }
+    });
 
-//       // Add trip to user's trip list
-//       await prisma.user.update({
-//         where: {
-//           id: inviteeId,
-//         },
-//         data: {
-//           tripID: {
-//             push: tripId // adds the trip ID to the user's tripID array
-//           }
-//         }
-//       });
+    if (!accepted) {
+      res.sendStatus(StatusCodes.BAD_REQUEST).send("Failed to accept");
+    }
+    res.sendStatus(StatusCodes.ACCEPTED).send("User added to trip successfully");
 
-//       const accepted = await prisma.tripInvitation.update({
-//         where: {
-//           tripId_inviteeId: {
-//             tripId: tripId,
-//             inviteeId: inviteeId
-//           }
-//         },
-//         data: {
-//           status: 'ACCEPTED'
-//         }
-//       });
+  } catch (error) {
+    console.error("Failed to accept trip invitation:", error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
+  }
+});
 
-//       if (!accepted) {
-//         res.sendStatus(StatusCodes.BAD_REQUEST).send("Failed to accept");
-//       }
-//       res.sendStatus(StatusCodes.ACCEPTED).send("User added to trip successfully");
-//     } else {
-//       // UPDATE tripinvitation model
-//       const declined = await prisma.tripInvitation.update({
-//         where: {
-//           tripId_inviteeId: {
-//             tripId: tripId,
-//             inviteeId: inviteeId
-//           }
-//         },
-//         data: {
-//           status: 'INIT'
-//         }
-//       });
 
-//       // find tripid in user model
-//       const trips = await prisma.user.findUnique({
-//         where: {
-//           id: userID
-//         },
-//         select: {
-//           tripID: true
-//         }
-//       });
+router.patch("/:tripId/decline", async (req: Request<InvitationParams>, res) => {
+  // UPDATE tripinvitation model
 
-//       // update user model, delete tripid from tripinvitation array
-//       await prisma.user.update({
-//         where: {
-//           id: inviteeId,
-//         },
-//         data: {
-//           tripID: {
-//             set: trips?.tripID.filter((id) => id !== tripId)
-//           }
-//         }
-//       });
-//       res.send("Invitation not accepted");
-//     }
-//   } catch (error) {
-//     console.error("Failed to accept trip invitation:", error);
-//     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
-//   }
-// });
+});
 
-// export default router;
+export default router;

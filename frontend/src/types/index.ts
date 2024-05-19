@@ -106,3 +106,13 @@ export interface AvatarGroupProps {
   users: User[];
   size?: DimensionValue;
 }
+
+export interface Invitation {
+  inviter: User,
+  invitee: User,
+  trip: TripData;
+}
+
+export interface InvitationCardProps {
+  invitation: Invitation;
+}
