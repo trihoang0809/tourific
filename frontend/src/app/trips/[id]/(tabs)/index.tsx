@@ -21,6 +21,7 @@ const TripDetailsScreen = () => {
     endDate: new Date(),
     startHour: 0,
     startMinute: 0,
+    image: { url: "" },
   });
 
   // more setting icon
@@ -98,8 +99,15 @@ const TripDetailsScreen = () => {
       <ScrollView style={{ width: width, height: height }}>
         <View>
           <Image
-            style={{ width: width, height: 200 }}
-            source={favicon} />
+            style={styles.image}
+            source={
+              trip.image && trip.image.url
+                ? { uri: trip.image.url }
+                : {
+                    uri: "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400",
+                  }
+            }
+          />
         </View>
         <View style={styles.view}>
           <View
