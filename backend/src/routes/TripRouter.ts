@@ -106,7 +106,7 @@ router.get("/:id", async (req, res) => {
 
 // Create a new trip
 router.post("/", validateData(tripCreateSchema), async (req, res) => {
-  const { name, startDate, endDate, location } = req.body;
+  const { name, startDate, endDate, location, image } = req.body;
   try {
     const trip = await prisma.trip.create({
       data: {
@@ -114,6 +114,7 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
         startDate,
         endDate,
         location,
+        image,
       },
     });
     res.status(StatusCodes.CREATED).json(trip);
@@ -133,7 +134,7 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
 router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
   const { id } = req.params;
   console.log("id", id);
-  const { name, startDate, endDate, location } = req.body;
+  const { name, startDate, endDate, location, image } = req.body;
   console.log(req.body);
   const isValidID = await prisma.trip.findUnique({
     where: {
@@ -155,6 +156,7 @@ router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
         startDate: startDate,
         endDate: endDate,
         location: location,
+        image,
       },
     });
     res.status(StatusCodes.OK).json(trip);
