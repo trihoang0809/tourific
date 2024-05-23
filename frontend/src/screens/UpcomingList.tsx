@@ -1,10 +1,8 @@
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   TextInput,
-  Dimensions,
   StatusBar,
   FlatList,
 } from "react-native";
@@ -37,7 +35,6 @@ const Header = () => (
 export const ListFilteredCards: React.FC = () => {
   const [upcomingTrips, setUpcoming] = useState<Trip[]>([]);
   const serverUrl = serverURL();
-  const [numCols, setNumCols] = useState(0);
   const tripCardWidth = 380;
   const tripCardHeight = 330;
 
@@ -76,8 +73,6 @@ export const ListFilteredCards: React.FC = () => {
                 flexWrap: "wrap",
               }}
               data={upcomingTrips}
-              key={numCols}
-              numColumns={numCols}
               renderItem={({ item }) => (
                 <TripCard
                   height={tripCardHeight}

@@ -5,11 +5,10 @@ import {
   StyleSheet,
   TouchableHighlight,
 } from "react-native";
-import { useState, useEffect } from "react";
-import { Float } from "react-native/Libraries/Types/CodegenTypes";
+import { useState } from "react";
 import { Trip } from "../types";
 import { Octicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Link, router, Stack } from "expo-router";
+import { router } from "expo-router";
 
 interface tripProps {
   trip: Trip;
@@ -23,13 +22,12 @@ export const TripCard: React.FC<tripProps> = ({
   width = 350,
 }) => {
   const tripImage = trip.image;
-  const tripLocation = trip.location;
   const tripName = trip.name;
   const tripStartDate = trip.startDate;
   const tripEndDate = trip.endDate;
   const fontTripName = Math.max(18, (height * 18) / 300);
   const fontTripDetail = Math.max(13, (height * 14) / 300);
-  const [location, setLocation] = useState(trip.location.citystate);
+  const [location, setLocation] = useState(trip.location);
 
   const noImage =
     "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg";
@@ -51,20 +49,6 @@ export const TripCard: React.FC<tripProps> = ({
 
   // Calculate image height as 2/3 of the card's height
   const imageHeight = (height * 2) / 3;
-  const textSize = height / 18;
-  const tripState = tripLocation.citystate.split(", ");
-
-  useEffect(() => {
-    //fontTripDetail == height of the text --> 0.75*fontTripDetail ~ width of the text
-    if (tripLocation.citystate.length * fontTripDetail * 0.75 >= width)
-      if (tripState.length >= 2)
-        setLocation(
-          tripState[tripState.length - 2] +
-            ", " +
-            tripState[tripState.length - 1],
-        );
-  }, []);
-
   return (
     <View>
       <TouchableHighlight
@@ -112,7 +96,7 @@ export const TripCard: React.FC<tripProps> = ({
                     },
                   ]}
                 >
-                  {location}
+                  {location.citystate}
                 </Text>
               </View>
               <View style={styles.detail}>
