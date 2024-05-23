@@ -1,5 +1,5 @@
 import express, { Request } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Status } from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
 import { createHash } from "crypto";
 import { TripParams } from "./TripRouter";
@@ -14,20 +14,22 @@ export interface InvitationParams extends TripParams {
 }
 
 // temporary for testing until auth done
-const userID = "664038e4c21dfa644ef2a453";
+const userID = "664023f929694f249f1a4c86";
 
 // get all received invitations of a user, including trip details
-router.get("/", async (req: Request, res) => {
+router.get("/all-received", async (req: Request, res) => {
   try {
     const trips = await prisma.tripMember.findMany({
       where: {
         inviteeId: userID,
       },
       include: {
-        trip: true
+        trip: true,
+        inviter: true
       }
     });
 
+    console.log("trips", trips);
     res.status(StatusCodes.OK).json(trips);
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting invitatiion." });
@@ -35,14 +37,15 @@ router.get("/", async (req: Request, res) => {
 });
 
 // get all sent invitations of a user, including trip details
-router.get("/", async (req: Request, res) => {
+router.get("/all-sent", async (req: Request, res) => {
   try {
     const trips = await prisma.tripMember.findMany({
       where: {
         inviterId: userID,
       },
       include: {
-        trip: true
+        trip: true,
+        invitee: true
       }
     });
 
@@ -53,13 +56,14 @@ router.get("/", async (req: Request, res) => {
 });
 
 // get an invitation by status
+// example endpoint: /invite?status=PENDING
 router.get("/", async (req: Request<InvitationParams>, res) => {
-  const { status } = req.body;
+  const { status } = req.query;
   try {
     const trips = await prisma.tripMember.findMany({
       where: {
         inviteeId: userID,
-        status: status
+        status: status as Status
       },
     });
 
@@ -142,66 +146,26 @@ router.get("/", async (req: Request<InvitationParams>, res) => {
 
 // accept or decline invite to join group
 // endpoint: /trips/tripId/accept
-router.patch("/:tripId/accept", async (req: Request<InvitationParams>, res) => {
-  const inviteeId = userID;
-  const { tripId, accept } = req.params;
-
+router.patch("/:invitationId/accept", async (req: Request<InvitationParams>, res) => {
+  const { invitationId } = req.params;
   try {
-    // check if already joined the group for case multiple users sending invitation
-    const isJoined = await prisma.trip.findFirst({
-      where: {
-        participantsID: {
-          has: inviteeId
-        }
+    const result = await prisma.$transaction(async (prisma) => {
+      const invitation = await prisma.tripMember.findUnique({
+        where: { id: invitationId },
+        select: { status: true }
+      });
+
+      if (!invitation || invitation.status !== 'PENDING') {
+        throw new Error("Invitation cannot be accepted");
       }
+
+      return await prisma.tripMember.update({
+        where: { id: invitationId },
+        data: { status: 'ACCEPTED' },
+      });
     });
 
-    if (isJoined) {
-      res.sendStatus(StatusCodes.BAD_REQUEST).json({ error: "You already in the trip" });
-    }
-
-    // user accepts invitation
-    // Add user to trip participants
-    await prisma.trip.update({
-      where: {
-        id: tripId,
-      },
-      data: {
-        participantsID: {
-          push: inviteeId // adds user ID to the participantsID array
-        }
-      }
-    });
-
-    // Add trip to user's trip list
-    await prisma.user.update({
-      where: {
-        id: inviteeId,
-      },
-      data: {
-        tripID: {
-          push: tripId // adds the trip ID to the user's tripID array
-        }
-      }
-    });
-
-    const accepted = await prisma.tripInvitation.update({
-      where: {
-        tripId_inviteeId: {
-          tripId: tripId,
-          inviteeId: inviteeId
-        }
-      },
-      data: {
-        status: 'ACCEPTED'
-      }
-    });
-
-    if (!accepted) {
-      res.sendStatus(StatusCodes.BAD_REQUEST).send("Failed to accept");
-    }
-    res.sendStatus(StatusCodes.ACCEPTED).send("User added to trip successfully");
-
+    res.status(StatusCodes.OK).json(result);
   } catch (error) {
     console.error("Failed to accept trip invitation:", error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
@@ -209,9 +173,32 @@ router.patch("/:tripId/accept", async (req: Request<InvitationParams>, res) => {
 });
 
 
-router.patch("/:tripId/decline", async (req: Request<InvitationParams>, res) => {
-  // UPDATE tripinvitation model
+// accept or decline invite to join group
+// endpoint: /trips/tripId/decline
+router.patch("/:invitationId/decline", async (req: Request<InvitationParams>, res) => {
+  const { invitationId } = req.params;
+  try {
+    const result = await prisma.$transaction(async (prisma) => {
+      const invitation = await prisma.tripMember.findUnique({
+        where: { id: invitationId },
+        select: { status: true }
+      });
 
+      if (!invitation || invitation.status !== 'PENDING') {
+        throw new Error("Invitation cannot be declined");
+      }
+
+      return await prisma.tripMember.update({
+        where: { id: invitationId },
+        data: { status: 'REJECTED' },
+      });
+    });
+
+    res.status(StatusCodes.OK).json(result);
+  } catch (error) {
+    console.error("Failed to accept trip invitation:", error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
+  }
 });
 
 export default router;

@@ -6,9 +6,8 @@ import {
   TouchableHighlight,
 } from "react-native";
 import { useState, useEffect } from "react";
-import { Float } from "react-native/Libraries/Types/CodegenTypes";
 import { Trip } from "../types";
-import { Octicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Octicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link, router, Stack } from "expo-router";
 
 interface tripProps {
@@ -21,21 +20,18 @@ export const TripCard: React.FC<tripProps> = ({
   trip,
   height = 300,
   width = 350,
- }) => {
-  const tripImage = trip.image;
-  const tripLocation = trip.location;
+}) => {
+  const tripImage = trip.trip.image;
+  const tripLocation = trip.trip.location;
   const tripName = trip.name;
   const tripStartDate = trip.startDate;
   const tripEndDate = trip.endDate;
-  const fontTripName = Math.max(18, (height*18)/300);
-  const fontTripDetail = Math.max(13, (height*14)/300);
-  const [location, setLocation] = useState(trip.location.citystate);
-  
+  const fontTripName = Math.max(18, (height * 18) / 300);
+  const fontTripDetail = Math.max(13, (height * 14) / 300);
+  const [location, setLocation] = useState(trip.trip.location.citystate);
+
   const noImage =
     "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg";
-
-  const defaultAvatar =
-    "https://static1.colliderimages.com/wordpress/wp-content/uploads/2022/02/avatar-the-last-airbender-7-essential-episodes.jpg";
 
   const onPressTripCard = () => {
     // console.log("You pressed this card");
@@ -55,15 +51,23 @@ export const TripCard: React.FC<tripProps> = ({
   // Calculate image height as 2/3 of the card's height
   const imageHeight = (height * 2) / 3;
   const textSize = height / 18;
-  const tripState = tripLocation.citystate.split(", ");
 
   useEffect(() => {
     //fontTripDetail == height of the text --> 0.75*fontTripDetail ~ width of the text
-    if (tripLocation.citystate.length * fontTripDetail * 0.75 >= width)
-      if (tripState.length >= 2)
-        setLocation(tripState[tripState.length - 2] + ", " + tripState[tripState.length - 1]);
+    setLocation(trip.trip.location.citystate);
+    const tripState = location !== null ? location.split(", ") : "";
+    if (tripState.length >= 2) {
+      if (tripLocation.citystate.length * fontTripDetail * 0.75 >= width) {
+        setLocation(
+          tripState[tripState.length - 2] +
+          ", " +
+          tripState[tripState.length - 1],
+        );
+      }
+    }
   }, []);
 
+  console.log("lo", location);
   return (
     <View>
       <TouchableHighlight
@@ -89,7 +93,10 @@ export const TripCard: React.FC<tripProps> = ({
           ></Image>
           <View style={styles.descriptionContainer}>
             <View>
-              <Text numberOfLines={1} style={{ fontSize: fontTripName, fontWeight: "bold" }}>
+              <Text
+                numberOfLines={1}
+                style={{ fontSize: fontTripName, fontWeight: "bold" }}
+              >
                 {tripName}
               </Text>
             </View>
@@ -97,13 +104,31 @@ export const TripCard: React.FC<tripProps> = ({
             <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
               <View style={styles.detail}>
                 <Octicons name="location" size={17} color="black" />
-                <Text numberOfLines={1} style={[{ color: "blue", marginLeft: 6, fontSize: fontTripDetail, width: 100 }]}>
+                <Text
+                  numberOfLines={1}
+                  style={[
+                    {
+                      color: "blue",
+                      marginLeft: 6,
+                      fontSize: fontTripDetail,
+                      width: 100,
+                    },
+                  ]}
+                >
                   {location}
                 </Text>
               </View>
               <View style={styles.detail}>
-                <MaterialCommunityIcons name="timetable" size={17} color="black" />
-                <Text style={[{ color: "blue", marginLeft: 6, fontSize: fontTripDetail }]}>
+                <MaterialCommunityIcons
+                  name="timetable"
+                  size={17}
+                  color="black"
+                />
+                <Text
+                  style={[
+                    { color: "blue", marginLeft: 6, fontSize: fontTripDetail },
+                  ]}
+                >
                   {tripDate(new Date(tripStartDate))}
                 </Text>
               </View>

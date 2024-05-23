@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
   Button,
   Pressable,
@@ -11,14 +10,16 @@ import {
 import { TripCard } from "../components/TripCard";
 import { HomeScreenHeader } from "../components/HomeScreenHeader";
 import { useState, useEffect } from "react";
-import { UserProps, Trip } from "../types";
+import { UserProps, Trip, Invitation } from "../types";
 import { Link, router } from 'expo-router';
 import { EXPO_PUBLIC_HOST_URL } from "@/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
+import InvitationCard from "@/components/Invitation/InvitationCard";
 
 export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [ongoingTrips, setOngoingTrips] = useState<Trip[]>([]);
   const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
+  const [invitation, setInvitation] = useState<Invitation[]>([]);
   useEffect(() => {
     const fetchTrips = async () => {
       try {
@@ -38,11 +39,38 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
     fetchTrips();
   }, []);
 
+  useEffect(() => {
+    const fetchInvitations = async () => {
+      try {
+        const invitations = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/all-received`);
+        const invites = await invitations.json();
+        setInvitation(invites);
+      } catch (error) {
+        console.error("Failed to fetch invitations", error);
+      }
+    };
+
+    fetchInvitations();
+  }, []);
+
+  function onAccept(id: string): void {
+    throw new Error("Function not implemented.");
+  }
+
+  function onDecline(id: string): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <ScrollView style={styles.container}>
       <SafeAreaView>
         <HomeScreenHeader user={user} />
         <Text style={styles.greeting}>Welcome back, {user.firstName}!</Text>
+        <ScrollView>
+          {invitation.map((invite: Invitation) => (
+            <InvitationCard key={invite.id} invitation={invite} onAccept={onAccept} onDecline={onDecline} />
+          ))}
+        </ScrollView>
         <Text style={styles.title}>Ongoing Trips</Text>
         <ScrollView horizontal={true} style={styles.tripScroll}>
           {ongoingTrips.length > 0 ? (
@@ -53,7 +81,6 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             <Text style={styles.noTrip}>No ongoing trips</Text>
           )}
         </ScrollView>
-
         <Pressable style={styles.buttonContainer}>
           <Link href="/trips/create" style={styles.button}>
             <Text style={styles.buttonText}>Create a new trip</Text>

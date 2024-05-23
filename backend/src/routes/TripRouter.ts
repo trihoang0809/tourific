@@ -36,35 +36,29 @@ router.get("/", async (req: Request<TripParams>, res) => {
 
     if (req.query.ongoing === "true") {
       queryConditions = {
-        where: {
-          AND: [
-            {
-              startDate: {
-                lt: now,
-              },
+        AND: [
+          {
+            startDate: {
+              lt: now,
             },
-            {
-              endDate: {
-                gt: now,
-              },
+          },
+          {
+            endDate: {
+              gt: now,
             },
-          ],
-        },
+          },
+        ],
       };
     } else if (req.query.past === "true") {
       queryConditions = {
-        where: {
-          endDate: {
-            lt: now,
-          },
+        endDate: {
+          lt: now,
         },
       };
     } else if (req.query.upcoming === "true") {
       queryConditions = {
-        where: {
-          startDate: {
-            gt: now,
-          },
+        startDate: {
+          gt: now,
         },
       };
       // console.log(now);
@@ -72,13 +66,16 @@ router.get("/", async (req: Request<TripParams>, res) => {
 
     const trips = await prisma.tripMember.findMany({
       where: {
-        status: 'ACCEPTED'
+        status: 'ACCEPTED',
+        trip: {
+          AND: queryConditions
+        }
       },
-      select: {
-        trip: queryConditions
+      include: {
+        trip: true
       }
     });
-    res.json(trips);
+    res.status(StatusCodes.OK).json(trips);
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "An error occurred while fetching trips." });
@@ -105,7 +102,7 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
         }
       },
     });
-    res.status(201).json(trip);
+    res.status(StatusCodes.CREATED).json(trip);
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
       if (error.code === "P2002") {

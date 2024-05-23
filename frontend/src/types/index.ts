@@ -108,11 +108,19 @@ export interface AvatarGroupProps {
 }
 
 export interface Invitation {
-  inviter: User,
-  invitee: User,
+  id: string;
+  inviter: User;
+  invitee: User;
   trip: TripData;
 }
 
 export interface InvitationCardProps {
   invitation: Invitation;
+  onAccept: (id: string) => void;
+  onDecline: (id: string) => void;
+}
+
+export interface BottomSliderProps {
+  handlePresentModalPress: () => void;
+  handleSheetChanges: (index: number) => void;
 }

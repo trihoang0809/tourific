@@ -1,11 +1,15 @@
 import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import favicon from "@/assets/favicon.png";
 import { Link, Stack, router, useLocalSearchParams } from "expo-router";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from 'luxon';
-import AvatarGroup from "@/components/Avatar/AvatarGroup";
+import BottomSlider from "@/components/BottomSheet/BottomSlider";
+import {
+  BottomSheetModal,
+} from '@gorhom/bottom-sheet';
+import { TouchableOpacity } from "react-native";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 const width = Dimensions.get('window').width; //full width
@@ -23,8 +27,21 @@ const TripDetailsScreen = () => {
     startMinute: 0,
   });
 
-  // more setting icon
-  const [modalEditVisible, setModalEditVisible] = useState(false);
+  // ref
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+  // callbacks
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+
+  const handleDismissModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.dismiss();
+  }, []);
+
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log('handleSheetChanges', index);
+  }, []);
 
   const getTrip = async ({ id: text }: { id: string; }) => {
     try {
@@ -53,15 +70,6 @@ const TripDetailsScreen = () => {
     getTrip({ id });
   }, []);
 
-  // showing more setting options
-  const showMoreSetting = () => {
-    setModalEditVisible(true);
-  };
-
-  const notShowMoreSetting = () => {
-    setModalEditVisible(false);
-  };
-
   return (
     <View>
       <Stack.Screen
@@ -73,16 +81,19 @@ const TripDetailsScreen = () => {
           },
           headerTransparent: false,
           headerRight: () => (
-            <Link href={`/trips/create?id=${id}`}>
-              <Feather
-                onPressIn={showMoreSetting}
-                onPressOut={notShowMoreSetting}
-                name="edit-2"
-                size={20}
-                color="black"
-                style={{ marginRight: 10 }}
-              />
-            </Link>
+            // <Link href={`/trips/create?id=${id}`}>
+            <>
+              <TouchableOpacity onPress={handlePresentModalPress}>
+                <Feather
+                  name="edit-2"
+                  size={20}
+                  color="black"
+                  style={{ marginRight: 10 }}
+                />
+              </TouchableOpacity>
+
+            </>
+            // </Link>
           ),
           headerLeft: () => (
             <MaterialIcons
@@ -168,6 +179,13 @@ const TripDetailsScreen = () => {
           </View>
         </View>
       </ScrollView>
+      <View style={{ flex: 1, paddingTop: 200 }}>
+        <BottomSlider
+          ref={bottomSheetModalRef}
+          handlePresentModalPress={handlePresentModalPress}
+          handleSheetChanges={handleSheetChanges}
+        />
+      </View>
     </View >
   );
 };
