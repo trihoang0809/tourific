@@ -15,7 +15,7 @@ import React, { useState, useEffect } from "react";
 import GoogleMapInput from "@/components/GoogleMaps/GoogleMapInput";
 import { formatDate, serverURL } from "@/utils";
 import { Trip } from "@/types";
-import DatePicker from "react-native-date-picker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
   const serverUrl = serverURL();
@@ -24,14 +24,22 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
   const [activityName, setActivityName] = useState("");
   const [activityDescription, setActivityDescription] = useState("");
   const [activityNote, setActivityNote] = useState("");
-  const [activityLocation, setActivityLocation] = useState(trip.location);
-  const activityStartDate = trip.startDate;
-  const activityEndDate = trip.endDate;
+  const [activityLocation, setActivityLocation] = useState({
+    ...trip.location,
+  });
+  const [activityStartDate, setActivityStartDate] = useState(
+    new Date(trip.startDate),
+  );
+  const [activityEndDate, setActivityEndDate] = useState(
+    new Date(trip.endDate),
+  );
+  const [startDatePickerVisibility, setStartDatePickerVisibility] =
+    useState(false);
+  const [endDatePickerVisibility, setEndDatePickerVisibility] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isFormFilled, setIsFormFilled] = useState(false);
   const [isNoteSelected, setNoteSelected] = useState(false);
   const [mapVisible, setMapVisible] = useState(false);
-  const [underlineTitle, setUnderlineTitle] = useState("black");
   //Header render + Return Button + Alert Pop up
   const alertUnSaved = () => {
     Alert.alert("Unsaved Changes", "You have unsaved changes", [
@@ -49,7 +57,7 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
       },
     ]);
   };
-
+  console.log(trip.startDate);
   //Submit Button
   const validateForm = () => {
     // console.log(activityDescription);
@@ -107,6 +115,17 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
     </TouchableWithoutFeedback>
   );
 
+  const showStartDatePicker = () => {
+    setStartDatePickerVisibility(true);
+  };
+
+  const hideStartDatePicker = () => {
+    setStartDatePickerVisibility(false);
+  };
+  const handleConfirm = (date: Date) => {
+    setActivityStartDate(date);
+    hideStartDatePicker();
+  };
   return (
     <View style={{ flex: 1, margin: 7, backgroundColor: "white" }}>
       <View style={styles.formContainer}>
@@ -133,11 +152,11 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
           >
             <Pressable
               style={[{ flexDirection: "row", flex: 1, alignItems: "center" }]}
-              onPress={() => setMapVisible(true)}
+              onPress={showStartDatePicker}
             >
               <MaterialCommunityIcons name="timetable" size={22} color="grey" />
               <Text style={[material.title, { color: "grey", fontSize: 15 }]}>
-                {formatDate(new Date(trip.startDate))}
+                {formatDate(activityStartDate)}
               </Text>
             </Pressable>
           </View>
@@ -155,7 +174,7 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
             >
               <Entypo name="location-pin" size={22} color="grey" />
               <Text style={[material.title, { color: "grey", fontSize: 15 }]}>
-                {trip.location.citystate + ", " + trip.location.address}
+                {activityLocation.address + ", " + activityLocation.citystate}
               </Text>
             </Pressable>
           </View>
@@ -211,6 +230,14 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
             </View>
           </View>
         </Modal>
+
+        <DateTimePickerModal
+          isVisible={startDatePickerVisibility}
+          mode="date"
+          onConfirm={handleConfirm}
+          onCancel={hideStartDatePicker}
+          date={activityStartDate}
+        />
       </View>
 
       {/* Submit Button to submit user's answer */}
