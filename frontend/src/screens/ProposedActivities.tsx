@@ -9,18 +9,13 @@ import {
   Pressable,
   Modal,
 } from "react-native";
-import {
-  AntDesign,
-  FontAwesome5,
-  MaterialIcons,
-  Entypo,
-  FontAwesome6,
-} from "@expo/vector-icons";
+import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { material } from "react-native-typography";
 import React, { useState, useEffect } from "react";
 import GoogleMapInput from "@/components/GoogleMaps/GoogleMapInput";
 import { formatDate, serverURL } from "@/utils";
 import { Trip } from "@/types";
+import DatePicker from "react-native-date-picker";
 
 export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
   const serverUrl = serverURL();
@@ -113,16 +108,12 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
   );
 
   return (
-    <ScrollView style={styles.formContainer}>
-      {/* Form */}
-      <View style={styles.formInputContainer}>
+    <View style={{ flex: 1, margin: 7, backgroundColor: "white" }}>
+      <View style={styles.formContainer}>
+        {/* Form */}
+
         {/* Activity Title input  */}
-        <View
-          style={[
-            styles.queInput,
-            { borderBottomWidth: 0.5, borderBottomColor: underlineTitle },
-          ]}
-        >
+        <View style={[{ rowGap: 7 }]}>
           <TextInput
             onChangeText={(value) => {
               setActivityName(value);
@@ -133,24 +124,62 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
             placeholderTextColor={"grey"}
             value={activityName}
           ></TextInput>
+          {/* Time */}
+
+          <View
+            style={{
+              flexDirection: "row",
+            }}
+          >
+            <Pressable
+              style={[{ flexDirection: "row", flex: 1, alignItems: "center" }]}
+              onPress={() => setMapVisible(true)}
+            >
+              <MaterialCommunityIcons name="timetable" size={22} color="grey" />
+              <Text style={[material.title, { color: "grey", fontSize: 15 }]}>
+                {formatDate(new Date(trip.startDate))}
+              </Text>
+            </Pressable>
+          </View>
+
+          {/* Map Pressable + Note Creator Button */}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Pressable
+              style={[{ flexDirection: "row", flex: 1, alignItems: "center" }]}
+              onPress={() => setMapVisible(true)}
+            >
+              <Entypo name="location-pin" size={22} color="grey" />
+              <Text style={[material.title, { color: "grey", fontSize: 15 }]}>
+                {trip.location.citystate + ", " + trip.location.address}
+              </Text>
+            </Pressable>
+          </View>
         </View>
 
         {/* Activity Note input */}
-        <View style={styles.noteInputFocus}>
-          <View style={{ flexDirection: "row" }}>
-            <FontAwesome5 name="sticky-note" size={24} color="black" />
-            <TextInput
-              onChangeText={(value) => {
-                console.log(value);
-                setActivityNote(value);
-              }}
-              style={[material.title, { fontStyle: "italic", marginLeft: 10 }]}
-              placeholder="Add your notes here"
-              value={activityNote}
-              multiline={true}
-            ></TextInput>
-          </View>
-        </View>
+
+        <TextInput
+          onChangeText={(value) => {
+            console.log(value);
+            setActivityNote(value);
+          }}
+          style={[
+            material.title,
+            {
+              fontStyle: "italic",
+              verticalAlign: "top",
+            },
+            styles.noteInputFocus,
+          ]}
+          placeholder="Add your notes here"
+          value={activityNote}
+          multiline={true}
+        />
 
         {/* Map Input */}
         <Modal
@@ -182,69 +211,30 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
             </View>
           </View>
         </Modal>
-
-        {/* Map Pressable + Note Creator Button */}
-        <View
-          style={{ flexDirection: "row", columnGap: 10, alignItems: "center" }}
-        >
-          <Pressable
-            style={[styles.noteInputFocus, { flexDirection: "row", flex: 1 }]}
-            onPress={() => setMapVisible(true)}
-          >
-            <Entypo name="location-pin" size={24} color="black" />
-            <Text style={[material.title, { color: "grey" }]}>Add a place</Text>
-          </Pressable>
-        </View>
-        <SubmitButton />
       </View>
 
       {/* Submit Button to submit user's answer */}
-    </ScrollView>
+      <SubmitButton />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    width: "100%",
-    padding: 5,
-  },
-
-  headerBack: {
-    flexDirection: "row",
-    marginBottom: 18,
-    alignContent: "center",
-    alignItems: "center",
-    backgroundColor: "#64A0EE",
-    width: 100,
-    borderRadius: 200,
-  },
-
-  noteInput: {
-    // borderWidth: 1,
-    borderBottomWidth: 1,
-    padding: 10,
-    borderRadius: 4,
-    backgroundColor: "white",
-    // color: "red",
-  },
-
   noteInputFocus: {
     backgroundColor: "#F6F5F5",
     padding: 10,
-    borderRadius: 4,
+    borderRadius: 5,
     borderWidth: 1,
-    borderCurve: "circular",
-  },
-
-  queInput: {
-    marginBottom: 50,
+    flex: 1,
+    marginTop: 15,
   },
 
   formContainer: {
     flex: 1,
-    padding: 10,
+    padding: 15,
     backgroundColor: "white",
-    // marginBottom: 100,
+    borderWidth: 1,
+    borderRadius: 20,
   },
 
   submitButton: {
@@ -253,15 +243,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: "dashed",
     borderRadius: 10,
-    backgroundColor: "grey",
+    backgroundColor: "#91A5F5",
     width: "100%",
-    marginTop: 50,
     padding: 5,
-  },
-
-  formInputContainer: {
-    marginBottom: 50,
-    // backgroundColor: "red",
+    marginTop: 20,
   },
 
   modalMapView: {
