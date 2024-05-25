@@ -129,17 +129,29 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
 // Update an existing trip
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
+  console.log("id", id);
   const { name, startDate, endDate, location } = req.body;
+  console.log(req.body);
+  const isValidID = await prisma.trip.findUnique({
+    where: {
+      id: id,
+    },
+  });
+
+  if (!isValidID) {
+    return res.status(404).json({ error: "Trip does not exist" });
+  }
+
   try {
     const trip = await prisma.trip.update({
       where: {
         id,
       },
       data: {
-        name,
-        startDate,
-        endDate,
-        location,
+        name: name,
+        startDate: startDate,
+        endDate: endDate,
+        location: location,
       },
     });
     res.status(StatusCodes.OK).json(trip);

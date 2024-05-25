@@ -9,15 +9,15 @@ import {
   Pressable,
   Alert,
 } from "react-native";
-import React, { useCallback, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import React, { useCallback, useEffect, useState } from "react";
+import { useForm, Controller, useFormState } from "react-hook-form";
 import favicon from "@/assets/favicon.png";
 import { Link, Stack, useLocalSearchParams } from "expo-router";
 import trips from "@/mock-data/trips";
 import { MapData, TripData } from "@/types";
 import GooglePlacesInput from "@/components/GoogleMaps/GooglePlacesInput";
 import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
-import { formatDateTime } from "@/utils";
+import { extractDateTime, formatDateTime } from "@/utils";
 import { DateTime } from "luxon";
 import { TripSchema } from "@/validation/types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,44 +25,106 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 // CREATING: /trips/create
 // UPDATING: /trips/create?id=${id}
+const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
 export default function CreateTripScreen() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
-    setError,
+    formState: { isDirty, dirtyFields, errors },
     control,
+    setError,
+    reset,
+    getValues,
   } = useForm({
     resolver: zodResolver(TripSchema),
   });
-  const { id: id } = useLocalSearchParams();
+  const { id: idString } = useLocalSearchParams();
+  console.log("idString", idString);
+  // const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
 
   // check if there's an id -> if there's id meaning trip has been created
-  const isUpdating = !!id; // id is type of string
+  const isUpdating = !!idString; // id is type of string
+  console.log("isUpdating", isUpdating);
+
+  //fetch trip if exist
+  async function setTripIfExist(tripId: string) {
+    try {
+      const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${tripId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch trip");
+      }
+      // Optionally, you can handle the response here
+      const data = await response.json();
+      console.log("ata bfore bo vo form", data);
+      const startTime = extractDateTime(data.startDate);
+      const endTime = extractDateTime(data.endDate);
+      setFormData({
+        ...formData,
+        name: data.name,
+        dateRange: {
+          startDate: new Date(data.startDate),
+          endDate: new Date(data.endDate),
+        },
+        startTime: {
+          hours: startTime.hour,
+          minutes: startTime.minute,
+        },
+        endTime: {
+          hours: endTime.hour,
+          minutes: endTime.minute,
+        },
+        location: data.location
+      });
+      console.log("form data trong settripexist", formData);
+    } catch (error: any) {
+      console.error("Error fetching trip:", error.toString());
+    }
+  };
 
   //trip data for form
-  // fetch data from api
-  const [formData, setFormData] = useState(
-    isUpdating
-      ? trips[0]
-      : {
-          name: "",
-          dateRange: {
-            startDate: new Date(),
-            endDate: new Date(),
-          },
-          startTime: {
-            hours: Number,
-            minutes: Number,
-          },
-          endTime: {
-            hours: Number,
-            minutes: Number,
-          },
-          location: {},
-        },
+  const [formData, setFormData] = useState<TripData | null>(
+    {
+      name: "",
+      dateRange: {
+        startDate: new Date(),
+        endDate: new Date(),
+      },
+      startTime: {
+        hours: 8,
+        minutes: 15,
+      },
+      endTime: {
+        hours: 10,
+        minutes: 30,
+      },
+      location: {
+        address: '',
+        citystate: '',
+        latitude: 0,
+        longitude: 0,
+        radius: 0
+      },
+    }
   );
+
+  useEffect(() => {
+    console.log("id", idString);
+    if (isUpdating) {
+      setTripIfExist(idString);
+      console.log("form sau settrip", formData);
+    }
+  }, []);
+
+  useEffect(() => {
+    reset({ ...formData });
+  }, [formData]);
 
   // for date range picker modal
   const [open, setOpen] = useState(false);
@@ -72,7 +134,7 @@ export default function CreateTripScreen() {
   const [visibleEnd, setVisibleEnd] = useState(false);
 
   const onSubmit = async (data: any) => {
-    console.log(data);
+    console.log("changed fields", dirtyFields);
     // const {
     // dateRange,
     // location,
@@ -100,29 +162,28 @@ export default function CreateTripScreen() {
     if (isUpdating) {
       // UPDATING
       try {
-        const response = await fetch(`http://localhost:3000/trips/${id}`, {
+        const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${idString}`, {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(req),
         });
+
         if (!response.ok) {
           throw new Error("Failed to update trip");
         }
-        // Optionally, you can handle the response here
+
         const data = await response.json();
-        console.log("Trip created:", data);
-        Alert.alert("Alert Title", "Successful", [
-          { text: "OK", onPress: () => <Link href={"/"} /> },
+        console.log("Trip updated:", data);
+        Alert.alert("Alert Title", "Successful update trip", [
+          { text: "Go back home", onPress: () => <Link href={"/"} /> },
         ]);
       } catch (error: any) {
-        console.error("Error creating trip:", error.toString());
+        console.error("Error updating trip:", error.toString());
       }
     } else {
       // CREATING
       try {
-        const response = await fetch("http://localhost:3000/trips", {
+        const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -136,7 +197,7 @@ export default function CreateTripScreen() {
         const data = await response.json();
         console.log("Trip created:", data);
         Alert.alert("Alert Title", "Create Trip Successfully", [
-          { text: "Go back home page", onPress: () => <Link href={"/"} /> },
+          { text: "Go back home page", onPress: () => <Link href={"/trips"} /> },
         ]);
       } catch (error: any) {
         console.error("Error creating trip:", error.toString());
@@ -146,7 +207,7 @@ export default function CreateTripScreen() {
 
   // change data from form, for updating
   const handleChange = (key: keyof TripData, value: string | Date) => {
-    setFormData({ ...formData, [key]: value });
+    setFormData({ ...formData, [key]: value } as TripData);
   };
 
   // function for date picker
@@ -173,6 +234,7 @@ export default function CreateTripScreen() {
     [setOpen, formData],
   );
 
+  console.log("form data trong onconfirm", formData);
   console.log("daterange trg onconfirm", formData.dateRange);
   console.log(errors);
 
@@ -241,8 +303,8 @@ export default function CreateTripScreen() {
     <View>
       <Stack.Screen
         options={{
-          title: "",
           headerShown: true,
+          title: ' ',
         }}
       />
       <ScrollView nestedScrollEnabled={true}>
@@ -277,6 +339,7 @@ export default function CreateTripScreen() {
             backgroundColor: "#fff",
             marginTop: -50,
             paddingTop: 20,
+            flex: 1,
           }}
         >
           <View
@@ -294,7 +357,7 @@ export default function CreateTripScreen() {
               className="font-bold text-3xl mb-5"
               style={{ textAlign: "center" }}
             >
-              Create a new trip
+              {isUpdating ? "Update trip" : "Create a new trip"}
             </Text>
             <View style={{ marginVertical: 10 }}>
               <Text className="font-semibold text-base">Name</Text>
@@ -312,14 +375,11 @@ export default function CreateTripScreen() {
                       borderRadius: 10,
                     }}
                     placeholder="Enter trip name"
-                    // value={formData.name}
-                    // onChangeText={(value) => {
-                    //   handleChange('name', value);
-                    //   onChange;
-                    // }}
                     value={value}
-                    onChangeText={onChange}
-                    {...register("name")}
+                    onChangeText={(name) => {
+                      onChange(name);
+                      handleChange("name", name);
+                    }}
                   />
                 )}
               />
@@ -342,7 +402,7 @@ export default function CreateTripScreen() {
                     borderRadius: 10,
                   }}
                   placeholder="Start Date"
-                  value={`${formData.dateRange.startDate?.toLocaleDateString()} - ${formData.dateRange.endDate ? formData.dateRange.endDate.toLocaleDateString() : "None"}`}
+                  value={`${formData?.dateRange.startDate ? formData.dateRange.startDate.toLocaleDateString() : "None"} - ${formData?.dateRange.endDate ? formData.dateRange.endDate.toLocaleDateString() : "None"}`}
                   onPressIn={() => setOpen(true)}
                   editable={false}
                 />
@@ -357,8 +417,8 @@ export default function CreateTripScreen() {
                       mode="range"
                       visible={open}
                       onDismiss={onDismiss}
-                      startDate={formData.dateRange.startDate}
-                      endDate={formData.dateRange.endDate}
+                      startDate={formData?.dateRange.startDate}
+                      endDate={formData?.dateRange.endDate}
                       onConfirm={onConfirm}
                       disableStatusBarPadding
                       startYear={2023}
@@ -399,8 +459,8 @@ export default function CreateTripScreen() {
                       overflow: "hidden",
                     }}
                   >
-                    {typeof formData.startTime.hours === "number" &&
-                    typeof formData.startTime.minutes === "number"
+                    {typeof formData?.startTime.hours === "number" &&
+                      typeof formData.startTime.minutes === "number"
                       ? new Date(
                           1970,
                           0,
@@ -456,8 +516,8 @@ export default function CreateTripScreen() {
                       overflow: "hidden",
                     }}
                   >
-                    {typeof formData.endTime.hours === "number" &&
-                    typeof formData.endTime.minutes === "number"
+                    {typeof formData?.endTime.hours === "number" &&
+                      typeof formData.endTime.minutes === "number"
                       ? new Date(
                           1970,
                           0,
@@ -484,7 +544,6 @@ export default function CreateTripScreen() {
                         onDismissTime("end");
                       }}
                       onConfirm={(endTime) => {
-                        console.log("endTime trong oncf", typeof endTime.hours);
                         onConfirmEndTime(endTime);
                         onChange(endTime);
                       }}
@@ -505,27 +564,32 @@ export default function CreateTripScreen() {
             {/* select location and showing map */}
             <View style={{ marginVertical: 10 }}>
               <Text className="font-semibold text-base">Location name</Text>
-              <Controller
-                control={control}
-                name={"location"}
-                render={({ field: { onChange } }) => (
-                  <GooglePlacesInput
-                    onLocationSelect={(location) => {
-                      onLocationSelect(location);
-                      onChange(location);
-                      console.log("loc", location);
-                    }}
-                  />
-                )}
-              />
-              {errors.location && (
-                <Text className="text-red-500">
-                  {errors.location?.message?.toString()}
-                </Text>
-              )}
+              {isUpdating ?
+                <TextInput
+                  value={`${formData?.location.address ? formData.location.address + ', ' : ''} ${formData?.location.citystate ? formData.location.citystate : ''}`}
+                  editable={false}
+                />
+                : <Controller
+                  control={control}
+                  name={"location"}
+                  defaultValue={`${formData?.location.address ? formData.location.address + ', ' : ''}${formData?.location.citystate ? formData.location.citystate : ''}`}
+                  render={({ field: { onChange, value } }) => (
+                    <GooglePlacesInput
+                      onLocationSelect={(value) => {
+                        onLocationSelect(value);
+                        onChange(value);
+                        console.log("loc", value);
+                      }}
+                      value={`${getValues("location.address" + ', ')}${getValues("location.citystate")}`}
+                    // value={`${formData?.location.address ? formData.location.address + ', ' : ''} ${formData?.location.citystate ? formData.location.citystate : ''}`}
+                    />
+                  )}
+                />
+              }
+              {errors.location && <Text className="text-red-500">{errors.location?.message?.toString()}</Text>}
             </View>
             <Button
-              title={isUpdating ? "Edit Trip" : "Create Trip"}
+              title={isUpdating ? "Save edit" : "Create Trip"}
               onPress={handleSubmit(onSubmit)}
             />
           </View>
@@ -533,4 +597,4 @@ export default function CreateTripScreen() {
       </ScrollView>
     </View>
   );
-}
+};

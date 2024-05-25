@@ -1,7 +1,6 @@
 // this file is for declaring types
 
 export interface TripData {
-  id: string;
   name: string;
   dateRange: {
     startDate: Date;
@@ -15,8 +14,13 @@ export interface TripData {
     hours: number;
     minutes: number;
   };
-  location: MapData;
-}
+  location: MapData,
+  image?: {
+    height: number;
+    width: number;
+    url: string;
+  };
+};
 
 export type MapData = {
   address: String;
@@ -41,6 +45,7 @@ export interface DateRangePickerProps {
 
 export interface GooglePlacesInputProps {
   onLocationSelect: (location: MapData) => void;
+  value: string;
 }
 
 export interface ActivityProps {

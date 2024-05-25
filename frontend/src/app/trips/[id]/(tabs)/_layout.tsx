@@ -4,7 +4,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { Link, useLocalSearchParams } from "expo-router";
 import { Feather } from "@expo/vector-icons";
-import { View, Text } from "react-native";
+import { View, Text } from "react-native";;
 
 export default function TabLayout() {
   const { id } = useLocalSearchParams();
@@ -21,46 +21,35 @@ export default function TabLayout() {
         tabBarItemStyle: {
           height: 50,
         },
-        // tabBarLabelStyle: styles.tabBarLabelStyle,
         tabBarLabelStyle: {
           fontSize: 12,
-          // marginBottom: 10,
         },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
-          // tabBarLabel:() => {return null},
-          tabBarIcon: ({ color }) => (
-            <FontAwesome size={28} name="home" color={color} />
-          ),
-          headerShown: true,
-          headerTransparent: true,
-          headerTitle: "",
-          headerRight: () => (
-            <Link href={`/trip/create?id=${id}`}>
-              <View
-                style={{
-                  backgroundColor: "#004999", // This sets the background color to black with 10% opacity
-                  borderRadius: 50,
-                  padding: 10,
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <Feather
-                  // onPressIn={showMoreSetting}
-                  // onPressOut={notShowMoreSetting}
-                  name="edit-2"
-                  size={20}
-                  color="white"
-                />
-                <Text style={{ marginLeft: 10, color: "white" }}>Edit</Text>
-              </View>
-            </Link>
-          ),
+          title: 'Home',
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
+          // headerShown: false,
+          // headerTransparent: true,
+          headerTitle: '',
+          // headerRight: () => (
+          //   <Link href={`/trips/create?id=${id}`}>
+          //     <View style={{
+          //       backgroundColor: 'rgba(0, 0, 128, 0.3)', // This sets the background color to black with 10% opacity
+          //       borderRadius: 50,
+          //       padding: 5,
+          //     }}>
+          //       <Feather
+          //         // onPressIn={showMoreSetting}
+          //         // onPressOut={notShowMoreSetting}
+          //         name="edit-2"
+          //         size={24}
+          //         color="black" />
+          //     </View>
+          //   </Link>
+          // ),
         }}
       />
       <Tabs.Screen

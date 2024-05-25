@@ -1,11 +1,12 @@
 import { View, ScrollView, TouchableOpacity } from "react-native";
 import React from "react";
-import { useGlobalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { Stack, router, useGlobalSearchParams } from "expo-router";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import ActivityThumbnail from "@/components/ActivityThumbnail";
 import { mockData } from "../../../../mock-data/activities";
 import { ActivityProps } from "@/types";
+import Style from "Style";
 
 const ActivitiesScreen = () => {
   const { id } = useGlobalSearchParams();
@@ -33,15 +34,25 @@ const ActivitiesScreen = () => {
 
   return (
     <View style={{ flex: 1, height: Dimensions.get("window").height }}>
-      {/* <Stack.Screen
+      <Stack.Screen
         options={{
-          title: '',
+          title: 'Activities',
           headerShown: true,
-          headerBackTitle: 'Back',
-          headerBackTitleStyle: { fontSize: 10 },
-          
+          headerStyle: {
+            backgroundColor: 'white',
+          },
+          headerTransparent: false,
+          headerLeft: () => (
+            <MaterialIcons
+              name="arrow-back"
+              size={24}
+              color="black"
+              style={{ marginLeft: 10 }}
+              onPress={() => router.navigate('/')}
+            />
+          ),
         }}
-      /> */}
+      />
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -61,21 +72,7 @@ const ActivitiesScreen = () => {
         ))}
       </ScrollView>
       <TouchableOpacity
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-          width: 60,
-          height: 60,
-          position: "absolute",
-          bottom: 10,
-          right: 10,
-          borderRadius: 35,
-          backgroundColor: "#006ee6",
-          shadowOffset: { width: 1, height: 1 },
-          shadowColor: "#333",
-          shadowOpacity: 0.3,
-          shadowRadius: 2,
-        }}
+        style={Style.addIcon}
         onPress={() => {
           /* Handle the button press */
         }}
