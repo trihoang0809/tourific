@@ -16,6 +16,7 @@ import GoogleMapInput from "@/components/GoogleMaps/GoogleMapInput";
 import { formatDate, serverURL } from "@/utils";
 import { Trip } from "@/types";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { router } from "expo-router";
 
 export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
   const serverUrl = serverURL();
@@ -40,9 +41,10 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
   const [isFormFilled, setIsFormFilled] = useState(false);
   const [isNoteSelected, setNoteSelected] = useState(false);
   const [mapVisible, setMapVisible] = useState(false);
+
   //Header render + Return Button + Alert Pop up
-  const alertUnSaved = () => {
-    Alert.alert("Unsaved Changes", "You have unsaved changes", [
+  const alertSuccess = () => {
+    Alert.alert("Success", "Good boy", [
       {
         text: "Discard",
         onPress: () => {
@@ -50,14 +52,14 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
         },
       },
       {
-        text: "Continue",
+        text: "Ok",
         onPress: () => {
-          console.log("Navigate to the previous page");
+          router.back();
         },
       },
     ]);
   };
-  console.log(trip.startDate);
+
   //Submit Button
   const validateForm = () => {
     // console.log(activityDescription);
@@ -69,7 +71,7 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
     console.log("Submit: " + activityNote);
     console.log(isFormFilled);
     console.log(activityLocation.address);
-    if (isFormFilled) {
+    if (true) {
       try {
         const createActivity = await fetch(
           serverUrl + "trips/" + trip.id + "/activities",
@@ -95,10 +97,8 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
           },
         );
 
-        if (createActivity.status === 201) {
-          console.log("success");
-          setNoteSelected(false);
-        }
+        //alert Success
+        alertSuccess();
         // console.log(activityNote);
       } catch (error) {
         console.log("An error occured while CREATING new Activity " + error);
@@ -136,7 +136,6 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
           <TextInput
             onChangeText={(value) => {
               setActivityName(value);
-              console.log(activityName);
             }}
             style={[material.title, { fontSize: 25, fontStyle: "italic" }]}
             placeholder="Add a title"
@@ -184,7 +183,6 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
 
         <TextInput
           onChangeText={(value) => {
-            console.log(value);
             setActivityNote(value);
           }}
           style={[

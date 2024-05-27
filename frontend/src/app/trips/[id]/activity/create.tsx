@@ -19,17 +19,18 @@ const createActivity = () => {
     },
     startDate: new Date(),
     endDate: new Date(),
+    image: null,
   });
 
   useEffect(() => {
     const getTripData = async () => {
       try {
         const link = serverUrl + "trips/" + id;
-        console.log(link);
         const trip = await fetch(link);
         const data = await trip.json();
         setTripData(data);
-        console.log(data);
+        // console.log(data);
+        // console.log(tripData);
       } catch (error) {
         console.log(error);
       }
@@ -37,7 +38,7 @@ const createActivity = () => {
 
     getTripData();
   }, []);
-
+  // console.log(tripData);
   return (
     <ProposedActivities
       id={String(id)}
