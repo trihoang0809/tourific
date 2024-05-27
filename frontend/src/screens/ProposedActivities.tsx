@@ -18,7 +18,11 @@ import { Trip } from "@/types";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { router } from "expo-router";
 
-export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
+interface props {
+  id: String;
+}
+
+export const ProposedActivities: React.FC<props> = (id: props) => {
   const serverUrl = serverURL();
 
   //Declare useState
@@ -26,14 +30,15 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
   const [activityDescription, setActivityDescription] = useState("");
   const [activityNote, setActivityNote] = useState("");
   const [activityLocation, setActivityLocation] = useState({
-    ...trip.location,
+    address: "",
+    citystate: "",
+    latitude: 0,
+    longitude: 0,
+    radius: 0,
   });
-  const [activityStartDate, setActivityStartDate] = useState(
-    new Date(trip.startDate),
-  );
-  const [activityEndDate, setActivityEndDate] = useState(
-    new Date(trip.endDate),
-  );
+
+  const [activityStartDate, setActivityStartDate] = useState(new Date());
+  const [activityEndDate, setActivityEndDate] = useState(new Date());
   const [startDatePickerVisibility, setStartDatePickerVisibility] =
     useState(false);
   const [endDatePickerVisibility, setEndDatePickerVisibility] = useState(false);
@@ -41,7 +46,23 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
   const [isFormFilled, setIsFormFilled] = useState(false);
   const [isNoteSelected, setNoteSelected] = useState(false);
   const [mapVisible, setMapVisible] = useState(false);
+  // setActivityStartDate(new Date(trip.startDate));
+  useEffect(() => {
+    const getTripData = async () => {
+      try {
+        const link = serverUrl + "trips/" + id.id;
+        const trip = await fetch(link);
+        const data = await trip.json();
+        setActivityLocation({ ...data.location });
+        setActivityStartDate(new Date(data.startDate));
+        setActivityEndDate(new Date(data.endDate));
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
+    getTripData();
+  }, []);
   //Header render + Return Button + Alert Pop up
   const alertSuccess = () => {
     Alert.alert("Success", "Good boy", [
@@ -74,7 +95,7 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
     if (true) {
       try {
         const createActivity = await fetch(
-          serverUrl + "trips/" + trip.id + "/activities",
+          serverUrl + "trips/" + id.id + "/activities",
           {
             method: "POST",
             headers: {
@@ -172,7 +193,12 @@ export const ProposedActivities: React.FC<Trip> = (trip: Trip) => {
               onPress={() => setMapVisible(true)}
             >
               <Entypo name="location-pin" size={22} color="grey" />
-              <Text style={[material.title, { color: "grey", fontSize: 15 }]}>
+              <Text
+                style={[
+                  material.title,
+                  { color: "grey", fontSize: 15, width: "100%" },
+                ]}
+              >
                 {activityLocation.address + ", " + activityLocation.citystate}
               </Text>
             </Pressable>
