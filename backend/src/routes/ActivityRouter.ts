@@ -12,12 +12,13 @@ interface ActivityParams extends TripParams {
 //type ActivityParams = { activityId: string } & TripParams;
 
 // Get all activities
-router.get("/", async (req, res) => {
+router.get("/", async (req: Request<ActivityParams>, res) => {
   try {
-    const activities = await prisma.activity.findMany();
+    const activities = await prisma.activity.findMany({ where: { tripId: req.params.tripId } });
     res.json(activities);
   } catch (error) {
     res.status(500).json({ error: "An error occurred while fetching activities." });
+    console.log(error);
   }
 });
 
