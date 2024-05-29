@@ -42,41 +42,56 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
     <ScrollView style={styles.container}>
       <SafeAreaView>
         <HomeScreenHeader user={user} />
-        <Text style={styles.greeting}>Welcome back, {user.firstName}!</Text>
-        <Text style={styles.title}>Ongoing Trips</Text>
-        <ScrollView horizontal={true} style={styles.tripScroll}>
-          {ongoingTrips.length > 0 ? (
-            ongoingTrips.map((trip) => (
-              <TripCard key={trip.id} trip={trip} height={250} width={400} />
-            ))
-          ) : (
-            <Text style={styles.noTrip}>No ongoing trips</Text>
-          )}
-        </ScrollView>
-
-        <Pressable style={styles.buttonContainer}>
-          <Link href="/trips/create" style={styles.button}>
-            <Text style={styles.buttonText}>Create a new trip</Text>
-          </Link>
-        </Pressable>
-
-        <View style={styles.upcoming}>
-          <Text style={styles.title}>Upcoming Trips</Text>
-          <Button
-            title="See all"
-            onPress={() => {
-              router.replace("/trips/upcoming");
+        <Text style={styles.greeting}>Hey 👋, {user.firstName}!</Text>
+        <View style={{ height: 180 }}>
+          <Image
+            source={{
+              uri: randomizeCover(headerImage),
             }}
+            style={{ height: 180, position: 'absolute', width: '100%', top: 0 }} // Image is positioned absolutely and aligned to the top
+            resizeMode="cover"
           />
         </View>
-
-        <ScrollView horizontal={true} style={styles.tripScroll}>
-          {upcomingTrips.map((trip) => (
-            <TripCard key={trip.id} trip={trip} height={200} width={200} />
-          ))}
-        </ScrollView>
-      </SafeAreaView>
-    </ScrollView>
+        <View style={{ marginTop: -5 }}>
+          <View style={styles.inline}>
+            <Text style={styles.title}>Ongoing Trips</Text>
+            <Text onPress={() => { router.replace('/trips/ongoing'); }}>See all</Text>
+          </View>
+          <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            style={styles.tripScroll}>
+            {ongoingTrips.length > 0 ? (
+              ongoingTrips.map((trip) => (
+                <TripCard key={trip.id} trip={trip} height={250} width={300} />
+              ))
+            ) : (
+              <Text style={styles.noTrip}>No ongoing trips</Text>
+            )}
+          </ScrollView>
+        </View>
+        <View>
+          <View style={styles.inline}>
+            <Text style={styles.title}>Upcoming Trips</Text>
+            <Text onPress={() => { router.replace('/trips/upcoming'); }} >See all</Text>
+          </View>
+          <ScrollView style={{ paddingHorizontal: 10 }}>
+            {upcomingTrips.slice(0, 3).map((trip) => (
+              <View style={{ padding: 5, alignItems: 'center' }}>
+                <TripCardRect key={trip.id} trip={trip} height={100} />
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      </ScrollView>
+      <TouchableOpacity
+        style={Style.addIcon}
+      >
+        <Link href="/trips/create">
+          <Ionicons name="add" size={40} color="white" />
+        </Link>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 };
 

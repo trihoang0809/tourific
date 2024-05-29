@@ -74,20 +74,23 @@ export const ListFilteredCards: React.FC = () => {
       <View style={styles.container}>
         <Header />
         <View style={{ flex: 1 }}>
-          <LinearGradient
-            colors={['#4c669f', '#5692F9', '#95BAF9']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            style={styles.content}
-          >
-            <FlatList
-              style={{ width: "100%", alignContent: "center", flexWrap: "wrap" }}
-              data={upcomingTrips}
-              key={numCols}
-              numColumns={numCols}
-              renderItem={({ item }) => <TripCard height={tripCardHeight} width={tripCardWidth} trip={item} />}
-            />
-          </LinearGradient>
+          <FlatList
+            style={{
+              width: "100%",
+              alignContent: "center",
+              flexWrap: "wrap",
+            }}
+            data={upcomingTrips}
+            renderItem={({ item }) => (
+              <View style={{ marginVertical: 8}}>
+                <TripCard
+                  height={tripCardHeight}
+                  width={tripCardWidth}
+                  trip={item}
+                />
+              </View>
+            )}
+          />
         </View>
       </View>
     </View>
