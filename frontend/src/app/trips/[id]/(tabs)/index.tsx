@@ -42,7 +42,7 @@ const TripDetailsScreen = () => {
       // Optionally, you can handle the response here
       const data = await response.json();
       setTrip(data);
-      console.log("Trip fetch:", data);
+      // console.log("Trip fetch:", data);
     } catch (error: any) {
       console.error("Error fetching trip:", error.toString());
     }

@@ -2,12 +2,13 @@ import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, TouchableOpacity, Modal, Pressable } from "react-native";
 import { useGlobalSearchParams, router } from "expo-router";
 import { Calendar, DateRangeHandler } from "react-native-big-calendar";
-import { Mode } from "react-native-big-calendar/build/interfaces";
+// import { Mode } from "react-native-big-calendar/build/interfaces";
 import { StyleSheet } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { add, differenceInDays } from "date-fns";
 
 interface Activity {
   isOnCalendar: boolean;
@@ -29,35 +30,80 @@ interface Event {
   activityid: string;
 }
 
+interface TripDate {
+  start: String;
+  range: Number;
+}
+
+export type Mode =
+  | "3days"
+  | "week"
+  | "day"
+  | "custom"
+  | "month"
+  | "schedule"
+  | "itinerary";
+
 const Itinerary = () => {
   const { id } = useGlobalSearchParams();
   const [activities, setActivities] = useState<Activity[] | []>([]);
   const [events, setEvents] = useState<Event[]>([]);
+  const [tripDate, setTripDate] = useState<TripDate>();
+  const [dateList, setDateList] = useState<Date[]>([]);
+  // Helper function to group events by date
+  const groupEventsByDate = (events: Event[]) => {
+    const groupedEvents = {};
 
-  const getActivities = async ({ id }: { id: string }) => {
-    try {
-      const response = await fetch(`http://localhost:3000/trips/${id}/`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch activities");
+    events.forEach((event) => {
+      const eventDate = new Date(event.start).toLocaleDateString();
+      if (!groupedEvents[eventDate]) {
+        groupedEvents[eventDate] = [];
       }
-      const data = await response.json();
-      const activities = data.activities;
-      setActivities(activities);
-      // console.log("First activities fetch:", activities[0]);
-      // console.log("First events fetch:", events[0]);
-    } catch (error: any) {
-      console.error("Error fetching activities:", error.toString());
-    }
+      groupedEvents[eventDate].push(event);
+    });
+
+    return groupedEvents;
   };
 
   useEffect(() => {
+    const getActivities = async ({ id }: { id: string }) => {
+      try {
+        const response = await fetch(`http://localhost:3000/trips/${id}/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if (!response.ok) {
+          throw new Error("Failed to fetch activities");
+        }
+        const data = await response.json();
+        setTripDate({
+          start: data.startDate,
+          range: differenceInDays(data.endDate, data.startDate),
+        });
+        const activities = data.activities;
+        setActivities(activities);
+        // console.log("First activities fetch:", activities[0]);
+        // console.log("date range: ", data.startDate, data.endDate);
+      } catch (error: any) {
+        console.error("Error fetching activities:", error.toString());
+      }
+    };
     getActivities({ id });
   }, []);
+
+  useEffect(() => {
+    if (tripDate) {
+      for (let i = 0; i <= Number(tripDate.range); i++) {
+        setDateList((prev) => [
+          ...prev,
+          add(String(tripDate.start), { days: i }),
+        ]);
+      }
+    }
+  }, [tripDate]);
+  // console.log("datelist:", dateList);
 
   useEffect(() => {
     const filteredEvents = activities
@@ -87,8 +133,11 @@ const Itinerary = () => {
       });
     setEvents(filteredEvents);
   }, [activities]);
+  // console.log("first filtered events: ", events[0]);
+  const groupedEvents = groupEventsByDate(events);
+  console.log("group events", groupedEvents)
 
-  const [calendarMode, setCalendarMode] = useState<Mode>("schedule");
+  const [calendarMode, setCalendarMode] = useState<Mode>("itinerary");
   const [currentDate, setCurrentDate] = useState(new Date(Date.now()));
   const handleNextWeek = () => {
     const nextWeek = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -142,6 +191,7 @@ const Itinerary = () => {
     [],
   );
   const labels = [
+    { label: "Itinerary", value: "itinerary" },
     { label: "Schedule", value: "schedule" },
     { label: "Day", value: "day" },
     { label: "3 days", value: "3days" },
@@ -203,12 +253,12 @@ const Itinerary = () => {
       <View
         style={[
           styles.row,
-          calendarMode === "schedule"
+          calendarMode === "schedule" || calendarMode === "itinerary"
             ? { justifyContent: "center" }
             : { justifyContent: "space-between" },
         ]}
       >
-        {calendarMode !== "schedule" && (
+        {calendarMode !== "schedule" && calendarMode !== "itinerary" && (
           <TouchableOpacity
             onPress={() => {
               switch (calendarMode) {
@@ -236,12 +286,16 @@ const Itinerary = () => {
           </TouchableOpacity>
         )}
         <View style={styles.monthContainer}>
-          <Text style={styles.h1}>{monthNames[currentDate.getMonth()]}</Text>
+          {calendarMode === "itinerary" ? (
+            <Text style={styles.h1}>Intinerary</Text>
+          ) : (
+            <Text style={styles.h1}>{monthNames[currentDate.getMonth()]}</Text>
+          )}
           <Pressable onPress={() => setModalVisible(true)}>
             <Entypo name="chevron-down" size={24} color="black" />
           </Pressable>
         </View>
-        {calendarMode !== "schedule" && (
+        {calendarMode !== "schedule" && calendarMode !== "itinerary" && (
           <TouchableOpacity
             onPress={() => {
               switch (calendarMode) {
@@ -304,19 +358,47 @@ const Itinerary = () => {
           </View>
         </View>
       </Modal>
+      {calendarMode === "itinerary" ? (
+        <ScrollView>
+          {dateList.map((date, index) => {
+            const eventsForDate = groupedEvents[dateString] || [];
+            const dateString = new Date(date).toLocaleDateString();
 
-      <Calendar
-        events={events}
-        height={600}
-        onChangeDate={handleChangeDate}
-        mode={calendarMode}
-        onPressEvent={(event) => {
-          router.push(`trips/${id}/(itinerary)/${event.activityid}`);
-        }} // eventCellStyle={{ backgroundColor: 'blue' }}
-        date={currentDate}
-        swipeEnabled={false}
-        theme={customTheme}
-      />
+            return (
+              <View key={index} style={{ marginBottom: 20 }}>
+                <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                  {dateString}
+                </Text>
+                {eventsForDate.length > 0 ? (
+                  eventsForDate.map((event) => (
+                    <View key={event.activityid} style={{ marginLeft: 10 }}>
+                      <Text>{event.title}</Text>
+                      {event.children}
+                    </View>
+                  ))
+                ) : (
+                  <Text style={{ marginLeft: 10 }}>
+                    No events for this date
+                  </Text>
+                )}
+              </View>
+            );
+          })}
+        </ScrollView>
+      ) : (
+        <Calendar
+          events={events}
+          height={600}
+          onChangeDate={handleChangeDate}
+          mode={calendarMode}
+          onPressEvent={(event) => {
+            router.push(`trips/${id}/(itinerary)/${event.activityid}`);
+          }} // eventCellStyle={{ backgroundColor: 'blue' }}
+          date={currentDate}
+          swipeEnabled={false}
+          theme={customTheme}
+        />
+      )}
     </View>
   );
 };
