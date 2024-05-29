@@ -25,7 +25,6 @@ const Header = () => (
           <AntDesign name="left" size={24} color="blue" />
         </TouchableWithoutFeedback>
         <Text style={{ fontSize: 22, marginLeft: 10 }}>Upcoming Trips</Text>
-        <Text style={{ fontSize: 22, marginLeft: 10 }}>Upcoming Trips</Text>
       </View>
       <View style={styles.userInput}>
         <MaterialIcons name="search" size={24} color="black" />

@@ -37,13 +37,10 @@ export default function CreateTripScreen() {
     resolver: zodResolver(TripSchema),
   });
   const { id: idString } = useLocalSearchParams();
-  console.log("idString", idString);
-  // const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
 
   // check if there's an id -> if there's id meaning trip has been created
   const isUpdating = !!idString; // id is type of string
-  console.log("isUpdating", isUpdating);
-
+  
   //fetch trip if exist
   async function setTripIfExist(tripId: string) {
     try {
@@ -59,7 +56,6 @@ export default function CreateTripScreen() {
       }
       // Optionally, you can handle the response here
       const data = await response.json();
-      console.log("ata bfore bo vo form", data);
       const startTime = extractDateTime(data.startDate);
       const endTime = extractDateTime(data.endDate);
       setFormData({
@@ -79,7 +75,6 @@ export default function CreateTripScreen() {
         },
         location: data.location
       });
-      console.log("form data trong settripexist", formData);
     } catch (error: any) {
       console.error("Error fetching trip:", error.toString());
     }
@@ -182,7 +177,6 @@ export default function CreateTripScreen() {
         }
         // Optionally, you can handle the response here
         const data = await response.json();
-        console.log("Trip created:", data);
         Alert.alert("Alert Title", "Create Trip Successfully", [
           { text: "Go back home page", onPress: () => <Link href={"/trips"} /> },
         ]);
@@ -204,7 +198,6 @@ export default function CreateTripScreen() {
 
   const onConfirm = useCallback(
     ({ startDate, endDate }: { startDate: Date; endDate: Date; }) => {
-      console.log("start date", startDate, endDate);
       setOpen(false);
       // Check if startDate and endDate are already set in formData
       setFormData(
@@ -560,10 +553,8 @@ export default function CreateTripScreen() {
                       onLocationSelect={(value) => {
                         onLocationSelect(value);
                         onChange(value);
-                        console.log("loc", value);
                       }}
                       value={`${getValues("location.address" + ', ')}${getValues("location.citystate")}`}
-                    // value={`${formData?.location.address ? formData.location.address + ', ' : ''} ${formData?.location.citystate ? formData.location.citystate : ''}`}
                     />
                   )}
                 />

@@ -7,12 +7,12 @@ export interface TripData {
     endDate: Date;
   };
   startTime: {
-    hours: Number,
-    minutes: Number,
+    hours: number,
+    minutes: number,
   };
   endTime: {
-    hours: Number,
-    minutes: Number,
+    hours: number,
+    minutes: number,
   };
   location: MapData;
 }
