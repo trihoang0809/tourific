@@ -84,7 +84,7 @@ export const ListFilteredCards = ({ isUpcoming }: listprops) => {
             }}
             data={upcomingTrips}
             renderItem={({ item }) => (
-              <View style={{ marginVertical: 8, }}>
+              <View style={{ marginVertical: 8}}>
                 <TripCard
                   height={tripCardHeight}
                   width={tripCardWidth}

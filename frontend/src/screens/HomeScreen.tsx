@@ -84,7 +84,6 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             <Text style={styles.title}>Upcoming Trips</Text>
             <Text onPress={() => { router.replace('/trips/upcoming'); }} >See all</Text>
           </View>
-
           <ScrollView style={{ paddingHorizontal: 10 }}>
             {upcomingTrips.slice(0, 3).map((trip) => (
               <View style={{ padding: 5, alignItems: 'center' }}>

@@ -43,7 +43,7 @@ const TripCardRect = (
               ]}
             />
           </View>
-          <View style={{ flexDirection: 'column' }}>
+          <View style={{ flexDirection: 'column', flex: 1 }}>
             <Text numberOfLines={1} style={{ fontSize: 17, fontWeight: 'bold' }}>
               {trip.name}
             </Text>
