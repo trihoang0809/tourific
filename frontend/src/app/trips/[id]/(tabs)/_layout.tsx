@@ -50,6 +50,12 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="invite"
+        options={{
+          headerShown: false
+        }}
+      />
     </Tabs>
   );
 }

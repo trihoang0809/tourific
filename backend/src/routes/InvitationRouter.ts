@@ -14,7 +14,7 @@ export interface InvitationParams extends TripParams {
 }
 
 // temporary for testing until auth done
-const userID = "664023f929694f249f1a4c86";
+const userID = "663965ad325de4616021409b";
 
 // get all received invitations of a user, including trip details
 router.get("/all-received", async (req: Request, res) => {
@@ -78,71 +78,73 @@ router.get("/", async (req: Request<InvitationParams>, res) => {
 // out of the trip
 
 
-// // INVITE MULTIPLE USERS, ACCEPTING LIST OF USERS
-// // NO NEED TO CHECK IF USER ALREADY JOINED TRIP BCOZ
-// // WHEN FETCHING USER TO CHOOSE TO ADD TO TRIP, WE WILL
-// // CHECL THAT
-// // route: invitation/tripid
-// router.post("/:tripId", async (req: Request<InvitationParams>, res) => {
-//   const { tripId } = req.params;
-//   const inviteeIds = req.body.inviteeIds; // array of user ids
-//   const inviterId = userID;
+// invite users, accept list of users' id
+router.post("/:tripId", async (req: Request<InvitationParams>, res) => {
+  const { tripId } = req.params;
+  const inviteeIds = req.body.inviteeIds; // array of user ids
+  const inviterId = userID;
 
-//   try {
-//     // Validate all provided user IDs exist
-//     const validUsers = await prisma.user.findMany({
-//       where: { id: { in: inviteeIds } },
-//       select: { id: true }
-//     });
+  try {
+    // Validate all provided user IDs exist
+    const trans = await prisma.$transaction(async (tx) => {
+      const validUsers = await tx.user.findMany({
+        where: { id: { in: inviteeIds } },
+        select: { id: true }
+      });
 
-//     // check if exist an invitation
-//     const existInvitations = await Promise.all(
-//       validUsers.map(user => prisma.tripInvitation.findMany({
-//         where: {
-//           tripId: tripId,
-//           inviterId: userID,
-//           inviteeId: user.id
-//         },
-//         select: { id: true }
-//       }))
-//     );
+      const validUserIds = validUsers.map(user => user.id);
+      const invalidUserIds = inviteeIds.filter((id: string) => !validUserIds.includes(id));
 
-//     // validUserInvitations is a 2d array
-//     const invalidUserIds = existInvitations.flat().map(invitation => invitation.id);
+      console.log(validUserIds + "," + invalidUserIds);
+      // Check for existing invitations
+      const existingInvitations = await tx.tripMember.findMany({
+        where: {
+          tripId: tripId,
+          inviteeId: { in: validUserIds }
+        },
+        select: { inviteeId: true }
+      });
 
-//     const validUserIds = inviteeIds.filter((id: string) => !invalidUserIds.includes(id));
+      console.log("existingInvitations", existingInvitations);
+      const alreadyInvitedIds = existingInvitations.map(invitation => invitation.inviteeId);
+      const newInviteeIds = validUserIds.filter(id => !alreadyInvitedIds.includes(id));
+      console.log("newInviteeIds", newInviteeIds);
+      console.log("alreadyInvitedIds", alreadyInvitedIds);
 
-//     // Create an invitation for each user
-//     const invitations = validUserIds.map((inviteeId: string) => ({
-//       tripId: tripId,
-//       inviteeId: inviteeId,
-//       inviterId: inviterId,
-//       code: createHash('sha256').update(inviteeId + tripId + Date.now().toString()).digest('hex'), // generate a unique code
-//       status: 'PENDING'
-//     }));
+      // Create an invitation for each user
+      const invitations = tx.tripMember.createMany({
+        data: newInviteeIds.map((inviteeId: string) => ({
+          tripId: tripId,
+          inviteeId: inviteeId,
+          inviterId: inviterId,
+          status: 'PENDING'
+        })),
+      });
+      // const invitations = validUserIds.map((inviteeId: string) => ({
+      //   tripId: tripId,
+      //   inviteeId: inviteeId,
+      //   inviterId: inviterId,
+      //   status: 'PENDING'
+      // }));
 
-//     const createdInvitations = await Promise.all(
-//       invitations.map((invitation: any) =>
-//         prisma.tripInvitation.create({
-//           data: invitation
-//         })
-//       )
-//     );
+      if (!invitations) {
+        res.status(StatusCodes.NOT_ACCEPTABLE).json(invitations);
+      }
 
-//     if (!createdInvitations) {
-//       res.status(StatusCodes.NOT_ACCEPTABLE).json(createdInvitations);
-//     }
+      return { newInviteeIds, invalidUserIds, invitations };
+    });
 
-//     res.status(StatusCodes.CREATED).json({
-//       message: 'Invitations sent successfully to valid users.',
-//       invalidUserIds: invalidUserIds // inform the invalid user IDs
-//     });
-
-//   } catch (error) {
-//     console.error('Failed to send invitations:', error);
-//     res.status(500).send('Internal Server Error');
-//   }
-// });
+    res.status(StatusCodes.CREATED).json({
+      message: 'Invitations processing completed.',
+      sentToNewUsers: trans.newInviteeIds,
+      alreadyInvitedUsers: trans.invitations,
+      invalidUserIds: trans.invalidUserIds
+    });
+  } catch (error) {
+    console.error('Failed to send invitations:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 // accept or decline invite to join group
 // endpoint: /trips/tripId/accept
@@ -200,5 +202,6 @@ router.patch("/:invitationId/decline", async (req: Request<InvitationParams>, re
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
   }
 });
+
 
 export default router;

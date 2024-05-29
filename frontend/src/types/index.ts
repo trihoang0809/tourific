@@ -124,3 +124,21 @@ export interface BottomSliderProps {
   handlePresentModalPress: () => void;
   handleSheetChanges: (index: number) => void;
 }
+
+export enum Status {
+  ACCEPTED,
+  REJECTED,
+  PENDING,
+}
+
+export interface FriendRequest {
+  friendStatus: Status;
+  receiver: User,
+  senderId?: string;
+}
+
+export interface ContactCardProps {
+  user: User;
+  isChecked: boolean;
+  setChecked: (e: any, userId: string) => void;
+}
