@@ -1,15 +1,17 @@
-import { View, ScrollView, TouchableOpacity } from "react-native";
-import React from "react";
+import { View, ScrollView, TouchableOpacity, Text } from "react-native";
+import React, { useEffect, useState } from "react";
 import { Link, router, useGlobalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import ActivityThumbnail from "@/components/ActivityThumbnail";
 import { mockData } from "../../../../mock-data/activities";
 import { ActivityProps } from "@/types";
+import { serverURL } from "@/utils";
 
 const ActivitiesScreen = () => {
   const { id } = useGlobalSearchParams();
-
+  const serverUrl = serverURL();
+  const [activityData, setActivityData] = useState(mockData);
   // const getActivities = async ({ id: text }: { id: string; }) => {
   //   try {
   //     const response = await fetch(`http://localhost:3000/trips/${id}`, {
@@ -30,7 +32,32 @@ const ActivitiesScreen = () => {
   //     console.error("Error fetching trip:", error.toString());
   //   }
   // };
-
+  useEffect(() => {
+    const getActivities = async () => {
+      try {
+        const response = await fetch(
+          serverUrl + `trips/${id}` + "/activities",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            // body: JSON.stringify(req),
+          },
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch trip");
+        }
+        // Optionally, you can handle the response here
+        const data = await response.json();
+        setActivityData(data);
+        console.log("Trip fetch:", data);
+      } catch (error: any) {
+        console.error("Error fetching trip:", error.toString());
+      }
+    };
+    getActivities();
+  }, []);
   return (
     <View style={{ flex: 1, height: Dimensions.get("window").height }}>
       {/* <Stack.Screen
@@ -54,12 +81,21 @@ const ActivitiesScreen = () => {
           onPress={() => { }}>
           <Text>Add</Text>
         </TouchableOpacity> */}
-        {mockData.map((activity: ActivityProps, index: number) => (
-          <View style={{ width: "100%", padding: 15 }}>
-            <ActivityThumbnail key={index} {...activity} />
-          </View>
+        {activityData.map((activity) => (
+          <TouchableOpacity
+            style={{ width: "100%", padding: 15 }}
+            onPress={() => {
+              router.push({
+                pathname: "../activity/view",
+                params: { actId: activity.id, tripId: id },
+              });
+            }}
+          >
+            <ActivityThumbnail key={activity.id} {...activity} />
+          </TouchableOpacity>
         ))}
       </ScrollView>
+
       <TouchableOpacity
         style={{
           alignItems: "center",
