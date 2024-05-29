@@ -21,13 +21,8 @@ export const TripCard: React.FC<tripProps> = ({
   height = 300,
   width = 350,
 }) => {
-  // const tripImage = trip.image;
-  // const tripName = trip.name;
-  // const tripStartDate = trip.startDate;
-  // const tripEndDate = trip.endDate;
   const fontTripName = Math.max(18, (height * 18) / 300);
   const fontTripDetail = Math.max(13, (height * 14) / 300);
-  // const [location, setLocation] = useState(trip.location);
   const { image, location, name, startDate, endDate } = trip;
   const noImage =
     "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg";
@@ -96,7 +91,7 @@ export const TripCard: React.FC<tripProps> = ({
                     },
                   ]}
                 >
-                  {location.citystate}
+                  {trip.location.citystate}
                 </Text>
               </View>
               <View style={styles.detail}>
