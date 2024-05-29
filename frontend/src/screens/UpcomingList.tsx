@@ -11,7 +11,7 @@ import { TripCard } from "../components/TripCard";
 import { LinearGradient } from "expo-linear-gradient";
 import { Trip } from "../types";
 import { MaterialIcons } from "@expo/vector-icons";
-import { serverURL } from "@/utils";
+import { EXPO_PUBLIC_HOST_URL } from "@/utils";
 
 const Header = () => (
   <View>
@@ -34,7 +34,7 @@ const Header = () => (
 
 export const ListFilteredCards: React.FC = () => {
   const [upcomingTrips, setUpcoming] = useState<Trip[]>([]);
-  const serverUrl = serverURL();
+  const serverUrl = EXPO_PUBLIC_HOST_URL;
   const tripCardWidth = 380;
   const tripCardHeight = 330;
 
@@ -42,7 +42,8 @@ export const ListFilteredCards: React.FC = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const link = serverUrl + "trips?upcoming=true";
+        const link = "http://" + serverUrl + ":3000/trips?upcoming=true";
+        console.log(link);
         const upcoming = await fetch(link);
         let data = await upcoming.json();
         setUpcoming(data);

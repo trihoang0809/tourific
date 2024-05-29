@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from "luxon";
 import { StyleSheet } from "react-native";
-import { serverURL } from "@/utils";
+import { EXPO_PUBLIC_HOST_URL } from "@/utils";
 
 const TripDetailsScreen = () => {
   const { id } = useLocalSearchParams();
@@ -21,19 +21,22 @@ const TripDetailsScreen = () => {
     startHour: 0,
     startMinute: 0,
   });
-  const serverUrl = serverURL();
+  const serverUrl = EXPO_PUBLIC_HOST_URL;
   // more setting icon
   const [modalEditVisible, setModalEditVisible] = useState(false);
 
   const getTrip = async ({ id: text }: { id: string }) => {
     try {
-      const response = await fetch(serverUrl + `trips/${id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          // body: JSON.stringify(req),
         },
-        // body: JSON.stringify(req),
-      });
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch trip");
       }

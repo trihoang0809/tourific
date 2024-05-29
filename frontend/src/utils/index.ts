@@ -23,8 +23,4 @@ export function formatDateTime(dateString: Date, hour: number, minute: number) {
   return isoString;
 }
 
-export function serverURL() {
-  let server = "http://localhost:3000/";
-  if (Platform.OS === "android") server = "http://10.0.2.2:3000/";
-  return server;
-}
+export const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;

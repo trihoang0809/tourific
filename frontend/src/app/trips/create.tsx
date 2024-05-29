@@ -17,7 +17,7 @@ import trips from "@/mock-data/trips";
 import { MapData, TripData } from "@/types";
 import GooglePlacesInput from "@/components/GoogleMaps/GooglePlacesInput";
 import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
-import { formatDateTime } from "@/utils";
+import { EXPO_PUBLIC_HOST_URL, formatDateTime } from "@/utils";
 import { DateTime } from "luxon";
 import { TripSchema } from "@/validation/types";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -100,13 +100,16 @@ export default function CreateTripScreen() {
     if (isUpdating) {
       // UPDATING
       try {
-        const response = await fetch(`http://localhost:3000/trips/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
+        const response = await fetch(
+          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(req),
           },
-          body: JSON.stringify(req),
-        });
+        );
         if (!response.ok) {
           throw new Error("Failed to update trip");
         }
@@ -122,15 +125,20 @@ export default function CreateTripScreen() {
     } else {
       // CREATING
       try {
-        const response = await fetch("http://localhost:3000/trips", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const response = await fetch(
+          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(req),
           },
-          body: JSON.stringify(req),
-        });
+        );
         if (!response.ok) {
-          throw new Error(`Failed to create trip: ${response.status} ${response.statusText}`);
+          throw new Error(
+            `Failed to create trip: ${response.status} ${response.statusText}`,
+          );
         }
         // Optionally, you can handle the response here
         const data = await response.json();
