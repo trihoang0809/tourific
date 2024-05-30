@@ -74,10 +74,49 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
       >
         <Text style={styles.title}>{activityData.name}</Text>
         <View style={styles.informationBlock}>
-          <Text>{activityData.description}</Text>
+          <Text style={{ fontSize: 20 }}>
+            {activityData.description !== ""
+              ? activityData.description
+              : "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."}
+          </Text>
         </View>
-        <View style={styles.informationBlock}>
-          <Text>{activityData.notes}</Text>
+
+        <View style={[styles.informationBlock]}>
+          <View
+            style={{
+              width: 120,
+              height: 20,
+              overflow: "hidden",
+              position: "relative",
+              // top: 6,
+              // right: 100,
+              // backgroundColor: "red",
+              // zIndex: 1,
+            }}
+          >
+            <View
+              style={[
+                styles.triangle,
+                // { backgroundColor: "yellow" },
+                { marginRight: 0, position: "absolute" },
+                // { position: "absolute", borderRightColor: "black", zIndex },
+              ]}
+            ></View>
+            <View
+              style={[
+                styles.triangle,
+                {
+                  borderRightColor: "red",
+                  marginLeft: 10,
+                  position: "absolute",
+                },
+              ]}
+            ></View>
+          </View>
+
+          <View style={styles.messageBox}>
+            <Text style={{ fontSize: 20 }}>{activityData.notes}</Text>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -107,5 +146,31 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderRadius: 20,
     borderColor: "grey",
+  },
+
+  triangle: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 10,
+    borderBottomWidth: 10,
+    borderRightWidth: 25,
+    borderRightColor: "black",
+    borderTopColor: "white",
+    borderBottomColor: "white",
+    borderStyle: "solid",
+    position: "absolute",
+    // right: 3,
+    marginTop: 0,
+    // zIndex: 1,
+    // position: "relative",
+  },
+
+  messageBox: {
+    overflow: "hidden",
+    borderWidth: 0.5,
+    borderRadius: 10,
+    backgroundColor: "#ECE9E9",
+    padding: 8,
+    flex: 1,
   },
 });
