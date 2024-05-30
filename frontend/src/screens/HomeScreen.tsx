@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Pressable,
   TouchableOpacity,
   Image,
   Dimensions,
@@ -14,13 +13,11 @@ import { HomeScreenHeader } from "../components/HomeScreenHeader";
 import { useState, useEffect } from "react";
 import { UserProps, Trip } from "../types";
 import { Link, router } from 'expo-router';
-import { EXPO_PUBLIC_HOST_URL } from "@/utils";
+import { EXPO_PUBLIC_HOST_URL, getRecentTrips, randomizeCover } from "@/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import TripCardRect from "@/components/TripCard/TripCardRect";
-import { LinearGradient } from "expo-linear-gradient";
-import { homeheader } from '@/assets/homeheader.jpg';
-import { headerImage, randomizeCover } from "@/utils/constants";
+import { headerImage } from "@/utils/constants";
 import Style from "Style";
 
 const screenw = Dimensions.get("window").width;
@@ -28,6 +25,7 @@ const titleWidth = screenw - (screenw * 0.96);
 export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [ongoingTrips, setOngoingTrips] = useState<Trip[]>([]);
   const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
+
   useEffect(() => {
     const fetchTrips = async () => {
       try {
@@ -39,7 +37,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
         const upcomingData = await upcoming.json();
 
         setOngoingTrips(ongoingData);
-        setUpcomingTrips(upcomingData);
+        setUpcomingTrips(getRecentTrips(upcomingData));
       } catch (error) {
         console.error("Failed to fetch trips:", error);
       }
@@ -79,7 +77,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             )}
           </ScrollView>
         </View>
-        <View>
+        <View style={{ marginTop: -5 }}>
           <View style={styles.inline}>
             <Text style={styles.title}>Upcoming Trips</Text>
             <Text onPress={() => { router.replace('/trips/upcoming'); }} >See all</Text>

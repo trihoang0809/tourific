@@ -1,4 +1,4 @@
-import { isLeapYear } from "react-native-paper-dates/lib/typescript/Date/dateUtils";
+import { Trip, TripData } from "@/types";
 
 // format follow UTC
 export function formatDateTime(dateString: Date, hour: number, minute: number) {
@@ -50,5 +50,23 @@ export const tripDate = (date: Date) => {
   const month = date.toLocaleString("default", { month: "short" });
   return `${date.getDate()} ${month}, ${date.getFullYear()}`;
 };
+
+// function to get the most 3 recent upcoming trips
+// @params: trips array
+// return an array of 3 most recent upcoming trips
+export function getRecentTrips(trips: Trip[]) {
+  if (!trips) {
+    return [];
+  }
+
+  const upcomingTrips = trips.sort((a, b) => new Date(a.startDate).valueOf() - new Date(b.startDate).valueOf());
+
+  return upcomingTrips;
+}
+
+export function randomizeCover(images: string[]) {
+  const idx = Math.floor(Math.random() * images.length);
+  return images[idx];
+}
 
 export const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;

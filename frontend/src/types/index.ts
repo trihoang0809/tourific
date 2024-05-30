@@ -101,3 +101,9 @@ export type User = {
 export interface UserProps {
   user: User;
 }
+
+export interface TripCardRectProps {
+  trip: Trip;
+  height?: number; // Optional height prop
+  width?: number; // Optional width prop
+}

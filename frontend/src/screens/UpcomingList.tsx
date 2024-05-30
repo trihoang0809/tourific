@@ -13,6 +13,7 @@ import { TripCard } from "@/components/TripCard/TripCard";
 import { Trip } from "../types";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { getRecentTrips } from "@/utils";
 
 const onPressCategory = () => {
   console.log("You pressed on this category");
@@ -58,16 +59,15 @@ export const ListFilteredCards = ({ isUpcoming }: listprops) => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const link = isUpcoming ? `http://${serverUrl}:3000/trips?ongoing=true` : `http://${serverUrl}:3000/trips?ongoing=true`;
+        const link = isUpcoming ? `http://${serverUrl}:3000/trips?upcoming=true` : `http://${serverUrl}:3000/trips?ongoing=true`;
         const upcoming = await fetch(link);
         let data = await upcoming.json();
-        setUpcoming(data);
+        setUpcoming(getRecentTrips(data));
       } catch (error) {
         console.log(error);
       }
     };
 
-    //Fetch Data + Format Data
     getData();
   }, []);
 
@@ -84,7 +84,7 @@ export const ListFilteredCards = ({ isUpcoming }: listprops) => {
             }}
             data={upcomingTrips}
             renderItem={({ item }) => (
-              <View style={{ marginVertical: 8}}>
+              <View style={{ marginVertical: 8 }}>
                 <TripCard
                   height={tripCardHeight}
                   width={tripCardWidth}
