@@ -1,22 +1,26 @@
 import {
-  View, Text, StyleSheet,
-  TextInput, Dimensions,
-  StatusBar, FlatList, TouchableWithoutFeedback
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Dimensions,
+  StatusBar,
+  FlatList,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useState, useEffect } from "react";
-import { TripCard } from "../components/TripCard";
-import { LinearGradient } from "expo-linear-gradient";
+import { TripCard } from "@/components/TripCard/TripCard";
 import { Trip } from "../types";
-import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { EXPO_PUBLIC_HOST_URL } from "@/utils";
+import { getRecentTrips } from "@/utils";
 
 const onPressCategory = () => {
   console.log("You pressed on this category");
   router.replace("/");
 };
 
-const Header = () => (
+const Header = ({ isUpcoming }: listprops) => (
   <View>
     <StatusBar backgroundColor="black" />
     <View style={styles.headerConainner}>
@@ -24,55 +28,53 @@ const Header = () => (
         <TouchableWithoutFeedback onPress={onPressCategory}>
           <AntDesign name="left" size={24} color="blue" />
         </TouchableWithoutFeedback>
-        <Text style={{ fontSize: 22, marginLeft: 10 }}>Upcoming Trips</Text>
+        <Text style={{ fontSize: 22, marginLeft: 10 }}>
+          {isUpcoming ? "Upcoming Trips" : "Ongoing Trips"}
+        </Text>
       </View>
+
       <View style={styles.userInput}>
         <MaterialIcons name="search" size={24} color="black" />
-        <TextInput placeholder="Search" style={{ flex: 1, padding: 2.5, fontSize: 16 }}></TextInput>
+        <TextInput
+          placeholder="Search"
+          style={{ flex: 1, padding: 2.5, fontSize: 16 }}
+        ></TextInput>
       </View>
     </View>
   </View>
 );
 
-export const ListFilteredCards: React.FC = () => {
+export interface listprops {
+  isUpcoming: boolean;
+}
+
+export const ListFilteredCards = ({ isUpcoming }: listprops) => {
   const [upcomingTrips, setUpcoming] = useState<Trip[]>([]);
-  const serverUrl = EXPO_PUBLIC_HOST_URL;
-  const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
-  const [windowHeight, setWindowHeight] = useState(Dimensions.get('window').height);
-  const [numCols, setNumCols] = useState(0);
-  const [tripCardWidth, setTripCardWidth] = useState(380);
-  const [tripCardHeight, setTripCardHeight] = useState(330);
+  const serverUrl = process.env.EXPO_PUBLIC_HOST_URL;
+  const windowWidth = Dimensions.get("window").width;
+  const tripCardWidth = windowWidth - (windowWidth * 0.12);
+  const tripCardHeight = 280;
 
   //Fetching data
   useEffect(() => {
-    Dimensions.addEventListener('change', ({ window: { width, height } }) => {
-      //Get window size every render
-      setWindowHeight(height);
-      setWindowWidth(width);
-
-      //Adjust the number of columns of FlatList based on window size
-      //width of the window/(trip card width + horizontal margin)
-      setNumCols(Math.floor(width / (tripCardWidth + 40)));
-    });
-
     const getData = async () => {
       try {
-        const link = serverUrl + "/trips?upcoming=true";
+        const link = isUpcoming ? `http://${serverUrl}:3000/trips?upcoming=true` : `http://${serverUrl}:3000/trips?ongoing=true`;
         const upcoming = await fetch(link);
         let data = await upcoming.json();
-        setUpcoming(data);
+        setUpcoming(getRecentTrips(data));
       } catch (error) {
         console.log(error);
       }
     };
-    //Fetch Data + Format Data
+
     getData();
   }, []);
 
   return (
     <View>
       <View style={styles.container}>
-        <Header />
+        <Header isUpcoming={isUpcoming} />
         <View style={{ flex: 1 }}>
           <FlatList
             style={{
@@ -82,7 +84,7 @@ export const ListFilteredCards: React.FC = () => {
             }}
             data={upcomingTrips}
             renderItem={({ item }) => (
-              <View style={{ marginVertical: 8}}>
+              <View style={{ marginVertical: 8 }}>
                 <TripCard
                   height={tripCardHeight}
                   width={tripCardWidth}
@@ -100,22 +102,11 @@ export const ListFilteredCards: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     height: "100%",
-    backgroundColor: "#CADBFA",
   },
-
   headerConainner: {
     width: "100%",
-    marginBottom: 10,
     padding: 10,
   },
-
-  category: {
-    fontSize: 25,
-    marginBottom: 10,
-    fontWeight: "bold",
-    color: "blue",
-  },
-
   userInput: {
     borderWidth: 2,
     alignContent: "center",
@@ -123,11 +114,9 @@ const styles = StyleSheet.create({
     padding: 5,
     paddingLeft: 20,
     flexDirection: "row",
-    backgroundColor: "#ADC8F7",
     borderRadius: 20,
-    alignItems: "center"
+    alignItems: "center",
   },
-
   content: {
     flex: 1,
     alignItems: "center",
@@ -139,6 +128,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 18,
     alignContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
 });

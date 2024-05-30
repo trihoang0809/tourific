@@ -11,8 +11,8 @@ import { Ionicons } from "@expo/vector-icons";
 
 export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+    <SafeAreaView style={styles.content}>
+      <View>
         <Text style={styles.appName}>tourific</Text>
         <TouchableOpacity
           onPress={() => {
@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between", // Aligns children at space-between
     alignItems: "center",
     padding: 10,
+    marginHorizontal: 15,
   },
   notificationIcon: {
     position: "absolute",
