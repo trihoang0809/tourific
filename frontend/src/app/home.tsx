@@ -4,9 +4,8 @@ import { StatusBar } from "expo-status-bar";
 import { useRouter, Stack } from "expo-router";
 import { HomeScreen } from "../screens/HomeScreen";
 import sampleUser from "@/mock-data/userNickDoan";
-import LoginScreen from "./login";
 
-const App = () => {
+const Home = () => {
   // const { user } = useAuth();
   // const router = useRouter();
 
@@ -18,11 +17,10 @@ const App = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      {/* <HomeScreen user={sampleUser} /> */}
-      <LoginScreen />
+      <HomeScreen user={sampleUser} />
       <StatusBar style="auto" />
     </SafeAreaView>
   );
 };
 
-export default App;
+export default Home;

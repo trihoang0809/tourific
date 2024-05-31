@@ -14,18 +14,22 @@ const RootNavigation = () => {
   // }, [user]);
 
   return (
-    <Stack initialRouteName="login/index">
-      <Stack.Screen
+    <Stack initialRouteName="login">
+      {/* <Stack.Screen
         name="index"
         options={{ title: "Home", headerShown: false }}
-      />
+      /> */}
       <Stack.Screen
-        name="login/index"
+        name="login"
         options={{ title: "Login", headerShown: false }}
       />
       <Stack.Screen
-        name="register/index"
+        name="register"
         options={{ title: "Register", headerShown: false }}
+      />
+      <Stack.Screen
+        name="home"
+        options={{ title: "Home Screen", headerShown: false }}
       />
     </Stack>
   );

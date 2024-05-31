@@ -9,19 +9,20 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { loginWithEmail } from "../../authentication/authService";
+import { registerWithEmail } from "@/authentication/authService";
 
-const LoginScreen = () => {
+const RegisterScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     try {
-      await loginWithEmail(email, password);
+      await registerWithEmail(email, password);
       setError("");
-      console.log("Logged in successfully");
+      console.log("Registered successfully");
+      router.push("/home");
     } catch (err) {
       console.log(err);
     }
@@ -29,7 +30,7 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to Tourific</Text>
+      <Text style={styles.title}>Create a Tourific Account</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -48,14 +49,14 @@ const LoginScreen = () => {
         autoCapitalize="none"
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
+      <TouchableOpacity style={styles.button} onPress={handleRegister}>
+        <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.linkButton}
-        onPress={() => router.push("/register")}
+        onPress={() => router.replace("/login")}
       >
-        <Text style={styles.linkText}>Don't have an account? Sign up</Text>
+        <Text style={styles.linkText}>Already have an account? Login</Text>
       </TouchableOpacity>
     </View>
   );
@@ -66,7 +67,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "white",
     padding: 16,
   },
   logo: {
@@ -116,4 +117,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default RegisterScreen;

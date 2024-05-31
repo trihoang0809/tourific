@@ -9,27 +9,29 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { registerWithEmail } from "../../authentication/authService";
+import { loginWithEmail } from "@/authentication/authService";
 
-const RegisterScreen = () => {
+const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleRegister = async () => {
+  const handleLogin = async () => {
     try {
-      await registerWithEmail(email, password);
+      await loginWithEmail(email, password);
       setError("");
-      console.log("Registered successfully");
+      console.log("Logged in successfully");
+      router.push("/home");
     } catch (err) {
+      setError("Invalid email or password");
       console.log(err);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Create a Tourific Account</Text>
+      <Text style={styles.title}>Welcome to Tourific</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -48,14 +50,14 @@ const RegisterScreen = () => {
         autoCapitalize="none"
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Register</Text>
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.linkButton}
-        onPress={() => router.push("/login")}
+        onPress={() => router.replace("/register")}
       >
-        <Text style={styles.linkText}>Already have an account? Login</Text>
+        <Text style={styles.linkText}>Don't have an account? Sign up</Text>
       </TouchableOpacity>
     </View>
   );
@@ -66,7 +68,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "white",
     padding: 16,
   },
   logo: {
@@ -116,4 +118,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RegisterScreen;
+export default LoginScreen;
