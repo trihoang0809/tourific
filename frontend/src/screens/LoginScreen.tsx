@@ -7,13 +7,20 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { loginWithEmail } from "@/authentication/authService";
+import {
+  loginWithEmail,
+  sendPasswordResetEmail,
+} from "@/authentication/authService";
 import { Ionicons } from "@expo/vector-icons";
+import Modal from "react-native-modal";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -24,6 +31,23 @@ const LoginScreen = () => {
       router.push("/home");
     } catch (err) {
       setError("Invalid email or password");
+      console.log(err);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setModalVisible(true);
+  };
+
+  const handleSendPasswordResetEmail = async () => {
+    try {
+      await sendPasswordResetEmail(resetEmail);
+      setMessage("Password reset email sent");
+      setError("");
+      setModalVisible(false);
+    } catch (err) {
+      setError("Error sending password reset email");
+      setMessage("");
       console.log(err);
     }
   };
@@ -59,6 +83,39 @@ const LoginScreen = () => {
       >
         <Text style={styles.linkText}>Don't have an account? Sign up</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.linkButton}
+        onPress={handleForgotPassword}
+      >
+        <Text style={styles.linkText}>Forgot Password?</Text>
+      </TouchableOpacity>
+
+      <Modal isVisible={isModalVisible}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Reset Password</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your email"
+            placeholderTextColor="#aaa"
+            value={resetEmail}
+            onChangeText={setResetEmail}
+            autoCapitalize="none"
+          />
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleSendPasswordResetEmail}
+          >
+            <Text style={styles.buttonText}>Send Email</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.linkButton}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text style={styles.linkText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -118,6 +175,20 @@ const styles = StyleSheet.create({
   error: {
     color: "red",
     marginBottom: 10,
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 22,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 4,
+    borderColor: "rgba(0, 0, 0, 0.1)",
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "black",
   },
 });
 
