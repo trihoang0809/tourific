@@ -21,6 +21,8 @@ const TripDetailsScreen = () => {
     startMinute: 0,
     image: { url: "" },
   });
+  const defaultUri =
+    "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400";
 
   // more setting icon
   const [modalEditVisible, setModalEditVisible] = useState(false);
@@ -102,7 +104,7 @@ const TripDetailsScreen = () => {
               trip.image && trip.image.url
                 ? { uri: trip.image.url }
                 : {
-                    uri: "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400",
+                    uri: defaultUri,
                   }
             }
           />
