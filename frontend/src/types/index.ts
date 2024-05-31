@@ -96,3 +96,9 @@ export type User = {
 export interface UserProps {
   user: User;
 }
+
+export type Photo = {
+  url: string;
+  width?: number;
+  height?: number;
+};

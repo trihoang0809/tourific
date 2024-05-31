@@ -11,6 +11,7 @@ import {
 import { useRouter } from "expo-router";
 import { registerWithEmail } from "@/authentication/authService";
 import * as ImagePicker from "expo-image-picker";
+import { Photo } from "@/types";
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState("");
@@ -19,7 +20,7 @@ const RegisterScreen = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
-  const [avatar, setAvatar] = useState(null);
+  const [avatar, setAvatar] = useState<Photo | null>(null);
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -32,6 +33,10 @@ const RegisterScreen = () => {
       setError(
         "Password must be at least 8 characters long and contain a mix of letters and numbers",
       );
+      return;
+    }
+    if (!validateDate(dateOfBirth)) {
+      setError("Invalid date of birth format. Use YYYY-MM-DD.");
       return;
     }
 
@@ -77,6 +82,13 @@ const RegisterScreen = () => {
     return password.length >= 8 && /\d/.test(password);
   };
 
+  const validateDate = (date: string) => {
+    const re = /^\d{4}-\d{2}-\d{2}$/;
+    if (!re.test(date)) return false;
+    const parsedDate = new Date(date);
+    return !isNaN(parsedDate.getTime());
+  };
+
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -84,6 +96,14 @@ const RegisterScreen = () => {
       aspect: [4, 3],
       quality: 1,
     });
+
+    if (!result.canceled) {
+      setAvatar({
+        url: result.assets[0].uri,
+        width: result.assets[0].width,
+        height: result.assets[0].height,
+      });
+    }
   };
 
   return (
@@ -115,7 +135,7 @@ const RegisterScreen = () => {
       />
       <TextInput
         style={styles.input}
-        placeholder="Date of Birth"
+        placeholder="Date of Birth (YYYY-MM-DD)"
         placeholderTextColor="#aaa"
         value={dateOfBirth}
         onChangeText={setDateOfBirth}
@@ -141,8 +161,10 @@ const RegisterScreen = () => {
       <TouchableOpacity style={styles.button} onPress={pickImage}>
         <Text style={styles.buttonText}>Pick an Avatar</Text>
       </TouchableOpacity>
-      {avatar && <Image source={{ uri: avatar }} style={styles.avatar} />}
-      {error ? <Text style={styles.error}>{error}</Text> : null}{" "}
+      {avatar ? (
+        <Image source={{ uri: avatar.url }} style={styles.avatar} />
+      ) : null}
+      {error ? <Text style={styles.error}>{error}</Text> : null}
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
