@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   View,
   TextInput,
-  Button,
+  ScrollView,
   StyleSheet,
   Text,
   Image,
@@ -10,27 +10,117 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { registerWithEmail } from "@/authentication/authService";
+import * as ImagePicker from "expo-image-picker";
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [userName, setUserName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [avatar, setAvatar] = useState(null);
   const [error, setError] = useState("");
   const router = useRouter();
 
   const handleRegister = async () => {
+    if (!validateEmail(email)) {
+      setError("Invalid email format");
+      return;
+    }
+    if (!validatePassword(password)) {
+      setError(
+        "Password must be at least 8 characters long and contain a mix of letters and numbers",
+      );
+      return;
+    }
+
     try {
-      await registerWithEmail(email, password);
+      const userCredential = await registerWithEmail(email, password);
+      const user = userCredential.user;
+
+      // Upload user data to MongoDB
+      const response = await fetch("http://localhost:3000/user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userName,
+          email,
+          password,
+          firstName,
+          lastName,
+          dateOfBirth,
+          avatar,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error creating user in MongoDB");
+      }
+
       setError("");
       console.log("Registered successfully");
-      router.push("/home");
+      router.replace("/login");
     } catch (err) {
       console.log(err);
     }
   };
 
+  const validateEmail = (email: string) => {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  };
+
+  const validatePassword = (password: string) => {
+    return password.length >= 8 && /\d/.test(password);
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+  };
+
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Create a Tourific Account</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Username"
+        placeholderTextColor="#aaa"
+        value={userName}
+        onChangeText={setUserName}
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="First Name"
+        placeholderTextColor="#aaa"
+        value={firstName}
+        onChangeText={setFirstName}
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Last Name"
+        placeholderTextColor="#aaa"
+        value={lastName}
+        onChangeText={setLastName}
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Date of Birth"
+        placeholderTextColor="#aaa"
+        value={dateOfBirth}
+        onChangeText={setDateOfBirth}
+        autoCapitalize="none"
+      />
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -48,7 +138,11 @@ const RegisterScreen = () => {
         onChangeText={setPassword}
         autoCapitalize="none"
       />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      <TouchableOpacity style={styles.button} onPress={pickImage}>
+        <Text style={styles.buttonText}>Pick an Avatar</Text>
+      </TouchableOpacity>
+      {avatar && <Image source={{ uri: avatar }} style={styles.avatar} />}
+      {error ? <Text style={styles.error}>{error}</Text> : null}{" "}
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
@@ -58,16 +152,16 @@ const RegisterScreen = () => {
       >
         <Text style={styles.linkText}>Already have an account? Login</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "white",
+    backgroundColor: "#f5f5f5",
     padding: 16,
   },
   logo: {
@@ -114,6 +208,12 @@ const styles = StyleSheet.create({
   error: {
     color: "red",
     marginBottom: 10,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 20,
   },
 });
 
