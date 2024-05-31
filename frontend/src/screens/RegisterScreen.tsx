@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  View,
   TextInput,
   ScrollView,
   StyleSheet,
@@ -12,6 +13,7 @@ import { registerWithEmail } from "@/authentication/authService";
 import * as ImagePicker from "expo-image-picker";
 import { Photo } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
+import Spinner from "react-native-loading-spinner-overlay";
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState("");
@@ -22,6 +24,13 @@ const RegisterScreen = () => {
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [avatar, setAvatar] = useState<Photo | null>(null);
   const [error, setError] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+  });
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleRegister = async () => {
@@ -31,7 +40,7 @@ const RegisterScreen = () => {
     }
     if (!validatePassword(password)) {
       setError(
-        "Password must be at least 8 characters long and contain a mix of letters and numbers",
+        "Password must be at least 8 characters long and contain an uppercase letter, a lowercase letter, and a number",
       );
       return;
     }
@@ -39,6 +48,8 @@ const RegisterScreen = () => {
       setError("Invalid date of birth format. Use YYYY-MM-DD.");
       return;
     }
+
+    setLoading(true); // Show loading spinner
 
     try {
       const userCredential = await registerWithEmail(email, password);
@@ -60,6 +71,13 @@ const RegisterScreen = () => {
           avatar,
         }),
       });
+      setLoading(false); // Hide loading spinner
+
+      if (response.status === 409) {
+        setError("Username or email is already in use");
+        console.log(error);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error("Error creating user in MongoDB");
@@ -69,6 +87,7 @@ const RegisterScreen = () => {
       console.log("Registered successfully");
       router.replace("/login");
     } catch (err) {
+      setLoading(false); // Hide loading spinner in case of error
       console.log(err);
     }
   };
@@ -79,7 +98,14 @@ const RegisterScreen = () => {
   };
 
   const validatePassword = (password: string) => {
-    return password.length >= 8 && /\d/.test(password);
+    const length = password.length >= 8;
+    const uppercase = /[A-Z]/.test(password);
+    const lowercase = /[a-z]/.test(password);
+    const number = /\d/.test(password);
+
+    setPasswordErrors({ length, uppercase, lowercase, number });
+
+    return length && uppercase && lowercase && number;
   };
 
   const validateDate = (date: string) => {
@@ -108,6 +134,11 @@ const RegisterScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <Spinner
+        visible={loading}
+        textContent={"Loading..."}
+        textStyle={styles.spinnerTextStyle}
+      />
       <Ionicons name="person-add" size={25} color="black" />
       <Text style={styles.title}>Create a Tourific Account</Text>
       <TextInput
@@ -159,6 +190,40 @@ const RegisterScreen = () => {
         onChangeText={setPassword}
         autoCapitalize="none"
       />
+      <View style={styles.passwordRequirements}>
+        <Text
+          style={[
+            styles.requirement,
+            { color: passwordErrors.length ? "green" : "red" },
+          ]}
+        >
+          • At least 8 characters
+        </Text>
+        <Text
+          style={[
+            styles.requirement,
+            { color: passwordErrors.uppercase ? "green" : "red" },
+          ]}
+        >
+          • At least one uppercase letter
+        </Text>
+        <Text
+          style={[
+            styles.requirement,
+            { color: passwordErrors.lowercase ? "green" : "red" },
+          ]}
+        >
+          • At least one lowercase letter
+        </Text>
+        <Text
+          style={[
+            styles.requirement,
+            { color: passwordErrors.number ? "green" : "red" },
+          ]}
+        >
+          • At least one number
+        </Text>
+      </View>
       <TouchableOpacity style={styles.button} onPress={pickImage}>
         <Ionicons name="image-outline" size={24} color="#fff" />
         <Text style={styles.buttonText}>Pick an Avatar</Text>
@@ -192,6 +257,9 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: 20,
+  },
+  spinnerTextStyle: {
+    color: "#FFF",
   },
   title: {
     fontSize: 24,
@@ -240,6 +308,17 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     marginBottom: 20,
+  },
+  passwordRequirements: {
+    width: "auto",
+    alignItems: "flex-start",
+    marginBottom: 12,
+    padding: 10,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 8,
+  },
+  requirement: {
+    marginBottom: 4,
   },
 });
 

@@ -49,10 +49,11 @@ router.post("/", async (req, res) => {
     return res.status(StatusCodes.BAD_REQUEST).json({ error: "Invalid email format" });
   }
 
-  if (password.length < 8 || !/\d/.test(password)) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ error: "Password must be at least 8 characters long and contain a mix of letters and numbers" });
+  if (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password)) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      error:
+        "Password must be at least 8 characters long and contain an uppercase letter, a lowercase letter, and a number",
+    });
   }
 
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -65,6 +66,16 @@ router.post("/", async (req, res) => {
   }
 
   try {
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ userName }, { email }],
+      },
+    });
+
+    if (existingUser) {
+      return res.status(StatusCodes.CONFLICT).json({ error: "Username or email is already in use" });
+    }
+
     const hashedPassword = await bcrypt.hash(password, saltRounds); // Hash the password
     const user = await prisma.user.create({
       data: {
