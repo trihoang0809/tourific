@@ -28,7 +28,7 @@ const LoginScreen = () => {
       await loginWithEmail(email, password);
       setError("");
       console.log("Logged in successfully");
-      router.push("/home");
+      router.replace("/home");
     } catch (err) {
       setError("Invalid email or password");
       console.log(err);

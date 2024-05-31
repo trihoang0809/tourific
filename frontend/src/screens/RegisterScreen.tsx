@@ -34,6 +34,7 @@ const RegisterScreen = () => {
   const router = useRouter();
 
   const handleRegister = async () => {
+    setError("");
     if (!validateEmail(email)) {
       setError("Invalid email format");
       return;
@@ -80,14 +81,21 @@ const RegisterScreen = () => {
       }
 
       if (!response.ok) {
-        throw new Error("Error creating user in MongoDB");
+        throw new Error("Error creating user. Try a different username!");
       }
 
       setError("");
       console.log("Registered successfully");
       router.replace("/login");
-    } catch (err) {
+    } catch (err: any) {
       setLoading(false); // Hide loading spinner in case of error
+
+      // Handle Firebase errors
+      if (err.code === "auth/email-already-in-use") {
+        setError("Email is already in use!");
+      } else {
+        setError(err.message); // Set the error message
+      }
       console.log(err);
     }
   };
@@ -136,7 +144,7 @@ const RegisterScreen = () => {
     <ScrollView contentContainerStyle={styles.container}>
       <Spinner
         visible={loading}
-        textContent={"Loading..."}
+        textContent={"Creating account..."}
         textStyle={styles.spinnerTextStyle}
       />
       <Ionicons name="person-add" size={25} color="black" />
@@ -226,7 +234,7 @@ const RegisterScreen = () => {
       </View>
       <TouchableOpacity style={styles.button} onPress={pickImage}>
         <Ionicons name="image-outline" size={24} color="#fff" />
-        <Text style={styles.buttonText}>Pick an Avatar</Text>
+        <Text style={styles.buttonText}>Pick an avatar</Text>
       </TouchableOpacity>
       {avatar ? (
         <Image source={{ uri: avatar.url }} style={styles.avatar} />
