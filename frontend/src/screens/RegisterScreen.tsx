@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  View,
   TextInput,
   ScrollView,
   StyleSheet,
@@ -12,6 +11,7 @@ import { useRouter } from "expo-router";
 import { registerWithEmail } from "@/authentication/authService";
 import * as ImagePicker from "expo-image-picker";
 import { Photo } from "@/types";
+import { Ionicons } from "@expo/vector-icons";
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState("");
@@ -108,6 +108,7 @@ const RegisterScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <Ionicons name="person-add" size={25} color="black" />
       <Text style={styles.title}>Create a Tourific Account</Text>
       <TextInput
         style={styles.input}
@@ -159,6 +160,7 @@ const RegisterScreen = () => {
         autoCapitalize="none"
       />
       <TouchableOpacity style={styles.button} onPress={pickImage}>
+        <Ionicons name="image-outline" size={24} color="#fff" />
         <Text style={styles.buttonText}>Pick an Avatar</Text>
       </TouchableOpacity>
       {avatar ? (
@@ -183,7 +185,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "white",
     padding: 16,
   },
   logo: {
@@ -194,7 +196,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginVertical: 20,
   },
   input: {
     width: "100%",
@@ -214,11 +216,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
+    flexDirection: "row",
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+    marginLeft: 8,
   },
   linkButton: {
     marginTop: 10,

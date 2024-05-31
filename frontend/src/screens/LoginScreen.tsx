@@ -2,14 +2,13 @@ import React, { useState } from "react";
 import {
   View,
   TextInput,
-  Button,
   StyleSheet,
   Text,
-  Image,
   TouchableOpacity,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { loginWithEmail } from "@/authentication/authService";
+import { Ionicons } from "@expo/vector-icons";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -31,6 +30,7 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Ionicons name="log-in-outline" size={30} color="black" />
       <Text style={styles.title}>Welcome to Tourific</Text>
       <TextInput
         style={styles.input}
@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
+    color: "black",
     marginBottom: 20,
   },
   input: {
@@ -99,11 +100,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
+    flexDirection: "row",
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+    marginLeft: 8,
   },
   linkButton: {
     marginTop: 10,
