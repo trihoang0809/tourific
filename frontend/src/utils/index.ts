@@ -37,3 +37,14 @@ export const formatDate = (date: Date) => {
   const month = date.toLocaleString("default", { month: "short" });
   return `${date.getDate()} ${month}, ${date.getFullYear()}`;
 };
+
+//weekday
+export const weekday = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
