@@ -11,8 +11,16 @@ import {
   Image,
   SafeAreaView,
   Linking,
+  ImageBackground,
 } from "react-native";
-import { Entypo, EvilIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  Entypo,
+  EvilIcons,
+  Feather,
+  FontAwesome6,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import { material } from "react-native-typography";
 import React, { useState, useEffect } from "react";
 import GoogleMapInput from "@/components/GoogleMaps/GoogleMapInput";
@@ -30,9 +38,18 @@ interface Actprops {
 export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
   const serverUrl = serverURL();
   const [activityData, setActivityData] = useState(any);
+  const [noteEdit, setNoteEdit] = useState(false);
+  const [note, setNote] = useState("");
+  const [nameEdit, setNameEdit] = useState(false);
+  const [name, setName] = useState("");
+  const [startTimeEdit, setStartTimeEdit] = useState(false);
+  const [startTime, setStartTime] = useState(new Date());
+  const [startDatePickerVisibility, setStartDatePickerVisibility] =
+    useState(false);
   const coverImage =
     "https://media.istockphoto.com/id/904172104/photo/weve-made-it-all-this-way-i-am-proud.jpg?s=612x612&w=0&k=20&c=MewnsAhbeGRcMBN9_ZKhThmqPK6c8nCT8XYk5ZM_hdg=";
   const [descriptionSeeMore, setDescriptionSeeMore] = useState(3);
+  const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
   useEffect(() => {
     const getActivity = async () => {
       try {
@@ -56,21 +73,84 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
     getActivity();
   }, []);
   const activityStartDate = new Date(activityData.startTime);
+
   console.log(activityData);
+
   if (activityData.category !== undefined) {
     activityData.category.length === 0
       ? activityData.category.push("User Custom")
       : {};
   }
+
+  const updateActivity = async () => {
+    const req = {
+      name: activityData.name,
+      description: activityData.description,
+      startTime: activityData.startTime,
+      endTime: activityData.endTime,
+      notes: activityData.notes,
+      location: {
+        address: activityData.location.address,
+        citystate: activityData.location.citystate,
+        latitude: activityData.location.latitude,
+        longitude: activityData.location.longitude,
+        radius: 0,
+      },
+    };
+
+    try {
+      const response = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${activityData.tripId}/activities/${activityData.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(req),
+        },
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update trip");
+      }
+    } catch (error: any) {
+      console.error("Error updating trip:", error.toString());
+    }
+  };
+
+  const showStartDatePicker = () => {
+    setStartDatePickerVisibility(true);
+  };
+
+  const hideStartDatePicker = () => {
+    setStartDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date: Date) => {
+    let activity = activityData;
+    activity.startTime = date;
+    setActivityData(activity);
+    updateActivity();
+    hideStartDatePicker();
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 0.85 }}>
-        <Image
-          style={styles.backgroundImage}
+        <ImageBackground
+          style={[styles.backgroundImage, { alignItems: "flex-end" }]}
           source={{
             uri: coverImage,
           }}
-        />
+        >
+          <TouchableWithoutFeedback>
+            <Entypo
+              name="dots-three-vertical"
+              size={24}
+              color="black"
+              style={{ zIndex: 10, margin: 10 }}
+            />
+          </TouchableWithoutFeedback>
+        </ImageBackground>
       </View>
       <ScrollView
         style={{
@@ -84,9 +164,71 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
         }}
       >
         <View style={styles.informationBlock}>
-          <Text style={styles.title} numberOfLines={1}>
-            {activityData.name}
-          </Text>
+          <View
+            style={{
+              flexDirection: "row",
+              flex: 1,
+              justifyContent: "space-between",
+            }}
+          >
+            {nameEdit === false ? (
+              <Text style={styles.title} numberOfLines={1}>
+                {activityData.name}
+              </Text>
+            ) : (
+              <TextInput
+                style={styles.title}
+                onChangeText={setName}
+                value={name}
+              ></TextInput>
+            )}
+            {!nameEdit && (
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setNameEdit(true);
+                  setName(activityData.name);
+                }}
+              >
+                <Feather
+                  name="edit-2"
+                  size={20}
+                  color="black"
+                  style={{ alignSelf: "center" }}
+                />
+              </TouchableWithoutFeedback>
+            )}
+            {nameEdit && (
+              <View style={{ flexDirection: "row", columnGap: 10 }}>
+                <TouchableWithoutFeedback onPress={() => setNameEdit(false)}>
+                  <MaterialIcons
+                    name="cancel"
+                    size={27}
+                    color="red"
+                    style={{ alignSelf: "center" }}
+                  />
+                </TouchableWithoutFeedback>
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    let activity = activityData;
+                    activity.name = name;
+                    setActivityData(activity);
+                    console.log(activityData);
+                    setNameEdit(false);
+                    updateActivity();
+                  }}
+                >
+                  <FontAwesome6
+                    name="check"
+                    size={24}
+                    color="green"
+                    style={{ alignSelf: "center" }}
+                  />
+                </TouchableWithoutFeedback>
+              </View>
+            )}
+          </View>
+
+          {/* location */}
           <TouchableWithoutFeedback
             onPress={() => {
               let url =
@@ -99,7 +241,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <EvilIcons name="location" size={24} color="blue" />
-              <Text numberOfLines={1}>
+              <Text numberOfLines={1} style={{ fontSize: 16, padding: 4 }}>
                 {activityData.location !== undefined
                   ? activityData.location.address +
                     activityData.location.citystate
@@ -108,6 +250,59 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
             </View>
           </TouchableWithoutFeedback>
         </View>
+
+        {/* Date */}
+        <View style={[styles.informationBlock, { flexDirection: "row" }]}>
+          <View style={{ flex: 1, flexDirection: "row", columnGap: 15 }}>
+            <View style={{}}>
+              <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+                {activityStartDate.getDate()}
+              </Text>
+              <Text style={{ fontSize: 20, color: "grey" }}>
+                {activityStartDate.toLocaleString("default", {
+                  month: "long",
+                })}
+              </Text>
+            </View>
+            <View>
+              <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+                {weekday[activityStartDate.getDay()]}
+              </Text>
+              <Text style={{ fontSize: 20, color: "grey" }}>
+                {activityStartDate.toLocaleTimeString("default", {
+                  timeStyle: "short",
+                })}
+              </Text>
+            </View>
+          </View>
+          <TouchableWithoutFeedback onPress={showStartDatePicker}>
+            <View
+              style={{
+                borderWidth: 1,
+                width: 50,
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: 30,
+              }}
+            >
+              <MaterialCommunityIcons
+                name="timetable"
+                size={35}
+                color="black"
+              />
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+
+        <DateTimePickerModal
+          isVisible={startDatePickerVisibility}
+          mode="date"
+          onConfirm={handleConfirm}
+          onCancel={hideStartDatePicker}
+          date={activityStartDate}
+        />
+
+        {/* Description */}
         <View style={styles.informationBlock}>
           <Text style={{ fontSize: 20 }} numberOfLines={descriptionSeeMore}>
             {activityData.description !== ""
@@ -134,9 +329,79 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
           )}
         </View>
 
+        {/* Note */}
         <View style={[styles.informationBlock]}>
           <View style={styles.messageBox}>
-            <Text style={{ fontSize: 20 }}>{activityData.notes}</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                marginBottom: 10,
+                borderBottomWidth: 0.5,
+                justifyContent: "space-between",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 28,
+                  verticalAlign: "middle",
+                }}
+              >
+                Note
+              </Text>
+              {!noteEdit && (
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    setNoteEdit(true);
+                    setNote(activityData.notes);
+                  }}
+                >
+                  <Feather
+                    name="edit-2"
+                    size={20}
+                    color="black"
+                    style={{ alignSelf: "center" }}
+                  />
+                </TouchableWithoutFeedback>
+              )}
+              {noteEdit && (
+                <View style={{ flexDirection: "row", columnGap: 10 }}>
+                  <TouchableWithoutFeedback onPress={() => setNoteEdit(false)}>
+                    <MaterialIcons
+                      name="cancel"
+                      size={27}
+                      color="red"
+                      style={{ alignSelf: "center" }}
+                    />
+                  </TouchableWithoutFeedback>
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      let activity = activityData;
+                      activity.notes = note;
+                      setActivityData(activity);
+                      console.log(activityData);
+                      setNoteEdit(false);
+                      updateActivity();
+                    }}
+                  >
+                    <FontAwesome6
+                      name="check"
+                      size={24}
+                      color="green"
+                      style={{ alignSelf: "center" }}
+                    />
+                  </TouchableWithoutFeedback>
+                </View>
+              )}
+            </View>
+            {noteEdit === false ? (
+              <Text style={{ fontSize: 20 }}>{activityData.notes}</Text>
+            ) : (
+              <TextInput
+                style={{ fontSize: 20 }}
+                onChangeText={setNote}
+                value={note}
+              ></TextInput>
+            )}
           </View>
         </View>
 
@@ -167,33 +432,6 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
             <View />
           )}
         </View>
-
-        {/* Date */}
-        <View
-          style={[
-            styles.informationBlock,
-            { flexDirection: "row", columnGap: 15 },
-          ]}
-        >
-          <View style={{}}>
-            <Text style={{ fontSize: 20 }}>{activityStartDate.getDate()}</Text>
-            <Text style={{ fontSize: 20 }}>
-              {activityStartDate.toLocaleString("default", {
-                month: "long",
-              })}
-            </Text>
-          </View>
-          <View>
-            <Text style={{ fontSize: 20 }}>
-              {weekday[activityStartDate.getDay()]}
-            </Text>
-            <Text style={{ fontSize: 20 }}>
-              {activityStartDate.toLocaleTimeString("default", {
-                timeStyle: "short",
-              })}
-            </Text>
-          </View>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -218,10 +456,12 @@ const styles = StyleSheet.create({
   },
 
   informationBlock: {
-    padding: 15,
-    borderBottomWidth: 1,
+    paddingBottom: 30,
+    paddingHorizontal: 20,
+    borderBottomWidth: 0.35,
     borderRadius: 20,
     borderColor: "grey",
+    marginBottom: 30,
   },
 
   triangle: {
@@ -244,7 +484,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderWidth: 0.5,
     borderRadius: 10,
-    backgroundColor: "#ECE9E9",
+    backgroundColor: "white",
     padding: 8,
     flex: 1,
   },

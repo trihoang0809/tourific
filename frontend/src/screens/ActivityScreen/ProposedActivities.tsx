@@ -143,10 +143,12 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
   const hideStartDatePicker = () => {
     setStartDatePickerVisibility(false);
   };
+
   const handleConfirm = (date: Date) => {
     setActivityStartDate(date);
     hideStartDatePicker();
   };
+
   return (
     <View style={{ flex: 1, margin: 7, backgroundColor: "white" }}>
       <View style={styles.formContainer}>
