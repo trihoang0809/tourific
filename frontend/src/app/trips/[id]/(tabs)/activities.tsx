@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   TextInput,
   Text,
+  Button,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { useGlobalSearchParams } from "expo-router";
@@ -257,6 +258,17 @@ const ActivitiesScreen = () => {
             <Text style={styles.noActivitiesText}>
               No activities found for this category.
             </Text>
+            <TouchableOpacity
+              style={styles.updateButton}
+              onPress={() => {
+                /* Replace with the route to the update trip page */
+                console.log("Navigate to update trip page");
+              }}
+            >
+              <Text style={styles.updateButtonText}>
+                Update trip's radius or location
+              </Text>
+            </TouchableOpacity>
           </View>
         )}
       </ScrollView>
@@ -324,6 +336,18 @@ const styles = StyleSheet.create({
   noActivitiesText: {
     fontSize: 18,
     color: "#666",
+  },
+  updateButton: {
+    backgroundColor: "#1e90ff",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginTop: 10, // Add margin to give space between the text and button
+  },
+  updateButtonText: {
+    color: "white",
+    fontSize: 16,
+    textAlign: "center",
   },
 });
 
