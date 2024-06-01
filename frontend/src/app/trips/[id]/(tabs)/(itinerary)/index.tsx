@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, Text, TouchableOpacity, Modal, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  Pressable,
+  ScrollView,
+} from "react-native";
 import { useGlobalSearchParams, router } from "expo-router";
 import { Calendar, DateRangeHandler } from "react-native-big-calendar";
 // import { Mode } from "react-native-big-calendar/build/interfaces";
@@ -20,6 +27,7 @@ interface Activity {
     citystate: string;
   };
   id: string;
+  
 }
 
 interface Event {
@@ -112,12 +120,12 @@ const Itinerary = () => {
         const eventNotes = activity.location ? (
           <View style={{ marginTop: 3 }}>
             {activity.location.address ? (
-              <Text style={{ fontSize: 10, color: "white" }}>
+              <Text style={styles.p}>
                 {activity.location.address}
               </Text>
             ) : null}
             {activity.location.citystate ? (
-              <Text style={{ fontSize: 10, color: "white" }}>
+              <Text style={styles.p}>
                 {activity.location.citystate}
               </Text>
             ) : null}
@@ -135,7 +143,7 @@ const Itinerary = () => {
   }, [activities]);
   // console.log("first filtered events: ", events[0]);
   const groupedEvents = groupEventsByDate(events);
-  console.log("group events", groupedEvents)
+  console.log("group events", groupedEvents);
 
   const [calendarMode, setCalendarMode] = useState<Mode>("itinerary");
   const [currentDate, setCurrentDate] = useState(new Date(Date.now()));
@@ -361,23 +369,24 @@ const Itinerary = () => {
       {calendarMode === "itinerary" ? (
         <ScrollView>
           {dateList.map((date, index) => {
-            const eventsForDate = groupedEvents[dateString] || [];
             const dateString = new Date(date).toLocaleDateString();
-
+            const eventsForDate = groupedEvents[dateString] || [];
+            // console.log(eventsForDate["7/2/2024"]?.children)
             return (
-              <View key={index} style={{ marginBottom: 20 }}>
+              <View key={index} style={styles.itineraryContainer}>
                 <Text style={{ fontSize: 16, fontWeight: "bold" }}>
                   {dateString}
                 </Text>
                 {eventsForDate.length > 0 ? (
                   eventsForDate.map((event) => (
-                    <View key={event.activityid} style={{ marginLeft: 10 }}>
-                      <Text>{event.title}</Text>
-                      {event.children}
+                    <View key={event.activityid} style={styles.eventContainer}>
+                      <Text style={styles.h4}>{event.title}</Text>
+                      <Text style={styles.p}>{new Date(event.start).toLocaleTimeString()} - {new Date(event.end).toLocaleTimeString()}</Text>
+                      <View>{event.children}</View>
                     </View>
                   ))
                 ) : (
-                  <Text style={{ marginLeft: 10 }}>
+                  <Text>
                     No events for this date
                   </Text>
                 )}
@@ -406,6 +415,16 @@ const styles = StyleSheet.create({
   h1: {
     fontWeight: "600",
     fontSize: 26,
+  },
+  h4: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "500",
+    lineHeight: 22,
+  },
+  p: {
+    fontSize: 12, 
+    color: "white",
   },
   row: {
     display: "flex",
@@ -460,6 +479,14 @@ const styles = StyleSheet.create({
     top: 15,
     right: 15,
   },
+  itineraryContainer: {
+    padding: 20,
+  },
+  eventContainer: {
+    backgroundColor: '#006ee6',
+    padding: 5,
+    width: '100%'
+  }
 });
 export default Itinerary;
 
