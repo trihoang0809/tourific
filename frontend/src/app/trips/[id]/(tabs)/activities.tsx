@@ -10,17 +10,10 @@ import { useGlobalSearchParams } from "expo-router";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { Dimensions, StyleSheet } from "react-native";
 import ActivityThumbnail from "@/components/ActivityThumbnail";
-import { ActivityProps } from "@/types";
+import { ActivityProps, CategoryKeys } from "@/types";
 import { fetchActivities } from "@/utils/fetchActivities";
 
-type CategoryKeys =
-  | "Dining"
-  | "Entertainment"
-  | "OutdoorRecreation"
-  | "Shopping"
-  | "Services"
-  | "Transportation"
-  | "Wellness";
+const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
 const categories: Record<CategoryKeys, string[]> = {
   Dining: [
@@ -122,12 +115,15 @@ const ActivitiesScreen = () => {
   useEffect(() => {
     const getTripAndActivities = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/trips/${id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
+        const response = await fetch(
+          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
           },
-        });
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch trip");
         }

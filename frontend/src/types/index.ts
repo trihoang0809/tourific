@@ -97,3 +97,12 @@ export type User = {
 export interface UserProps {
   user: User;
 }
+
+export type CategoryKeys =
+  | "Dining"
+  | "Entertainment"
+  | "OutdoorRecreation"
+  | "Shopping"
+  | "Services"
+  | "Transportation"
+  | "Wellness";

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Dimensions } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Rating } from "react-native-ratings";
+const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -20,7 +21,7 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
     try {
       const newLikedState = !liked;
       const newUpvotes = newLikedState ? upvotes + 1 : upvotes - 1;
-      const url = `http://localhost:3000/trips/${tripId}/activities/${activity.id}`;
+      const url = `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${tripId}/activities/${activity.id}`;
       console.log(url);
       // Send PUT request to backend
       const response = await fetch(url, {
