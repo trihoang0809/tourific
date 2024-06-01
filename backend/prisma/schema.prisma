@@ -28,12 +28,13 @@ type Location {
   citystate String @default("")
   latitude Float
   longitude Float
-  radius Float?
+  radius Float
 }
 
 model User {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   userName String @unique
+  email String @unique
   password String
   friendRequestReceived   Friendship[]   @relation("friendRequestReceived")
   tripID String[] @db.ObjectId
@@ -70,13 +71,12 @@ model Activity {
   netUpvotes Int @default(0)
   isOnCalendar Boolean @default(false)
   category String[]
-  rating Int?
   tripId String @db.ObjectId
   trip Trip @relation(fields: [tripId], references: [id])
 }
 
 type Photo {
-  height Int
-  width  Int
+  height Int?
+  width  Int?
   url    String
 }
