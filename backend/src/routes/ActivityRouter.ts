@@ -43,8 +43,7 @@ router.get("/:activityId", async (req: Request<ActivityParams>, res) => {
 // Create a new activity
 router.post("/", async (req: Request<ActivityParams>, res) => {
   const { tripId } = req.params;
-  const { name, description, startTime, endTime, location, notes, netUpvotes, isOnCalendar, rating, category } =
-    req.body;
+  const { name, description, startTime, endTime, location, notes } = req.body;
 
   if (!tripId) {
     res.status(404).json({ error: "ID does not exist" });
@@ -63,16 +62,13 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
             endTime,
             location,
             notes,
-            netUpvotes,
-            isOnCalendar,
-            rating,
-            category,
           },
         },
       },
     });
     res.status(201).json(activity);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "An error occurred while creating the activity." });
   }
 });
@@ -80,8 +76,7 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
 // Update an activity
 router.put("/:activityId", async (req: Request<ActivityParams>, res) => {
   const { activityId: activityId, tripId } = req.params;
-  const { name, description, startTime, endTime, location, notes, netUpvotes, isOnCalendar, rating, category } =
-    req.body;
+  const { name, description, startTime, endTime, location, notes } = req.body;
 
   const isValidID = await prisma.activity.findUnique({
     where: {
@@ -106,10 +101,6 @@ router.put("/:activityId", async (req: Request<ActivityParams>, res) => {
         endTime,
         location,
         notes,
-        netUpvotes,
-        isOnCalendar,
-        rating,
-        category,
       },
     });
     res.status(200).json(activity);
