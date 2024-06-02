@@ -3,8 +3,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { AntDesign } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { Link, useLocalSearchParams } from "expo-router";
-import { Feather } from "@expo/vector-icons";
-import { View, Text } from "react-native";
+import { View, Text } from "react-native";;
 
 export default function TabLayout() {
   const { id } = useLocalSearchParams();
