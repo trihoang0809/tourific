@@ -63,8 +63,8 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
             location,
             notes,
           },
-        }
-      }
+        },
+      },
     });
     res.status(201).json(activity);
   } catch (error) {
@@ -81,7 +81,7 @@ router.put("/:activityId", async (req: Request<ActivityParams>, res) => {
   const isValidID = await prisma.activity.findUnique({
     where: {
       id: activityId,
-      tripId: tripId
+      tripId: tripId,
     },
   });
 
