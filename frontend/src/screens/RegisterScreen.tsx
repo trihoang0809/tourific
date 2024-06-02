@@ -11,9 +11,14 @@ import {
 import { useRouter } from "expo-router";
 import { registerWithEmail } from "@/authentication/authService";
 import * as ImagePicker from "expo-image-picker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Photo } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import Spinner from "react-native-loading-spinner-overlay";
+
+const noAvatar: Photo = {
+  url: "https://t4.ftcdn.net/jpg/03/59/58/91/360_F_359589186_JDLl8dIWoBNf1iqEkHxhUeeOulx0wOC5.jpg",
+};
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState("");
@@ -21,8 +26,9 @@ const RegisterScreen = () => {
   const [userName, setUserName] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
-  const [avatar, setAvatar] = useState<Photo | null>(null);
+  const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [avatar, setAvatar] = useState<Photo>(noAvatar);
   const [error, setError] = useState("");
   const [passwordErrors, setPasswordErrors] = useState({
     length: false,
@@ -45,8 +51,8 @@ const RegisterScreen = () => {
       );
       return;
     }
-    if (!validateDate(dateOfBirth)) {
-      setError("Invalid date of birth format. Use YYYY-MM-DD.");
+    if (!dateOfBirth) {
+      setError("Please select your date of birth.");
       return;
     }
 
@@ -68,7 +74,7 @@ const RegisterScreen = () => {
           password,
           firstName,
           lastName,
-          dateOfBirth,
+          dateOfBirth: dateOfBirth.toISOString().split("T")[0], // Format date as YYYY-MM-DD
           avatar,
         }),
       });
@@ -100,6 +106,19 @@ const RegisterScreen = () => {
     }
   };
 
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date: Date) => {
+    setDateOfBirth(date);
+    hideDatePicker();
+  };
+
   const validateEmail = (email: string) => {
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
@@ -114,13 +133,6 @@ const RegisterScreen = () => {
     setPasswordErrors({ length, uppercase, lowercase, number });
 
     return length && uppercase && lowercase && number;
-  };
-
-  const validateDate = (date: string) => {
-    const re = /^\d{4}-\d{2}-\d{2}$/;
-    if (!re.test(date)) return false;
-    const parsedDate = new Date(date);
-    return !isNaN(parsedDate.getTime());
   };
 
   const pickImage = async () => {
@@ -173,13 +185,20 @@ const RegisterScreen = () => {
         onChangeText={setLastName}
         autoCapitalize="none"
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Date of Birth (YYYY-MM-DD)"
-        placeholderTextColor="#aaa"
-        value={dateOfBirth}
-        onChangeText={setDateOfBirth}
-        autoCapitalize="none"
+      <TouchableOpacity onPress={showDatePicker} style={styles.dateButton}>
+        <Text style={styles.dateButtonText}>
+          {dateOfBirth
+            ? `D.O.B: ${dateOfBirth.toISOString().split("T")[0]}`
+            : "Select Date of Birth"}
+        </Text>
+      </TouchableOpacity>
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        display="spinner"
+        maximumDate={new Date(2020, 12, 31)}
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
       />
       <TextInput
         style={styles.input}
@@ -236,9 +255,8 @@ const RegisterScreen = () => {
         <Ionicons name="image-outline" size={24} color="#fff" />
         <Text style={styles.buttonText}>Pick an avatar</Text>
       </TouchableOpacity>
-      {avatar ? (
-        <Image source={{ uri: avatar.url }} style={styles.avatar} />
-      ) : null}
+      <Image source={{ uri: avatar.url }} style={styles.avatar} />
+
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Register</Text>
@@ -327,6 +345,19 @@ const styles = StyleSheet.create({
   },
   requirement: {
     marginBottom: 4,
+  },
+  dateButton: {
+    width: "100%",
+    height: 45,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 8,
+    justifyContent: "center",
+    marginBottom: 12,
+    paddingHorizontal: 10,
+  },
+  dateButtonText: {
+    color: "black",
+    fontSize: 16,
   },
 });
 
