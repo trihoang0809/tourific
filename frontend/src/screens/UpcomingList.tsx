@@ -1,21 +1,15 @@
 import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TextInput,
-  TouchableHighlight,
-  Dimensions,
-  StatusBar,
-  FlatList,
-  TouchableWithoutFeedback,
+  View, Text, StyleSheet,
+  TextInput, Dimensions,
+  StatusBar, FlatList, TouchableWithoutFeedback
 } from "react-native";
 import { useState, useEffect } from "react";
 import { TripCard } from "../components/TripCard";
 import { LinearGradient } from "expo-linear-gradient";
 import { Trip } from "../types";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
-import { Stack, router } from "expo-router";
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { router } from "expo-router";
+import { EXPO_PUBLIC_HOST_URL } from "@/utils";
 
 const onPressCategory = () => {
   console.log("You pressed on this category");
@@ -32,13 +26,9 @@ const Header = () => (
         </TouchableWithoutFeedback>
         <Text style={{ fontSize: 22, marginLeft: 10 }}>Upcoming Trips</Text>
       </View>
-
       <View style={styles.userInput}>
         <MaterialIcons name="search" size={24} color="black" />
-        <TextInput
-          placeholder="Search"
-          style={{ flex: 1, padding: 2.5, fontSize: 16 }}
-        ></TextInput>
+        <TextInput placeholder="Search" style={{ flex: 1, padding: 2.5, fontSize: 16 }}></TextInput>
       </View>
     </View>
   </View>
@@ -46,20 +36,16 @@ const Header = () => (
 
 export const ListFilteredCards: React.FC = () => {
   const [upcomingTrips, setUpcoming] = useState<Trip[]>([]);
-  const serverUrl = "http://localhost:3000";
-  const [windowWidth, setWindowWidth] = useState(
-    Dimensions.get("window").width,
-  );
-  const [windowHeight, setWindowHeight] = useState(
-    Dimensions.get("window").height,
-  );
+  const serverUrl = EXPO_PUBLIC_HOST_URL;
+  const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
+  const [windowHeight, setWindowHeight] = useState(Dimensions.get('window').height);
   const [numCols, setNumCols] = useState(0);
   const [tripCardWidth, setTripCardWidth] = useState(380);
   const [tripCardHeight, setTripCardHeight] = useState(330);
 
   //Fetching data
   useEffect(() => {
-    Dimensions.addEventListener("change", ({ window: { width, height } }) => {
+    Dimensions.addEventListener('change', ({ window: { width, height } }) => {
       //Get window size every render
       setWindowHeight(height);
       setWindowWidth(width);
@@ -79,7 +65,6 @@ export const ListFilteredCards: React.FC = () => {
         console.log(error);
       }
     };
-
     //Fetch Data + Format Data
     getData();
   }, []);
@@ -90,27 +75,17 @@ export const ListFilteredCards: React.FC = () => {
         <Header />
         <View style={{ flex: 1 }}>
           <LinearGradient
-            colors={["#4c669f", "#5692F9", "#95BAF9"]}
+            colors={['#4c669f', '#5692F9', '#95BAF9']}
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}
             style={styles.content}
           >
             <FlatList
-              style={{
-                width: "100%",
-                alignContent: "center",
-                flexWrap: "wrap",
-              }}
+              style={{ width: "100%", alignContent: "center", flexWrap: "wrap" }}
               data={upcomingTrips}
               key={numCols}
               numColumns={numCols}
-              renderItem={({ item }) => (
-                <TripCard
-                  height={tripCardHeight}
-                  width={tripCardWidth}
-                  trip={item}
-                />
-              )}
+              renderItem={({ item }) => <TripCard height={tripCardHeight} width={tripCardWidth} trip={item} />}
             />
           </LinearGradient>
         </View>
@@ -147,7 +122,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#ADC8F7",
     borderRadius: 20,
-    alignItems: "center",
+    alignItems: "center"
   },
 
   content: {
@@ -161,6 +136,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 18,
     alignContent: "center",
-    alignItems: "center",
+    alignItems: "center"
   },
 });

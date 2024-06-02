@@ -12,7 +12,9 @@ import { TripCard } from "../components/TripCard";
 import { HomeScreenHeader } from "../components/HomeScreenHeader";
 import { useState, useEffect } from "react";
 import { UserProps, Trip } from "../types";
-import { Link, router } from "expo-router";
+import { Link, router } from 'expo-router';
+import { EXPO_PUBLIC_HOST_URL } from "@/utils";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [ongoingTrips, setOngoingTrips] = useState<Trip[]>([]);
@@ -20,11 +22,9 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   useEffect(() => {
     const fetchTrips = async () => {
       try {
-        const ongoing = await fetch("http://localhost:3000/trips?ongoing=true");
-        // const ongoing = await fetch("http://10.0.2.2:3000/trips?ongoing=true");
+        const ongoing = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`);
         const upcoming = await fetch(
-          "http://localhost:3000/trips?upcoming=true",
-          //"http://10.0.2.2:3000/trips?upcoming=true",
+          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?upcoming=true`,
         );
         const ongoingData = await ongoing.json();
         const upcomingData = await upcoming.json();
@@ -40,40 +40,42 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
 
   return (
     <ScrollView style={styles.container}>
-      <HomeScreenHeader user={user} />
-      <Text style={styles.greeting}>Welcome back, {user.firstName}!</Text>
-      <Text style={styles.title}>Ongoing Trips</Text>
-      <ScrollView horizontal={true} style={styles.tripScroll}>
-        {ongoingTrips.length > 0 ? (
-          ongoingTrips.map((trip) => (
-            <TripCard key={trip.id} trip={trip} height={250} width={400} />
-          ))
-        ) : (
-          <Text style={styles.noTrip}>No ongoing trips</Text>
-        )}
-      </ScrollView>
+      <SafeAreaView>
+        <HomeScreenHeader user={user} />
+        <Text style={styles.greeting}>Welcome back, {user.firstName}!</Text>
+        <Text style={styles.title}>Ongoing Trips</Text>
+        <ScrollView horizontal={true} style={styles.tripScroll}>
+          {ongoingTrips.length > 0 ? (
+            ongoingTrips.map((trip) => (
+              <TripCard key={trip.id} trip={trip} height={250} width={400} />
+            ))
+          ) : (
+            <Text style={styles.noTrip}>No ongoing trips</Text>
+          )}
+        </ScrollView>
 
-      <Pressable style={styles.buttonContainer}>
-        <Link href="/trips/create" style={styles.button}>
-          <Text style={styles.buttonText}>Create a new trip</Text>
-        </Link>
-      </Pressable>
+        <Pressable style={styles.buttonContainer}>
+          <Link href="/trips/create" style={styles.button}>
+            <Text style={styles.buttonText}>Create a new trip</Text>
+          </Link>
+        </Pressable>
 
-      <View style={styles.upcoming}>
-        <Text style={styles.title}>Upcoming Trips</Text>
-        <Button
-          title="See all"
-          onPress={() => {
-            router.replace("/trips/upcoming");
-          }}
-        />
-      </View>
+        <View style={styles.upcoming}>
+          <Text style={styles.title}>Upcoming Trips</Text>
+          <Button
+            title="See all"
+            onPress={() => {
+              router.replace("/trips/upcoming");
+            }}
+          />
+        </View>
 
-      <ScrollView horizontal={true} style={styles.tripScroll}>
-        {upcomingTrips.map((trip) => (
-          <TripCard key={trip.id} trip={trip} height={200} width={200} />
-        ))}
-      </ScrollView>
+        <ScrollView horizontal={true} style={styles.tripScroll}>
+          {upcomingTrips.map((trip) => (
+            <TripCard key={trip.id} trip={trip} height={200} width={200} />
+          ))}
+        </ScrollView>
+      </SafeAreaView>
     </ScrollView>
   );
 };

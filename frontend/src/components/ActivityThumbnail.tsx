@@ -97,7 +97,6 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
 
 const styles = StyleSheet.create({
   card: {
-    // width: screenWidth / 2 - 10,
     backgroundColor: "#fff",
     borderRadius: 15,
     elevation: 3,
@@ -130,9 +129,6 @@ const styles = StyleSheet.create({
   },
   heartIcon: {
     marginLeft: 5,
-    // position: 'absolute',
-    // top: 10,
-    // right: 10,
   },
   title: {
     fontSize: 20,
