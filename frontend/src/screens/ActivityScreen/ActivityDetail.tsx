@@ -8,27 +8,27 @@ import {
   Alert,
   Pressable,
   Modal,
-  Image,
   SafeAreaView,
   Linking,
   ImageBackground,
 } from "react-native";
 import {
+  AntDesign,
   Entypo,
   EvilIcons,
   Feather,
   FontAwesome6,
+  Ionicons,
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";
-import { material } from "react-native-typography";
 import React, { useState, useEffect } from "react";
 import GoogleMapInput from "@/components/GoogleMaps/GoogleMapInput";
 import { formatDate, serverURL, weekday } from "@/utils";
-import { Trip } from "@/types";
+
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { router } from "expo-router";
-import { any, nullable } from "zod";
+import { any } from "zod";
 
 interface Actprops {
   tripId: String;
@@ -42,8 +42,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
   const [note, setNote] = useState("");
   const [nameEdit, setNameEdit] = useState(false);
   const [name, setName] = useState("");
-  const [startTimeEdit, setStartTimeEdit] = useState(false);
-  const [startTime, setStartTime] = useState(new Date());
+  const [delEdit, setDelEdit] = useState(false);
   const [startDatePickerVisibility, setStartDatePickerVisibility] =
     useState(false);
   const coverImage =
@@ -110,10 +109,45 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
         },
       );
       if (!response.ok) {
-        throw new Error("Failed to update trip");
+        throw new Error("Failed to update activity");
       }
     } catch (error: any) {
-      console.error("Error updating trip:", error.toString());
+      console.error("Error updating activity:", error.toString());
+    }
+  };
+
+  const deleteConfirm = () => {
+    Alert.alert("Are you sure?", "Think again bro, it's fun I promise", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Do it anyway, sorry bro",
+        onPress: () => deleteActivity(),
+      },
+    ]);
+  };
+
+  const deleteActivity = async () => {
+    try {
+      const response = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${activityData.tripId}/activities/${activityData.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete activity");
+      } else {
+        router.push("../activities");
+      }
+    } catch (error: any) {
+      console.error("Error deleting activity:", error.toString());
     }
   };
 
@@ -137,12 +171,31 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 0.85 }}>
         <ImageBackground
-          style={[styles.backgroundImage, { alignItems: "flex-end" }]}
+          style={[
+            styles.backgroundImage,
+            {
+              justifyContent: "space-between",
+              flexDirection: "row",
+            },
+          ]}
           source={{
             uri: coverImage,
           }}
         >
-          <TouchableWithoutFeedback>
+          <Pressable onPress={() => router.push("../activities")}>
+            <Ionicons
+              name="chevron-back-outline"
+              size={35}
+              color="black"
+              style={{ zIndex: 10, margin: 10 }}
+            />
+          </Pressable>
+
+          <TouchableWithoutFeedback
+            onPress={() => {
+              setDelEdit(true);
+            }}
+          >
             <Entypo
               name="dots-three-vertical"
               size={24}
@@ -150,8 +203,46 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
               style={{ zIndex: 10, margin: 10 }}
             />
           </TouchableWithoutFeedback>
+
+          {delEdit && (
+            <Modal transparent={true}>
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setDelEdit(false);
+                }}
+              >
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: "flex-end",
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                  }}
+                >
+                  <Pressable
+                    style={{
+                      // flex: 0.1,
+                      backgroundColor: "white",
+                      padding: 20,
+                      borderTopStartRadius: 20,
+                      borderTopEndRadius: 20,
+                      flexDirection: "row",
+                      columnGap: 10,
+                      alignItems: "center",
+                    }}
+                    onPress={() => {
+                      deleteConfirm();
+                    }}
+                  >
+                    <AntDesign name="delete" size={22} color="red" />
+                    <Text style={{ fontSize: 25, color: "red" }}>Delete</Text>
+                  </Pressable>
+                </View>
+              </TouchableWithoutFeedback>
+            </Modal>
+          )}
         </ImageBackground>
       </View>
+
       <ScrollView
         style={{
           flex: 1,
@@ -163,7 +254,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
           // padding: 10,
         }}
       >
-        <View style={styles.informationBlock}>
+        <View style={[styles.informationBlock, { marginTop: 15 }]}>
           <View
             style={{
               flexDirection: "row",
@@ -244,6 +335,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
               <Text numberOfLines={1} style={{ fontSize: 16, padding: 4 }}>
                 {activityData.location !== undefined
                   ? activityData.location.address +
+                    " " +
                     activityData.location.citystate
                   : "Hehe"}
               </Text>
