@@ -1,5 +1,3 @@
-import { CategoryKeys } from "@/types";
-
 // format follow UTC
 export function formatDateTime(dateString: Date, hour: number, minute: number) {
   // "2024-04-01T07:00:00.000Z"
@@ -23,7 +21,7 @@ export function formatDateTime(dateString: Date, hour: number, minute: number) {
   return isoString;
 }
 
-export const categories: Record<CategoryKeys, string[]> = {
+export const categories: Record<string, string[]> = {
   Dining: [
     "restaurant",
     "cafe",

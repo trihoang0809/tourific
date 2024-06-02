@@ -1,4 +1,4 @@
-// this file is for declaring types
+import { Ionicons, Feather } from "@expo/vector-icons";
 
 export interface TripData {
   id: string;
@@ -98,11 +98,40 @@ export interface UserProps {
   user: User;
 }
 
-export type CategoryKeys =
-  | "Dining"
-  | "Entertainment"
-  | "OutdoorRecreation"
-  | "Shopping"
-  | "Services"
-  | "Transportation"
-  | "Wellness";
+export const categoriesMap = [
+  {
+    key: "All",
+    name: "All",
+    icon: <Ionicons name="apps-outline" size={24} color="black" />,
+  },
+  {
+    key: "Dining",
+    name: "Dining",
+    icon: <Ionicons name="restaurant-outline" size={24} color="black" />,
+  },
+  {
+    key: "Entertainment",
+    name: "Entertainment",
+    icon: <Ionicons name="film-outline" size={24} color="black" />,
+  },
+  {
+    key: "OutdoorRecreation",
+    name: "Outdoor",
+    icon: <Ionicons name="partly-sunny-outline" size={24} color="black" />,
+  },
+  {
+    key: "Shopping",
+    name: "Shopping",
+    icon: <Feather name="shopping-cart" size={24} color="black" />,
+  },
+  {
+    key: "Services",
+    name: "Services",
+    icon: <Ionicons name="settings-outline" size={24} color="black" />,
+  },
+  {
+    key: "Wellness",
+    name: "Wellness",
+    icon: <Feather name="activity" size={24} color="black" />,
+  },
+];

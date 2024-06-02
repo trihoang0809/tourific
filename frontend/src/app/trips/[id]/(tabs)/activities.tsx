@@ -4,16 +4,16 @@ import {
   TouchableOpacity,
   TextInput,
   Text,
-  Button,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { useGlobalSearchParams } from "expo-router";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { Dimensions, StyleSheet } from "react-native";
 import ActivityThumbnail from "@/components/ActivityThumbnail";
-import { ActivityProps, CategoryKeys } from "@/types";
+import { ActivityProps } from "@/types";
 import { fetchActivities } from "@/utils/fetchActivities";
 import { categories } from "@/utils";
+import { categoriesMap } from "@/types";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
@@ -100,7 +100,7 @@ const ActivitiesScreen = () => {
   //   }
   // };
 
-  const handleSelectCategory = (category: CategoryKeys | "All") => {
+  const handleSelectCategory = (category: string) => {
     setSelectedCategory(category);
     if (category === "All") {
       setFilteredActivities(activities);
@@ -147,86 +147,19 @@ const ActivitiesScreen = () => {
         showsHorizontalScrollIndicator={false}
         alwaysBounceVertical={false}
       >
-        <TouchableOpacity
-          style={[
-            styles.categoryItem,
-            selectedCategory === "All" && styles.selectedCategory,
-          ]}
-          onPress={() => handleSelectCategory("All")}
-        >
-          <Ionicons name="apps-outline" size={24} color="black" />
-          <Text>All</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.categoryItem,
-            selectedCategory === "Dining" && styles.selectedCategory,
-          ]}
-          onPress={() => handleSelectCategory("Dining")}
-        >
-          <Ionicons name="restaurant-outline" size={24} color="black" />
-          <Text>Dining</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.categoryItem,
-            selectedCategory === "Entertainment" && styles.selectedCategory,
-          ]}
-          onPress={() => handleSelectCategory("Entertainment")}
-        >
-          <Ionicons name="film-outline" size={24} color="black" />
-          <Text>Entertainment</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.categoryItem,
-            selectedCategory === "OutdoorRecreation" && styles.selectedCategory,
-          ]}
-          onPress={() => handleSelectCategory("OutdoorRecreation")}
-        >
-          <Ionicons name="partly-sunny-outline" size={24} color="black" />
-          <Text>Outdoor</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.categoryItem,
-            selectedCategory === "Shopping" && styles.selectedCategory,
-          ]}
-          onPress={() => handleSelectCategory("Shopping")}
-        >
-          <Feather name="shopping-cart" size={24} color="black" />
-          <Text>Shopping</Text>
-        </TouchableOpacity>
-        {/* <TouchableOpacity
-          style={[
-            styles.categoryItem,
-            selectedCategory === "Transportation" && styles.selectedCategory,
-          ]}
-          onPress={() => handleSelectCategory("Transportation")}
-        >
-          <Ionicons name="bus-outline" size={24} color="black" />
-          <Text>Transportation</Text>
-        </TouchableOpacity> */}
-        <TouchableOpacity
-          style={[
-            styles.categoryItem,
-            selectedCategory === "Services" && styles.selectedCategory,
-          ]}
-          onPress={() => handleSelectCategory("Services")}
-        >
-          <Ionicons name="settings-outline" size={24} color="black" />
-          <Text>Services</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.categoryItem,
-            selectedCategory === "Wellness" && styles.selectedCategory,
-          ]}
-          onPress={() => handleSelectCategory("Wellness")}
-        >
-          <Feather name="activity" size={24} color="black" />
-          <Text>Wellness</Text>
-        </TouchableOpacity>
+        {categoriesMap.map((category) => (
+          <TouchableOpacity
+            key={category.key}
+            style={[
+              styles.categoryItem,
+              selectedCategory === category.key && styles.selectedCategory,
+            ]}
+            onPress={() => handleSelectCategory(category.key)}
+          >
+            {category.icon}
+            <Text>{category.name}</Text>
+          </TouchableOpacity>
+        ))}
       </ScrollView>
       <ScrollView
         contentContainerStyle={{
