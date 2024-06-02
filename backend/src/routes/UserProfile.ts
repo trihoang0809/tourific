@@ -195,14 +195,21 @@ router.get("/:userId/friends", async (req, res) => {
   try {
     const friends = await prisma.friendship.findMany({
       where: {
+        // get all friends that have accepted the friend request
         OR: [
           {
             senderID: userId,
             friendStatus: "ACCEPTED",
+            receiverID: {
+              not: userId
+            }
           },
           {
             receiverID: userId,
             friendStatus: "ACCEPTED",
+            senderID: {
+              not: userId
+            }
           },
         ],
       },

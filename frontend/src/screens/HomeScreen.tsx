@@ -30,7 +30,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
         const ongoingData = await ongoing.json();
         const upcomingData = await upcoming.json();
 
-        setOngoingTrips(ongoingData);
+        setOngoingTrips(ongoingData.trip);
         setUpcomingTrips(upcomingData);
       } catch (error) {
         console.error("Failed to fetch trips:", error);
@@ -38,6 +38,9 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
     };
     fetchTrips();
   }, []);
+
+  console.log("up", upcomingTrips);
+  console.log("on", ongoingTrips);
 
   useEffect(() => {
     const fetchInvitations = async () => {
@@ -73,9 +76,9 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
         </ScrollView>
         <Text style={styles.title}>Ongoing Trips</Text>
         <ScrollView horizontal={true} style={styles.tripScroll}>
-          {ongoingTrips.length > 0 ? (
+          {ongoingTrips?.length > 0 ? (
             ongoingTrips.map((trip) => (
-              <TripCard key={trip.id} trip={trip} height={250} width={400} />
+              <TripCard key={trip.tripId} trip={trip.trip} height={250} width={400} />
             ))
           ) : (
             <Text style={styles.noTrip}>No ongoing trips</Text>
@@ -99,7 +102,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
 
         <ScrollView horizontal={true} style={styles.tripScroll}>
           {upcomingTrips.map((trip) => (
-            <TripCard key={trip.id} trip={trip} height={200} width={200} />
+            <TripCard key={trip.id} trip={trip.trip} height={200} width={200} />
           ))}
         </ScrollView>
       </SafeAreaView>

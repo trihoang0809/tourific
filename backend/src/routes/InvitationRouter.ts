@@ -1,7 +1,6 @@
 import express, { Request } from "express";
 import { PrismaClient, Status } from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
-import { createHash } from "crypto";
 import { TripParams } from "./TripRouter";
 
 const router = express.Router({ mergeParams: true });
@@ -14,7 +13,18 @@ export interface InvitationParams extends TripParams {
 }
 
 // temporary for testing until auth done
-const userID = "663965ad325de4616021409b";
+const userID = "664023f929694f249f1a4c86";
+
+// get all invitations
+router.get("/", async (req: Request, res) => {
+  try {
+    const trips = await prisma.tripMember.findMany();
+    console.log("trips", trips);
+    res.status(StatusCodes.OK).json(trips);
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting invitatiion." });
+  }
+});
 
 // get all received invitations of a user, including trip details
 router.get("/all-received", async (req: Request, res) => {
@@ -22,6 +32,7 @@ router.get("/all-received", async (req: Request, res) => {
     const trips = await prisma.tripMember.findMany({
       where: {
         inviteeId: userID,
+        status: 'PENDING'
       },
       include: {
         trip: true,
@@ -81,10 +92,15 @@ router.get("/", async (req: Request<InvitationParams>, res) => {
 // invite users, accept list of users' id
 router.post("/:tripId", async (req: Request<InvitationParams>, res) => {
   const { tripId } = req.params;
-  const inviteeIds = req.body.inviteeIds; // array of user ids
+  const inviteeIds = req.body.inviteeIds;
   const inviterId = userID;
 
   try {
+    console.log("inviteeIds", inviteeIds);
+    if (!inviteeIds || inviteeIds.length === 0) {
+      res.status(StatusCodes.BAD_REQUEST).json({ error: 'No invitee IDs provided' });
+    }
+
     // Validate all provided user IDs exist
     const trans = await prisma.$transaction(async (tx) => {
       const validUsers = await tx.user.findMany({
@@ -92,15 +108,22 @@ router.post("/:tripId", async (req: Request<InvitationParams>, res) => {
         select: { id: true }
       });
 
+      if (validUsers.length === 0) {
+        return { newInviteeIds: [], invalidUserIds: inviteeIds, invitations: [] };
+      }
+
       const validUserIds = validUsers.map(user => user.id);
+      console.log("validUserIds", validUserIds);
+
       const invalidUserIds = inviteeIds.filter((id: string) => !validUserIds.includes(id));
 
-      console.log(validUserIds + "," + invalidUserIds);
+      console.log("invalid", invalidUserIds);
       // Check for existing invitations
       const existingInvitations = await tx.tripMember.findMany({
         where: {
           tripId: tripId,
-          inviteeId: { in: validUserIds }
+          inviteeId: { in: validUserIds },
+          status: { not: 'REJECTED' }
         },
         select: { inviteeId: true }
       });
@@ -111,8 +134,12 @@ router.post("/:tripId", async (req: Request<InvitationParams>, res) => {
       console.log("newInviteeIds", newInviteeIds);
       console.log("alreadyInvitedIds", alreadyInvitedIds);
 
+      if (newInviteeIds.length === 0) {
+        return { newInviteeIds, invalidUserIds, invitations: [] };
+      }
+
       // Create an invitation for each user
-      const invitations = tx.tripMember.createMany({
+      const invitations = await tx.tripMember.createMany({
         data: newInviteeIds.map((inviteeId: string) => ({
           tripId: tripId,
           inviteeId: inviteeId,
@@ -120,12 +147,6 @@ router.post("/:tripId", async (req: Request<InvitationParams>, res) => {
           status: 'PENDING'
         })),
       });
-      // const invitations = validUserIds.map((inviteeId: string) => ({
-      //   tripId: tripId,
-      //   inviteeId: inviteeId,
-      //   inviterId: inviterId,
-      //   status: 'PENDING'
-      // }));
 
       if (!invitations) {
         res.status(StatusCodes.NOT_ACCEPTABLE).json(invitations);
@@ -203,5 +224,19 @@ router.patch("/:invitationId/decline", async (req: Request<InvitationParams>, re
   }
 });
 
+//delete an invitation
+router.delete("/:invitationId", async (req: Request<InvitationParams>, res) => {
+  const { invitationId } = req.params;
+  try {
+    const result = await prisma.tripMember.delete({
+      where: { id: invitationId }
+    });
+
+    res.status(StatusCodes.OK).json(result);
+  } catch (error) {
+    console.error("Failed to delete trip invitation:", error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
+  }
+});
 
 export default router;

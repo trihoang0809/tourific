@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import ContactCard from '../Avatar/ContactCard';
 import { EXPO_PUBLIC_HOST_URL } from '@/utils';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { FriendRequest, User } from '@/types';
 import NoFriendDisplay from '../AddFriend/NoFriendDisplay';
 
@@ -65,6 +65,7 @@ const InvitePage = () => {
   };
 
   console.log("invitations", invitations);
+  console.log("friendsToInvite", friendsToInvite);
   useEffect(() => {
     getAllFriends();
     getFriendsToInvite();
@@ -86,12 +87,14 @@ const InvitePage = () => {
 
   const sendInvitations = async () => {
     try {
-      const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/invite`, {
+      const inviteeIds = invitations;
+      console.log("inviteeIds", inviteeIds);
+      const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/${id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ invitations }),
+        body: JSON.stringify({ inviteeIds }),
       });
 
       if (response.ok) {
@@ -103,6 +106,10 @@ const InvitePage = () => {
     } catch (error) {
       console.error("Failed to send invitations", error);
     }
+  };
+
+  const handleSkip = () => {
+    router.push(`/trips/${id}`);
   };
 
   return (
@@ -130,6 +137,7 @@ const InvitePage = () => {
             {friendsToInvite.map((user, index) => (
               <ContactCard
                 user={user.receiver}
+                status={user.status}
                 key={index}
                 isChecked={isChecked(user.receiver.id)}
                 setChecked={(e) => setChecked(e, user.receiver.id)} />
@@ -145,7 +153,7 @@ const InvitePage = () => {
                 Send Invitations
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleSkip}>
               <Text>Skip</Text>
             </TouchableOpacity>
           </View>

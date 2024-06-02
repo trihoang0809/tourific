@@ -1,9 +1,9 @@
 import { ContactCardProps } from '@/types';
 import React from 'react';
-import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import Checkbox from 'expo-checkbox';
 
-const ContactCard = ({ user, isChecked, setChecked }: ContactCardProps) => {
+const ContactCard = ({ user, isChecked, setChecked, status }: ContactCardProps) => {
   return (
     <View style={styles.cardContainer}>
       <View style={styles.innerContainer}>
@@ -14,16 +14,21 @@ const ContactCard = ({ user, isChecked, setChecked }: ContactCardProps) => {
           style={styles.avatar}
         />
         <View style={styles.textContainer}>
-          <Text style={styles.name}>{user.firstName}</Text>
+          <Text style={styles.name}>{user.firstName} {user.lastName}</Text>
           <Text style={styles.username}>{user.userName}</Text>
         </View>
       </View>
-      <Checkbox
-        style={styles.checkbox}
-        value={isChecked}
-        onValueChange={(newValue) => setChecked(newValue, user.id)}
-        color={isChecked ? '#4630EB' : undefined}
-      />
+      {
+        status === 'PENDING' ?
+          <Text>Pending</Text>
+          :
+          <Checkbox
+            style={styles.checkbox}
+            value={isChecked}
+            onValueChange={(newValue) => setChecked(newValue, user.id)}
+            color={isChecked ? '#4630EB' : undefined}
+          />
+      }
     </View >
   );
 };

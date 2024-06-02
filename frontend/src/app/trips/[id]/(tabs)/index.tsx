@@ -17,7 +17,6 @@ const height = Dimensions.get('window').height; //full height
 
 const TripDetailsScreen = () => {
   const { id } = useLocalSearchParams();
-
   const [trip, setTrip] = useState({
     name: "",
     location: { address: "", citystate: "", radius: 0 },
@@ -25,6 +24,7 @@ const TripDetailsScreen = () => {
     endDate: new Date(),
     startHour: 0,
     startMinute: 0,
+    participants: [],
   });
 
   // ref
@@ -65,11 +65,34 @@ const TripDetailsScreen = () => {
     }
   };
 
+  // get participants
+  const getParticipants = async () => {
+    try {
+      const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/participants`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch participants");
+      }
+      const data = await response.json();
+      setTrip((prev) => ({ ...prev, participants: data }));
+      console.log("Participants fetch:", data);
+    } catch (error: any) {
+      console.error("Error fetching participants:", error.toString());
+    }
+
+  };
+
   useEffect(() => {
     console.log("id", id);
     getTrip({ id });
+    getParticipants();
   }, []);
 
+  console.log("trip", trip);
   return (
     <View>
       <Stack.Screen
@@ -120,15 +143,15 @@ const TripDetailsScreen = () => {
               height: height,
             }}
           >
-            <Text style={[styles.h1, { marginTop: 18 }]}>{trip.name}</Text>
+            <Text style={[styles.h1, { marginTop: 18 }]}>{trip?.name}</Text>
             <View style={styles.row}>
               <Ionicons name="location-outline" size={25} color="#006ee6" />
               <View>
                 <Text style={[styles.h3, { marginLeft: 10 }]}>
-                  {trip.location.address} {trip.location.citystate}
+                  {trip?.location.address} {trip?.location.citystate}
                 </Text>
                 <Text style={[styles.h4, { marginLeft: 10 }]}>
-                  + {Number(trip.location.radius * 0.0006213712).toFixed(2)}{" "}
+                  + {Number(trip?.location.radius * 0.0006213712).toFixed(2)}{" "}
                   miles
                 </Text>
               </View>
@@ -137,14 +160,14 @@ const TripDetailsScreen = () => {
               <Ionicons name="calendar-outline" size={25} color="#006ee6" />
               <View style={styles.dateContainer}>
                 <Text style={[styles.h3, { marginHorizontal: 10 }]}>
-                  {new Date(trip.startDate).toLocaleString("en-US", {
+                  {new Date(trip?.startDate).toLocaleString("en-US", {
                     weekday: "short",
                     month: "short",
                     day: "numeric",
                   })}
                 </Text>
                 <Text style={[styles.h4, { marginLeft: 10 }]}>
-                  {DateTime.fromISO(trip.startDate.toString())
+                  {DateTime.fromISO(trip?.startDate.toString())
                     .setZone("system")
                     .toLocaleString(DateTime.TIME_SIMPLE)}
                   {/* {trip.startDate.getHours() % 12 || 12}:{trip.startDate.getMinutes().toString().padStart(2, '0')} {trip.startDate.getHours() >= 12 ? 'PM' : 'AM'} */}
@@ -157,14 +180,14 @@ const TripDetailsScreen = () => {
               />
               <View style={styles.dateContainer}>
                 <Text style={[styles.h3, { marginLeft: 10 }]}>
-                  {new Date(trip.endDate).toLocaleString("en-US", {
+                  {new Date(trip?.endDate).toLocaleString("en-US", {
                     weekday: "short",
                     month: "short",
                     day: "numeric",
                   })}
                 </Text>
                 <Text style={[styles.h4, { marginLeft: 10 }]}>
-                  {DateTime.fromISO(trip.endDate.toString())
+                  {DateTime.fromISO(trip?.endDate.toString())
                     .setZone("system")
                     .toLocaleString(DateTime.TIME_SIMPLE)}
                   {/* {trip.endDate.getHours() % 12 || 12}:{trip.endDate.getMinutes().toString().padStart(2, '0')} {trip.endDate.getHours() >= 12 ? 'PM' : 'AM'} */}

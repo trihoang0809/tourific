@@ -126,9 +126,9 @@ export interface BottomSliderProps {
 }
 
 export enum Status {
-  ACCEPTED,
-  REJECTED,
-  PENDING,
+  'ACCEPTED',
+  'REJECTED',
+  'PENDING',
 }
 
 export interface FriendRequest {
@@ -141,4 +141,5 @@ export interface ContactCardProps {
   user: User;
   isChecked: boolean;
   setChecked: (e: any, userId: string) => void;
+  status: Status;
 }

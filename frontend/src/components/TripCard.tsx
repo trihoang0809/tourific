@@ -21,14 +21,14 @@ export const TripCard: React.FC<tripProps> = ({
   height = 300,
   width = 350,
 }) => {
-  const tripImage = trip.trip.image;
-  const tripLocation = trip.trip.location;
+  const tripImage = trip.image;
+  const tripLocation = trip.location;
   const tripName = trip.name;
   const tripStartDate = trip.startDate;
   const tripEndDate = trip.endDate;
   const fontTripName = Math.max(18, (height * 18) / 300);
   const fontTripDetail = Math.max(13, (height * 14) / 300);
-  const [location, setLocation] = useState(trip.trip.location.citystate);
+  const [location, setLocation] = useState(trip.location.citystate);
 
   const noImage =
     "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg";
@@ -54,7 +54,7 @@ export const TripCard: React.FC<tripProps> = ({
 
   useEffect(() => {
     //fontTripDetail == height of the text --> 0.75*fontTripDetail ~ width of the text
-    setLocation(trip.trip.location.citystate);
+    setLocation(trip.location.citystate);
     const tripState = location !== null ? location.split(", ") : "";
     if (tripState.length >= 2) {
       if (tripLocation.citystate.length * fontTripDetail * 0.75 >= width) {
