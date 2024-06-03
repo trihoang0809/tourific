@@ -62,7 +62,7 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
             endTime,
             location,
             notes,
-            image,
+            // image,
           },
         },
       },
@@ -102,7 +102,7 @@ router.put("/:activityId", async (req: Request<ActivityParams>, res) => {
         endTime,
         location,
         notes,
-        image,
+        // image,
       },
     });
     res.status(200).json(activity);

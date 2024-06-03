@@ -5,7 +5,6 @@ import { Tabs } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
 
 export default function TabLayout() {
-  const { id } = useLocalSearchParams();
   return (
     <Tabs
       screenOptions={{

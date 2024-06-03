@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet } from "react-native";
 import React, { useState, useEffect } from "react";
 import favicon from "@/assets/favicon.png";
 import { Link, Stack, router, useLocalSearchParams } from "expo-router";
@@ -100,69 +100,75 @@ const TripDetailsScreen = () => {
             style={{ width: width, height: 200 }}
             source={favicon} />
         </View>
-        <View style={styles.view}>
-          <View
-            style={{
-              paddingHorizontal: 30,
-              paddingVertical: 19,
-              height: height,
-            }}
-          >
-            <Text style={[styles.h1, { marginTop: 18 }]}>{trip.name}</Text>
-            <View style={styles.row}>
-              <Ionicons name="location-outline" size={25} color="#006ee6" />
-              <View>
-                <Text style={[styles.h3, { marginLeft: 10 }]}>
-                  {trip.location.address} {trip.location.citystate}
-                </Text>
-                <Text style={[styles.h4, { marginLeft: 10 }]}>
-                  + {Number(trip.location.radius * 0.0006213712).toFixed(2)}{" "}
-                  miles
-                </Text>
+        <View
+          style={{ borderTopLeftRadius: 30, borderTopRightRadius: 30, flex: 1, marginTop: -50 }}
+          className="bg-white h-full"
+        >
+          <View style={styles.view}>
+            <View
+              style={{
+                paddingHorizontal: 30,
+                paddingVertical: 19,
+                height: height,
+              }}
+            >
+              <Text style={[styles.h1, { marginTop: 18 }]}>{trip.name}</Text>
+              <View style={styles.row}>
+                <Ionicons name="location-outline" size={25} color="#006ee6" />
+                <View>
+                  <Text style={[styles.h3, { marginLeft: 10 }]}>
+                    {trip.location.address} {trip.location.citystate}
+                  </Text>
+                  <Text style={[styles.h4, { marginLeft: 10 }]}>
+                    + {Number(trip.location.radius * 0.0006213712).toFixed(2)}{" "}
+                    miles
+                  </Text>
+                </View>
               </View>
+              <View style={styles.row}>
+                <Ionicons name="calendar-outline" size={25} color="#006ee6" />
+                <View style={styles.dateContainer}>
+                  <Text style={[styles.h3, { marginHorizontal: 10 }]}>
+                    {new Date(trip.startDate).toLocaleString("en-US", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </Text>
+                  <Text style={[styles.h4, { marginLeft: 10 }]}>
+                    {DateTime.fromISO(trip.startDate.toString())
+                      .setZone("system")
+                      .toLocaleString(DateTime.TIME_SIMPLE)}
+                    {/* {trip.startDate.getHours() % 12 || 12}:{trip.startDate.getMinutes().toString().padStart(2, '0')} {trip.startDate.getHours() >= 12 ? 'PM' : 'AM'} */}
+                  </Text>
+                </View>
+                <Ionicons
+                  name="arrow-forward-outline"
+                  size={25}
+                  color="#006ee6"
+                />
+                <View style={styles.dateContainer}>
+                  <Text style={[styles.h3, { marginLeft: 10 }]}>
+                    {new Date(trip.endDate).toLocaleString("en-US", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </Text>
+                  <Text style={[styles.h4, { marginLeft: 10 }]}>
+                    {DateTime.fromISO(trip.endDate.toString())
+                      .setZone("system")
+                      .toLocaleString(DateTime.TIME_SIMPLE)}
+                    {/* {trip.endDate.getHours() % 12 || 12}:{trip.endDate.getMinutes().toString().padStart(2, '0')} {trip.endDate.getHours() >= 12 ? 'PM' : 'AM'} */}
+                  </Text>
+                </View>
+
+              </View>
+              <Text style={[styles.h4, { marginLeft: 35 }]}>
+                {DateTime.local().zoneName}
+              </Text>
+              <Text style={styles.h2}>Participants</Text>
             </View>
-            <View style={styles.row}>
-              <Ionicons name="calendar-outline" size={25} color="#006ee6" />
-              <View style={styles.dateContainer}>
-                <Text style={[styles.h3, { marginHorizontal: 10 }]}>
-                  {new Date(trip.startDate).toLocaleString("en-US", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </Text>
-                <Text style={[styles.h4, { marginLeft: 10 }]}>
-                  {DateTime.fromISO(trip.startDate.toString())
-                    .setZone("system")
-                    .toLocaleString(DateTime.TIME_SIMPLE)}
-                  {/* {trip.startDate.getHours() % 12 || 12}:{trip.startDate.getMinutes().toString().padStart(2, '0')} {trip.startDate.getHours() >= 12 ? 'PM' : 'AM'} */}
-                </Text>
-              </View>
-              <Ionicons
-                name="arrow-forward-outline"
-                size={25}
-                color="#006ee6"
-              />
-              <View style={styles.dateContainer}>
-                <Text style={[styles.h3, { marginLeft: 10 }]}>
-                  {new Date(trip.endDate).toLocaleString("en-US", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </Text>
-                <Text style={[styles.h4, { marginLeft: 10 }]}>
-                  {DateTime.fromISO(trip.endDate.toString())
-                    .setZone("system")
-                    .toLocaleString(DateTime.TIME_SIMPLE)}
-                  {/* {trip.endDate.getHours() % 12 || 12}:{trip.endDate.getMinutes().toString().padStart(2, '0')} {trip.endDate.getHours() >= 12 ? 'PM' : 'AM'} */}
-                </Text>
-              </View>
-            </View>
-            <Text style={[styles.h4, { marginLeft: 35 }]}>
-              {DateTime.local().zoneName}
-            </Text>
-            <Text style={styles.h2}>Participants</Text>
           </View>
         </View>
       </ScrollView>
