@@ -32,7 +32,6 @@ const Header = ({ isUpcoming }: listprops) => (
           {isUpcoming ? "Upcoming Trips" : "Ongoing Trips"}
         </Text>
       </View>
-
       <View style={styles.userInput}>
         <MaterialIcons name="search" size={24} color="black" />
         <TextInput

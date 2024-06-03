@@ -5,7 +5,6 @@ import { Tabs } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
 
 export default function TabLayout() {
-  const { id } = useLocalSearchParams();
   return (
     <Tabs
       screenOptions={{
@@ -28,25 +27,8 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
-          // headerShown: false,
-          // headerTransparent: true,
+
           headerTitle: '',
-          // headerRight: () => (
-          //   <Link href={`/trips/create?id=${id}`}>
-          //     <View style={{
-          //       backgroundColor: 'rgba(0, 0, 128, 0.3)', // This sets the background color to black with 10% opacity
-          //       borderRadius: 50,
-          //       padding: 5,
-          //     }}>
-          //       <Feather
-          //         // onPressIn={showMoreSetting}
-          //         // onPressOut={notShowMoreSetting}
-          //         name="edit-2"
-          //         size={24}
-          //         color="black" />
-          //     </View>
-          //   </Link>
-          // ),
         }}
       />
       <Tabs.Screen
@@ -56,7 +38,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <AntDesign name="find" size={28} color={color} />
           ),
-          // tabBarLabel:() => {return null},
         }}
       />
       <Tabs.Screen
@@ -66,8 +47,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <AntDesign name="calendar" size={28} color={color} />
           ),
-          // tabBarShowLabel: false,
-          // tabBarLabel:() => {return null},
         }}
       />
     </Tabs>

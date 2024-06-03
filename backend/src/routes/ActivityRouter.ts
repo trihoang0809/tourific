@@ -9,7 +9,7 @@ interface ActivityParams extends TripParams {
   activityId: string;
 }
 
-//type ActivityParams = { activityId: string } & TripParams;
+// type ActivityParams = { activityId: string } & TripParams;
 
 // Get all activities
 router.get("/", async (req, res) => {
@@ -43,7 +43,7 @@ router.get("/:activityId", async (req: Request<ActivityParams>, res) => {
 // Create a new activity
 router.post("/", async (req: Request<ActivityParams>, res) => {
   const { tripId } = req.params;
-  const { name, description, startTime, endTime, location, notes } = req.body;
+  const { name, description, startTime, endTime, location, notes, image } = req.body;
 
   if (!tripId) {
     res.status(404).json({ error: "ID does not exist" });
@@ -62,9 +62,10 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
             endTime,
             location,
             notes,
+            // image,
           },
-        }
-      }
+        },
+      },
     });
     res.status(201).json(activity);
   } catch (error) {
@@ -76,12 +77,12 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
 // Update an activity
 router.put("/:activityId", async (req: Request<ActivityParams>, res) => {
   const { activityId: activityId, tripId } = req.params;
-  const { name, description, startTime, endTime, location, notes } = req.body;
+  const { name, description, startTime, endTime, location, notes, image } = req.body;
 
   const isValidID = await prisma.activity.findUnique({
     where: {
       id: activityId,
-      tripId: tripId
+      tripId: tripId,
     },
   });
 
@@ -101,6 +102,7 @@ router.put("/:activityId", async (req: Request<ActivityParams>, res) => {
         endTime,
         location,
         notes,
+        // image,
       },
     });
     res.status(200).json(activity);
@@ -122,66 +124,6 @@ router.delete("/:activityId", async (req: Request<ActivityParams>, res) => {
     res.status(200).json(deletedActivity);
   } catch (error) {
     res.status(500).json({ error: "An error occurred while deleting the activity." });
-  }
-});
-
-// Upvote an activity
-router.put("/:activityId/upvote", async (req: Request<ActivityParams>, res) => {
-  const { activityId: activityId } = req.params;
-
-  const isValidID = await prisma.activity.findUnique({
-    where: {
-      id: activityId,
-    },
-  });
-
-  if (!isValidID) {
-    res.status(404).json({ error: "Activity does not exist" });
-  }
-
-  try {
-    const upVoteActivity = prisma.activity.update({
-      where: {
-        id: activityId
-      },
-      data: {
-        netUpvotes: { increment: 1 }
-      }
-    });
-
-    res.status(200).json(upVoteActivity);
-  } catch (error) {
-    res.status(500).json({ error: "An error occurred while like the activity." });
-  }
-});
-
-// Downvote an activity
-router.put("/:activityId/downvote", async (req: Request<ActivityParams>, res) => {
-  const { activityId: activityId } = req.params;
-
-  const isValidID = await prisma.activity.findUnique({
-    where: {
-      id: activityId,
-    },
-  });
-
-  if (!isValidID) {
-    res.status(404).json({ error: "Activity does not exist" });
-  }
-
-  try {
-    const downVoteActivity = prisma.activity.update({
-      where: {
-        id: activityId
-      },
-      data: {
-        netUpvotes: { decrement: 1 }
-      }
-    });
-
-    res.status(200).json(downVoteActivity);
-  } catch (error) {
-    res.status(500).json({ error: "An error occurred while dislike the activity." });
   }
 });
 
