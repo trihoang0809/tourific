@@ -1,4 +1,4 @@
-// this file is for declaring types
+import { Ionicons, Feather } from "@expo/vector-icons";
 
 export interface TripData {
   name: string;
@@ -7,20 +7,15 @@ export interface TripData {
     endDate: Date;
   };
   startTime: {
-    hours: number;
-    minutes: number;
+    hours: number,
+    minutes: number,
   };
   endTime: {
-    hours: number;
-    minutes: number;
+    hours: number,
+    minutes: number,
   };
-  location: MapData,
-  image?: {
-    height: number;
-    width: number;
-    url: string;
-  };
-};
+  location: MapData;
+}
 
 export type MapData = {
   address: String;
@@ -49,6 +44,7 @@ export interface GooglePlacesInputProps {
 }
 
 export interface ActivityProps {
+  id: string;
   name: string;
   description: string;
   imageUrl: string;
@@ -61,7 +57,6 @@ export interface ActivityProps {
   category: string[];
   rating?: number;
 }
-
 export type Trip = {
   id: string;
   name: string;
@@ -101,3 +96,41 @@ export type User = {
 export interface UserProps {
   user: User;
 }
+
+export const categoriesMap = [
+  {
+    key: "All",
+    name: "All",
+    icon: <Ionicons name="apps-outline" size={24} color="black" />,
+  },
+  {
+    key: "Dining",
+    name: "Dining",
+    icon: <Ionicons name="restaurant-outline" size={24} color="black" />,
+  },
+  {
+    key: "Entertainment",
+    name: "Entertainment",
+    icon: <Ionicons name="film-outline" size={24} color="black" />,
+  },
+  {
+    key: "OutdoorRecreation",
+    name: "Outdoor",
+    icon: <Ionicons name="partly-sunny-outline" size={24} color="black" />,
+  },
+  {
+    key: "Shopping",
+    name: "Shopping",
+    icon: <Feather name="shopping-cart" size={24} color="black" />,
+  },
+  {
+    key: "Services",
+    name: "Services",
+    icon: <Ionicons name="settings-outline" size={24} color="black" />,
+  },
+  {
+    key: "Wellness",
+    name: "Wellness",
+    icon: <Feather name="activity" size={24} color="black" />,
+  },
+];

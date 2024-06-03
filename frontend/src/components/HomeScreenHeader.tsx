@@ -13,7 +13,6 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
     <SafeAreaView style={styles.content}>
       <View>
-        {/* <Text style={styles.appName}>tourific</Text> */}
         <Text style={styles.appName}>tourific</Text>
       </View>
       <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
@@ -39,6 +38,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     padding: 10,
+    marginHorizontal: 15,
   },
   notificationIcon: {
     position: "absolute",

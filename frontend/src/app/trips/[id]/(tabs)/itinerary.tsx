@@ -1,5 +1,5 @@
-import { Feather, MaterialIcons } from '@expo/vector-icons';
-import { Stack, Link, router } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
+import { Stack, router } from 'expo-router';
 import { View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
