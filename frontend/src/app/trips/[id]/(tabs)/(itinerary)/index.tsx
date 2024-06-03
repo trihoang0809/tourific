@@ -16,6 +16,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { add, differenceInDays } from "date-fns";
+import { SearchBar } from "@rneui/themed";
+import AddActivityToItinerary from "@/components/AddActivityToItinerary";
+import { ActivityProps } from "@/types";
 
 interface Activity {
   isOnCalendar: boolean;
@@ -27,7 +30,7 @@ interface Activity {
     citystate: string;
   };
   id: string;
-  
+  netUpvotes: number;
 }
 
 interface Event {
@@ -54,14 +57,26 @@ export type Mode =
 
 const Itinerary = () => {
   const { id } = useGlobalSearchParams();
-  const [activities, setActivities] = useState<Activity[] | []>([]);
+  const [activities, setActivities] = useState<ActivityProps[] | []>([]);
   const [events, setEvents] = useState<Event[]>([]);
+  const [eventOptions, setEventOptions] = useState<ActivityProps[]>([]);
   const [tripDate, setTripDate] = useState<TripDate>();
   const [dateList, setDateList] = useState<Date[]>([]);
+  // May use these for search activity:
+  // const [query, setQuery] = useState("scenery");
+  // const [searchBarValue, setSearchBarValue] = useState("");
+  // const updateQuery = (query: string) => {
+  //   setQuery(query);
+  //   setSearchBarValue(query);
+  // };
+  const [savedActivityId, setSavedActivityId] = useState("");
+  const [currentDateUpdate, setCurrentDateUpdate] = useState(new Date());
+  const [bannerModalVisible, setBannerModalVisible] = useState(false);
+  const [groupedEvents, setGroupedEvents] = useState({});
+
   // Helper function to group events by date
   const groupEventsByDate = (events: Event[]) => {
     const groupedEvents = {};
-
     events.forEach((event) => {
       const eventDate = new Date(event.start).toLocaleDateString();
       if (!groupedEvents[eventDate]) {
@@ -69,10 +84,10 @@ const Itinerary = () => {
       }
       groupedEvents[eventDate].push(event);
     });
-
     return groupedEvents;
   };
 
+  // Fetch activities
   useEffect(() => {
     const getActivities = async ({ id }: { id: string }) => {
       try {
@@ -99,8 +114,55 @@ const Itinerary = () => {
       }
     };
     getActivities({ id });
-  }, []);
+  }, [savedActivityId]);
 
+  // Update activity whenever saved activityId is changed
+  useEffect(() => {
+    const updateCalendarStatus = async ({
+      id,
+      activityid,
+      date,
+    }: {
+      id: string;
+      activityid: string;
+      date: string;
+    }) => {
+      try {
+        console.log("id: ", id, "activityid:", activityid);
+        const req = {
+          startTime: currentDateUpdate,
+          endTime: currentDateUpdate,
+          // startTime: new Date(),
+          // endTime: new Date()
+        };
+        const response = await fetch(
+          `http://localhost:3000/trips/${id}/activities/${activityid}/toggle`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(req),
+          },
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch activities");
+        }
+        const data = await response.json();
+      } catch (error: any) {
+        console.error(
+          "Error updating calendar status of this activity:",
+          error.toString(),
+        );
+      }
+    };
+    if (id && savedActivityId) {
+      updateCalendarStatus({ id, activityid: savedActivityId });
+    }
+  }, [savedActivityId]);
+  console.log("updated calendar status of activity", savedActivityId);
+
+  // Set list of ascending dates from the start date
   useEffect(() => {
     if (tripDate) {
       for (let i = 0; i <= Number(tripDate.range); i++) {
@@ -113,6 +175,7 @@ const Itinerary = () => {
   }, [tripDate]);
   // console.log("datelist:", dateList);
 
+  // Filter activities that are marked to be on calendar
   useEffect(() => {
     const filteredEvents = activities
       .filter((activity) => activity.isOnCalendar)
@@ -120,14 +183,10 @@ const Itinerary = () => {
         const eventNotes = activity.location ? (
           <View style={{ marginTop: 3 }}>
             {activity.location.address ? (
-              <Text style={styles.p}>
-                {activity.location.address}
-              </Text>
+              <Text style={styles.p}>{activity.location.address}</Text>
             ) : null}
             {activity.location.citystate ? (
-              <Text style={styles.p}>
-                {activity.location.citystate}
-              </Text>
+              <Text style={styles.p}>{activity.location.citystate}</Text>
             ) : null}
           </View>
         ) : null;
@@ -139,11 +198,26 @@ const Itinerary = () => {
           activityid: activity.id,
         };
       });
+    const activitiesNotOnCalendar = activities.filter(
+      (activity) => !activity.isOnCalendar,
+    );
+    const sortedActivities = [...activitiesNotOnCalendar].sort(
+      (activities1: ActivityProps, activities2: ActivityProps) => {
+        return activities2.netUpvotes - activities1.netUpvotes;
+      },
+    );
     setEvents(filteredEvents);
+    setEventOptions(sortedActivities);
   }, [activities]);
+
+  useEffect(() => {
+    setGroupedEvents(groupEventsByDate(events));
+  }, [events]);
   // console.log("first filtered events: ", events[0]);
-  const groupedEvents = groupEventsByDate(events);
+  // const groupedEvents = groupEventsByDate(events);
   console.log("group events", groupedEvents);
+  // console.log("first not on calendar events: ", eventOptions[0]);
+  // console.log("first most upvoted not on calendar events: ", eventOptions[0]);
 
   const [calendarMode, setCalendarMode] = useState<Mode>("itinerary");
   const [currentDate, setCurrentDate] = useState(new Date(Date.now()));
@@ -330,6 +404,7 @@ const Itinerary = () => {
           </TouchableOpacity>
         )}
       </View>
+      {/* Modal to pick calendar view */}
       <Modal animationType="slide" visible={isModalVisible} transparent={true}>
         <View style={{ alignItems: "center", top: "20%" }}>
           <View style={styles.modalView}>
@@ -374,22 +449,57 @@ const Itinerary = () => {
             // console.log(eventsForDate["7/2/2024"]?.children)
             return (
               <View key={index} style={styles.itineraryContainer}>
-                <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                <Text style={{ fontSize: 20, fontWeight: "bold" }}>
                   {dateString}
                 </Text>
                 {eventsForDate.length > 0 ? (
                   eventsForDate.map((event) => (
                     <View key={event.activityid} style={styles.eventContainer}>
                       <Text style={styles.h4}>{event.title}</Text>
-                      <Text style={styles.p}>{new Date(event.start).toLocaleTimeString()} - {new Date(event.end).toLocaleTimeString()}</Text>
+                      <Text style={styles.p}>
+                        {new Date(event.start).toLocaleTimeString()} -{" "}
+                        {new Date(event.end).toLocaleTimeString()}
+                      </Text>
                       <View>{event.children}</View>
                     </View>
                   ))
                 ) : (
-                  <Text>
-                    No events for this date
+                  <Text style={{ marginVertical: 10, fontSize: 18 }}>
+                    No activities for this date yet!
                   </Text>
                 )}
+                <AddActivityToItinerary
+                  currentDateUpdate={date}
+                  setCurrentDateUpdate={setCurrentDateUpdate}
+                  input={eventOptions}
+                  saveActivityId={(activityId: string) => {
+                    setSavedActivityId(activityId);
+                    // setCurrentDateUpdate(date);
+                    console.log("saved id from modal", activityId);
+                  }}
+                  isVisible={bannerModalVisible}
+                  setIsVisible={setBannerModalVisible}
+                />
+                <TouchableOpacity
+                  onPress={() => {
+                    setBannerModalVisible(true);
+                  }}
+                >
+                  <SearchBar
+                    placeholder="Add an activity..."
+                    // onChangeText={updateQuery}
+                    // value={searchBarValue}
+                    lightTheme={true}
+                    round={true}
+                    containerStyle={{
+                      backgroundColor: "white",
+                      borderTopColor: "white",
+                      borderBottomColor: "white",
+                      padding: 0,
+                    }}
+                    inputStyle={styles.h4}
+                  />
+                </TouchableOpacity>
               </View>
             );
           })}
@@ -423,7 +533,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   p: {
-    fontSize: 12, 
+    fontSize: 12,
     color: "white",
   },
   row: {
@@ -483,10 +593,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   eventContainer: {
-    backgroundColor: '#006ee6',
+    backgroundColor: "#006ee6",
     padding: 5,
-    width: '100%'
-  }
+    width: "100%",
+    borderRadius: 8,
+    marginVertical: 3,
+  },
 });
 export default Itinerary;
 
