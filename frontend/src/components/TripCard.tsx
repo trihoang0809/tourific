@@ -27,6 +27,12 @@ export const TripCard: React.FC<tripProps> = ({
   const noImage =
     "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg";
 
+<<<<<<< HEAD
+=======
+  const defaultAvatar =
+    "https://static1.colliderimages.com/wordpress/wp-content/uploads/2022/02/avatar-the-last-airbender-7-essential-episodes.jpg";
+
+>>>>>>> main
   const onPressTripCard = () => {
     // console.log("You pressed this card");
     const route = `/trips/${trip.id}`;
@@ -44,6 +50,19 @@ export const TripCard: React.FC<tripProps> = ({
 
   // Calculate image height as 2/3 of the card's height
   const imageHeight = (height * 2) / 3;
+<<<<<<< HEAD
+=======
+  const textSize = height / 18;
+  const tripState = tripLocation.citystate.split(", ");
+
+  useEffect(() => {
+    //fontTripDetail == height of the text --> 0.75*fontTripDetail ~ width of the text
+    if (tripLocation.citystate.length * fontTripDetail * 0.75 >= width)
+      if (tripState.length >= 2)
+        setLocation(tripState[tripState.length - 2] + ", " + tripState[tripState.length - 1]);
+  }, []);
+
+>>>>>>> main
   return (
     <View>
       <TouchableHighlight
@@ -69,17 +88,23 @@ export const TripCard: React.FC<tripProps> = ({
           ></Image>
           <View style={styles.descriptionContainer}>
             <View>
+<<<<<<< HEAD
               <Text
                 numberOfLines={1}
                 style={{ fontSize: fontTripName, fontWeight: "bold" }}
               >
                 {trip.name}
+=======
+              <Text numberOfLines={1} style={{ fontSize: fontTripName, fontWeight: "bold" }}>
+                {tripName}
+>>>>>>> main
               </Text>
             </View>
 
             <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
               <View style={styles.detail}>
                 <Octicons name="location" size={17} color="black" />
+<<<<<<< HEAD
                 <Text
                   numberOfLines={1}
                   style={[
@@ -92,6 +117,10 @@ export const TripCard: React.FC<tripProps> = ({
                   ]}
                 >
                   {trip.location.citystate}
+=======
+                <Text numberOfLines={1} style={[{ color: "blue", marginLeft: 6, fontSize: fontTripDetail, width: 100 }]}>
+                  {location}
+>>>>>>> main
                 </Text>
               </View>
               <View style={styles.detail}>
