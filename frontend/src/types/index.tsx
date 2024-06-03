@@ -55,7 +55,6 @@ export interface ActivityProps {
   netUpvotes: number;
   isOnCalendar: boolean;
   category: string[];
-  id?: string;
   rating?: number;
 }
 export type Trip = {

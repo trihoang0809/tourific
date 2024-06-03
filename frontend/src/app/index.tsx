@@ -8,7 +8,7 @@ import { sampleUser } from "@/mock-data/user";
 export default function App() {
 
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-white">
       <HomeScreen user={sampleUser} />
       <Link href="/trips/661f78b88c72a65f2f6e49d4">
         Go to trip at the beach
