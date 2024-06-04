@@ -6,7 +6,6 @@ import { Link, useLocalSearchParams } from "expo-router";
 import { View, Text } from "react-native";;
 
 export default function TabLayout() {
-  const { id } = useLocalSearchParams();
   return (
     <Tabs
       screenOptions={{
