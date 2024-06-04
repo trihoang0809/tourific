@@ -1,7 +1,7 @@
 import { View } from "react-native";
 import UserProfileView from "@/screens/UserProfile/UserProfileView";
 const userProfileUI = () => {
-  return <UserProfileView userID="663965ad325de4616021409b"></UserProfileView>;
+  return <UserProfileView userID="6659f8e36ac8b75586fa7d73"></UserProfileView>;
 };
 
 export default userProfileUI;

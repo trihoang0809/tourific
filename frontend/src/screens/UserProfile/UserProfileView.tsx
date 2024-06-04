@@ -1,35 +1,33 @@
 import { User } from "@/types";
 import { useEffect, useState } from "react";
-import { Platform, ScrollView, View, StyleSheet, Text, Image, Pressable, TouchableOpacity } from "react-native";
+import {
+  Platform,
+  ScrollView,
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  Pressable,
+  TouchableOpacity,
+} from "react-native";
 import { material } from "react-native-typography";
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 interface userIDProps {
-  userID: string,
+  userID: string;
 }
 
 const UserProfileView = (userID: userIDProps) => {
   const [userProfile, setUserProfile] = useState<User>();
   const [selectedValue, setSelectedValue] = useState("Trips");
 
-  // Format the Date 
-  const formatDate = (date: Date) => {
-    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
-      return "Invalid date"; // Handle invalid dates
-    }
-    const month = date.toLocaleString("default", { month: "short" });
-    return `${date.getDate()} ${month}, ${date.getFullYear()}`;
-  };
-  
-
   // Fetching data
   useEffect(() => {
     // Let ios as default
-    let serverUrl = 'http://localhost:3000';
+    let serverUrl = "http://localhost:3000";
 
-    if(Platform.OS === 'android')
-      serverUrl = 'http://10.0.2.2:3000';
+    if (Platform.OS === "android") serverUrl = "http://10.0.2.2:3000";
 
     const getData = async () => {
       try {
@@ -45,51 +43,108 @@ const UserProfileView = (userID: userIDProps) => {
 
     //Fetch Data + Format Data
     getData();
-
   }, []);
 
-
-
-
-  return (  
+  return (
     <ScrollView style={styles.infoContainer}>
-      <View style={[{flexDirection: "column"}, styles.header]}>
-          <MaterialCommunityIcons name="menu" size={40} color="white" style={{alignSelf:"flex-end"}}/>
+      <View style={[{ flexDirection: "column" }, styles.header]}>
+        <MaterialCommunityIcons
+          name="menu"
+          size={40}
+          color="white"
+          style={{ alignSelf: "flex-end" }}
+        />
 
-
-          <View style={styles.avatarContainer}>
-              <Image source={{ uri: userProfile?.avatar.url }} style={styles.avatar} />
-          </View>
-
+        <View style={styles.avatarContainer}>
+          <Image
+            source={{ uri: userProfile?.avatar.url }}
+            style={styles.avatar}
+          />
+        </View>
       </View>
 
       <View style={styles.username}>
-          <Text style={[material.headline, {color: "black", marginBottom: 10, fontWeight: "bold"}]}>{userProfile?.userName}</Text>
+        <Text
+          style={[
+            material.headline,
+            { color: "black", marginBottom: 10, fontWeight: "bold" },
+          ]}
+        >
+          {userProfile?.userName}
+        </Text>
       </View>
 
-      <View style={{flexDirection: "row", justifyContent: "space-around", columnGap: 10, padding: 10,}}>
-        <Pressable style={styles.editContainer} onPress={()=>router.push("userProfile/update")}>
-          <Text style={{fontSize: 20, fontWeight: "bold"}}>Edit Profile</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-around",
+          columnGap: 10,
+          padding: 10,
+        }}
+      >
+        <Pressable
+          style={styles.editContainer}
+          onPress={() => router.push("userProfile/update")}
+        >
+          <Text style={{ fontSize: 20, fontWeight: "bold" }}>Edit Profile</Text>
         </Pressable>
 
-        <Pressable style={styles.editContainer} onPress={()=>{}}>
-          <Text style={{fontSize: 20, fontWeight: "bold"}}>Share Profile</Text>
+        <Pressable style={styles.editContainer} onPress={() => {}}>
+          <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+            Share Profile
+          </Text>
         </Pressable>
       </View>
 
-      <View style={{flexDirection: "row", justifyContent: "space-around", columnGap: 10, padding: 10,}}>
-        <Pressable style={[styles.sectionPhoto, selectedValue === "Trips" && { borderBottomColor: "#3945E9"}]} onPress={()=>{setSelectedValue("Trips")}}>
-          <Text style={[{fontSize: 20, fontWeight: "bold"}, selectedValue === "Trips" && {color: "#3945E9"}]}>Trips</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-around",
+          columnGap: 10,
+          padding: 10,
+        }}
+      >
+        <Pressable
+          style={[
+            styles.sectionPhoto,
+            selectedValue === "Trips" && { borderBottomColor: "#3945E9" },
+          ]}
+          onPress={() => {
+            setSelectedValue("Trips");
+          }}
+        >
+          <Text
+            style={[
+              { fontSize: 20, fontWeight: "bold" },
+              selectedValue === "Trips" && { color: "#3945E9" },
+            ]}
+          >
+            Trips
+          </Text>
         </Pressable>
 
-        <Pressable style={[styles.sectionPhoto, selectedValue === "Photos" && { borderBottomColor: "#3945E9"}]} onPress={()=>{setSelectedValue("Photos")}}>
-          <Text style={[{fontSize: 20, fontWeight: "bold"}, selectedValue === "Photos" && {color: "#3945E9"}]}>Photos</Text>
+        <Pressable
+          style={[
+            styles.sectionPhoto,
+            selectedValue === "Photos" && { borderBottomColor: "#3945E9" },
+          ]}
+          onPress={() => {
+            setSelectedValue("Photos");
+          }}
+        >
+          <Text
+            style={[
+              { fontSize: 20, fontWeight: "bold" },
+              selectedValue === "Photos" && { color: "#3945E9" },
+            ]}
+          >
+            Photos
+          </Text>
         </Pressable>
       </View>
     </ScrollView>
   );
-}
- 
+};
 
 const styles = StyleSheet.create({
   infoContainer: {

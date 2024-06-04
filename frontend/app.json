@@ -27,21 +27,20 @@
     },
     "scheme": "tourific",
     "plugins": [
-      ["expo-router"],
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "Allow Tourific to access your photos",
-          "cameraPermission": "Allow Tourific to access your photos",
-          "microphonePermission": "Allow Tourific to access your photos"
-        }],
-      ["expo-router",
       [
         "expo-build-properties",
         {
           "android": {
             "usesCleartextTraffic": true
           }
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Tourific to access your photos",
+          "cameraPermission": "Allow Tourific to access your photos",
+          "microphonePermission": "Allow Tourific to access your photos"
         }
       ]
     ]

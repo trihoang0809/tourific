@@ -1,4 +1,5 @@
 import { Ionicons, Feather } from "@expo/vector-icons";
+import React from "react";
 
 export interface TripData {
   name: string;
@@ -7,17 +8,17 @@ export interface TripData {
     endDate: Date;
   };
   startTime: {
-    hours: number,
-    minutes: number,
+    hours: number;
+    minutes: number;
   };
   endTime: {
-    hours: number,
-    minutes: number,
+    hours: number;
+    minutes: number;
   };
   location: MapData;
   image: {
     url: String;
-  }
+  };
 }
 
 export type MapData = {
