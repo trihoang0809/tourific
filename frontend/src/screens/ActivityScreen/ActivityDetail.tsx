@@ -492,6 +492,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
                 style={{ fontSize: 20 }}
                 onChangeText={setNote}
                 value={note}
+                multiline={true}
               ></TextInput>
             )}
           </View>
