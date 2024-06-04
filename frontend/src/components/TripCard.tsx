@@ -17,24 +17,24 @@ interface tripProps {
   width?: number; // Optional width prop
 }
 
-export const TripCard: React.FC<tripProps> = ({ 
+export const TripCard: React.FC<tripProps> = ({
   trip,
   height = 300,
   width = 350,
  }) => {
-  const [tripImage, setTripImage] = useState(trip.image);
-  const [tripLocation, setTripLocation] = useState(trip.location);
-  const [tripName, setTripName] = useState(trip.name);
-  const [tripStartDate, setTripStartDate] = useState(trip.startDate);
-  const [tripEndDate, setTripEndDate] = useState(trip.endDate);
-  const [fontTripName, setFontTripName] = useState(Math.max(18, (height*18)/300));
-  const [fontTripDetail, setFontTripDetail] = useState(Math.max(13, (height*14)/300));
+  const tripImage = trip.image;
+  const tripLocation = trip.location;
+  const tripName = trip.name;
+  const tripStartDate = trip.startDate;
+  const tripEndDate = trip.endDate;
+  const fontTripName = Math.max(18, (height*18)/300);
+  const fontTripDetail = Math.max(13, (height*14)/300);
   const [location, setLocation] = useState(trip.location.citystate);
   
   const noImage =
-    "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg";
+    "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400";
 
-  const defaultAvatar = 
+  const defaultAvatar =
     "https://static1.colliderimages.com/wordpress/wp-content/uploads/2022/02/avatar-the-last-airbender-7-essential-episodes.jpg";
 
   const onPressTripCard = () => {
@@ -59,15 +59,13 @@ export const TripCard: React.FC<tripProps> = ({
 
   useEffect(() => {
     //fontTripDetail == height of the text --> 0.75*fontTripDetail ~ width of the text
-    if(tripLocation.citystate.length*fontTripDetail*0.75 >= width)
-    if(tripState.length >= 2)
-      setLocation(tripState[tripState.length - 2] + ", " + tripState[tripState.length - 1]);
-
+    if (tripLocation.citystate.length * fontTripDetail * 0.75 >= width)
+      if (tripState.length >= 2)
+        setLocation(tripState[tripState.length - 2] + ", " + tripState[tripState.length - 1]);
   }, []);
 
   return (
-
-    <View> 
+    <View>
       <TouchableHighlight
         style={[styles.card, { height: height, width: width }]} // Apply dynamic height and width
         underlayColor="#BEC0F5"
@@ -91,15 +89,15 @@ export const TripCard: React.FC<tripProps> = ({
           ></Image>
           <View style={styles.descriptionContainer}>
             <View>
-              <Text numberOfLines={1} style={{fontSize: fontTripName, fontWeight: "bold"}}>
+              <Text numberOfLines={1} style={{ fontSize: fontTripName, fontWeight: "bold" }}>
                 {tripName}
               </Text>
             </View>
 
-            <View style={{flexDirection: "row", flexWrap: "wrap"}}>
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
               <View style={styles.detail}>
                 <Octicons name="location" size={17} color="black" />
-                <Text numberOfLines={1} style={[{ color: "blue", marginLeft: 6, fontSize: fontTripDetail, width: 100}]}>
+                <Text numberOfLines={1} style={[{ color: "blue", marginLeft: 6, fontSize: fontTripDetail, width: 100 }]}>
                   {location}
                 </Text>
               </View>
@@ -113,7 +111,7 @@ export const TripCard: React.FC<tripProps> = ({
           </View>
         </View>
       </TouchableHighlight>
-    </View> 
+    </View>
   );
 };
 
@@ -148,7 +146,7 @@ const styles = StyleSheet.create({
   },
 
   detail: {
-    flexDirection: "row", 
+    flexDirection: "row",
     marginRight: 18,
     alignItems: "center",
   },

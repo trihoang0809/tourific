@@ -12,9 +12,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+    <SafeAreaView style={styles.content}>
+      <View>
         <Text style={styles.appName}>tourific</Text>
+      </View>
+      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
         <TouchableOpacity
           onPress={() => {
             /* navigate to notifications */
@@ -32,13 +34,14 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%", // Ensures the SafeAreaView fills the screen width
   },
   content: {
+    flex: 1,
     flexDirection: "row",
-    justifyContent: "space-between", // Aligns children at space-between
-    alignItems: "center",
+    justifyContent: 'space-around',
+    alignItems: 'center',
     padding: 10,
+    marginHorizontal: 15,
   },
   notificationIcon: {
     position: "absolute",
@@ -46,14 +49,15 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   appName: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
     flex: 1,
-    textAlign: "center", // Ensures the text is centered in the available space
+    textAlign: "center",
   },
   avatar: {
     width: 30,
     height: 30,
     borderRadius: 20,
+    marginLeft: 20,
   },
 });
