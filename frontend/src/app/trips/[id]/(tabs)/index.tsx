@@ -7,7 +7,6 @@ import {
   StyleSheet,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import favicon from "@/assets/favicon.png";
 import { Link, Stack, router, useLocalSearchParams } from "expo-router";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
@@ -27,8 +26,12 @@ const TripDetailsScreen = () => {
     endDate: new Date(),
     startHour: 0,
     startMinute: 0,
+    image: { url: "" },
   });
   const serverUrl = EXPO_PUBLIC_HOST_URL;
+  const defaultUri =
+    "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400";
+
   // more setting icon
   const [modalEditVisible, setModalEditVisible] = useState(false);
 
@@ -105,7 +108,16 @@ const TripDetailsScreen = () => {
       />
       <ScrollView style={{ width: width, height: height }}>
         <View>
-          <Image style={{ width: width, height: 200 }} source={favicon} />
+          <Image
+            style={styles.image}
+            source={
+              trip.image && trip.image.url
+                ? { uri: trip.image.url }
+                : {
+                    uri: defaultUri,
+                  }
+            }
+          />
         </View>
         <View
           style={{

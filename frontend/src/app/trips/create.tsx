@@ -21,6 +21,7 @@ import { DateTime } from "luxon";
 import { TripSchema } from "@/validation/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import PhotoAPI from "@/components/PhotoAPI";
 
 // CREATING: /trips/create
 // UPDATING: /trips/create?id=${id}
@@ -37,6 +38,11 @@ export default function CreateTripScreen() {
     resolver: zodResolver(TripSchema),
   });
   const { id: idString } = useLocalSearchParams();
+  const [savedPhoto, setSavedPhoto] = useState(
+    "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400",
+  );
+  const [bannerModalVisible, setBannerModalVisible] = useState(false);
+  console.log("save banner: ", savedPhoto);
 
   // check if there's an id -> if there's id meaning trip has been created
   const isUpdating = !!idString; // id is type of string
@@ -77,6 +83,9 @@ export default function CreateTripScreen() {
           minutes: endTime.minute,
         },
         location: data.location,
+        image: {
+          url: savedPhoto,
+        },
       });
     } catch (error: any) {
       console.error("Error fetching trip:", error.toString());
@@ -105,6 +114,9 @@ export default function CreateTripScreen() {
       longitude: 0,
       radius: 0,
     },
+    image: {
+      url: savedPhoto,
+    },
   });
 
   useEffect(() => {
@@ -125,7 +137,7 @@ export default function CreateTripScreen() {
   const [visibleEnd, setVisibleEnd] = useState(false);
 
   const onSubmit = async (data: any) => {
-    const { name, location, startTime, endTime, dateRange } = data;
+    const { name, location, startTime, endTime, dateRange, image } = data;
     const isoStartDate = DateTime.fromISO(
       formatDateTime(dateRange.startDate, startTime.hours, startTime.minutes),
     ).setZone("system");
@@ -137,6 +149,7 @@ export default function CreateTripScreen() {
       startDate: isoStartDate,
       endDate: isoEndDate,
       location,
+      image: { url: savedPhoto },
     };
 
     if (isUpdating) {
@@ -282,10 +295,6 @@ export default function CreateTripScreen() {
     [setFormData],
   );
 
-  function chooseBannerCover(): void {
-    throw new Error("Function not implemented.");
-  }
-
   return (
     <View>
       <Stack.Screen
@@ -297,7 +306,7 @@ export default function CreateTripScreen() {
       <ScrollView nestedScrollEnabled={true}>
         {/* trips banner */}
         <View style={{ position: "relative" }}>
-          <Image className="w-full h-40" source={favicon} />
+          <Image className="w-full h-40" source={{ uri: savedPhoto }} />
           <Pressable
             style={{
               display: "flex",
@@ -312,11 +321,29 @@ export default function CreateTripScreen() {
               width: 130,
               padding: "auto",
             }}
-            onPress={() => {}}
+            onPress={() => {
+              setBannerModalVisible(true);
+            }}
           >
-            <Text>Change image</Text>
+            <Text>Set cover</Text>
           </Pressable>
         </View>
+        <PhotoAPI
+          savePhoto={(photo: string) => {
+            setSavedPhoto(photo);
+            setFormData(
+              (prevFormData) =>
+                ({
+                  ...prevFormData,
+                  image: {
+                    url: photo,
+                  },
+                }) as TripData,
+            );
+          }}
+          isVisible={bannerModalVisible}
+          setIsVisible={setBannerModalVisible}
+        />
 
         {/* trip details */}
         <View

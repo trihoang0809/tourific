@@ -25,7 +25,7 @@ export const TripCard: React.FC<tripProps> = ({
   const fontTripDetail = Math.max(13, (height * 14) / 300);
   const { image, location, name, startDate, endDate } = trip;
   const noImage =
-    "https://st4.depositphotos.com/14953852/24787/v/450/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg";
+    "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400";
 
 <<<<<<< HEAD
 =======
