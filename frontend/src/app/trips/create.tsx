@@ -79,7 +79,10 @@ export default function CreateTripScreen() {
           hours: endTime.hour,
           minutes: endTime.minute,
         },
-        location: data.location
+        location: data.location,
+        image: {
+          url: savedPhoto,
+        }
       });
     } catch (error: any) {
       console.error("Error fetching trip:", error.toString());
@@ -109,6 +112,9 @@ export default function CreateTripScreen() {
         longitude: 0,
         radius: 0
       },
+      image: {
+        url: savedPhoto
+      }
     }
   );
 
