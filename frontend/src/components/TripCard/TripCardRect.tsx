@@ -5,7 +5,7 @@ import { noImage } from '@/utils/constants';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { tripDate } from '@/utils';
 import { router } from 'expo-router';
-import Style from 'Style';
+import Style from '../../Style';
 
 const screenw = Dimensions.get("window").width;
 const desiredWidth = screenw - (screenw * 0.1);
