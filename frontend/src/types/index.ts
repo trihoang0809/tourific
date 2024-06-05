@@ -96,3 +96,23 @@ export type User = {
 export interface UserProps {
   user: User;
 }
+
+export interface Activity {
+  isOnCalendar: boolean;
+  name: string;
+  startTime: Date;
+  endTime: Date;
+  location: {
+    address: string;
+    citystate: string;
+  };
+  id: string;
+}
+
+export interface Event {
+  title: string;
+  start: Date;
+  end: Date;
+  children: JSX.Element | null;
+  activityid: string;
+}

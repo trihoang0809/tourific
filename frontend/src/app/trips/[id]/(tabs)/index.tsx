@@ -1,8 +1,8 @@
 import { View, Text, ScrollView, Image } from "react-native";
 import React, { useState, useEffect } from "react";
 import favicon from "@/assets/favicon.png";
-import { Link, Stack, useGlobalSearchParams } from "expo-router";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { useGlobalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from "luxon";
 import { StyleSheet } from "react-native";

@@ -8,26 +8,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
-
-interface Activity {
-  isOnCalendar: boolean;
-  name: string;
-  startTime: Date;
-  endTime: Date;
-  location: {
-    address: string;
-    citystate: string;
-  };
-  id: string;
-}
-
-interface Event {
-  title: string;
-  start: Date;
-  end: Date;
-  children: JSX.Element;
-  activityid: string;
-}
+import { Activity, Event } from "@/types";
 
 const Itinerary = () => {
   const { id } = useGlobalSearchParams();
@@ -170,26 +151,26 @@ const Itinerary = () => {
         contrastText: "#fff",
       },
     },
-    typography: {
-      xs: {
-        fontWeight: "400",
-        fontSize: 12,
-        lineHeight: 16,
-        letterSpacing: 0.5,
-      },
-      sm: {
-        fontWeight: "400",
-        fontSize: 14,
-        lineHeight: 20,
-        letterSpacing: 0.25,
-      },
-      xl: {
-        fontWeight: "500",
-        fontSize: 24,
-        lineHeight: 28,
-        letterSpacing: 0.15,
-      },
-    },
+    // typography: {
+    //   xs: {
+    //     fontWeight: 400,
+    //     fontSize: 12,
+    //     lineHeight: 16,
+    //     letterSpacing: 0.5,
+    //   },
+    //   sm: {
+    //     fontWeight: 400,
+    //     fontSize: 14,
+    //     lineHeight: 20,
+    //     letterSpacing: 0.25,
+    //   },
+    //   xl: {
+    //     fontWeight: 500,
+    //     fontSize: 24,
+    //     lineHeight: 28,
+    //     letterSpacing: 0.15,
+    //   },
+    // },
     eventCellOverlappings: [
       {
         main: "#e6352b", // Tomato color
