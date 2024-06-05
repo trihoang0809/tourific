@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, Text, TouchableOpacity, Modal, Pressable } from "react-native";
+import { View, Text, TouchableOpacity, Modal, Pressable, SafeAreaView } from "react-native";
 import { useGlobalSearchParams, router } from "expo-router";
 import { Calendar, DateRangeHandler } from "react-native-big-calendar";
 import { Mode } from "react-native-big-calendar/build/interfaces";
 import { StyleSheet } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Activity, Event } from "@/types";
@@ -180,7 +179,7 @@ const Itinerary = () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "white" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <View
         style={[
           styles.row,
@@ -298,7 +297,7 @@ const Itinerary = () => {
         swipeEnabled={false}
         theme={customTheme}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
