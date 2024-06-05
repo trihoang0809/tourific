@@ -117,6 +117,39 @@ router.put("/:activityId", async (req: Request<ActivityParams>, res) => {
   }
 });
 
+// Update calendar status of an activity
+router.put("/:activityId/toggle", async (req: Request<ActivityParams>, res) => {
+  const { activityId: activityId, tripId } = req.params;
+  const { name, description, startTime, endTime, location, notes } = req.body;
+
+  const isValidID = await prisma.activity.findUnique({
+    where: {
+      id: activityId,
+      tripId: tripId
+    },
+  });
+
+  if (!isValidID) {
+    res.status(404).json({ error: "Activity does not exist" });
+  }
+
+  try {
+    const activity = await prisma.activity.update({
+      where: {
+        id: activityId,
+      },
+      data: {
+        isOnCalendar: !isValidID?.isOnCalendar,
+        startTime, 
+        endTime,
+      },
+    });
+    res.status(200).json(activity);
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred while updating the activity." });
+  }
+});
+
 // Delete an activity
 router.delete("/:activityId", async (req: Request<ActivityParams>, res) => {
   const { activityId: activityId, tripId } = req.params;
