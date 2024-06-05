@@ -137,3 +137,24 @@ export const categoriesMap = [
     icon: <Feather name="activity" size={24} color="black" />,
   },
 ];
+
+export interface Activity {
+  isOnCalendar: boolean;
+  name: string;
+  startTime: Date;
+  endTime: Date;
+  location: {
+    address: string;
+    citystate: string;
+  };
+  id: string;
+  netUpvotes: number;
+}
+
+export interface Event {
+  title: string;
+  start: Date;
+  end: Date;
+  children: JSX.Element | null;
+  activityid: string;
+}
