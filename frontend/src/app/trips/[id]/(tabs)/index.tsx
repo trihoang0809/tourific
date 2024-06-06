@@ -10,6 +10,7 @@ import {
   BottomSheetModal,
 } from '@gorhom/bottom-sheet';
 import { TouchableOpacity } from "react-native";
+import AvatarGroup from "@/components/Avatar/AvatarGroup";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 const width = Dimensions.get('window').width; //full width
@@ -79,13 +80,14 @@ const TripDetailsScreen = () => {
       }
       const data = await response.json();
       setTrip((prev) => ({ ...prev, participants: data }));
-      console.log("Participants fetch:", data);
+      // console.log("Participants fetch:", data);
     } catch (error: any) {
       console.error("Error fetching participants:", error.toString());
     }
 
   };
 
+  console.log("trip", trip.participants);
   useEffect(() => {
     console.log("id", id);
     getTrip({ id });
@@ -198,7 +200,7 @@ const TripDetailsScreen = () => {
               {DateTime.local().zoneName}
             </Text>
             <Text style={styles.h2}>Participants</Text>
-            {/* <AvatarGroup /> */}
+            <AvatarGroup users={trip.participants} size={55}/>
           </View>
         </View>
       </ScrollView>

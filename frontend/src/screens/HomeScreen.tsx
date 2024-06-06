@@ -56,13 +56,46 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
     fetchInvitations();
   }, []);
 
-  function onAccept(id: string): void {
-    throw new Error("Function not implemented.");
-  }
+  console.log("inv", invitation);
+  const onAccept = async (id: string) => {
+    try {
+      console.log("accepting", id);
+      const sendAccept = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/${id}/accept`, {
+        method: "PATCH",
+      });
 
-  function onDecline(id: string): void {
-    throw new Error("Function not implemented.");
-  }
+      if (!sendAccept.ok) {
+        throw new Error("Failed to accept invitation");
+      }
+
+      const newInvitations = invitation.filter((invite) => invite.id !== id);
+      setInvitation(newInvitations);
+
+      const acceptedInvite = await sendAccept.json();
+      if (acceptedInvite.trip) {
+        router.replace(`/trips/${acceptedInvite.trip.id}`);
+      }
+    } catch (error) {
+      console.error("Failed to accept invitation", error);
+    }
+  };
+
+  const onDecline = async (id: string) => {
+    try {
+      const sendDecline = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/${id}/decline`, {
+        method: "PATCH",
+      });
+
+      if (!sendDecline.ok) {
+        throw new Error("Failed to decline invitation");
+      }
+
+      const newInvitations = invitation.filter((invite) => invite.id !== id);
+      setInvitation(newInvitations);
+    } catch (error) {
+      console.error("Failed to decline invitation", error);
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>

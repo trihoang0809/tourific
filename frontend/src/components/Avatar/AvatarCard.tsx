@@ -9,18 +9,19 @@ const AvatarCard = ({ user, size = 50 }: AvatarCardProps) => {
       style={{
         borderWidth: 2,
         borderColor: 'white',
+        borderRadius: size / 2,
       }}
     >
       {
-        user.avatar.url !== null ?
+        user?.avatar?.url !== null ?
           <UserAvatar
             size={size}
-            src={user.avatar.url}
+            src={user?.avatar?.url}
           />
           :
           <UserAvatar
             size={size}
-            name={user.firstName + user.lastName}
+            name={user?.firstName + user?.lastName}
           />
       }
     </View>

@@ -13,7 +13,7 @@ export interface InvitationParams extends TripParams {
 }
 
 // temporary for testing until auth done
-const userID = "664023f929694f249f1a4c86";
+const userID = "66428776e8e67c56cab2133d";
 
 // get all invitations
 router.get("/", async (req: Request, res) => {
@@ -56,15 +56,22 @@ router.get("/all-sent", async (req: Request, res) => {
       },
       include: {
         trip: true,
-        invitee: true
+        invitee: true,
       }
     });
 
+    if (!trips) {
+      res.status(StatusCodes.NOT_FOUND).json({ error: "No invitations found." });
+    }
+
     res.status(StatusCodes.OK).json(trips);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting invitatiion." });
+    console.error("Error retrieving sent invitations:", error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting invitation." });
   }
 });
+
+// will need get sent invitationa by status but will implement later
 
 // get an invitation by status
 // example endpoint: /invite?status=PENDING

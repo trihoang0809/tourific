@@ -6,7 +6,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // temporary for testing until auth done
-const userID = "664023f929694f249f1a4c86";
+const userID = "66428776e8e67c56cab2133d";
 
 // get all user for testing
 router.get("/", async (req, res) => {

@@ -4,25 +4,21 @@ import { AvatarGroupProps } from '@/types';
 import AvatarCard from './AvatarCard';
 
 const AvatarGroup = ({ users, size }: AvatarGroupProps) => {
-  const displayUsers = users.slice(0, 4); // Only take the first 5 users
-  const additionalCount = users.length > 5 ? users.length - 5 : 0; // Calculate remaining users if more than 5
+  const displayUsers = users?.slice(0, 4); // Only take the first 5 users
+  const additionalCount = users?.length > 5 ? users?.length - 5 : 0; // Calculate remaining users if more than 5
 
+  console.log("displayUsers", displayUsers);
   return (
     <View
       style={{
         flexDirection: 'row',
-        justifyContent: 'flex-start',
+        // justifyContent: 'center',
+        alignItems: 'center',
       }}
     >
-      {displayUsers.map((user, index) => (
-        <View style={{
-          marginRight: -12,
-        }}>
-          <AvatarCard
-            user={user}
-            key={index}
-            size={size}
-          />
+      {displayUsers?.map((user, index) => (
+        <View key={user?.invitee?.id} style={{ marginLeft: index === 0 ? 0 : -(size / 4) }}>
+          <AvatarCard user={user?.invitee} size={size} />
         </View>
       ))}
       {additionalCount > 0 && (
@@ -30,7 +26,8 @@ const AvatarGroup = ({ users, size }: AvatarGroupProps) => {
         {
           width: size,
           height: size,
-          borderRadius: size / 2,
+          borderRadius: 9999,
+          marginLeft: -(size / 4),
         }]}>
           <Text style={styles.additionalText}>+{additionalCount}</Text>
         </View>
@@ -44,7 +41,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'gray',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: -12,
   },
   additionalText: {
     color: 'white',

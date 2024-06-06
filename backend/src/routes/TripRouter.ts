@@ -20,7 +20,7 @@ export interface TripParams {
 }
 
 // temporary for testing until auth done
-const userID = "664023f929694f249f1a4c86";
+const userID = "66428776e8e67c56cab2133d";
 
 // Activites of a trip
 router.use("/:tripId/activities", ActivityRouter);
@@ -66,6 +66,7 @@ router.get("/", async (req: Request<TripParams>, res) => {
 
     const trips = await prisma.tripMember.findMany({
       where: {
+        inviteeId: userID,
         status: 'ACCEPTED',
         trip: {
           AND: queryConditions
@@ -196,6 +197,9 @@ router.get("/:id/participants", async (req: Request<TripParams>, res) => {
       where: {
         tripId: tripId,
         status: 'ACCEPTED'
+      },
+      include: {
+        invitee: true
       }
     });
     res.json(participants);

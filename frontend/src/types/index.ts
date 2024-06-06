@@ -103,7 +103,7 @@ export interface AvatarCardProps extends UserProps {
 }
 
 export interface AvatarGroupProps {
-  users: User[];
+  users: Invitation[];
   size?: DimensionValue;
 }
 

@@ -29,8 +29,8 @@ model TripMember {
   status   Status @default(PENDING)
   
   trip     Trip @relation(fields: [tripId], references: [id])
-  invitee  User @relation("InviteeToTripInvitations", fields: [inviteeId], references: [id])
-  inviter  User @relation("InviterToTripInvitations", fields: [inviterId], references: [id])
+  invitee  User? @relation("InviteeToTripInvitations", fields: [inviteeId], references: [id])
+  inviter  User? @relation("InviterToTripInvitations", fields: [inviterId], references: [id])
 
   @@unique([tripId, inviteeId])
 }
