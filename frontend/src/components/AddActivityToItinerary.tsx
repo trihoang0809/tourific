@@ -11,7 +11,7 @@ import {
   Pressable,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { ActivityProps } from "@/types";
+import { ActivityProps, AddActivityProps } from "@/types";
 
 interface Result {
   id: string;
@@ -25,18 +25,10 @@ interface Result {
     };
   };
 }
-interface AddActivityProps {
-  currentDateUpdate: Date,
-  setCurrentDateUpdate: (date: Date) => void,
-  input: ActivityProps[]
-  saveActivityId: (activityId: string) => void;
-  isVisible: boolean;
-  setIsVisible: (isVisible: boolean) => void;
-}
+
 
 const AddActivityToItinerary = ({
   currentDateUpdate,
-  setCurrentDateUpdate,
   input,
   saveActivityId,
   isVisible,
@@ -51,16 +43,15 @@ const AddActivityToItinerary = ({
   };
   const [searchBarValue, setSearchBarValue] = useState("");
 
-
   return (
     <Modal animationType="slide" visible={isVisible}>
       <SafeAreaView style={{ flex: 1, backgroundColor: "transparent" }}>
         <View style={styles.row}>
-          <Text style={styles.text}>Add an activity</Text>
+          <Text style={styles.text}>{currentDateUpdate.toDateString()}</Text>
           <Pressable
             style={styles.closeButton}
             onPress={() => setIsVisible(false)}
-          > 
+          >
             <Ionicons name="close" size={24} color="black" />
           </Pressable>
         </View>
@@ -86,12 +77,17 @@ const AddActivityToItinerary = ({
                   <View>
                     <TouchableOpacity
                       onPress={() => {
+                        console.log(
+                          "current date in add activity modal, ",
+                          currentDateUpdate,
+                        );
                         saveActivityId(activity.id);
                         setIsVisible(false);
-                        setCurrentDateUpdate(currentDateUpdate);
                       }}
                     >
-                      <Text numberOfLines={1} style={styles.author}>{activity.name}</Text>
+                      <Text numberOfLines={1} style={styles.author}>
+                        {activity.name}
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 );
