@@ -6,7 +6,7 @@ import {
   Modal,
   Pressable,
   ScrollView,
-  SafeAreaView
+  SafeAreaView,
 } from "react-native";
 import { useGlobalSearchParams, router } from "expo-router";
 import { Calendar, DateRangeHandler } from "react-native-big-calendar";
@@ -18,50 +18,25 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { add, differenceInDays } from "date-fns";
 import { SearchBar } from "@rneui/themed";
 import AddActivityToItinerary from "@/components/AddActivityToItinerary";
-import { ActivityProps } from "@/types";
-
-interface Activity {
-  isOnCalendar: boolean;
-  name: string;
-  startTime: Date;
-  endTime: Date;
-  location: {
-    address: string;
-    citystate: string;
-  };
-  id: string;
-  netUpvotes: number;
-}
-
-interface Event {
-  title: string;
-  start: Date;
-  end: Date;
-  children: JSX.Element;
-  activityid: string;
-}
-
-interface TripDate {
-  start: String;
-  range: Number;
-}
-
-export type Mode =
-  | "3days"
-  | "week"
-  | "day"
-  | "custom"
-  | "month"
-  | "schedule"
-  | "itinerary";
+import { ActivityProps, Event, TripDate, Mode, calendarViewLabels, monthNames } from "@/types";
 
 const Itinerary = () => {
   const { id } = useGlobalSearchParams();
+  const [savedActivityId, setSavedActivityId] = useState("");
+  const [bannerModalVisible, setBannerModalVisible] = useState(false);
+
   const [activities, setActivities] = useState<ActivityProps[] | []>([]);
-  const [events, setEvents] = useState<Event[]>([]);
-  const [eventOptions, setEventOptions] = useState<ActivityProps[]>([]);
+  const [eventsOnCalendar, setEventsOnCalendar] = useState<Event[]>([]);
+  const [activitiesNotOnCalendar, setActivitiesNotOnCalendar] = useState<
+    ActivityProps[]
+  >([]);
+  const [groupedEvents, setGroupedEvents] = useState({});
+
   const [tripDate, setTripDate] = useState<TripDate>();
-  const [dateList, setDateList] = useState<Date[]>([]);
+  const [datesConsecutiveList, setDatesConsecutiveList] = useState<Date[]>([]);
+  const [currentDateUpdate, setCurrentDateUpdate] = useState<Date | null>(null);
+  const [dateForUpdateForm, setDateForUpdateForm] = useState(new Date());
+
   // May use these for search activity:
   // const [query, setQuery] = useState("scenery");
   // const [searchBarValue, setSearchBarValue] = useState("");
@@ -69,14 +44,12 @@ const Itinerary = () => {
   //   setQuery(query);
   //   setSearchBarValue(query);
   // };
-  const [savedActivityId, setSavedActivityId] = useState("");
-  const [currentDateUpdate, setCurrentDateUpdate] = useState(new Date());
-  const [bannerModalVisible, setBannerModalVisible] = useState(false);
-  const [groupedEvents, setGroupedEvents] = useState({});
-
-  // Helper function to group events by date
-  const groupEventsByDate = (events: Event[]) => {
-    const groupedEvents = {};
+  interface GroupedEvents {
+    [key: string]: Event[];
+  }
+  // Function to group events by date
+  const groupEventsByDate = (events: Event[]): GroupedEvents => {
+    const groupedEvents: GroupedEvents = {};
     events.forEach((event) => {
       const eventDate = new Date(event.start).toLocaleDateString();
       if (!groupedEvents[eventDate]) {
@@ -85,6 +58,11 @@ const Itinerary = () => {
       groupedEvents[eventDate].push(event);
     });
     return groupedEvents;
+  };
+
+  const handleDateSelection = (date: Date) => {
+    setCurrentDateUpdate(date);
+    setBannerModalVisible(true); // Show the modal
   };
 
   // Fetch activities
@@ -107,8 +85,6 @@ const Itinerary = () => {
         });
         const activities = data.activities;
         setActivities(activities);
-        // console.log("First activities fetch:", activities[0]);
-        // console.log("date range: ", data.startDate, data.endDate);
       } catch (error: any) {
         console.error("Error fetching activities:", error.toString());
       }
@@ -116,7 +92,7 @@ const Itinerary = () => {
     getActivities({ id });
   }, [savedActivityId]);
 
-  // Update activity whenever saved activityId is changed
+  // Update new time for activity
   useEffect(() => {
     const updateCalendarStatus = async ({
       id,
@@ -128,12 +104,9 @@ const Itinerary = () => {
       date: string;
     }) => {
       try {
-        console.log("id: ", id, "activityid:", activityid);
         const req = {
-          startTime: currentDateUpdate,
-          endTime: currentDateUpdate,
-          // startTime: new Date(),
-          // endTime: new Date()
+          startTime: date,
+          endTime: date,
         };
         const response = await fetch(
           `http://localhost:3000/trips/${id}/activities/${activityid}/toggle`,
@@ -148,7 +121,6 @@ const Itinerary = () => {
         if (!response.ok) {
           throw new Error("Failed to fetch activities");
         }
-        const data = await response.json();
       } catch (error: any) {
         console.error(
           "Error updating calendar status of this activity:",
@@ -156,26 +128,55 @@ const Itinerary = () => {
         );
       }
     };
+
+    const moveNewEventToCalendar = (eventId: string) => {
+      // Find the event in activitiesNotOnCalendar
+      const eventToMove = activitiesNotOnCalendar.find(
+        (event) => event.id === eventId,
+      );
+
+      if (eventToMove) {
+        // Update the event to indicate it is now on the calendar
+        const transformedEvent: Event = {
+          title: eventToMove.name,
+          start: dateForUpdateForm,
+          end: dateForUpdateForm,
+          children: null,
+          activityid: eventToMove.id,
+        };
+
+        // Update the state
+        setEventsOnCalendar((prevEvents) => [...prevEvents, transformedEvent]);
+        setActivitiesNotOnCalendar((prevOptions) =>
+          prevOptions.filter((event) => event.id !== eventId),
+        );
+      }
+    };
     if (id && savedActivityId) {
-      updateCalendarStatus({ id, activityid: savedActivityId });
+      updateCalendarStatus({
+        id,
+        activityid: savedActivityId,
+        date: dateForUpdateForm.toISOString(),
+      })
+        .then(() => moveNewEventToCalendar(savedActivityId))
+        .catch((error) =>
+          console.error("Error in moving event to calendar:", error),
+        );
     }
   }, [savedActivityId]);
-  console.log("updated calendar status of activity", savedActivityId);
 
   // Set list of ascending dates from the start date
   useEffect(() => {
     if (tripDate) {
-      for (let i = 0; i <= Number(tripDate.range); i++) {
-        setDateList((prev) => [
-          ...prev,
-          add(String(tripDate.start), { days: i }),
-        ]);
-      }
+      const newDatesConsecutiveList = Array.from(
+        { length: +tripDate.range + 1 },
+        (_, i) => add(String(tripDate.start), { days: i }),
+      );
+      setDatesConsecutiveList(newDatesConsecutiveList);
     }
   }, [tripDate]);
-  // console.log("datelist:", dateList);
 
-  // Filter activities that are marked to be on calendar
+  // Filter activities that are on calendar, sort activities that are NOT on calendar by netUpvotes
   useEffect(() => {
     const filteredEvents = activities
       .filter((activity) => activity.isOnCalendar)
@@ -198,28 +199,25 @@ const Itinerary = () => {
           activityid: activity.id,
         };
       });
-    const activitiesNotOnCalendar = activities.filter(
+    const notOnCalendar = activities.filter(
       (activity) => !activity.isOnCalendar,
     );
-    const sortedActivities = [...activitiesNotOnCalendar].sort(
+    const sortedActivities = [...notOnCalendar].sort(
       (activities1: ActivityProps, activities2: ActivityProps) => {
         return activities2.netUpvotes - activities1.netUpvotes;
       },
     );
-    setEvents(filteredEvents);
-    setEventOptions(sortedActivities);
+    setEventsOnCalendar(filteredEvents);
+    setActivitiesNotOnCalendar(sortedActivities);
   }, [activities]);
 
   useEffect(() => {
-    setGroupedEvents(groupEventsByDate(events));
-  }, [events]);
-  // console.log("first filtered events: ", events[0]);
-  // const groupedEvents = groupEventsByDate(events);
-  console.log("group events", groupedEvents);
-  // console.log("first not on calendar events: ", eventOptions[0]);
-  // console.log("first most upvoted not on calendar events: ", eventOptions[0]);
+    setGroupedEvents(groupEventsByDate(eventsOnCalendar));
+  }, [eventsOnCalendar]);
 
   const [calendarMode, setCalendarMode] = useState<Mode>("itinerary");
+
+  // Functions to enable displaying current month when user move to past/next time period
   const [currentDate, setCurrentDate] = useState(new Date(Date.now()));
   const handleNextWeek = () => {
     const nextWeek = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -272,28 +270,7 @@ const Itinerary = () => {
     },
     [],
   );
-  const labels = [
-    { label: "Itinerary", value: "itinerary" },
-    { label: "Schedule", value: "schedule" },
-    { label: "Day", value: "day" },
-    { label: "3 days", value: "3days" },
-    { label: "Week", value: "week" },
-    { label: "Month", value: "month" },
-  ];
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  
   const [isModalVisible, setModalVisible] = useState(false);
   const customTheme = {
     palette: {
@@ -409,7 +386,7 @@ const Itinerary = () => {
         <View style={{ alignItems: "center", top: "20%" }}>
           <View style={styles.modalView}>
             <SafeAreaView style={styles.calendarViewContainer}>
-              {labels.map((view, index) => (
+              {calendarViewLabels.map((view, index) => (
                 <Pressable
                   key={index}
                   onPress={() => {
@@ -441,19 +418,20 @@ const Itinerary = () => {
           </View>
         </View>
       </Modal>
+      {/* Itinerary view to add activity to calendar */}
       {calendarMode === "itinerary" ? (
         <ScrollView>
-          {dateList.map((date, index) => {
+          {datesConsecutiveList.map((date, index) => {
             const dateString = new Date(date).toLocaleDateString();
             const eventsForDate = groupedEvents[dateString] || [];
-            // console.log(eventsForDate["7/2/2024"]?.children)
+            console.log("eventsfordate", eventsForDate);
             return (
               <View key={index} style={styles.itineraryContainer}>
                 <Text style={{ fontSize: 20, fontWeight: "bold" }}>
                   {dateString}
                 </Text>
                 {eventsForDate.length > 0 ? (
-                  eventsForDate.map((event) => (
+                  eventsForDate.map((event: Event) => (
                     <View key={event.activityid} style={styles.eventContainer}>
                       <Text style={styles.h4}>{event.title}</Text>
                       <Text style={styles.p}>
@@ -468,21 +446,27 @@ const Itinerary = () => {
                     No activities for this date yet!
                   </Text>
                 )}
-                <AddActivityToItinerary
-                  currentDateUpdate={date}
-                  setCurrentDateUpdate={setCurrentDateUpdate}
-                  input={eventOptions}
-                  saveActivityId={(activityId: string) => {
-                    setSavedActivityId(activityId);
-                    // setCurrentDateUpdate(date);
-                    console.log("saved id from modal", activityId);
-                  }}
-                  isVisible={bannerModalVisible}
-                  setIsVisible={setBannerModalVisible}
-                />
+                {currentDateUpdate && (
+                  <AddActivityToItinerary
+                    currentDateUpdate={currentDateUpdate}
+                    input={activitiesNotOnCalendar}
+                    saveActivityId={(activityId: string) => {
+                      setSavedActivityId(activityId);
+                      setDateForUpdateForm(currentDateUpdate);
+                      setCurrentDateUpdate(null);
+                      console.log("currentdateu[update before modal", date);
+                      console.log("saved id from modal", activityId);
+                    }}
+                    isVisible={bannerModalVisible}
+                    setIsVisible={() => {
+                      setCurrentDateUpdate(null);
+                      setBannerModalVisible(false);
+                    }}
+                  />
+                )}
                 <TouchableOpacity
                   onPress={() => {
-                    setBannerModalVisible(true);
+                    handleDateSelection(date);
                   }}
                 >
                   <SearchBar
@@ -506,7 +490,7 @@ const Itinerary = () => {
         </ScrollView>
       ) : (
         <Calendar
-          events={events}
+          events={eventsOnCalendar}
           height={600}
           onChangeDate={handleChangeDate}
           mode={calendarMode}
