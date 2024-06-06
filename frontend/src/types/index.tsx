@@ -158,3 +158,48 @@ export interface Event {
   children: JSX.Element | null;
   activityid: string;
 }
+
+export interface TripDate {
+  start: String;
+  range: Number;
+}
+
+export type Mode =
+  | "3days"
+  | "week"
+  | "day"
+  | "custom"
+  | "month"
+  | "schedule"
+  | "itinerary";
+
+  export interface AddActivityProps {
+    currentDateUpdate: Date;
+    input: ActivityProps[];
+    saveActivityId: (activityId: string) => void;
+    isVisible: boolean;
+    setIsVisible: (isVisible: boolean) => void;
+  }
+
+  export const calendarViewLabels = [
+    { label: "Itinerary", value: "itinerary" },
+    { label: "Schedule", value: "schedule" },
+    { label: "Day", value: "day" },
+    { label: "3 days", value: "3days" },
+    { label: "Week", value: "week" },
+    { label: "Month", value: "month" },
+  ];
+  export const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
