@@ -1,8 +1,8 @@
 import { View, Text, ScrollView, Image, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
 import favicon from "@/assets/favicon.png";
-import { Link, Stack, useGlobalSearchParams } from "expo-router";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { useGlobalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from "luxon";
 import { StyleSheet } from "react-native";
@@ -12,8 +12,8 @@ const ViewActivity = () => {
   const { id } = useGlobalSearchParams();
   console.log("id (view activity):", id);
 
-  const { activityid } = useGlobalSearchParams();
-  console.log("activity-id (view activity):", activityid);
+  const { itineraryid } = useGlobalSearchParams();
+  console.log("itinerary-id (view activity):", itineraryid);
 
   const [isOnCalendar, setIsOnCalendar] = useState(false);
   const [liked, setLiked] = React.useState(false);
@@ -34,24 +34,26 @@ const ViewActivity = () => {
 
   const getActivity = async ({
     id,
-    activityid,
+    itineraryid,
   }: {
     id: string;
-    activityid: string;
+    itineraryid: string;
   }) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/trips/${id}/activities/${activityid}`,
+        `http://localhost:3000/trips/${id}/activities/${itineraryid}`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
+          // body: JSON.stringify(req),
         },
       );
       if (!response.ok) {
         throw new Error("Failed to fetch activity");
       }
+      // Optionally, you can handle the response here
       const data = await response.json();
       setActivity(data);
       console.log("Activity fetch:", data);
@@ -61,23 +63,35 @@ const ViewActivity = () => {
   };
 
   useEffect(() => {
-    getActivity({ id, activityid });
+    getActivity({ id, itineraryid });
     setIsOnCalendar(activity.isOnCalendar);
   }, []);
 
   return (
     <View style={{ height: Dimensions.get("window").height }}>
+      {/* <Stack.Screen
+    options={{
+      title: '',
+      headerShown: true,
+      headerRight: () => (
+        <Link href={`/trip/create?id=${id}`}>
+          <Feather
+            onPressIn={showMoreSetting}
+            onPressOut={notShowMoreSetting}
+            name="edit-2"
+            size={24}
+            color="black" />
+        </Link>
+      ),
+    }}
+  /> */}
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.imageContainer}>
           <Image style={styles.image} source={favicon} />
           <View style={styles.likeContainer}>
             <Text style={styles.h4}>{activity.netUpvotes}</Text>
             <TouchableOpacity style={styles.heartIcon} onPress={toggleLike}>
-              <Ionicons
-                name={liked ? "heart" : "heart-outline"}
-                color="red"
-                size={25}
-              />
+              <Ionicons name={liked ? 'heart' : 'heart-outline'} color='red' size={25} />
             </TouchableOpacity>
           </View>
         </View>
@@ -92,6 +106,7 @@ const ViewActivity = () => {
             <Text style={[styles.h1, { marginTop: 18 }]}>{activity.name}</Text>
             <View style={styles.row}>
               <Text style={[styles.h3, { marginRight: 5 }]}>3</Text>
+              {/* <Ionicons name="star" size={24} color="#FFC501" /> */}
               <Rating
                 type="star"
                 ratingCount={5}
@@ -103,16 +118,9 @@ const ViewActivity = () => {
             <View style={styles.row}>
               <Ionicons name="location" size={25} color="#006ee6" />
               <View>
-                {activity.location.address ? (
-                  <Text style={[styles.h3, { marginLeft: 10 }]}>
-                    {activity.location.address}
-                  </Text>
-                ) : null}
-                {activity.location.citystate ? (
-                  <Text style={[styles.h3, { marginLeft: 10 }]}>
-                    {activity.location.citystate}
-                  </Text>
-                ) : null}
+                <Text style={[styles.h3, { marginLeft: 10 }]}>
+                  {activity.location.address} {activity.location.citystate}
+                </Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -129,13 +137,10 @@ const ViewActivity = () => {
                   {DateTime.fromISO(activity.startTime.toString())
                     .setZone("system")
                     .toLocaleString(DateTime.TIME_SIMPLE)}
+                  {/* {trip.startDate.getHours() % 12 || 12}:{trip.startDate.getMinutes().toString().padStart(2, '0')} {trip.startDate.getHours() >= 12 ? 'PM' : 'AM'} */}
                 </Text>
               </View>
-              <Ionicons
-                name="arrow-forward-outline"
-                size={25}
-                color="#006ee6"
-              />
+              <Ionicons name="arrow-forward-outline" size={25} color="#006ee6" />
               <View style={styles.dateContainer}>
                 <Text style={[styles.h3, { marginLeft: 10 }]}>
                   {new Date(activity.endTime).toLocaleString("en-US", {
@@ -148,20 +153,21 @@ const ViewActivity = () => {
                   {DateTime.fromISO(activity.endTime.toString())
                     .setZone("system")
                     .toLocaleString(DateTime.TIME_SIMPLE)}
+                  {/* {trip.endDate.getHours() % 12 || 12}:{trip.endDate.getMinutes().toString().padStart(2, '0')} {trip.endDate.getHours() >= 12 ? 'PM' : 'AM'} */}
                 </Text>
               </View>
             </View>
             <Text style={[styles.h4, { marginLeft: 35 }]}>
               {DateTime.local().zoneName}
             </Text>
-
+            
             <TouchableOpacity
               onPress={() => setIsOnCalendar(!isOnCalendar)}
               style={{
-                width: "100%",
-                backgroundColor: isOnCalendar ? "#006ee6" : "#D3D3D3",
+                width: '100%',
+                backgroundColor: isOnCalendar ? '#006ee6' : '#D3D3D3',
                 padding: 10,
-                alignItems: "center",
+                alignItems: 'center',
                 borderRadius: 10,
                 shadowOffset: { width: 1, height: 1 },
                 shadowColor: "#333",
@@ -171,11 +177,9 @@ const ViewActivity = () => {
               }}
             >
               {isOnCalendar ? (
-                <Text style={{ color: "white" }}>Added to Calendar</Text>
+                <Text style={{ color: 'white' }}>Added to Calendar</Text>
               ) : (
-                <Text style={{ color: "black", borderColor: "black" }}>
-                  Add to Calendar
-                </Text>
+                <Text style={{ color: 'black', borderColor: 'black' }}>Add to Calendar</Text>
               )}
             </TouchableOpacity>
             <View>
@@ -194,17 +198,26 @@ const ViewActivity = () => {
 };
 
 const styles = StyleSheet.create({
+  // scrollContainer: {
+  //   display: 'flex',
+  //   flex-direction: 'column',
+  // },
+  container: {
+    // flex: 1,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+  },
   imageContainer: {
-    position: "relative",
+    position: 'relative',
   },
   likeContainer: {
-    position: "absolute",
+    position: 'absolute',
     top: 10,
     right: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-    padding: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    padding: 5, 
     borderRadius: 5,
   },
   heartIcon: {
@@ -247,6 +260,12 @@ const styles = StyleSheet.create({
     marginTop: -12,
     paddingTop: 6,
   },
+  // innerView: {
+  //   paddingHorizontal: 30,
+  //   paddingVertical: 5,
+  //   height: 'auto',
+  // },
+
   row: {
     flexDirection: "row",
     marginTop: 18,

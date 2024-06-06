@@ -4,7 +4,7 @@ export default function ItineraryLayout() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="[activityid]" options={{ headerShown: true }} />
+      <Stack.Screen name="[itineraryid]" options={{ headerShown: true }} />
     </Stack>
   );
 }

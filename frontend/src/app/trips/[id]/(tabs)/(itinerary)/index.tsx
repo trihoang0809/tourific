@@ -18,7 +18,14 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { add, differenceInDays } from "date-fns";
 import { SearchBar } from "@rneui/themed";
 import AddActivityToItinerary from "@/components/AddActivityToItinerary";
-import { ActivityProps, Event, TripDate, Mode, calendarViewLabels, monthNames } from "@/types";
+import {
+  ActivityProps,
+  Event,
+  TripDate,
+  Mode,
+  calendarViewLabels,
+  monthNames,
+} from "@/types";
 
 const Itinerary = () => {
   const { id } = useGlobalSearchParams();
@@ -270,7 +277,7 @@ const Itinerary = () => {
     },
     [],
   );
-  
+
   const [isModalVisible, setModalVisible] = useState(false);
   const customTheme = {
     palette: {
@@ -432,14 +439,22 @@ const Itinerary = () => {
                 </Text>
                 {eventsForDate.length > 0 ? (
                   eventsForDate.map((event: Event) => (
-                    <View key={event.activityid} style={styles.eventContainer}>
+                    <TouchableOpacity
+                    onPress={() => {
+                      router.push(`trips/${id}/(itinerary)/${event.activityid}`);
+                    }} 
+                    key={event.activityid} 
+                    >
+                    <View style={styles.eventContainer}>
                       <Text style={styles.h4}>{event.title}</Text>
-                      <Text style={styles.p}>
-                        {new Date(event.start).toLocaleTimeString()} -{" "}
-                        {new Date(event.end).toLocaleTimeString()}
-                      </Text>
+                      {event.start.getTime() !== event.end.getTime() && (
+                        <Text style={styles.p}>
+                          {new Date(event.start).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} -{" "}
+                          {new Date(event.end).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
+                        </Text>
+                      )}
                       <View>{event.children}</View>
-                    </View>
+                    </View></TouchableOpacity>
                   ))
                 ) : (
                   <Text style={{ marginVertical: 10, fontSize: 18 }}>
