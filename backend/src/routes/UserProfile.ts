@@ -5,12 +5,16 @@ import { StatusCodes } from "http-status-codes";
 const router = express.Router();
 const prisma = new PrismaClient();
 
+// temporary for testing until auth done
+const userID = "6661308f193a6cd9e0ea4d36";
+
 // Get all user profiles
 router.get("/", async (req, res) => {
   try {
     const users = await prisma.user.findMany();
     res.json(users);
   } catch (error) {
+    console.log(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while fetching users." });
   }
 });
@@ -40,7 +44,6 @@ router.get("/:userId", async (req, res) => {
 // Create a user profile
 router.post("/", async (req, res) => {
   const { userName, email, password, firstName, lastName, dateOfBirth, avatar } = req.body;
-
   try {
     const user = await prisma.user.create({
       data: {
@@ -113,4 +116,141 @@ router.delete("/:id", async (req, res) => {
       .json({ error: `An error occurred while deleting the user profile with id: ${id}` });
   }
 });
+
+// Add a friend
+router.post("/add-friend", async (req, res) => {
+  const { friendId } = req.body;
+  const userId = userID;
+  try {
+    const friend = await prisma.friendship.create({
+      data: {
+        senderID: userId,
+        receiverID: friendId,
+      },
+    });
+    res.status(StatusCodes.CREATED).json(friend);
+  }
+  catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while adding a friend." });
+  }
+});
+
+// view all friend requests
+router.get("/friend/requests", async (req, res) => {
+  const userId = userID;
+  try {
+    const friendRequests = await prisma.friendship.findMany({
+      where: {
+        receiverID: userId,
+        friendStatus: "PENDING",
+      },
+    });
+    res.status(StatusCodes.OK).json(friendRequests);
+  }
+  catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting friend requests." });
+  }
+});
+
+// get all sent friend requests
+router.get("/friend/sent-requests", async (req, res) => {
+  const userId = userID;
+  try {
+    const sentRequests = await prisma.friendship.findMany({
+      where: {
+        senderID: userId,
+        friendStatus: "PENDING",
+      },
+    });
+    res.status(StatusCodes.OK).json(sentRequests);
+  }
+  catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting sent friend requests." });
+  }
+});
+
+// accept a friend request
+router.patch("/friend/accept", async (req, res) => {
+  const { friendId } = req.body;
+  const userId = userID;
+  try {
+    const friend = await prisma.friendship.update({
+      where: {
+        receiverID_senderID: {
+          senderID: friendId,
+          receiverID: userId,
+        },
+      },
+      data: {
+        friendStatus: "ACCEPTED",
+      },
+    });
+    res.status(StatusCodes.OK).json(friend);
+  }
+  catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while accepting a friend." });
+  }
+});
+
+// reject a friend request
+router.patch("/friend/reject", async (req, res) => {
+  const { friendId } = req.body;
+  const userId = userID;
+  try {
+    const friend = await prisma.friendship.update({
+      where: {
+        receiverID_senderID: {
+          senderID: friendId,
+          receiverID: userId,
+        },
+      },
+      data: {
+        friendStatus: "REJECTED",
+      },
+    });
+    res.status(StatusCodes.OK).json(friend);
+  }
+  catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while rejecting a friend." });
+  }
+});
+
+// get all friends
+router.get("/:userId/friends", async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const friends = await prisma.friendship.findMany({
+      where: {
+        // get all friends that have accepted the friend request
+        OR: [
+          {
+            senderID: userId,
+            friendStatus: "ACCEPTED",
+            receiverID: {
+              not: userId
+            }
+          },
+          {
+            receiverID: userId,
+            friendStatus: "ACCEPTED",
+            senderID: {
+              not: userId
+            }
+          },
+        ],
+      },
+    });
+    res.status(StatusCodes.OK).json(friends);
+  }
+  catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting friends." });
+  }
+});
+
 export default router;
