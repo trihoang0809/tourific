@@ -18,9 +18,11 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import * as ImagePicker from "expo-image-picker";
 import { User } from "@/types";
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
-import { date } from "zod";
+import { any, date } from "zod";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import DatePicker from "react-native-date-picker";
+import * as FileSystem from "expo-file-system";
+import { firebase } from "../../../firebaseConfig";
 
 interface editProps {
   method: string;
@@ -224,7 +226,7 @@ export const UserProfileCreate: React.FC<editProps> = ({ method, id = "" }) => {
     return `${date.getDate()} ${month}, ${date.getFullYear()}`;
   };
 
-  // Upload photo
+  // Pick photo
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -238,6 +240,32 @@ export const UserProfileCreate: React.FC<editProps> = ({ method, id = "" }) => {
 
     if (!result.canceled) {
       setAvatar({ height: 200, width: 200, url: result.assets[0].uri });
+      uploadImage();
+    }
+  };
+
+  const uploadImage = async () => {
+    try {
+      const { uri } = await FileSystem.getInfoAsync(avatar.url);
+      const blob = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = () => {
+          resolve(xhr.response);
+        };
+        xhr.onerror = (e) => {
+          reject(new TypeError("Network request failed"));
+        };
+        xhr.responseType = "blob";
+        xhr.open("GET", uri, true);
+        xhr.send(null);
+      });
+
+      const filename = avatar.url.substring(avatar.url.lastIndexOf("/") + 1);
+      const ref = firebase.storage().ref().child(filename);
+      await ref.put(blob);
+      setAvatar(null);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -525,3 +553,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
+function getInfoAsync(url: string): { uri: any } | PromiseLike<{ uri: any }> {
+  throw new Error("Function not implemented.");
+}
