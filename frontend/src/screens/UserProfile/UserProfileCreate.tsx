@@ -259,11 +259,12 @@ export const UserProfileCreate: React.FC<editProps> = ({ method, id = "" }) => {
         xhr.open("GET", uri, true);
         xhr.send(null);
       });
-
       const filename = avatar.url.substring(avatar.url.lastIndexOf("/") + 1);
-      const ref = firebase.storage().ref().child(filename);
+      const ref = firebase
+        .storage()
+        .ref()
+        .child("users/avatars/" + filename);
       await ref.put(blob);
-      setAvatar(null);
     } catch (error) {
       console.log(error);
     }
