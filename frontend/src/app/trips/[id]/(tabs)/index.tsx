@@ -1,13 +1,20 @@
-import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import { Link, Stack, router, useGlobalSearchParams } from "expo-router";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
-import { DateTime } from 'luxon';
+import { DateTime } from "luxon";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
-const width = Dimensions.get('window').width; //full width
-const height = Dimensions.get('window').height; //full height
+const width = Dimensions.get("window").width; //full width
+const height = Dimensions.get("window").height; //full height
 
 const TripDetailsScreen = () => {
   const { id } = useGlobalSearchParams();
@@ -22,22 +29,25 @@ const TripDetailsScreen = () => {
     startMinute: 0,
     image: { url: "" },
   });
+  const serverUrl = EXPO_PUBLIC_HOST_URL;
   const defaultUri =
     "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400";
 
   // more setting icon
   const [modalEditVisible, setModalEditVisible] = useState(false);
 
-  const getTrip = async ({ id: text }: { id: string; }) => {
+  const getTrip = async ({ id: text }: { id: string }) => {
     try {
       console.log(EXPO_PUBLIC_HOST_URL);
-      const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-        // body: JSON.stringify(req),
-      });
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch trip");
       }
@@ -68,10 +78,10 @@ const TripDetailsScreen = () => {
     <View>
       <Stack.Screen
         options={{
-          title: 'Home',
+          title: "Home",
           headerShown: true,
           headerStyle: {
-            backgroundColor: 'white',
+            backgroundColor: "white",
           },
           headerTransparent: false,
           headerRight: () => (
@@ -92,7 +102,7 @@ const TripDetailsScreen = () => {
               size={24}
               color="black"
               style={{ marginLeft: 10 }}
-              onPress={() => router.navigate('/')}
+              onPress={() => router.navigate("/")}
             />
           ),
         }}
@@ -111,7 +121,12 @@ const TripDetailsScreen = () => {
           />
         </View>
         <View
-          style={{ borderTopLeftRadius: 30, borderTopRightRadius: 30, flex: 1, marginTop: -50 }}
+          style={{
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+            flex: 1,
+            marginTop: -50,
+          }}
           className="bg-white h-full"
         >
           <View style={styles.view}>
@@ -172,7 +187,6 @@ const TripDetailsScreen = () => {
                     {/* {trip.endDate.getHours() % 12 || 12}:{trip.endDate.getMinutes().toString().padStart(2, '0')} {trip.endDate.getHours() >= 12 ? 'PM' : 'AM'} */}
                   </Text>
                 </View>
-
               </View>
               <Text style={[styles.h4, { marginLeft: 35 }]}>
                 {DateTime.local().zoneName}
@@ -182,7 +196,7 @@ const TripDetailsScreen = () => {
           </View>
         </View>
       </ScrollView>
-    </View >
+    </View>
   );
 };
 
