@@ -13,7 +13,7 @@ export interface InvitationParams extends TripParams {
 }
 
 // temporary for testing until auth done
-const userID = "66428776e8e67c56cab2133d";
+const userID = "6661308f193a6cd9e0ea4d36";
 
 // get all invitations
 router.get("/", async (req: Request, res) => {
