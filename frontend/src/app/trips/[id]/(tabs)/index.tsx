@@ -1,7 +1,13 @@
-import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import favicon from "@/assets/favicon.png";
-import { Link, Stack, router, useLocalSearchParams } from "expo-router";
+import {
+  View,
+  Text,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { Link, Stack, router, useGlobalSearchParams } from "expo-router";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from 'luxon';
@@ -9,15 +15,16 @@ import BottomSlider from "@/components/BottomSheet/BottomSlider";
 import {
   BottomSheetModal,
 } from '@gorhom/bottom-sheet';
-import { TouchableOpacity } from "react-native";
 import AvatarGroup from "@/components/Avatar/AvatarGroup";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
-const width = Dimensions.get('window').width; //full width
-const height = Dimensions.get('window').height; //full height
+const width = Dimensions.get("window").width; //full width
+const height = Dimensions.get("window").height; //full height
 
 const TripDetailsScreen = () => {
-  const { id } = useLocalSearchParams();
+  const { id } = useGlobalSearchParams();
+  // const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
+
   const [trip, setTrip] = useState({
     name: "",
     location: { address: "", citystate: "", radius: 0 },
@@ -26,7 +33,13 @@ const TripDetailsScreen = () => {
     startHour: 0,
     startMinute: 0,
     participants: [],
+    image: { url: "" },
   });
+
+  const serverUrl = EXPO_PUBLIC_HOST_URL;
+  const defaultUri =
+    "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400";
+
 
   // ref
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -47,13 +60,15 @@ const TripDetailsScreen = () => {
   const getTrip = async ({ id: text }: { id: string; }) => {
     try {
       console.log(EXPO_PUBLIC_HOST_URL);
-      const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-        // body: JSON.stringify(req),
-      });
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch trip");
       }
@@ -99,10 +114,10 @@ const TripDetailsScreen = () => {
     <View>
       <Stack.Screen
         options={{
-          title: 'Home',
+          title: "Home",
           headerShown: true,
           headerStyle: {
-            backgroundColor: 'white',
+            backgroundColor: "white",
           },
           headerTransparent: false,
           headerRight: () => (
@@ -126,7 +141,7 @@ const TripDetailsScreen = () => {
               size={24}
               color="black"
               style={{ marginLeft: 10 }}
-              onPress={() => router.navigate('/')}
+              onPress={() => router.navigate("/")}
             />
           ),
         }}
@@ -134,73 +149,89 @@ const TripDetailsScreen = () => {
       <ScrollView style={{ width: width, height: height }}>
         <View>
           <Image
-            style={{ width: width, height: 200 }}
-            source={favicon} />
+            style={styles.image}
+            source={
+              trip.image && trip.image.url
+                ? { uri: trip.image.url }
+                : {
+                    uri: defaultUri,
+                  }
+            }
+          />
         </View>
-        <View style={styles.view}>
-          <View
-            style={{
-              paddingHorizontal: 30,
-              paddingVertical: 19,
-              height: height,
-            }}
-          >
-            <Text style={[styles.h1, { marginTop: 18 }]}>{trip?.name}</Text>
-            <View style={styles.row}>
-              <Ionicons name="location-outline" size={25} color="#006ee6" />
-              <View>
-                <Text style={[styles.h3, { marginLeft: 10 }]}>
-                  {trip?.location.address} {trip?.location.citystate}
-                </Text>
-                <Text style={[styles.h4, { marginLeft: 10 }]}>
-                  + {Number(trip?.location.radius * 0.0006213712).toFixed(2)}{" "}
-                  miles
-                </Text>
+        <View
+          style={{
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+            flex: 1,
+            marginTop: -50,
+          }}
+          className="bg-white h-full"
+        >
+          <View style={styles.view}>
+            <View
+              style={{
+                paddingHorizontal: 30,
+                paddingVertical: 19,
+                height: height,
+              }}
+            >
+              <Text style={[styles.h1, { marginTop: 18 }]}>{trip.name}</Text>
+              <View style={styles.row}>
+                <Ionicons name="location-outline" size={25} color="#006ee6" />
+                <View>
+                  <Text style={[styles.h3, { marginLeft: 10 }]}>
+                    {trip.location.address} {trip.location.citystate}
+                  </Text>
+                  <Text style={[styles.h4, { marginLeft: 10 }]}>
+                    + {Number(trip.location.radius * 0.0006213712).toFixed(2)}{" "}
+                    miles
+                  </Text>
+                </View>
               </View>
+              <View style={styles.row}>
+                <Ionicons name="calendar-outline" size={25} color="#006ee6" />
+                <View style={styles.dateContainer}>
+                  <Text style={[styles.h3, { marginHorizontal: 10 }]}>
+                    {new Date(trip.startDate).toLocaleString("en-US", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </Text>
+                  <Text style={[styles.h4, { marginLeft: 10 }]}>
+                    {DateTime.fromISO(trip.startDate.toString())
+                      .setZone("system")
+                      .toLocaleString(DateTime.TIME_SIMPLE)}
+                    {/* {trip.startDate.getHours() % 12 || 12}:{trip.startDate.getMinutes().toString().padStart(2, '0')} {trip.startDate.getHours() >= 12 ? 'PM' : 'AM'} */}
+                  </Text>
+                </View>
+                <Ionicons
+                  name="arrow-forward-outline"
+                  size={25}
+                  color="#006ee6"
+                />
+                <View style={styles.dateContainer}>
+                  <Text style={[styles.h3, { marginLeft: 10 }]}>
+                    {new Date(trip.endDate).toLocaleString("en-US", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </Text>
+                  <Text style={[styles.h4, { marginLeft: 10 }]}>
+                    {DateTime.fromISO(trip.endDate.toString())
+                      .setZone("system")
+                      .toLocaleString(DateTime.TIME_SIMPLE)}
+                    {/* {trip.endDate.getHours() % 12 || 12}:{trip.endDate.getMinutes().toString().padStart(2, '0')} {trip.endDate.getHours() >= 12 ? 'PM' : 'AM'} */}
+                  </Text>
+                </View>
+              </View>
+              <Text style={[styles.h4, { marginLeft: 35 }]}>
+                {DateTime.local().zoneName}
+              </Text>
+              <Text style={styles.h2}>Participants</Text>
             </View>
-            <View style={styles.row}>
-              <Ionicons name="calendar-outline" size={25} color="#006ee6" />
-              <View style={styles.dateContainer}>
-                <Text style={[styles.h3, { marginHorizontal: 10 }]}>
-                  {new Date(trip?.startDate).toLocaleString("en-US", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </Text>
-                <Text style={[styles.h4, { marginLeft: 10 }]}>
-                  {DateTime.fromISO(trip?.startDate.toString())
-                    .setZone("system")
-                    .toLocaleString(DateTime.TIME_SIMPLE)}
-                  {/* {trip.startDate.getHours() % 12 || 12}:{trip.startDate.getMinutes().toString().padStart(2, '0')} {trip.startDate.getHours() >= 12 ? 'PM' : 'AM'} */}
-                </Text>
-              </View>
-              <Ionicons
-                name="arrow-forward-outline"
-                size={25}
-                color="#006ee6"
-              />
-              <View style={styles.dateContainer}>
-                <Text style={[styles.h3, { marginLeft: 10 }]}>
-                  {new Date(trip?.endDate).toLocaleString("en-US", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </Text>
-                <Text style={[styles.h4, { marginLeft: 10 }]}>
-                  {DateTime.fromISO(trip?.endDate.toString())
-                    .setZone("system")
-                    .toLocaleString(DateTime.TIME_SIMPLE)}
-                  {/* {trip.endDate.getHours() % 12 || 12}:{trip.endDate.getMinutes().toString().padStart(2, '0')} {trip.endDate.getHours() >= 12 ? 'PM' : 'AM'} */}
-                </Text>
-              </View>
-            </View>
-            <Text style={[styles.h4, { marginLeft: 35 }]}>
-              {DateTime.local().zoneName}
-            </Text>
-            <Text style={styles.h2}>Participants</Text>
-            <AvatarGroup users={trip.participants} size={55}/>
           </View>
         </View>
       </ScrollView>

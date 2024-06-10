@@ -22,8 +22,8 @@ export const tripCreateSchema = z.object({
       return data.address || data.citystate;
     }, "Please choose a destination"),
   image: z.object({
-    height: z.number(),
-    width: z.number(),
-    url: z.string()
-  }).optional()
+    height: z.number().optional(),
+    width: z.number().optional(),
+    url: z.string().url({ message: "Please use a URL" }).min(5),
+  }),
 });

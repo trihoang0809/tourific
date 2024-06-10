@@ -21,6 +21,7 @@ import { DateTime } from "luxon";
 import { TripSchema } from "@/validation/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import PhotoAPI from "@/components/PhotoAPI";
 
 // CREATING: /trips/create
 // UPDATING: /trips/create?id=${id}
@@ -37,29 +38,33 @@ export default function CreateTripScreen() {
     resolver: zodResolver(TripSchema),
   });
   const { id: idString } = useLocalSearchParams();
-  console.log("idString", idString);
-  // const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
+  const [savedPhoto, setSavedPhoto] = useState(
+    "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400",
+  );
+  const [bannerModalVisible, setBannerModalVisible] = useState(false);
+  console.log("save banner: ", savedPhoto);
 
   // check if there's an id -> if there's id meaning trip has been created
   const isUpdating = !!idString; // id is type of string
-  console.log("isUpdating", isUpdating);
 
   //fetch trip if exist
   async function setTripIfExist(tripId: string) {
     try {
-      const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${tripId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${tripId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch trip");
       }
       // Optionally, you can handle the response here
       const data = await response.json();
-      console.log("ata bfore bo vo form", data);
       const startTime = extractDateTime(data.startDate);
       const endTime = extractDateTime(data.endDate);
       setFormData({
@@ -77,39 +82,42 @@ export default function CreateTripScreen() {
           hours: endTime.hour,
           minutes: endTime.minute,
         },
-        location: data.location
+        location: data.location,
+        image: {
+          url: savedPhoto,
+        },
       });
-      console.log("form data trong settripexist", formData);
     } catch (error: any) {
       console.error("Error fetching trip:", error.toString());
     }
-  };
+  }
 
   //trip data for form
-  const [formData, setFormData] = useState<TripData | null>(
-    {
-      name: "",
-      dateRange: {
-        startDate: new Date(),
-        endDate: new Date(),
-      },
-      startTime: {
-        hours: 8,
-        minutes: 15,
-      },
-      endTime: {
-        hours: 10,
-        minutes: 30,
-      },
-      location: {
-        address: '',
-        citystate: '',
-        latitude: 0,
-        longitude: 0,
-        radius: 0
-      },
-    }
-  );
+  const [formData, setFormData] = useState<TripData | null>({
+    name: "",
+    dateRange: {
+      startDate: new Date(),
+      endDate: new Date(),
+    },
+    startTime: {
+      hours: 8,
+      minutes: 15,
+    },
+    endTime: {
+      hours: 10,
+      minutes: 30,
+    },
+    location: {
+      address: "",
+      citystate: "",
+      latitude: 0,
+      longitude: 0,
+      radius: 0,
+    },
+    image: {
+      url: savedPhoto,
+    },
+  });
 
   useEffect(() => {
     if (isUpdating) {
@@ -129,7 +137,7 @@ export default function CreateTripScreen() {
   const [visibleEnd, setVisibleEnd] = useState(false);
 
   const onSubmit = async (data: any) => {
-    const { name, location, startTime, endTime, dateRange } = data;
+    const { name, location, startTime, endTime, dateRange, image } = data;
     const isoStartDate = DateTime.fromISO(
       formatDateTime(dateRange.startDate, startTime.hours, startTime.minutes),
     ).setZone("system");
@@ -141,16 +149,20 @@ export default function CreateTripScreen() {
       startDate: isoStartDate,
       endDate: isoEndDate,
       location,
+      image: { url: savedPhoto },
     };
 
     if (isUpdating) {
       // UPDATING
       try {
-        const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${idString}`, {
-          method: "PUT",
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(req),
-        });
+        const response = await fetch(
+          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${idString}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(req),
+          },
+        );
 
         if (!response.ok) {
           throw new Error("Failed to update trip");
@@ -161,8 +173,8 @@ export default function CreateTripScreen() {
             text: "Go back home",
             onPress: () => {
               router.push("/");
-            }
-          }
+            },
+          },
         ]);
       } catch (error: any) {
         console.error("Error updating trip:", error.toString());
@@ -170,21 +182,27 @@ export default function CreateTripScreen() {
     } else {
       // CREATING
       try {
-        const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const response = await fetch(
+          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
           },
-          body: JSON.stringify(req),
-        });
+        );
         if (!response.ok) {
-          throw new Error(`Failed to create trip: ${response.status} ${response.statusText}`);
+          throw new Error(
+            `Failed to create trip: ${response.status} ${response.statusText}`,
+          );
         }
         // Optionally, you can handle the response here
         const data = await response.json();
-        console.log("Trip created:", data);
         Alert.alert("Alert Title", "Create Trip Successfully", [
-          { text: "Go back home page", onPress: () => <Link href={"/trips"} /> },
+          {
+            text: "Go back home page",
+            onPress: () => <Link href={"/trips"} />,
+          },
         ]);
       } catch (error: any) {
         console.error("Error creating trip:", error.toString());
@@ -203,8 +221,7 @@ export default function CreateTripScreen() {
   }, [setOpen]);
 
   const onConfirm = useCallback(
-    ({ startDate, endDate }: { startDate: Date; endDate: Date; }) => {
-      console.log("start date", startDate, endDate);
+    ({ startDate, endDate }: { startDate: Date; endDate: Date }) => {
       setOpen(false);
       // Check if startDate and endDate are already set in formData
       setFormData(
@@ -234,7 +251,7 @@ export default function CreateTripScreen() {
   );
 
   const onConfirmStartTime = useCallback(
-    ({ hours, minutes }: { hours: number; minutes: number; }) => {
+    ({ hours, minutes }: { hours: number; minutes: number }) => {
       setFormData(
         (prevFormData) =>
           ({
@@ -251,7 +268,7 @@ export default function CreateTripScreen() {
   );
 
   const onConfirmEndTime = useCallback(
-    ({ hours, minutes }: { hours: number; minutes: number; }) => {
+    ({ hours, minutes }: { hours: number; minutes: number }) => {
       setFormData(
         (prevFormData) =>
           ({
@@ -278,22 +295,18 @@ export default function CreateTripScreen() {
     [setFormData],
   );
 
-  function chooseBannerCover(): void {
-    throw new Error("Function not implemented.");
-  }
-
   return (
     <View>
       <Stack.Screen
         options={{
           headerShown: true,
-          title: ' ',
+          title: " ",
         }}
       />
       <ScrollView nestedScrollEnabled={true}>
         {/* trips banner */}
         <View style={{ position: "relative" }}>
-          <Image className="w-full h-40" source={favicon} />
+          <Image className="w-full h-40" source={{ uri: savedPhoto }} />
           <Pressable
             style={{
               display: "flex",
@@ -308,11 +321,29 @@ export default function CreateTripScreen() {
               width: 130,
               padding: "auto",
             }}
-            onPress={() => { }}
+            onPress={() => {
+              setBannerModalVisible(true);
+            }}
           >
-            <Text>Change image</Text>
+            <Text>Set cover</Text>
           </Pressable>
         </View>
+        <PhotoAPI
+          savePhoto={(photo: string) => {
+            setSavedPhoto(photo);
+            setFormData(
+              (prevFormData) =>
+                ({
+                  ...prevFormData,
+                  image: {
+                    url: photo,
+                  },
+                }) as TripData,
+            );
+          }}
+          isVisible={bannerModalVisible}
+          setIsVisible={setBannerModalVisible}
+        />
 
         {/* trip details */}
         <View
@@ -443,21 +474,21 @@ export default function CreateTripScreen() {
                     }}
                   >
                     {typeof formData?.startTime.hours === "number" &&
-                      typeof formData.startTime.minutes === "number"
+                    typeof formData.startTime.minutes === "number"
                       ? new Date(
-                        1970,
-                        0,
-                        1,
-                        formData.startTime.hours,
-                        formData.startTime.minutes,
-                      ).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
+                          1970,
+                          0,
+                          1,
+                          formData.startTime.hours,
+                          formData.startTime.minutes,
+                        ).toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
                       : new Date(1970, 0, 1, 8, 0).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                   </Text>
                 </TouchableOpacity>
                 <Controller
@@ -499,21 +530,21 @@ export default function CreateTripScreen() {
                     }}
                   >
                     {typeof formData?.endTime.hours === "number" &&
-                      typeof formData.endTime.minutes === "number"
+                    typeof formData.endTime.minutes === "number"
                       ? new Date(
-                        1970,
-                        0,
-                        1,
-                        formData.endTime.hours,
-                        formData.endTime.minutes,
-                      ).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
+                          1970,
+                          0,
+                          1,
+                          formData.endTime.hours,
+                          formData.endTime.minutes,
+                        ).toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
                       : new Date(1970, 0, 1, 8, 0).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                   </Text>
                 </TouchableOpacity>
                 <Controller
@@ -546,29 +577,32 @@ export default function CreateTripScreen() {
             {/* select location and showing map */}
             <View style={{ marginVertical: 10 }}>
               <Text className="font-semibold text-base">Location name</Text>
-              {isUpdating ?
+              {isUpdating ? (
                 <TextInput
-                  value={`${formData?.location.address ? formData.location.address + ', ' : ''} ${formData?.location.citystate ? formData.location.citystate : ''}`}
+                  value={`${formData?.location.address ? formData.location.address + ", " : ""} ${formData?.location.citystate ? formData.location.citystate : ""}`}
                   editable={false}
                 />
-                : <Controller
+              ) : (
+                <Controller
                   control={control}
                   name={"location"}
-                  defaultValue={`${formData?.location.address ? formData.location.address + ', ' : ''}${formData?.location.citystate ? formData.location.citystate : ''}`}
+                  defaultValue={`${formData?.location.address ? formData.location.address + ", " : ""}${formData?.location.citystate ? formData.location.citystate : ""}`}
                   render={({ field: { onChange, value } }) => (
                     <GooglePlacesInput
                       onLocationSelect={(value) => {
                         onLocationSelect(value);
                         onChange(value);
-                        console.log("loc", value);
                       }}
-                      value={`${getValues("location.address" + ', ')}${getValues("location.citystate")}`}
-                    // value={`${formData?.location.address ? formData.location.address + ', ' : ''} ${formData?.location.citystate ? formData.location.citystate : ''}`}
+                      value={`${getValues("location.address" + ", ")}${getValues("location.citystate")}`}
                     />
                   )}
                 />
-              }
-              {errors.location && <Text className="text-red-500">{errors.location?.message?.toString()}</Text>}
+              )}
+              {errors.location && (
+                <Text className="text-red-500">
+                  {errors.location?.message?.toString()}
+                </Text>
+              )}
             </View>
             <Button
               title={isUpdating ? "Save edit" : "Create Trip"}
@@ -579,4 +613,4 @@ export default function CreateTripScreen() {
       </ScrollView>
     </View>
   );
-};
+}

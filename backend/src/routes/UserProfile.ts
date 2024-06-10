@@ -6,7 +6,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // temporary for testing until auth done
-const userID = "6661308f193a6cd9e0ea4d36";
+const userID = "665d2e50daefbf432fff98dc";
 
 // get all user for testing
 router.get("/", async (req, res) => {
@@ -47,12 +47,13 @@ router.get("/:userId", async (req, res) => {
 
 // Create a user profile
 router.post("/", async (req, res) => {
-  const { userName, password, firstName, lastName, dateOfBirth, avatar } = req.body;
+  const { userName, email, password, firstName, lastName, dateOfBirth, avatar } = req.body;
 
   try {
     const user = await prisma.user.create({
       data: {
         userName,
+        email,
         password,
         firstName,
         lastName,

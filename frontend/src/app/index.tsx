@@ -5,7 +5,6 @@ import { sampleUser } from "@/mock-data/user";
 import { Link } from 'expo-router';
 
 export default function App() {
-
   return (
     <View className="flex-1 bg-white">
       <HomeScreen user={sampleUser} />

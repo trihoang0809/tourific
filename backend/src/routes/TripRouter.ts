@@ -20,7 +20,7 @@ export interface TripParams {
 }
 
 // temporary for testing until auth done
-const userID = "6661308f193a6cd9e0ea4d36";
+const userID = "665d2e50daefbf432fff98dc";
 
 // Activites of a trip
 router.use("/:tripId/activities", ActivityRouter);
@@ -124,6 +124,9 @@ router.get("/:id", async (req, res) => {
       where: {
         id,
       },
+      include: {
+        activities: true, // Include activities associated with the trip
+      },
     });
     res.status(StatusCodes.OK).json(trip);
   } catch (error) {
@@ -135,10 +138,12 @@ router.get("/:id", async (req, res) => {
 router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
   try {
     const { id } = req.params;
+    console.log("id", id);
     const { name, startDate, endDate, location, image } = req.body;
+    console.log(req.body);
     const isValidID = await prisma.trip.findUnique({
       where: {
-        id,
+        id: id,
       },
     });
 
@@ -151,11 +156,11 @@ router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
         id,
       },
       data: {
-        name,
-        startDate,
-        endDate,
-        location,
-        image
+        name: name,
+        startDate: startDate,
+        endDate: endDate,
+        location: location,
+        image,
       },
     });
     res.status(StatusCodes.OK).json(trip);
@@ -250,27 +255,6 @@ router.get("/:id/non-participants", async (req, res) => {
       return res.status(StatusCodes.NOT_FOUND).json({ error: "Trip not found" });
     }
 
-    // map non participants with status
-    // const participantIdsToStatus = new Map(participants.map(participant => [participant.inviteeId, participant.status]));
-
-    // const total: { receiver: { id: string; userName: string; password: string; firstName: string; lastName: string; dateOfBirth: Date; } & { avatar: { height: number; width: number; url: string; }; }; status: string | undefined; }[] = [];
-    // const contactsNotInTrip = friends.filter(friend => {
-    //   if (!participantIdsToStatus.has(friend.receiverID)) {
-    //     total.push({
-    //       receiver: friend.receiver,
-    //       status: 'NOT_INVITED'
-    //     });
-    //   } else {
-    //     if (participantIdsToStatus.get(friend.receiverID) !== 'ACCEPTED') {
-    //       total.push({
-    //         receiver: friend.receiver,
-    //         status: participantIdsToStatus.get(friend.receiverID)
-    //       });
-    //     }
-    //   }
-    // });
-
-    // res.json(total);
     // Map participants to their status
     const participantIdsToStatus = new Map(participants.map(p => [p.inviteeId, p.status]));
 

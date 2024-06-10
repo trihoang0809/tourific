@@ -5,7 +5,6 @@ import { Tabs } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
 
 export default function TabLayout() {
-  const { id } = useLocalSearchParams();
   return (
     <Tabs
       screenOptions={{
@@ -33,7 +32,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="activities"
+        name="(activities)"
         options={{
           title: "Suggestions",
           tabBarIcon: ({ color }) => (
@@ -42,7 +41,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="itinerary"
+        name="(itinerary)"
         options={{
           title: "Itinerary",
           tabBarIcon: ({ color }) => (

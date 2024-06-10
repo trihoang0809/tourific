@@ -22,7 +22,7 @@ export const sampleUser: User = {
       image: {
         height: 600,
         width: 800,
-        url: "https://example.com/path/to/beach.jpg",
+        url: "https://static1.thetravelimages.com/wordpress/wp-content/uploads/2023/10/northern-lights-aurora-in-banff-canada.jpg",
       },
     },
     {

@@ -6,7 +6,7 @@ import UserProfile from "./routes/UserProfile";
 import ActivityRouter from "./routes/ActivityRouter";
 
 const app = express();
-const cors = require('cors');
+const cors = require("cors");
 const port = process.env.PORT || 3000;
 const LOCAL_HOST_URL = process.env.LOCAL_HOST_URL;
 

@@ -12,7 +12,7 @@ const screenHeight = Dimensions.get("window").height;
 
 const InvitePage = () => {
   const { id } = useLocalSearchParams();
-  const userId = "6661308f193a6cd9e0ea4d36";
+  const userId = "665d2e50daefbf432fff98dc";
   const [searchTerm, setSearchTerm] = useState("");
   const [friendList, setFriendList] = useState<User[]>([]);
   const [friendsToInvite, setFriendsToInvite] = useState<FriendRequest[]>([]);
