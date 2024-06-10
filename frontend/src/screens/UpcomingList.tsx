@@ -51,14 +51,16 @@ export const ListFilteredCards = ({ isUpcoming }: listprops) => {
   const [upcomingTrips, setUpcoming] = useState<Trip[]>([]);
   const serverUrl = process.env.EXPO_PUBLIC_HOST_URL;
   const windowWidth = Dimensions.get("window").width;
-  const tripCardWidth = windowWidth - (windowWidth * 0.12);
+  const tripCardWidth = windowWidth - windowWidth * 0.12;
   const tripCardHeight = 280;
 
   //Fetching data
   useEffect(() => {
     const getData = async () => {
       try {
-        const link = isUpcoming ? `http://${serverUrl}:3000/trips?upcoming=true` : `http://${serverUrl}:3000/trips?ongoing=true`;
+        const link = isUpcoming
+          ? `http://${serverUrl}:3000/trips?upcoming=true`
+          : `http://${serverUrl}:3000/trips?ongoing=true`;
         const upcoming = await fetch(link);
         let data = await upcoming.json();
         setUpcoming(getRecentTrips(data));
