@@ -81,7 +81,7 @@ export type Trip = {
 
 export type User = {
   id: string;
-  username: string;
+  userName: string;
   password: string;
   friendRequestReceived: any[]; // Specify the type if known
   tripID: string[];

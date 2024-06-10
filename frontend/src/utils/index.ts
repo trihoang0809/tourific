@@ -59,7 +59,9 @@ export function getRecentTrips(trips: Trip[]) {
     return [];
   }
 
-  const upcomingTrips = trips.sort((a, b) => new Date(a.startDate).valueOf() - new Date(b.startDate).valueOf());
+  const upcomingTrips = trips.sort(
+    (a, b) => new Date(a.startDate).valueOf() - new Date(b.startDate).valueOf(),
+  );
 
   return upcomingTrips;
 }
