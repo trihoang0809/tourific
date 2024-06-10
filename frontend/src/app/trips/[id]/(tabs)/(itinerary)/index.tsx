@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Pressable,
   ScrollView,
   SafeAreaView,
+  FlatList,
 } from "react-native";
 import { useGlobalSearchParams, router } from "expo-router";
 import { Calendar, DateRangeHandler } from "react-native-big-calendar";
@@ -44,6 +45,8 @@ const Itinerary = () => {
   const [currentDateUpdate, setCurrentDateUpdate] = useState<Date | null>(null);
   const [dateForUpdateForm, setDateForUpdateForm] = useState(new Date());
 
+  const flatlistRef = useRef<FlatList>(null);
+
   // May use these for search activity:
   // const [query, setQuery] = useState("scenery");
   // const [searchBarValue, setSearchBarValue] = useState("");
@@ -54,6 +57,10 @@ const Itinerary = () => {
   interface GroupedEvents {
     [key: string]: Event[];
   }
+  const getEventsForDate = (date: Date) => {
+    return groupedEvents[date.toLocaleDateString()] || [];
+  };
+
   // Function to group events by date
   const groupEventsByDate = (events: Event[]): GroupedEvents => {
     const groupedEvents: GroupedEvents = {};
@@ -70,6 +77,23 @@ const Itinerary = () => {
   const handleDateSelection = (date: Date) => {
     setCurrentDateUpdate(date);
     setBannerModalVisible(true); // Show the modal
+  };
+
+  // Function to scroll to a specific date
+  const scrollToIndex = (index: number) => {
+    if (flatlistRef.current) {
+      flatlistRef.current.scrollToIndex({ index, animated: true });
+    }
+  };
+  const scrollToDate = (date: Date) => {
+    const index = datesConsecutiveList.findIndex(
+      (d) =>
+        new Date(d).toLocaleDateString() ===
+        new Date(date).toLocaleDateString(),
+    );
+    if (index !== -1) {
+      scrollToIndex(index);
+    }
   };
 
   // Fetch activities
@@ -425,36 +449,69 @@ const Itinerary = () => {
           </View>
         </View>
       </Modal>
-      {/* Itinerary view to add activity to calendar */}
+      {/* Customized itinerary view to add activity to calendar */}
       {calendarMode === "itinerary" ? (
-        <ScrollView>
-          {datesConsecutiveList.map((date, index) => {
-            const dateString = new Date(date).toLocaleDateString();
-            const eventsForDate = groupedEvents[dateString] || [];
-            console.log("eventsfordate", eventsForDate);
-            return (
+        <View>
+          {/* Easy navigation to different dates */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{ marginVertical: 10 }}
+          >
+            {datesConsecutiveList.map((date, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => scrollToDate(new Date(date))}
+                style={{ marginHorizontal: 5 }}
+              >
+                <Text
+                  style={{
+                    padding: 10,
+                    backgroundColor: "#ddd",
+                    borderRadius: 5,
+                  }}
+                >
+                  {`${new Date(date).toLocaleDateString(undefined, { weekday: "short" })} ${new Date(date).toLocaleDateString(undefined, { month: "numeric" })}/${new Date(date).toLocaleDateString(undefined, { day: "numeric" })} `}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+          <FlatList
+            data={datesConsecutiveList}
+            renderItem={({ item: date, index }) => (
               <View key={index} style={styles.itineraryContainer}>
                 <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                  {dateString}
+                  {`${new Date(date).toLocaleDateString(undefined, { weekday: "short" })} ${new Date(date).toLocaleDateString(undefined, { month: "numeric" })}/${new Date(date).toLocaleDateString(undefined, { day: "numeric" })} `}
                 </Text>
-                {eventsForDate.length > 0 ? (
-                  eventsForDate.map((event: Event) => (
+                {/* Render events for this date */}
+                {getEventsForDate(date).length > 0 ? (
+                  getEventsForDate(date).map((event: Event) => (
                     <TouchableOpacity
-                    onPress={() => {
-                      router.push(`trips/${id}/(itinerary)/${event.activityid}`);
-                    }} 
-                    key={event.activityid} 
+                      onPress={() => {
+                        router.push(
+                          `trips/${id}/(itinerary)/${event.activityid}`,
+                        );
+                      }}
+                      key={event.activityid}
                     >
-                    <View style={styles.eventContainer}>
-                      <Text style={styles.h4}>{event.title}</Text>
-                      {event.start.getTime() !== event.end.getTime() && (
-                        <Text style={styles.p}>
-                          {new Date(event.start).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} -{" "}
-                          {new Date(event.end).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
-                        </Text>
-                      )}
-                      <View>{event.children}</View>
-                    </View></TouchableOpacity>
+                      <View style={styles.eventContainer}>
+                        <Text style={styles.h4}>{event.title}</Text>
+                        {event.start.getTime() !== event.end.getTime() && (
+                          <Text style={styles.p}>
+                            {new Date(event.start).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}{" "}
+                            -{" "}
+                            {new Date(event.end).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </Text>
+                        )}
+                        <View>{event.children}</View>
+                      </View>
+                    </TouchableOpacity>
                   ))
                 ) : (
                   <Text style={{ marginVertical: 10, fontSize: 18 }}>
@@ -500,9 +557,11 @@ const Itinerary = () => {
                   />
                 </TouchableOpacity>
               </View>
-            );
-          })}
-        </ScrollView>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+            ref={flatlistRef}
+          />
+        </View>
       ) : (
         <Calendar
           events={eventsOnCalendar}
