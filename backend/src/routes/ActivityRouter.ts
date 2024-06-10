@@ -49,7 +49,7 @@ router.get("/:activityId", async (req: Request<ActivityParams>, res) => {
 // Create a new activity
 router.post("/", async (req: Request<ActivityParams>, res) => {
   const { tripId } = req.params;
-  const { name, description, startTime, endTime, location, notes, image } = req.body;
+  const { name, description, startTime, endTime, location, notes } = req.body;
 
   if (!tripId) {
     res.status(404).json({ error: "ID does not exist" });
@@ -68,7 +68,6 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
             endTime,
             location,
             notes,
-            // image,
           },
         },
       },
