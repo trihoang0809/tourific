@@ -20,7 +20,7 @@ export interface TripParams {
 }
 
 // temporary for testing until auth done
-const userID = "665d2e50daefbf432fff98dc";
+const userID = "6661308f193a6cd9e0ea4d36";
 
 // Activites of a trip
 router.use("/:tripId/activities", ActivityRouter);
@@ -87,6 +87,7 @@ router.get("/", async (req: Request<TripParams>, res) => {
 router.post("/", validateData(tripCreateSchema), async (req, res) => {
   try {
     const { name, startDate, endDate, location, image } = req.body;
+    console.log(req.body);
     const trip = await prisma.trip.create({
       data: {
         name,
