@@ -1,24 +1,30 @@
 import {
   View,
   Text,
-  StatusBar,
   TextInput,
   StyleSheet,
   TouchableWithoutFeedback,
   ScrollView,
   Alert,
-  Button,
+  Pressable,
+  Modal,
 } from "react-native";
-import { styled } from "nativewind";
-import { withExpoSnack } from "nativewind";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { material } from "react-native-typography";
-import { useState, useEffect } from "react";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+import React, { useState, useEffect } from "react";
 import GoogleMapInput from "@/components/GoogleMaps/GoogleMapInput";
-import GooglePlacesInput from "@/components/GoogleMaps/GooglePlacesInput";
+import { Trip } from "@/types";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { router } from "expo-router";
+import { EXPO_PUBLIC_HOST_URL } from "@/utils";
 
-export const ProposedActivities: React.FC = () => {
+interface props {
+  id: String;
+}
+
+export const ProposedActivities: React.FC<props> = (id: props) => {
+  const serverUrl = EXPO_PUBLIC_HOST_URL;
+
   //Declare useState
   const [activityName, setActivityName] = useState("");
   const [activityDescription, setActivityDescription] = useState("");
@@ -26,20 +32,40 @@ export const ProposedActivities: React.FC = () => {
   const [activityLocation, setActivityLocation] = useState({
     address: "",
     citystate: "",
-    longitude: 0,
     latitude: 0,
+    longitude: 0,
+    radius: 0,
   });
+
   const [activityStartDate, setActivityStartDate] = useState(new Date());
   const [activityEndDate, setActivityEndDate] = useState(new Date());
+  const [startDatePickerVisibility, setStartDatePickerVisibility] =
+    useState(false);
+  const [endDatePickerVisibility, setEndDatePickerVisibility] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isFormFilled, setIsFormFilled] = useState(false);
-  const [isStartDatePickerVisible, setStartDatePickerVisibility] =
-    useState(false);
-  const [isEndDatePickerVisible, setEndDatePickerVisibility] = useState(false);
+  const [isNoteSelected, setNoteSelected] = useState(false);
+  const [mapVisible, setMapVisible] = useState(false);
+  // setActivityStartDate(new Date(trip.startDate));
+  useEffect(() => {
+    const getTripData = async () => {
+      try {
+        const link = serverUrl + "trips/" + id.id;
+        const trip = await fetch(link);
+        const data = await trip.json();
+        setActivityLocation({ ...data.location });
+        setActivityStartDate(new Date(data.startDate));
+        setActivityEndDate(new Date(data.endDate));
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
+    getTripData();
+  }, []);
   //Header render + Return Button + Alert Pop up
-  const alertUnSaved = () => {
-    Alert.alert("Unsaved Changes", "You have unsaved changes", [
+  const alertSuccess = () => {
+    Alert.alert("Success", "Good boy", [
       {
         text: "Discard",
         onPress: () => {
@@ -47,46 +73,29 @@ export const ProposedActivities: React.FC = () => {
         },
       },
       {
-        text: "Continue",
+        text: "Ok",
         onPress: () => {
-          console.log("Navigate to the previous page");
+          router.back();
         },
       },
     ]);
   };
 
-  const onPressBack = () => {
-    console.log("You pressed on Return Button");
-    if (!isSaved) {
-      alertUnSaved();
-    }
-  };
-
-  const Header = () => (
-    <View>
-      <StatusBar backgroundColor="black" />
-      <View style={styles.headerContainer}>
-        <Text style={[material.display1, { alignSelf: "center" }]}>
-          Create New Activity
-        </Text>
-      </View>
-    </View>
-  );
-
   //Submit Button
   const validateForm = () => {
     // console.log(activityDescription);
-    if (activityDescription !== "") setIsFormFilled(true);
+    setIsFormFilled(true);
   };
 
   const onPressSubmit = async () => {
     validateForm();
-    console.log("Submit: " + activityLocation.address);
-    // console.log(ad)
-    if (isFormFilled) {
+    console.log("Submit: " + activityNote);
+    console.log(isFormFilled);
+    console.log(activityLocation.address);
+    if (true) {
       try {
         const createActivity = await fetch(
-          "http://10.0.2.2:3000/trips/661f78b88c72a65f2f6e49d4/activities",
+          serverUrl + "trips/" + id.id + "/activities",
           {
             method: "POST",
             headers: {
@@ -108,35 +117,26 @@ export const ProposedActivities: React.FC = () => {
             }),
           },
         );
-        setActivityName("");
-        setActivityDescription("");
-        setActivityNote("");
-        setActivityLocation({
-          address: "",
-          citystate: "",
-          longitude: 0,
-          latitude: 0,
-        });
-        setActivityStartDate(new Date());
-        setActivityEndDate(new Date());
+
+        //alert Success
+        alertSuccess();
+        // console.log(activityNote);
       } catch (error) {
         console.log("An error occured while CREATING new Activity " + error);
       }
     }
-
     setIsSaved(true);
   };
 
   const SubmitButton = () => (
     <TouchableWithoutFeedback onPress={onPressSubmit}>
       <View style={styles.submitButton}>
-        <Text style={[material.headline, { color: "black" }]}>Submit</Text>
+        <Text style={[material.headline, { color: "black" }]}>Save</Text>
       </View>
     </TouchableWithoutFeedback>
   );
 
-  //Show Start || End Date Picker Modal
-  const onPressShowStartDatePicker = () => {
+  const showStartDatePicker = () => {
     setStartDatePickerVisibility(true);
   };
 
@@ -144,218 +144,188 @@ export const ProposedActivities: React.FC = () => {
     setStartDatePickerVisibility(false);
   };
 
-  const handleStartConfirm = (date: Date) => {
-    console.log("A date has been picked: ", date);
+  const handleConfirm = (date: Date) => {
     setActivityStartDate(date);
     hideStartDatePicker();
   };
 
-  const onPressShowEndDatePicker = () => {
-    setEndDatePickerVisibility(true);
-  };
-
-  const hideEndDatePicker = () => {
-    setEndDatePickerVisibility(false);
-  };
-
-  const handleEndConfirm = (date: Date) => {
-    console.log("A date has been picked: ", date);
-    setActivityEndDate(date);
-    hideEndDatePicker();
-  };
-
-  // Format the Date
-  const formatDate = (date: Date) => {
-    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
-      return "Invalid date"; // Handle invalid dates
-    }
-    const month = date.toLocaleString("default", { month: "short" });
-    return `${date.getDate()} ${month}, ${date.getFullYear()}`;
-  };
-
   return (
-    <ScrollView style={styles.formContainer}>
-      <Header />
+    <View style={{ flex: 1, margin: 7, backgroundColor: "white" }}>
+      <View style={styles.formContainer}>
+        {/* Form */}
 
-      {/* Form */}
-      <View style={styles.formInputContainer}>
-        {/* Activity Name input  */}
-        <View style={styles.queInput}>
-          <Text
-            style={[material.headline, { color: "black", marginBottom: 10 }]}
-          >
-            Name:
-          </Text>
+        {/* Activity Title input  */}
+        <View style={[{ rowGap: 7 }]}>
           <TextInput
             onChangeText={(value) => {
               setActivityName(value);
             }}
-            style={[material.title, styles.formInput]}
-            placeholder="Undefined"
+            style={[material.title, { fontSize: 25, fontStyle: "italic" }]}
+            placeholder="Add a title"
+            placeholderTextColor={"grey"}
             value={activityName}
           ></TextInput>
-        </View>
+          {/* Time */}
 
-        {/* Activity Description input */}
-        <View style={styles.queInput}>
-          <Text
-            style={[material.headline, { color: "black", marginBottom: 10 }]}
-          >
-            Tell me what you're gonna do:
-          </Text>
-          <TextInput
-            onChangeText={(value) => {
-              setActivityDescription(value);
+          <View
+            style={{
+              flexDirection: "row",
             }}
-            style={[material.title, styles.formInput]}
-            placeholder="Undefined"
-            value={activityDescription}
-          ></TextInput>
+          >
+            <Pressable
+              style={[{ flexDirection: "row", flex: 1, alignItems: "center" }]}
+              onPress={showStartDatePicker}
+            >
+              <MaterialCommunityIcons name="timetable" size={22} color="grey" />
+              <Text style={[material.title, { color: "grey", fontSize: 15 }]}>
+                {formatDate(activityStartDate)}
+              </Text>
+            </Pressable>
+          </View>
+
+          {/* Map Pressable + Note Creator Button */}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Pressable
+              style={[{ flexDirection: "row", flex: 1, alignItems: "center" }]}
+              onPress={() => setMapVisible(true)}
+            >
+              <Entypo name="location-pin" size={22} color="grey" />
+              <Text
+                style={[
+                  material.title,
+                  { color: "grey", fontSize: 15, width: "100%" },
+                ]}
+              >
+                {activityLocation.address + ", " + activityLocation.citystate}
+              </Text>
+            </Pressable>
+          </View>
         </View>
 
         {/* Activity Note input */}
-        <View style={styles.queInput}>
-          <Text
-            style={[material.headline, { color: "black", marginBottom: 10 }]}
-          >
-            Note:
-          </Text>
-          <TextInput
-            onChangeText={(value) => {
-              setActivityNote(value);
-            }}
-            style={[material.title, styles.formInput]}
-            placeholder="Undefined"
-            value={activityNote}
-          ></TextInput>
-        </View>
 
-        {/* Start Date input using DateTimePickerModal */}
-        <View style={styles.dateButtonContainer}>
-          <View style={{ flexDirection: "row" }}>
-            <Text style={[material.headline, { color: "black" }]}>From: </Text>
-            <TouchableWithoutFeedback onPress={onPressShowStartDatePicker}>
-              <View style={styles.dateButton}>
-                <Text style={material.subheading}>
-                  {formatDate(activityStartDate)}
-                </Text>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-
-          <DateTimePickerModal
-            isVisible={isStartDatePickerVisible}
-            mode="date"
-            onConfirm={handleStartConfirm}
-            onCancel={hideStartDatePicker}
-          />
-
-          {/* End Date input using DateTimePickerModal */}
-          <View style={{ flexDirection: "row" }}>
-            <Text style={[material.headline, { color: "black" }]}>To: </Text>
-            <TouchableWithoutFeedback onPress={onPressShowEndDatePicker}>
-              <View style={styles.dateButton}>
-                <Text style={material.subheading}>
-                  {formatDate(activityEndDate)}
-                </Text>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-
-          <DateTimePickerModal
-            isVisible={isEndDatePickerVisible}
-            mode="date"
-            onConfirm={handleEndConfirm}
-            onCancel={hideEndDatePicker}
-          />
-        </View>
-
-        <GoogleMapInput
-          onLocationSelect={(location) => {
-            setActivityLocation({
-              address: String(location.address),
-              citystate: String(location.citystate),
-              longitude: location.longitude,
-              latitude: location.latitude,
-            });
-            console.log("loc Proposed Activity: " + activityLocation.address);
+        <TextInput
+          onChangeText={(value) => {
+            setActivityNote(value);
           }}
-          value={""}
+          style={[
+            material.title,
+            {
+              fontStyle: "italic",
+              verticalAlign: "top",
+            },
+            styles.noteInputFocus,
+          ]}
+          placeholder="Add your notes here"
+          value={activityNote}
+          multiline={true}
         />
-        {/* <GooglePlacesInput onLocationSelect={(location) => {
-              setActivityLocation({address: String(location.address), citystate: String(location.citystate), 
-                longitude: location.longitude, latitude: location.latitude})
-              console.log("------------------------------");
-              console.log("loc Proposed Activity: " + location.address);
-            }}/> */}
-        <SubmitButton />
+
+        {/* Map Input */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={mapVisible}
+          onRequestClose={() => setMapVisible(false)}
+        >
+          <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}>
+            <Pressable
+              style={{ height: "20%" }}
+              onPress={() => setMapVisible(false)}
+            ></Pressable>
+            <View style={[styles.modalMapView, { rowGap: 0 }]}>
+              <Text style={[material.title, { alignSelf: "center" }]}>
+                Add a Place
+              </Text>
+              <GoogleMapInput
+                onLocationSelect={(location) => {
+                  setActivityLocation({
+                    address: String(location.address),
+                    citystate: String(location.citystate),
+                    longitude: location.longitude,
+                    latitude: location.latitude,
+                    radius: 0,
+                  });
+                }}
+                value={""}
+              />
+            </View>
+          </View>
+        </Modal>
+
+        <DateTimePickerModal
+          isVisible={startDatePickerVisibility}
+          mode="date"
+          onConfirm={handleConfirm}
+          onCancel={hideStartDatePicker}
+          date={activityStartDate}
+        />
       </View>
 
       {/* Submit Button to submit user's answer */}
-    </ScrollView>
+      <SubmitButton />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    width: "100%",
-    padding: 5,
-  },
-
-  headerBack: {
-    flexDirection: "row",
-    marginBottom: 18,
-    alignContent: "center",
-    alignItems: "center",
-    backgroundColor: "#64A0EE",
-    width: 100,
-    borderRadius: 200,
-  },
-
-  formInput: {
-    borderWidth: 1,
+  noteInputFocus: {
+    backgroundColor: "#F6F5F5",
     padding: 10,
-    borderRadius: 4,
-    // color: "red",
-  },
-
-  queInput: {
-    marginBottom: 50,
+    borderRadius: 5,
+    borderWidth: 1,
+    flex: 1,
+    marginTop: 15,
   },
 
   formContainer: {
     flex: 1,
-    padding: 10,
-    // backgroundColor: "red",
-    // marginBottom: 100,
+    padding: 15,
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderRadius: 20,
   },
 
   submitButton: {
     alignSelf: "center",
+    alignItems: "center",
     borderWidth: 1,
-    padding: 10,
-    borderRadius: 30,
-    backgroundColor: "#569AF3",
+    borderStyle: "dashed",
+    borderRadius: 10,
+    backgroundColor: "#91A5F5",
+    width: "100%",
+    padding: 5,
+    marginTop: 20,
   },
 
-  dateButton: {
+  modalMapView: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 14,
+    borderTopRightRadius: 14,
+    flex: 1,
+    paddingTop: 30,
     borderWidth: 1,
-    paddingHorizontal: 14,
-    paddingVertical: 3,
-    borderRadius: 4,
-    marginBottom: 50,
-    // backgroundColor: "#569AF3"
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
 
-  dateButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    // alignItems: "center",
-    // backgroundColor: "red",
-  },
-
-  formInputContainer: {
-    marginBottom: 50,
-    // backgroundColor: "red",
+  noteIcon: {
+    borderWidth: 1,
+    backgroundColor: "#EBEBEB",
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
