@@ -1,8 +1,9 @@
 import { ProposedActivities } from "@/screens/ProposedActivities";
-import { View } from "react-native";
+import { useGlobalSearchParams } from "expo-router";
 
 const createActivity = () => {
-  return <ProposedActivities id={}></ProposedActivities>;
+  const { id } = useGlobalSearchParams();
+  return <ProposedActivities id={String(id)}></ProposedActivities>;
 };
 
 export default createActivity;

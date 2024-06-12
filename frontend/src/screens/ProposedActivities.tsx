@@ -16,14 +16,14 @@ import GoogleMapInput from "@/components/GoogleMaps/GoogleMapInput";
 import { Trip } from "@/types";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { router } from "expo-router";
-import { EXPO_PUBLIC_HOST_URL } from "@/utils";
+import { EXPO_PUBLIC_HOST_URL, formatDateTime, tripDate } from "@/utils";
 
 interface props {
   id: String;
 }
 
 export const ProposedActivities: React.FC<props> = (id: props) => {
-  const serverUrl = EXPO_PUBLIC_HOST_URL;
+  const serverUrl = "http://" + EXPO_PUBLIC_HOST_URL + ":3000/";
 
   //Declare useState
   const [activityName, setActivityName] = useState("");
@@ -150,7 +150,7 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
   };
 
   return (
-    <View style={{ flex: 1, margin: 7, backgroundColor: "white" }}>
+    <View style={{ flex: 1, padding: 3, backgroundColor: "white" }}>
       <View style={styles.formContainer}>
         {/* Form */}
 
@@ -178,7 +178,7 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
             >
               <MaterialCommunityIcons name="timetable" size={22} color="grey" />
               <Text style={[material.title, { color: "grey", fontSize: 15 }]}>
-                {formatDate(activityStartDate)}
+                {tripDate(activityStartDate)}
               </Text>
             </Pressable>
           </View>
