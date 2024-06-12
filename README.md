@@ -1,4 +1,4 @@
 **Tourific**
 
-- [Styling with `nativewind`](https://www.nativewind.dev/overview/how-it-works) (Tailwind ported to React Native)
-- [Routing/Navigation with `react navigation`](https://reactnavigation.org/docs/getting-started)
+- [Styling with `React Native's StyleSheet`](https://reactnative.dev/docs/stylesheet)
+- [Routing/Navigation with `Expo Router`](https://docs.expo.dev/router/introduction/)

@@ -1,14 +1,19 @@
-import React from 'react';
-import { SplashScreen, Stack } from 'expo-router';
+import React from "react"; // This import is often required for JSX transformation.
+import { Stack } from "expo-router";
 
-const RootNavigation = () => {
+const Layout = () => {
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ title: 'Trips', headerShown: true }}/>
-      <Stack.Screen name="[id]" />
-      <Stack.Screen name="upcoming" options={{headerShown: true}}/>
+      <Stack.Screen
+        name="[id]"
+        options={{ title: "Testing", headerShown: false }}
+      />
+      <Stack.Screen
+        name="upcoming"
+        options={{ title: "Upcoming", headerShown: false }}
+      />
     </Stack>
   );
 };
 
-export default RootNavigation;
+export default Layout;
