@@ -1,8 +1,7 @@
 import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { AntDesign } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
-import { useLocalSearchParams } from "expo-router";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { Tabs, router } from "expo-router";
 
 export default function TabLayout() {
   return (
@@ -50,9 +49,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="invite"
+        name="participants/index"
         options={{
-          headerShown: false
+          href: null,
+          headerShown: false,
         }}
       />
     </Tabs>

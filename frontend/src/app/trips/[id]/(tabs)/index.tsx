@@ -5,6 +5,7 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
+  SafeAreaView,
 } from "react-native";
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Link, Stack, router, useGlobalSearchParams } from "expo-router";
@@ -16,6 +17,7 @@ import {
   BottomSheetModal,
 } from '@gorhom/bottom-sheet';
 import AvatarGroup from "@/components/Avatar/AvatarGroup";
+import SplashScreen from "@/components/Loading/SplashScreen";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 const width = Dimensions.get("window").width; //full width
@@ -35,7 +37,7 @@ const TripDetailsScreen = () => {
     participants: [],
     image: { url: "" },
   });
-
+  const [isLoading, setIsLoading] = useState(false);
   const serverUrl = EXPO_PUBLIC_HOST_URL;
   const defaultUri =
     "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400";
@@ -59,6 +61,7 @@ const TripDetailsScreen = () => {
 
   const getTrip = async ({ id: text }: { id: string; }) => {
     try {
+      setIsLoading(true);
       console.log(EXPO_PUBLIC_HOST_URL);
       const response = await fetch(
         `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}`,
@@ -78,12 +81,15 @@ const TripDetailsScreen = () => {
       console.log("Trip fetch:", data);
     } catch (error: any) {
       console.error("Error fetching trip:", error.toString());
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // get participants
   const getParticipants = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/participants`, {
         method: "GET",
         headers: {
@@ -98,6 +104,8 @@ const TripDetailsScreen = () => {
       // console.log("Participants fetch:", data);
     } catch (error: any) {
       console.error("Error fetching participants:", error.toString());
+    } finally {
+      setIsLoading(false);
     }
 
   };
@@ -107,142 +115,166 @@ const TripDetailsScreen = () => {
     console.log("id", id);
     getTrip({ id });
     getParticipants();
-  }, []);
+  }, [id]);
 
   console.log("trip", trip);
   return (
-    <View>
-      <Stack.Screen
-        options={{
-          title: "Home",
-          headerShown: true,
-          headerStyle: {
-            backgroundColor: "white",
-          },
-          headerTransparent: false,
-          headerRight: () => (
-            // <Link href={`/trips/create?id=${id}`}>
-            <>
-              <TouchableOpacity onPress={handlePresentModalPress}>
-                <Feather
-                  name="edit-2"
-                  size={20}
-                  color="black"
-                  style={{ marginRight: 10 }}
-                />
-              </TouchableOpacity>
-
-            </>
-            // </Link>
-          ),
-          headerLeft: () => (
-            <MaterialIcons
-              name="arrow-back"
-              size={24}
-              color="black"
-              style={{ marginLeft: 10 }}
-              onPress={() => router.navigate("/")}
-            />
-          ),
-        }}
-      />
-      <ScrollView style={{ width: width, height: height }}>
-        <View>
-          <Image
-            style={styles.image}
-            source={
-              trip.image && trip.image.url
-                ? { uri: trip.image.url }
-                : {
-                    uri: defaultUri,
-                  }
-            }
-          />
-        </View>
-        <View
-          style={{
-            borderTopLeftRadius: 30,
-            borderTopRightRadius: 30,
-            flex: 1,
-            marginTop: -50,
-          }}
-          className="bg-white h-full"
-        >
-          <View style={styles.view}>
-            <View
-              style={{
-                paddingHorizontal: 30,
-                paddingVertical: 19,
-                height: height,
-              }}
-            >
-              <Text style={[styles.h1, { marginTop: 18 }]}>{trip.name}</Text>
-              <View style={styles.row}>
-                <Ionicons name="location-outline" size={25} color="#006ee6" />
-                <View>
-                  <Text style={[styles.h3, { marginLeft: 10 }]}>
-                    {trip.location.address} {trip.location.citystate}
-                  </Text>
-                  <Text style={[styles.h4, { marginLeft: 10 }]}>
-                    + {Number(trip.location.radius * 0.0006213712).toFixed(2)}{" "}
-                    miles
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.row}>
-                <Ionicons name="calendar-outline" size={25} color="#006ee6" />
-                <View style={styles.dateContainer}>
-                  <Text style={[styles.h3, { marginHorizontal: 10 }]}>
-                    {new Date(trip.startDate).toLocaleString("en-US", {
-                      weekday: "short",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </Text>
-                  <Text style={[styles.h4, { marginLeft: 10 }]}>
-                    {DateTime.fromISO(trip.startDate.toString())
-                      .setZone("system")
-                      .toLocaleString(DateTime.TIME_SIMPLE)}
-                    {/* {trip.startDate.getHours() % 12 || 12}:{trip.startDate.getMinutes().toString().padStart(2, '0')} {trip.startDate.getHours() >= 12 ? 'PM' : 'AM'} */}
-                  </Text>
-                </View>
-                <Ionicons
-                  name="arrow-forward-outline"
-                  size={25}
-                  color="#006ee6"
-                />
-                <View style={styles.dateContainer}>
-                  <Text style={[styles.h3, { marginLeft: 10 }]}>
-                    {new Date(trip.endDate).toLocaleString("en-US", {
-                      weekday: "short",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </Text>
-                  <Text style={[styles.h4, { marginLeft: 10 }]}>
-                    {DateTime.fromISO(trip.endDate.toString())
-                      .setZone("system")
-                      .toLocaleString(DateTime.TIME_SIMPLE)}
-                    {/* {trip.endDate.getHours() % 12 || 12}:{trip.endDate.getMinutes().toString().padStart(2, '0')} {trip.endDate.getHours() >= 12 ? 'PM' : 'AM'} */}
-                  </Text>
-                </View>
-              </View>
-              <Text style={[styles.h4, { marginLeft: 35 }]}>
-                {DateTime.local().zoneName}
-              </Text>
-              <Text style={styles.h2}>Participants</Text>
-            </View>
+    <SafeAreaView>
+      {
+        isLoading ? (
+          <View style={{ backgroundColor: 'white' }}>
+            <SplashScreen width={width} height={height} />
           </View>
-        </View>
-      </ScrollView>
-      <View style={{ flex: 1, paddingTop: 200 }}>
-        <BottomSlider
-          ref={bottomSheetModalRef}
-          handlePresentModalPress={handlePresentModalPress}
-          handleSheetChanges={handleSheetChanges}
-        />
-      </View>
-    </View >
+        ) : (
+          <>
+            <Stack.Screen
+              options={{
+                title: "Home",
+                headerShown: true,
+                headerStyle: {
+                  backgroundColor: "white",
+                },
+                headerTransparent: false,
+                headerRight: () => (
+                  // <Link href={`/trips/create?id=${id}`}>
+                  <>
+                    <TouchableOpacity onPress={handlePresentModalPress}>
+                      <Feather
+                        name="edit-2"
+                        size={20}
+                        color="black"
+                        style={{ marginRight: 10 }}
+                      />
+                    </TouchableOpacity>
+
+                  </>
+                  // </Link>
+                ),
+                headerLeft: () => (
+                  <MaterialIcons
+                    name="arrow-back"
+                    size={24}
+                    color="black"
+                    style={{ marginLeft: 10 }}
+                    onPress={() => router.navigate("/")}
+                  />
+                ),
+              }}
+            />
+            <ScrollView style={{ width: width, height: height }}>
+              <View>
+                <Image
+                  style={styles.image}
+                  source={
+                    trip.image && trip.image.url
+                      ? { uri: trip.image.url }
+                      : {
+                        uri: defaultUri,
+                      }
+                  }
+                />
+              </View>
+              <View
+                style={{
+                  borderTopLeftRadius: 30,
+                  borderTopRightRadius: 30,
+                  flex: 1,
+                  marginTop: -50,
+                }}
+                className="bg-white h-full"
+              >
+                <View style={styles.view}>
+                  <View
+                    style={{
+                      paddingHorizontal: 30,
+                      paddingVertical: 19,
+                      height: height,
+                    }}
+                  >
+                    <Text style={[styles.h1, { marginTop: 18 }]}>{trip.name}</Text>
+                    <View style={styles.row}>
+                      <Ionicons name="location-outline" size={25} color="#006ee6" />
+                      <View>
+                        <Text style={[styles.h3, { marginLeft: 10 }]}>
+                          {trip.location.address} {trip.location.citystate}
+                        </Text>
+                        <Text style={[styles.h4, { marginLeft: 10 }]}>
+                          + {Number(trip.location.radius * 0.0006213712).toFixed(2)}{" "}
+                          miles
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.row}>
+                      <Ionicons name="calendar-outline" size={25} color="#006ee6" />
+                      <View style={styles.dateContainer}>
+                        <Text style={[styles.h3, { marginHorizontal: 10 }]}>
+                          {new Date(trip.startDate).toLocaleString("en-US", {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </Text>
+                        <Text style={[styles.h4, { marginLeft: 10 }]}>
+                          {DateTime.fromISO(trip.startDate.toString())
+                            .setZone("system")
+                            .toLocaleString(DateTime.TIME_SIMPLE)}
+                          {/* {trip.startDate.getHours() % 12 || 12}:{trip.startDate.getMinutes().toString().padStart(2, '0')} {trip.startDate.getHours() >= 12 ? 'PM' : 'AM'} */}
+                        </Text>
+                      </View>
+                      <Ionicons
+                        name="arrow-forward-outline"
+                        size={25}
+                        color="#006ee6"
+                      />
+                      <View style={styles.dateContainer}>
+                        <Text style={[styles.h3, { marginLeft: 10 }]}>
+                          {new Date(trip.endDate).toLocaleString("en-US", {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </Text>
+                        <Text style={[styles.h4, { marginLeft: 10 }]}>
+                          {DateTime.fromISO(trip.endDate.toString())
+                            .setZone("system")
+                            .toLocaleString(DateTime.TIME_SIMPLE)}
+                          {/* {trip.endDate.getHours() % 12 || 12}:{trip.endDate.getMinutes().toString().padStart(2, '0')} {trip.endDate.getHours() >= 12 ? 'PM' : 'AM'} */}
+                        </Text>
+                      </View>
+                    </View>
+                    <Text style={[styles.h4, { marginLeft: 35 }]}>
+                      {DateTime.local().zoneName}
+                    </Text>
+                    <Text style={styles.h2}>Participants</Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                      <AvatarGroup users={trip.participants} />
+                      <TouchableOpacity
+                        style={[styles.additionalAvatar,
+                        {
+                          width: 50,
+                          height: 50,
+                          borderRadius: 9999,
+                          marginLeft: 10,
+                        }]}
+                        onPress={() => router.navigate(`/trips/${id}/participants`)}
+                      >
+                        <Text style={styles.additionalText}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
+            <View style={{ flex: 1, paddingTop: 200 }}>
+              <BottomSlider
+                ref={bottomSheetModalRef}
+                handlePresentModalPress={handlePresentModalPress}
+                handleSheetChanges={handleSheetChanges}
+              />
+            </View>
+          </>
+        )}
+    </SafeAreaView >
   );
 };
 
@@ -288,6 +320,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginTop: 18,
   },
+  additionalAvatar: {
+    backgroundColor: 'gray',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  additionalText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 20
+  }
 });
 
 export default TripDetailsScreen;

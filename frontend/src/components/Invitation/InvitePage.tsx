@@ -1,18 +1,18 @@
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, Dimensions, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, Dimensions } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
 import ContactCard from '../Avatar/ContactCard';
 import { EXPO_PUBLIC_HOST_URL } from '@/utils';
-import { router, useLocalSearchParams } from 'expo-router';
+import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { FriendRequest, User } from '@/types';
 import NoFriendDisplay from '../AddFriend/NoFriendDisplay';
+import { SafeAreaView } from 'react-native';
 
 const screenHeight = Dimensions.get("window").height;
 
 const InvitePage = () => {
   const { id } = useLocalSearchParams();
-  const userId = "665d2e50daefbf432fff98dc";
+  const userId = "6661308f193a6cd9e0ea4d36";
   const [searchTerm, setSearchTerm] = useState("");
   const [friendList, setFriendList] = useState<User[]>([]);
   const [friendsToInvite, setFriendsToInvite] = useState<FriendRequest[]>([]);
@@ -116,6 +116,7 @@ const InvitePage = () => {
     <SafeAreaView
       style={{ height: screenHeight, flexDirection: 'column', backgroundColor: 'white' }}
     >
+
       {friendList?.length > 0 ?
         <>
           <Text style={{ fontSize: 25, fontWeight: 'bold', textAlign: 'center', marginVertical: 10 }}>
@@ -189,7 +190,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 10,
     position: 'absolute',
-    bottom: 40,
+    bottom: 90,
     width: '100%',
     zIndex: 99,
   },
@@ -199,7 +200,7 @@ const styles = StyleSheet.create({
     padding: 15,
     width: '90%',
     backgroundColor: 'blue',
-    marginBottom: 5
+    marginBottom: 15
   }
 });
 

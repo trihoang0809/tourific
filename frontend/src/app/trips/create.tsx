@@ -10,8 +10,7 @@ import {
   Alert,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
-import { useForm, Controller, useFormState } from "react-hook-form";
-import favicon from "@/assets/favicon.png";
+import { useForm, Controller } from "react-hook-form";
 import { Link, Stack, router, useLocalSearchParams } from "expo-router";
 import { MapData, TripData } from "@/types";
 import GooglePlacesInput from "@/components/GoogleMaps/GooglePlacesInput";
@@ -189,6 +188,7 @@ export default function CreateTripScreen() {
             headers: {
               "Content-Type": "application/json",
             },
+            body: JSON.stringify(req),
           },
         );
         if (!response.ok) {
