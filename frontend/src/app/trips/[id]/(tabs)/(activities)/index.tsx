@@ -223,7 +223,7 @@ const ActivitiesScreen = () => {
           shadowRadius: 2,
         }}
         onPress={() => {
-          router.push("/create");
+          router.push("../create");
         }}
       >
         <Ionicons name="add" size={25} color="white" />
