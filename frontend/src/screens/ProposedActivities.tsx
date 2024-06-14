@@ -17,6 +17,7 @@ import { Trip } from "@/types";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { router } from "expo-router";
 import { EXPO_PUBLIC_HOST_URL, formatDateTime, tripDate } from "@/utils";
+import GooglePlacesInput from "@/components/GoogleMaps/GooglePlacesInput";
 
 interface props {
   id: String;
@@ -233,7 +234,12 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
           visible={mapVisible}
           onRequestClose={() => setMapVisible(false)}
         >
-          <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(0,0,0,0.5)",
+            }}
+          >
             <Pressable
               style={{ height: "20%" }}
               onPress={() => setMapVisible(false)}
@@ -242,18 +248,26 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
               <Text style={[material.title, { alignSelf: "center" }]}>
                 Add a Place
               </Text>
-              <GoogleMapInput
-                onLocationSelect={(location) => {
-                  setActivityLocation({
-                    address: String(location.address),
-                    citystate: String(location.citystate),
-                    longitude: location.longitude,
-                    latitude: location.latitude,
-                    radius: 0,
-                  });
-                }}
-                value={""}
-              />
+              <View
+                style={{ height: "100%", flex: 2, backgroundColor: "white" }}
+              >
+                <GoogleMapInput
+                  onLocationSelect={(location) => {
+                    setActivityLocation({
+                      address: String(location.address),
+                      citystate: String(location.citystate),
+                      longitude: location.longitude,
+                      latitude: location.latitude,
+                      radius: 0,
+                    });
+                  }}
+                  value={activityLocation.address + activityLocation.citystate}
+                  location={{
+                    latitude: activityLocation.latitude,
+                    longitude: activityLocation.longitude,
+                  }}
+                />
+              </View>
             </View>
           </View>
         </Modal>

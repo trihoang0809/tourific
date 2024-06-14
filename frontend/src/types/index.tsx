@@ -7,17 +7,17 @@ export interface TripData {
     endDate: Date;
   };
   startTime: {
-    hours: number,
-    minutes: number,
+    hours: number;
+    minutes: number;
   };
   endTime: {
-    hours: number,
-    minutes: number,
+    hours: number;
+    minutes: number;
   };
   location: MapData;
   image: {
     url: String;
-  }
+  };
 }
 
 export type MapData = {
@@ -44,6 +44,12 @@ export interface DateRangePickerProps {
 export interface GooglePlacesInputProps {
   onLocationSelect: (location: MapData) => void;
   value: string;
+}
+
+export interface GoogleMapInputProps {
+  onLocationSelect: (location: MapData) => void;
+  value: string;
+  location: { latitude: number; longitude: number };
 }
 
 export interface ActivityProps {
