@@ -179,7 +179,7 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
             >
               <MaterialCommunityIcons name="timetable" size={22} color="grey" />
               <Text style={[material.title, { color: "grey", fontSize: 15 }]}>
-                {tripDate(activityStartDate)}
+                {" " + tripDate(activityStartDate)}
               </Text>
             </Pressable>
           </View>
@@ -201,8 +201,9 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
                   material.title,
                   { color: "grey", fontSize: 15, width: "100%" },
                 ]}
+                numberOfLines={1}
               >
-                {activityLocation.address + ", " + activityLocation.citystate}
+                {activityLocation.address + " " + activityLocation.citystate}
               </Text>
             </Pressable>
           </View>
@@ -262,10 +263,7 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
                     });
                   }}
                   value={activityLocation.address + activityLocation.citystate}
-                  location={{
-                    latitude: activityLocation.latitude,
-                    longitude: activityLocation.longitude,
-                  }}
+                  location={activityLocation}
                 />
               </View>
             </View>

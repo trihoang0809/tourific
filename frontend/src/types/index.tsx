@@ -49,7 +49,7 @@ export interface GooglePlacesInputProps {
 export interface GoogleMapInputProps {
   onLocationSelect: (location: MapData) => void;
   value: string;
-  location: { latitude: number; longitude: number };
+  location: MapData;
 }
 
 export interface ActivityProps {

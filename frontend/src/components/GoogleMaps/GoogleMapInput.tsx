@@ -1,9 +1,8 @@
 import Geocoder from "react-native-geocoding";
 import React, { useState, useEffect, useRef } from "react";
-import MapView, { PROVIDER_GOOGLE, Circle, Marker } from "react-native-maps";
-import { StyleSheet, View, Dimensions, Text } from "react-native";
-import Slider from "@react-native-community/slider";
-import { GoogleMapInputProps, GooglePlacesInputProps } from "@/types";
+import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
+import { StyleSheet, View } from "react-native";
+import { GoogleMapInputProps } from "@/types";
 
 // env
 const GOOGLE_MAP_API_KEY =
@@ -11,7 +10,6 @@ const GOOGLE_MAP_API_KEY =
 import { LocationSearch } from "./LocationSearch";
 import Geocoding from "react-native-geocoding";
 
-const { width, height } = Dimensions.get("window");
 Geocoding.init(GOOGLE_MAP_API_KEY);
 
 const GoogleMapInput = ({
@@ -20,13 +18,16 @@ const GoogleMapInput = ({
   location,
 }: GoogleMapInputProps) => {
   Geocoder.init(GOOGLE_MAP_API_KEY); // use a valid API key
-  const [query, setQuery] = useState({ address: "", citystate: "" });
+  const [query, setQuery] = useState({
+    address: "",
+    citystate: "",
+  });
   const [coord, setCoord] = useState<{ latitude: number; longitude: number }>({
     latitude: location.latitude,
     longitude: location.longitude,
   });
   const mapRef = useRef(null);
-  const [radius, setRadius] = useState(300);
+  const radius = 500;
   const [mapData, setMapData] = useState({
     address: query.address,
     citystate: query.citystate,
@@ -34,8 +35,6 @@ const GoogleMapInput = ({
     longitude: coord.longitude,
     radius: radius,
   });
-
-  console.log("query useefect", query);
 
   useEffect(() => {
     if (query.address !== "" && query.citystate !== "") {
@@ -62,9 +61,6 @@ const GoogleMapInput = ({
       console.log("Error get location", error);
     }
   }, [query, coord, radius]);
-
-  // console.log("mapData 2", mapData);
-  // console.log("coord 2", coord);
 
   return (
     <View style={{ flex: 1 }}>
@@ -117,7 +113,11 @@ const GoogleMapInput = ({
       >
         <Marker
           coordinate={{ latitude: coord.latitude, longitude: coord.longitude }}
-          title={mapData.address + " " + mapData.citystate}
+          title={
+            mapData.address + " " + mapData.citystate === " "
+              ? location.address + " " + location.citystate
+              : mapData.address + " " + mapData.citystate
+          }
           description={""}
         />
       </MapView>
