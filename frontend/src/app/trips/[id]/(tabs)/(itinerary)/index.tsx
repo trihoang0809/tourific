@@ -8,6 +8,7 @@ import {
   ScrollView,
   SafeAreaView,
   FlatList,
+  Animated,
 } from "react-native";
 import { useGlobalSearchParams, router } from "expo-router";
 import { Calendar, DateRangeHandler } from "react-native-big-calendar";
@@ -32,6 +33,11 @@ import { TimePickerModal } from "react-native-paper-dates";
 import { timeRange, dateRange } from "@/types";
 import { TimeRangeSchema } from "@/validation/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Swipeable,
+  GestureHandlerRootView,
+  RectButton,
+} from "react-native-gesture-handler";
 
 const Itinerary = () => {
   const { id } = useGlobalSearchParams();
@@ -73,6 +79,67 @@ const Itinerary = () => {
       minutes: undefined,
     },
   });
+  let prevOpenedRow: any;
+  const rowRefs = useRef<{ [key: string]: Swipeable}>({});
+
+  const closeRow = (index: string): void => {
+    if (prevOpenedRow && prevOpenedRow !== rowRefs.current[index]) {
+      prevOpenedRow.close();
+    }
+    prevOpenedRow = rowRefs.current[index];
+  };
+  // Swipeawable to remove an activity from calendar
+  const renderRightActions = (
+    dragX: Animated.AnimatedInterpolation<number>,
+    event: Event,
+  ) => {
+    const trans = dragX.interpolate({
+      inputRange: [0, 100],
+      outputRange: [0, 50],
+      extrapolate: "clamp",
+    });
+
+    const closeSwipeable = () => {
+      updateActivityOnBackend({
+        id,
+        activityid: event.activityid,
+        startTime: new Date(),
+        endTime: new Date(),
+        calendarStatus: false,
+      });
+      setEventsOnCalendar((prevEvents) =>
+        prevEvents.filter((e) => e.activityid !== event.activityid),
+      );
+      setActivitiesNotOnCalendar((prevActivities) => {
+        const activityToAdd = activities.find((a) => a.id === event.activityid);
+        if (activityToAdd) {
+          return [...prevActivities, activityToAdd].sort(
+            (a, b) => b.netUpvotes - a.netUpvotes,
+          );
+        }
+        return prevActivities;
+      });
+      closeRow(event.activityid);
+    };
+
+    return (
+      <View style={{ marginVertical: 3 }}>
+        <RectButton style={styles.deleteButton} onPress={closeSwipeable}>
+          <Animated.Text
+            style={[
+              styles.actionText,
+              {
+                transform: [{ translateX: trans }],
+                alignItems: "flex-end",
+              },
+            ]}
+          >
+            Remove
+          </Animated.Text>
+        </RectButton>
+      </View>
+    );
+  };
 
   useEffect(() => {
     console.log("formData", formData);
@@ -195,48 +262,48 @@ const Itinerary = () => {
     getActivities({ id });
   }, [savedActivityId]);
 
-  // Update a single activity
-  useEffect(() => {
-    const updateActivityOnBackend = async ({
-      id,
-      activityid,
-      startTime,
-      endTime,
-      calendarStatus,
-    }: {
-      id: string;
-      activityid: string;
-      startTime: Date;
-      endTime: Date;
-      calendarStatus: boolean;
-    }) => {
-      try {
-        const req = {
-          startTime: startTime,
-          endTime: endTime,
-          isOnCalendar: calendarStatus,
-        };
-        const response = await fetch(
-          `http://localhost:3000/trips/${id}/activities/${activityid}/toggle`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(req),
+  const updateActivityOnBackend = async ({
+    id,
+    activityid,
+    startTime,
+    endTime,
+    calendarStatus,
+  }: {
+    id: string;
+    activityid: string;
+    startTime: Date;
+    endTime: Date;
+    calendarStatus: boolean;
+  }) => {
+    try {
+      const req = {
+        startTime: startTime,
+        endTime: endTime,
+        isOnCalendar: calendarStatus,
+      };
+      const response = await fetch(
+        `http://localhost:3000/trips/${id}/activities/${activityid}/toggle`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
-        if (!response.ok) {
-          throw new Error("Failed to update activity");
-        }
-      } catch (error: any) {
-        console.error(
-          "Error updating calendar status of this activity:",
-          error.toString(),
-        );
+          body: JSON.stringify(req),
+        },
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update activity");
       }
-    };
+    } catch (error: any) {
+      console.error(
+        "Error updating calendar status of this activity:",
+        error.toString(),
+      );
+    }
+  };
 
+  // Update calendar status or update time
+  useEffect(() => {
     const moveNewEventToItineraryUI = async (eventId: string) => {
       // Find the event in activitiesNotOnCalendar
       const eventToMove = activitiesNotOnCalendar.find(
@@ -499,447 +566,472 @@ const Itinerary = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-      <View
-        style={[
-          styles.row,
-          calendarMode === "itinerary"
-            ? { justifyContent: "center" }
-            : { justifyContent: "space-between" },
-        ]}
-      >
-        {calendarMode !== "itinerary" && (
-          <TouchableOpacity
-            onPress={() => {
-              switch (calendarMode) {
-                case "week":
-                  handlePrevWeek();
-                  break;
-                case "day":
-                  handlePrevDay();
-                  break;
-                case "3days":
-                  handlePrev3Days();
-                  break;
-                case "month":
-                  handlePrevMonth();
-                  break;
-                default:
-                  break;
-              }
-            }}
-            // style={styles.btnPrevNext}
-          >
-            <View style={styles.leftRightIcon}>
-              <AntDesign name="left" size={20} color="black" />
+    <GestureHandlerRootView>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+        <View
+          style={[
+            styles.row,
+            calendarMode === "itinerary"
+              ? { justifyContent: "center" }
+              : { justifyContent: "space-between" },
+          ]}
+        >
+          {calendarMode !== "itinerary" && (
+            <TouchableOpacity
+              onPress={() => {
+                switch (calendarMode) {
+                  case "week":
+                    handlePrevWeek();
+                    break;
+                  case "day":
+                    handlePrevDay();
+                    break;
+                  case "3days":
+                    handlePrev3Days();
+                    break;
+                  case "month":
+                    handlePrevMonth();
+                    break;
+                  default:
+                    break;
+                }
+              }}
+              // style={styles.btnPrevNext}
+            >
+              <View style={styles.leftRightIcon}>
+                <AntDesign name="left" size={20} color="black" />
+              </View>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity onPress={() => setModalVisible(true)}>
+            <View style={styles.monthContainer}>
+              {calendarMode === "itinerary" ? (
+                <Text style={styles.h1}>Intinerary</Text>
+              ) : (
+                <Text style={styles.h1}>
+                  {monthNames[currentDate.getMonth()]}
+                </Text>
+              )}
+              <Entypo name="chevron-down" size={24} color="black" />
             </View>
           </TouchableOpacity>
-        )}
-        <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <View style={styles.monthContainer}>
-            {calendarMode === "itinerary" ? (
-              <Text style={styles.h1}>Intinerary</Text>
-            ) : (
-              <Text style={styles.h1}>
-                {monthNames[currentDate.getMonth()]}
-              </Text>
-            )}
-            <Entypo name="chevron-down" size={24} color="black" />
-          </View>
-        </TouchableOpacity>
-        {calendarMode !== "itinerary" && (
-          <TouchableOpacity
-            onPress={() => {
-              switch (calendarMode) {
-                case "week":
-                  handleNextWeek();
-                  break;
-                case "day":
-                  handleNextDay();
-                  break;
-                case "3days":
-                  handleNext3Days();
-                  break;
-                case "month":
-                  handleNextMonth();
-                  break;
-                default:
-                  break;
-              }
-            }}
-          >
-            <View style={styles.leftRightIcon}>
-              <AntDesign name="right" size={20} color="black" />
-            </View>
-          </TouchableOpacity>
-        )}
-      </View>
-      {/* Modal to pick calendar view */}
-      <Modal animationType="fade" visible={isModalVisible} transparent={true}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalView}>
-            <View style={styles.row}>
-              <Text style={styles.modalText}>Select calendar view</Text>
-              <Pressable onPress={() => setModalVisible(!isModalVisible)}>
-                <Ionicons name="close" size={24} color="black" />
-              </Pressable>
-            </View>
-            <View style={styles.calendarViewContainer}>
-              <View style={styles.timePickerContainer}>
-                {calendarViewLabels.map((view, index) => (
-                  <Pressable
-                    key={index}
-                    onPress={() => {
-                      setCalendarMode(view.value as Mode);
-                      setModalVisible(!isModalVisible);
-                    }}
-                    style={
-                      calendarMode === view.value
-                        ? styles.calendarViewSelectedOption
-                        : styles.calendarViewOption
-                    }
-                  >
-                    <Text
+          {calendarMode !== "itinerary" && (
+            <TouchableOpacity
+              onPress={() => {
+                switch (calendarMode) {
+                  case "week":
+                    handleNextWeek();
+                    break;
+                  case "day":
+                    handleNextDay();
+                    break;
+                  case "3days":
+                    handleNext3Days();
+                    break;
+                  case "month":
+                    handleNextMonth();
+                    break;
+                  default:
+                    break;
+                }
+              }}
+            >
+              <View style={styles.leftRightIcon}>
+                <AntDesign name="right" size={20} color="black" />
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
+        {/* Modal to pick calendar view */}
+        <Modal animationType="fade" visible={isModalVisible} transparent={true}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalView}>
+              <View style={styles.row}>
+                <Text style={styles.modalText}>Select calendar view</Text>
+                <Pressable onPress={() => setModalVisible(!isModalVisible)}>
+                  <Ionicons name="close" size={24} color="black" />
+                </Pressable>
+              </View>
+              <View style={styles.calendarViewContainer}>
+                <View style={styles.timePickerContainer}>
+                  {calendarViewLabels.map((view, index) => (
+                    <Pressable
+                      key={index}
+                      onPress={() => {
+                        setCalendarMode(view.value as Mode);
+                        setModalVisible(!isModalVisible);
+                      }}
                       style={
-                        calendarMode === view.value ? { color: "white" } : {}
+                        calendarMode === view.value
+                          ? styles.calendarViewSelectedOption
+                          : styles.calendarViewOption
                       }
                     >
-                      {view.label}
-                    </Text>
-                  </Pressable>
-                ))}
+                      <Text
+                        style={
+                          calendarMode === view.value ? { color: "white" } : {}
+                        }
+                      >
+                        {view.label}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
               </View>
             </View>
           </View>
-        </View>
-      </Modal>
-      {/* Customized itinerary view to add activity to calendar */}
-      {calendarMode === "itinerary" ? (
-        <View>
-          {/* Easy navigation to different dates */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={{ marginVertical: 10 }}
-          >
-            {datesConsecutiveList.map((date, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => scrollToDate(new Date(date))}
-                style={{ marginHorizontal: 5 }}
-              >
-                <Text
-                  style={{
-                    padding: 10,
-                    backgroundColor: "#ddd",
-                    borderRadius: 5,
-                  }}
+        </Modal>
+        {/* Customized itinerary view to add activity to calendar */}
+        {calendarMode === "itinerary" ? (
+          <View>
+            {/* Easy navigation to different dates */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={{ marginVertical: 10 }}
+            >
+              {datesConsecutiveList.map((date, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => scrollToDate(new Date(date))}
+                  style={{ marginHorizontal: 5 }}
                 >
-                  {`${new Date(date).toLocaleDateString(undefined, { weekday: "short" })} ${new Date(date).toLocaleDateString(undefined, { month: "numeric" })}/${new Date(date).toLocaleDateString(undefined, { day: "numeric" })} `}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-          <FlatList
-            data={datesConsecutiveList}
-            renderItem={({ item: date, index }) => (
-              <View key={index} style={styles.itineraryContainer}>
-                <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                  {`${new Date(date).toLocaleDateString(undefined, { weekday: "short" })} ${new Date(date).toLocaleDateString(undefined, { month: "numeric" })}/${new Date(date).toLocaleDateString(undefined, { day: "numeric" })} `}
-                </Text>
-                {/* Render events for this date */}
-                {getEventsForDate(date).length > 0 ? (
-                  getEventsForDate(date).map((event: Event) => (
-                    // <TouchableOpacity
-                    //   // onPress={() => {
-                    //   //   router.push(
-                    //   //     `trips/${id}/(itinerary)/${event.activityid}`,
-                    //   //   );
-                    //   // }}
-                    //   key={event.activityid}
-                    // >
-                    <View style={styles.eventContainer}>
-                      <Text style={styles.h4}>{event.title}</Text>
-                      {/* if start time is similar to end time, the activity's time is not set yet */}
-                      {event.start.getTime() !== event.end.getTime() &&
-                      event.start != undefined &&
-                      event.end != undefined ? (
-                        <TouchableOpacity
-                          onPress={() => {
-                            setFormData({
-                              startTime: {
-                                hours: undefined,
-                                minutes: undefined,
-                              },
-                              endTime: {
-                                hours: undefined,
-                                minutes: undefined,
-                              },
-                            });
-                            setSavedActivityId(event.activityid);
-                            setTimeModalVisible(true);
+                  <Text
+                    style={{
+                      padding: 10,
+                      backgroundColor: "#ddd",
+                      borderRadius: 5,
+                    }}
+                  >
+                    {`${new Date(date).toLocaleDateString(undefined, { weekday: "short" })} ${new Date(date).toLocaleDateString(undefined, { month: "numeric" })}/${new Date(date).toLocaleDateString(undefined, { day: "numeric" })} `}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <FlatList
+              data={datesConsecutiveList}
+              renderItem={({ item: date, index }) => (
+                <View key={index} style={styles.itineraryContainer}>
+                  <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+                    {`${new Date(date).toLocaleDateString(undefined, { weekday: "short" })} ${new Date(date).toLocaleDateString(undefined, { month: "numeric" })}/${new Date(date).toLocaleDateString(undefined, { day: "numeric" })} `}
+                  </Text>
+                  {/* Render events for this date */}
+                  {getEventsForDate(date).length > 0 ? (
+                    getEventsForDate(date).map(
+                      (event: Event) => (
+                        <Swipeable
+                          key={event.activityid} // Use activityid as unique key
+                          ref={(ref) => {
+                            if (ref) {
+                              rowRefs.current[event.activityid] = ref;
+                            }
+                          }}
+                          friction={2}
+                          renderRightActions={(progress, dragX) =>
+                            renderRightActions(dragX, event)
+                          }
+                          rightThreshold={40}
+                          overshootRight={false}
+                          onSwipeableOpen={() => {
+                            closeRow(event.activityid);
                           }}
                         >
-                          <Text style={styles.p}>
-                            {new Date(event.start).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}{" "}
-                            -{" "}
-                            {new Date(event.end).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </Text>
-                        </TouchableOpacity>
-                      ) : (
-                        <TouchableOpacity
-                          onPress={() => {
-                            setFormData({
-                              startTime: {
-                                hours: undefined,
-                                minutes: undefined,
-                              },
-                              endTime: {
-                                hours: undefined,
-                                minutes: undefined,
-                              },
-                            });
-                            setSavedActivityId(event.activityid);
-                            setTimeModalVisible(true);
-                          }}
-                        >
-                          <Text>Add time</Text>
-                        </TouchableOpacity>
-                      )}
-                      <View>{event.children}</View>
-                      <Modal
-                        animationType="fade"
-                        visible={timeModalVisible}
-                        transparent={true}
-                      >
-                        <View style={styles.modalOverlay}>
-                          <View style={styles.modalView}>
-                            <View style={styles.row}>
-                              <Text style={styles.modalText}>
-                                What time should we go?
-                              </Text>
-                              <Pressable
+                          <View style={styles.eventContainer}>
+                            <Text style={styles.h4}>{event.title}</Text>
+                            {/* if start time is similar to end time, the activity's time is not set yet */}
+                            {event.start.getTime() !== event.end.getTime() &&
+                            event.start != undefined &&
+                            event.end != undefined ? (
+                              <TouchableOpacity
                                 onPress={() => {
-                                  setTimeModalVisible(!timeModalVisible);
+                                  setFormData({
+                                    startTime: {
+                                      hours: undefined,
+                                      minutes: undefined,
+                                    },
+                                    endTime: {
+                                      hours: undefined,
+                                      minutes: undefined,
+                                    },
+                                  });
+                                  setSavedActivityId(event.activityid);
+                                  setTimeModalVisible(true);
                                 }}
                               >
-                                <Ionicons
-                                  name="close"
-                                  size={24}
-                                  color="black"
-                                />
-                              </Pressable>
-                            </View>
-                            <View style={styles.calendarViewContainer}>
-                              <View style={styles.timePickerContainer}>
-                                <TouchableOpacity
-                                  style={styles.timePickerButton}
-                                  onPress={() => setStartTimeModalOpen(true)}
-                                >
-                                  <Text style={styles.modalText}>
-                                    {typeof formData.startTime.hours ===
-                                      "number" &&
-                                    typeof formData.startTime.minutes ===
-                                      "number"
-                                      ? new Date(
-                                          1970,
-                                          0,
-                                          1,
-                                          formData.startTime.hours,
-                                          formData.startTime.minutes,
-                                        ).toLocaleTimeString("en-US", {
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                        })
-                                      : ""}
-                                  </Text>
-                                </TouchableOpacity>
-                                <Controller
-                                  control={control}
-                                  name={"startTime"}
-                                  render={({ field: { onChange } }) => (
-                                    <TimePickerModal
-                                      visible={startTimeModalOpen}
-                                      onDismiss={() => {
-                                        onDismissTime("start");
+                                <Text style={styles.p}>
+                                  {new Date(event.start).toLocaleTimeString(
+                                    [],
+                                    {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    },
+                                  )}{" "}
+                                  -{" "}
+                                  {new Date(event.end).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
+                                </Text>
+                              </TouchableOpacity>
+                            ) : (
+                              <TouchableOpacity
+                                onPress={() => {
+                                  setFormData({
+                                    startTime: {
+                                      hours: undefined,
+                                      minutes: undefined,
+                                    },
+                                    endTime: {
+                                      hours: undefined,
+                                      minutes: undefined,
+                                    },
+                                  });
+                                  setSavedActivityId(event.activityid);
+                                  setTimeModalVisible(true);
+                                }}
+                              >
+                                <Text style={styles.p}>Add time</Text>
+                              </TouchableOpacity>
+                            )}
+                            <View>{event.children}</View>
+                            <Modal
+                              animationType="fade"
+                              visible={timeModalVisible}
+                              transparent={true}
+                            >
+                              <View style={styles.modalOverlay}>
+                                <View style={styles.modalView}>
+                                  <View style={styles.row}>
+                                    <Text style={styles.modalText}>
+                                      What time should we go?
+                                    </Text>
+                                    <Pressable
+                                      onPress={() => {
+                                        setTimeModalVisible(!timeModalVisible);
                                       }}
-                                      onConfirm={(startTime) => {
-                                        onChange(startTime);
-                                        onConfirmStartTime(startTime);
-                                      }}
-                                      hours={12}
-                                      minutes={0}
-                                    />
-                                  )}
-                                />
-                                {errors.startTime && (
-                                  <Text className="text-red-500">
-                                    {errors.startTime.message?.toString()}
-                                  </Text>
-                                )}
+                                    >
+                                      <Ionicons
+                                        name="close"
+                                        size={24}
+                                        color="black"
+                                      />
+                                    </Pressable>
+                                  </View>
+                                  <View style={styles.calendarViewContainer}>
+                                    <View style={styles.timePickerContainer}>
+                                      <TouchableOpacity
+                                        style={styles.timePickerButton}
+                                        onPress={() =>
+                                          setStartTimeModalOpen(true)
+                                        }
+                                      >
+                                        <Text style={styles.modalText}>
+                                          {typeof formData.startTime.hours ===
+                                            "number" &&
+                                          typeof formData.startTime.minutes ===
+                                            "number"
+                                            ? new Date(
+                                                1970,
+                                                0,
+                                                1,
+                                                formData.startTime.hours,
+                                                formData.startTime.minutes,
+                                              ).toLocaleTimeString("en-US", {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                              })
+                                            : ""}
+                                        </Text>
+                                      </TouchableOpacity>
+                                      <Controller
+                                        control={control}
+                                        name={"startTime"}
+                                        render={({ field: { onChange } }) => (
+                                          <TimePickerModal
+                                            visible={startTimeModalOpen}
+                                            onDismiss={() => {
+                                              onDismissTime("start");
+                                            }}
+                                            onConfirm={(startTime) => {
+                                              onChange(startTime);
+                                              onConfirmStartTime(startTime);
+                                            }}
+                                            hours={12}
+                                            minutes={0}
+                                          />
+                                        )}
+                                      />
+                                      {errors.startTime && (
+                                        <Text className="text-red-500">
+                                          {errors.startTime.message?.toString()}
+                                        </Text>
+                                      )}
 
-                                <Text style={{ padding: 10 }}>to</Text>
-                                <TouchableOpacity
-                                  style={styles.timePickerButton}
-                                  onPress={() => setEndTimeModalOpen(true)}
-                                >
-                                  <Text style={styles.modalText}>
-                                    {typeof formData.endTime.hours ===
-                                      "number" &&
-                                    typeof formData.endTime.minutes === "number"
-                                      ? new Date(
-                                          1970,
-                                          0,
-                                          1,
-                                          formData.endTime.hours,
-                                          formData.endTime.minutes,
-                                        ).toLocaleTimeString("en-US", {
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                        })
-                                      : ""}
-                                  </Text>
-                                </TouchableOpacity>
-                                <Controller
-                                  control={control}
-                                  name={"endTime"}
-                                  render={({ field: { onChange } }) => (
-                                    <TimePickerModal
-                                      visible={endTimeModalOpen}
-                                      onDismiss={() => {
-                                        onDismissTime("end");
-                                      }}
-                                      onConfirm={(endTime) => {
-                                        onConfirmEndTime(endTime);
-                                        onChange(endTime);
-                                      }}
-                                      hours={12}
-                                      minutes={0}
-                                      locale="en"
-                                    />
-                                  )}
-                                />
-                                {errors.endTime && (
-                                  <Text className="text-red-500">
-                                    {errors.endTime.message?.toString()}
-                                  </Text>
-                                )}
+                                      <Text style={{ padding: 10 }}>to</Text>
+                                      <TouchableOpacity
+                                        style={styles.timePickerButton}
+                                        onPress={() =>
+                                          setEndTimeModalOpen(true)
+                                        }
+                                      >
+                                        <Text style={styles.modalText}>
+                                          {typeof formData.endTime.hours ===
+                                            "number" &&
+                                          typeof formData.endTime.minutes ===
+                                            "number"
+                                            ? new Date(
+                                                1970,
+                                                0,
+                                                1,
+                                                formData.endTime.hours,
+                                                formData.endTime.minutes,
+                                              ).toLocaleTimeString("en-US", {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                              })
+                                            : ""}
+                                        </Text>
+                                      </TouchableOpacity>
+                                      <Controller
+                                        control={control}
+                                        name={"endTime"}
+                                        render={({ field: { onChange } }) => (
+                                          <TimePickerModal
+                                            visible={endTimeModalOpen}
+                                            onDismiss={() => {
+                                              onDismissTime("end");
+                                            }}
+                                            onConfirm={(endTime) => {
+                                              onConfirmEndTime(endTime);
+                                              onChange(endTime);
+                                            }}
+                                            hours={12}
+                                            minutes={0}
+                                            locale="en"
+                                          />
+                                        )}
+                                      />
+                                      {errors.endTime && (
+                                        <Text className="text-red-500">
+                                          {errors.endTime.message?.toString()}
+                                        </Text>
+                                      )}
+                                    </View>
+                                  </View>
+                                  <TouchableOpacity
+                                    onPress={() =>
+                                      setFormData({
+                                        startTime: {
+                                          hours: undefined,
+                                          minutes: undefined,
+                                        },
+                                        endTime: {
+                                          hours: undefined,
+                                          minutes: undefined,
+                                        },
+                                      })
+                                    }
+                                  >
+                                    <Text style={{ alignSelf: "flex-end" }}>
+                                      Clear
+                                    </Text>
+                                  </TouchableOpacity>
+                                  <TouchableOpacity
+                                    style={styles.saveButton}
+                                    onPress={() => {
+                                      if (
+                                        formData.startTime.hours !==
+                                          undefined &&
+                                        formData.startTime.minutes !==
+                                          undefined &&
+                                        formData.endTime.hours !== undefined &&
+                                        formData.endTime.minutes !== undefined
+                                      ) {
+                                        setShouldUpdateTime(true);
+                                      }
+                                      setTimeModalVisible(!timeModalVisible);
+                                    }}
+                                  >
+                                    <Text
+                                      style={{ color: "white", fontSize: 16 }}
+                                    >
+                                      Save
+                                    </Text>
+                                  </TouchableOpacity>
+                                </View>
                               </View>
-                            </View>
-                            <TouchableOpacity
-                              onPress={() =>
-                                setFormData({
-                                  startTime: {
-                                    hours: undefined,
-                                    minutes: undefined,
-                                  },
-                                  endTime: {
-                                    hours: undefined,
-                                    minutes: undefined,
-                                  },
-                                })
-                              }
-                            >
-                              <Text style={{ alignSelf: "flex-end" }}>
-                                Clear
-                              </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                              style={styles.saveButton}
-                              onPress={() => {
-                                if (
-                                  formData.startTime.hours !== undefined &&
-                                  formData.startTime.minutes !== undefined &&
-                                  formData.endTime.hours !== undefined &&
-                                  formData.endTime.minutes !== undefined
-                                ) {
-                                  setShouldUpdateTime(true);
-                                }
-                                setTimeModalVisible(!timeModalVisible);
-                              }}
-                            >
-                              <Text style={{ color: "white", fontSize: 16 }}>
-                                Save
-                              </Text>
-                            </TouchableOpacity>
+                            </Modal>
                           </View>
-                        </View>
-                      </Modal>
-                    </View>
-
-                    // </TouchableOpacity>
-                  ))
-                ) : (
-                  <Text style={{ marginVertical: 10, fontSize: 18 }}>
-                    No activities for this date yet!
-                  </Text>
-                )}
-                {currentDateUpdate && (
-                  <AddActivityToItinerary
-                    currentDateUpdate={currentDateUpdate}
-                    input={activitiesNotOnCalendar}
-                    saveActivityId={(activityId: string) => {
-                      setSavedActivityId(activityId);
-                      setDateForUpdateForm({
-                        startDate: currentDateUpdate,
-                        endDate: currentDateUpdate,
-                      });
-                      setCurrentDateUpdate(null);
+                        </Swipeable>
+                        // </TouchableOpacity>
+                      ),
+                    )
+                  ) : (
+                    <Text style={{ marginVertical: 10, fontSize: 18 }}>
+                      No activities for this date yet!
+                    </Text>
+                  )}
+                  {currentDateUpdate && (
+                    <AddActivityToItinerary
+                      currentDateUpdate={currentDateUpdate}
+                      input={activitiesNotOnCalendar}
+                      saveActivityId={(activityId: string) => {
+                        setSavedActivityId(activityId);
+                        setDateForUpdateForm({
+                          startDate: currentDateUpdate,
+                          endDate: currentDateUpdate,
+                        });
+                        setCurrentDateUpdate(null);
+                      }}
+                      isVisible={bannerModalVisible}
+                      setIsVisible={() => {
+                        setCurrentDateUpdate(null);
+                        setBannerModalVisible(false);
+                      }}
+                    />
+                  )}
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleDateSelection(date);
                     }}
-                    isVisible={bannerModalVisible}
-                    setIsVisible={() => {
-                      setCurrentDateUpdate(null);
-                      setBannerModalVisible(false);
-                    }}
-                  />
-                )}
-                <TouchableOpacity
-                  onPress={() => {
-                    handleDateSelection(date);
-                  }}
-                >
-                  <SearchBar
-                    placeholder="Add an activity..."
-                    // onChangeText={updateQuery}
-                    // value={searchBarValue}
-                    lightTheme={true}
-                    round={true}
-                    containerStyle={{
-                      backgroundColor: "white",
-                      borderTopColor: "white",
-                      borderBottomColor: "white",
-                      padding: 0,
-                    }}
-                    inputStyle={styles.h4}
-                  />
-                </TouchableOpacity>
-              </View>
-            )}
-            keyExtractor={(item, index) => index.toString()}
-            ref={flatlistRef}
+                  >
+                    <SearchBar
+                      placeholder="Add an activity..."
+                      // onChangeText={updateQuery}
+                      // value={searchBarValue}
+                      lightTheme={true}
+                      round={true}
+                      containerStyle={{
+                        backgroundColor: "white",
+                        borderTopColor: "white",
+                        borderBottomColor: "white",
+                        padding: 0,
+                      }}
+                      inputStyle={styles.h4}
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
+              keyExtractor={(item, index) => index.toString()}
+              ref={flatlistRef}
+            />
+          </View>
+        ) : (
+          <Calendar
+            events={eventsOnCalendar}
+            height={600}
+            onChangeDate={handleChangeDate}
+            mode={calendarMode}
+            onPressEvent={(event) => {
+              router.push(`trips/${id}/(itinerary)/${event.activityid}`);
+            }} // eventCellStyle={{ backgroundColor: 'blue' }}
+            date={currentDate}
+            swipeEnabled={false}
+            theme={customTheme}
           />
-        </View>
-      ) : (
-        <Calendar
-          events={eventsOnCalendar}
-          height={600}
-          onChangeDate={handleChangeDate}
-          mode={calendarMode}
-          onPressEvent={(event) => {
-            router.push(`trips/${id}/(itinerary)/${event.activityid}`);
-          }} // eventCellStyle={{ backgroundColor: 'blue' }}
-          date={currentDate}
-          swipeEnabled={false}
-          theme={customTheme}
-        />
-      )}
-    </SafeAreaView>
+        )}
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 };
 const styles = StyleSheet.create({
@@ -1049,6 +1141,18 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 8,
     marginVertical: 3,
+  },
+  deleteButton: {
+    flex: 1,
+    backgroundColor: "#FF3B30",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+  },
+  actionText: {
+    color: "white",
+    fontSize: 16,
+    paddingHorizontal: 10,
   },
 });
 export default Itinerary;
