@@ -7,17 +7,17 @@ export interface TripData {
     endDate: Date;
   };
   startTime: {
-    hours: number,
-    minutes: number,
+    hours: number;
+    minutes: number;
   };
   endTime: {
-    hours: number,
-    minutes: number,
+    hours: number;
+    minutes: number;
   };
   location: MapData;
   image: {
     url: String;
-  }
+  };
 }
 
 export type MapData = {
@@ -173,33 +173,49 @@ export type Mode =
   | "schedule"
   | "itinerary";
 
-  export interface AddActivityProps {
-    currentDateUpdate: Date;
-    input: ActivityProps[];
-    saveActivityId: (activityId: string) => void;
-    isVisible: boolean;
-    setIsVisible: (isVisible: boolean) => void;
-  }
+export interface AddActivityProps {
+  currentDateUpdate: Date;
+  input: ActivityProps[];
+  saveActivityId: (activityId: string) => void;
+  isVisible: boolean;
+  setIsVisible: (isVisible: boolean) => void;
+}
 
-  export const calendarViewLabels = [
-    { label: "Itinerary", value: "itinerary" },
-    { label: "Schedule", value: "schedule" },
-    { label: "Day", value: "day" },
-    { label: "3 days", value: "3days" },
-    { label: "Week", value: "week" },
-    { label: "Month", value: "month" },
-  ];
-  export const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+export const calendarViewLabels = [
+  { label: "Itinerary", value: "itinerary" },
+  { label: "Schedule", value: "schedule" },
+  { label: "Day", value: "day" },
+  { label: "3 days", value: "3days" },
+  { label: "Week", value: "week" },
+  { label: "Month", value: "month" },
+];
+export const monthNames = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+export interface timeRange {
+  startTime: {
+    hours: number | undefined;
+    minutes: number | undefined;
+  };
+  endTime: {
+    hours: number | undefined;
+    minutes: number | undefined;
+  };
+}
+
+export interface dateRange {
+  startDate: Date | undefined;
+  endDate: Date | undefined;
+}
