@@ -120,7 +120,7 @@ router.put("/:activityId", async (req: Request<ActivityParams>, res) => {
 // Update calendar status of an activity
 router.put("/:activityId/toggle", async (req: Request<ActivityParams>, res) => {
   const { activityId: activityId, tripId } = req.params;
-  const { name, description, startTime, endTime, location, notes } = req.body;
+  const { isOnCalendar, startTime, endTime } = req.body;
 
   const isValidID = await prisma.activity.findUnique({
     where: {
@@ -139,7 +139,7 @@ router.put("/:activityId/toggle", async (req: Request<ActivityParams>, res) => {
         id: activityId,
       },
       data: {
-        isOnCalendar: !isValidID?.isOnCalendar,
+        isOnCalendar,
         startTime, 
         endTime,
       },
