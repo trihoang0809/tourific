@@ -503,12 +503,12 @@ const Itinerary = () => {
       <View
         style={[
           styles.row,
-          calendarMode === "schedule" || calendarMode === "itinerary"
+          calendarMode === "itinerary"
             ? { justifyContent: "center" }
             : { justifyContent: "space-between" },
         ]}
       >
-        {calendarMode !== "schedule" && calendarMode !== "itinerary" && (
+        {calendarMode !== "itinerary" && (
           <TouchableOpacity
             onPress={() => {
               switch (calendarMode) {
@@ -535,17 +535,19 @@ const Itinerary = () => {
             </View>
           </TouchableOpacity>
         )}
-        <View style={styles.monthContainer}>
-          {calendarMode === "itinerary" ? (
-            <Text style={styles.h1}>Intinerary</Text>
-          ) : (
-            <Text style={styles.h1}>{monthNames[currentDate.getMonth()]}</Text>
-          )}
-          <Pressable onPress={() => setModalVisible(true)}>
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
+          <View style={styles.monthContainer}>
+            {calendarMode === "itinerary" ? (
+              <Text style={styles.h1}>Intinerary</Text>
+            ) : (
+              <Text style={styles.h1}>
+                {monthNames[currentDate.getMonth()]}
+              </Text>
+            )}
             <Entypo name="chevron-down" size={24} color="black" />
-          </Pressable>
-        </View>
-        {calendarMode !== "schedule" && calendarMode !== "itinerary" && (
+          </View>
+        </TouchableOpacity>
+        {calendarMode !== "itinerary" && (
           <TouchableOpacity
             onPress={() => {
               switch (calendarMode) {
@@ -573,39 +575,41 @@ const Itinerary = () => {
         )}
       </View>
       {/* Modal to pick calendar view */}
-      <Modal animationType="slide" visible={isModalVisible} transparent={true}>
-        <View style={{ alignItems: "center", top: "20%" }}>
+      <Modal animationType="fade" visible={isModalVisible} transparent={true}>
+        <View style={styles.modalOverlay}>
           <View style={styles.modalView}>
-            <SafeAreaView style={styles.calendarViewContainer}>
-              {calendarViewLabels.map((view, index) => (
-                <Pressable
-                  key={index}
-                  onPress={() => {
-                    setCalendarMode(view.value as Mode);
-                    setModalVisible(!isModalVisible);
-                  }}
-                  style={
-                    calendarMode === view.value
-                      ? styles.calendarViewSelectedOption
-                      : styles.calendarViewOption
-                  }
-                >
-                  <Text
+            <View style={styles.row}>
+              <Text style={styles.modalText}>Select calendar view</Text>
+              <Pressable onPress={() => setModalVisible(!isModalVisible)}>
+                <Ionicons name="close" size={24} color="black" />
+              </Pressable>
+            </View>
+            <View style={styles.calendarViewContainer}>
+              <View style={styles.timePickerContainer}>
+                {calendarViewLabels.map((view, index) => (
+                  <Pressable
+                    key={index}
+                    onPress={() => {
+                      setCalendarMode(view.value as Mode);
+                      setModalVisible(!isModalVisible);
+                    }}
                     style={
-                      calendarMode === view.value ? { color: "white" } : {}
+                      calendarMode === view.value
+                        ? styles.calendarViewSelectedOption
+                        : styles.calendarViewOption
                     }
                   >
-                    {view.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </SafeAreaView>
-            <Pressable
-              style={styles.cancelButton}
-              onPress={() => setModalVisible(!isModalVisible)}
-            >
-              <Ionicons name="close" size={24} color="black" />
-            </Pressable>
+                    <Text
+                      style={
+                        calendarMode === view.value ? { color: "white" } : {}
+                      }
+                    >
+                      {view.label}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
           </View>
         </View>
       </Modal>
@@ -710,159 +714,145 @@ const Itinerary = () => {
                       )}
                       <View>{event.children}</View>
                       <Modal
-                        animationType="slide"
+                        animationType="fade"
                         visible={timeModalVisible}
                         transparent={true}
                       >
-                        <View style={{ alignItems: "center", top: "20%" }}>
+                        <View style={styles.modalOverlay}>
                           <View style={styles.modalView}>
-                            <SafeAreaView style={styles.calendarViewContainer}>
-                              <View
-                                style={{
-                                  justifyContent: "space-around",
-                                  flex: 1,
-                                  alignItems: "center",
-                                  flexDirection: "row",
-                                  marginVertical: 10,
+                            <View style={styles.row}>
+                              <Text style={styles.modalText}>
+                                What time should we go?
+                              </Text>
+                              <Pressable
+                                onPress={() => {
+                                  setTimeModalVisible(!timeModalVisible);
                                 }}
                               >
-                                <View
-                                  style={{
-                                    flex: 1,
-                                    marginRight: 5,
-                                    flexDirection: "column",
-                                  }}
+                                <Ionicons
+                                  name="close"
+                                  size={24}
+                                  color="black"
+                                />
+                              </Pressable>
+                            </View>
+                            <View style={styles.calendarViewContainer}>
+                              <View style={styles.timePickerContainer}>
+                                <TouchableOpacity
+                                  style={styles.timePickerButton}
+                                  onPress={() => setStartTimeModalOpen(true)}
                                 >
-                                  <Text className="font-semibold text-base">
-                                    Start time
+                                  <Text style={styles.modalText}>
+                                    {typeof formData.startTime.hours ===
+                                      "number" &&
+                                    typeof formData.startTime.minutes ===
+                                      "number"
+                                      ? new Date(
+                                          1970,
+                                          0,
+                                          1,
+                                          formData.startTime.hours,
+                                          formData.startTime.minutes,
+                                        ).toLocaleTimeString("en-US", {
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                        })
+                                      : ""}
                                   </Text>
-                                  <TouchableOpacity
-                                    onPress={() => setStartTimeModalOpen(true)}
-                                  >
-                                    <Text
-                                      style={{
-                                        fontSize: 15,
-                                        color: "black",
-                                        backgroundColor: "#E6E6E6",
-                                        padding: 15,
-                                        marginTop: 5,
-                                        borderRadius: 10,
-                                        overflow: "hidden",
+                                </TouchableOpacity>
+                                <Controller
+                                  control={control}
+                                  name={"startTime"}
+                                  render={({ field: { onChange } }) => (
+                                    <TimePickerModal
+                                      visible={startTimeModalOpen}
+                                      onDismiss={() => {
+                                        onDismissTime("start");
                                       }}
-                                    >
-                                      {typeof formData.startTime.hours ===
-                                        "number" &&
-                                      typeof formData.startTime.minutes ===
-                                        "number"
-                                        ? new Date(
-                                            1970,
-                                            0,
-                                            1,
-                                            formData.startTime.hours,
-                                            formData.startTime.minutes,
-                                          ).toLocaleTimeString("en-US", {
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                          })
-                                        : ""}
-                                    </Text>
-                                  </TouchableOpacity>
-                                  <Controller
-                                    control={control}
-                                    name={"startTime"}
-                                    render={({ field: { onChange } }) => (
-                                      <TimePickerModal
-                                        visible={startTimeModalOpen}
-                                        onDismiss={() => {
-                                          onDismissTime("start");
-                                        }}
-                                        onConfirm={(startTime) => {
-                                          onChange(startTime);
-                                          onConfirmStartTime(startTime);
-                                        }}
-                                        hours={12}
-                                        minutes={0}
-                                      />
-                                    )}
-                                  />
-                                  {errors.startTime && (
-                                    <Text className="text-red-500">
-                                      {errors.startTime.message?.toString()}
-                                    </Text>
+                                      onConfirm={(startTime) => {
+                                        onChange(startTime);
+                                        onConfirmStartTime(startTime);
+                                      }}
+                                      hours={12}
+                                      minutes={0}
+                                    />
                                   )}
-                                </View>
-                                <View
-                                  style={{
-                                    flex: 1,
-                                    marginLeft: 5,
-                                    flexDirection: "column",
-                                  }}
+                                />
+                                {errors.startTime && (
+                                  <Text className="text-red-500">
+                                    {errors.startTime.message?.toString()}
+                                  </Text>
+                                )}
+
+                                <Text style={{ padding: 10 }}>to</Text>
+                                <TouchableOpacity
+                                  style={styles.timePickerButton}
+                                  onPress={() => setEndTimeModalOpen(true)}
                                 >
-                                  <Text className="font-semibold text-base">
-                                    End time
+                                  <Text style={styles.modalText}>
+                                    {typeof formData.endTime.hours ===
+                                      "number" &&
+                                    typeof formData.endTime.minutes === "number"
+                                      ? new Date(
+                                          1970,
+                                          0,
+                                          1,
+                                          formData.endTime.hours,
+                                          formData.endTime.minutes,
+                                        ).toLocaleTimeString("en-US", {
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                        })
+                                      : ""}
                                   </Text>
-                                  <TouchableOpacity
-                                    onPress={() => setEndTimeModalOpen(true)}
-                                  >
-                                    <Text
-                                      style={{
-                                        fontSize: 15,
-                                        color: "black",
-                                        backgroundColor: "#E6E6E6",
-                                        padding: 15,
-                                        marginTop: 5,
-                                        borderRadius: 10,
-                                        overflow: "hidden",
+                                </TouchableOpacity>
+                                <Controller
+                                  control={control}
+                                  name={"endTime"}
+                                  render={({ field: { onChange } }) => (
+                                    <TimePickerModal
+                                      visible={endTimeModalOpen}
+                                      onDismiss={() => {
+                                        onDismissTime("end");
                                       }}
-                                    >
-                                      {typeof formData.endTime.hours ===
-                                        "number" &&
-                                      typeof formData.endTime.minutes ===
-                                        "number"
-                                        ? new Date(
-                                            1970,
-                                            0,
-                                            1,
-                                            formData.endTime.hours,
-                                            formData.endTime.minutes,
-                                          ).toLocaleTimeString("en-US", {
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                          })
-                                        : ""}
-                                    </Text>
-                                  </TouchableOpacity>
-                                  <Controller
-                                    control={control}
-                                    name={"endTime"}
-                                    render={({ field: { onChange } }) => (
-                                      <TimePickerModal
-                                        visible={endTimeModalOpen}
-                                        onDismiss={() => {
-                                          onDismissTime("end");
-                                        }}
-                                        onConfirm={(endTime) => {
-                                          onConfirmEndTime(endTime);
-                                          onChange(endTime);
-                                        }}
-                                        hours={12}
-                                        minutes={0}
-                                        locale="en"
-                                      />
-                                    )}
-                                  />
-                                  {errors.endTime && (
-                                    <Text className="text-red-500">
-                                      {errors.endTime.message?.toString()}
-                                    </Text>
+                                      onConfirm={(endTime) => {
+                                        onConfirmEndTime(endTime);
+                                        onChange(endTime);
+                                      }}
+                                      hours={12}
+                                      minutes={0}
+                                      locale="en"
+                                    />
                                   )}
-                                </View>
+                                />
+                                {errors.endTime && (
+                                  <Text className="text-red-500">
+                                    {errors.endTime.message?.toString()}
+                                  </Text>
+                                )}
                               </View>
-                            </SafeAreaView>
-                            <Pressable
-                              style={styles.cancelButton}
+                            </View>
+                            <TouchableOpacity
+                              onPress={() =>
+                                setFormData({
+                                  startTime: {
+                                    hours: undefined,
+                                    minutes: undefined,
+                                  },
+                                  endTime: {
+                                    hours: undefined,
+                                    minutes: undefined,
+                                  },
+                                })
+                              }
+                            >
+                              <Text style={{ alignSelf: "flex-end" }}>
+                                Clear
+                              </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={styles.saveButton}
                               onPress={() => {
-                                // setSavedActivityId(event.activityid);
                                 if (
                                   formData.startTime.hours !== undefined &&
                                   formData.startTime.minutes !== undefined &&
@@ -874,8 +864,10 @@ const Itinerary = () => {
                                 setTimeModalVisible(!timeModalVisible);
                               }}
                             >
-                              <Ionicons name="close" size={24} color="black" />
-                            </Pressable>
+                              <Text style={{ color: "white", fontSize: 16 }}>
+                                Save
+                              </Text>
+                            </TouchableOpacity>
                           </View>
                         </View>
                       </Modal>
@@ -955,6 +947,11 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 26,
   },
+  modalText: {
+    fontSize: 18,
+    overflow: "hidden",
+    fontWeight: "500",
+  },
   h4: {
     color: "white",
     fontSize: 16,
@@ -970,7 +967,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 15,
   },
   leftRightIcon: {
     borderWidth: 1,
@@ -982,11 +978,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
   modalView: {
-    width: "80%",
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
     backgroundColor: "white",
-    borderRadius: 20,
-    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 25,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -1003,20 +1008,37 @@ const styles = StyleSheet.create({
   calendarViewOption: {
     backgroundColor: "#ddd",
     padding: 10,
-    margin: 5,
     borderRadius: 5,
   },
   calendarViewSelectedOption: {
     backgroundColor: "#006ee6",
     padding: 10,
-    margin: 5,
     borderRadius: 5,
     color: "white",
   },
-  cancelButton: {
-    position: "absolute",
-    top: 15,
-    right: 15,
+  timePickerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  timePickerButton: {
+    height: 45,
+    flex: 1,
+    backgroundColor: "#E6E6E6",
+    borderRadius: 7,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  saveButton: {
+    backgroundColor: "#007AFF",
+    padding: 10,
+    borderRadius: 7,
+    alignItems: "center",
+    width: "100%",
+    marginTop: 10,
   },
   itineraryContainer: {
     padding: 20,

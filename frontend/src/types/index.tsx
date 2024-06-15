@@ -170,7 +170,6 @@ export type Mode =
   | "day"
   | "custom"
   | "month"
-  | "schedule"
   | "itinerary";
 
 export interface AddActivityProps {
@@ -183,7 +182,6 @@ export interface AddActivityProps {
 
 export const calendarViewLabels = [
   { label: "Itinerary", value: "itinerary" },
-  { label: "Schedule", value: "schedule" },
   { label: "Day", value: "day" },
   { label: "3 days", value: "3days" },
   { label: "Week", value: "week" },
