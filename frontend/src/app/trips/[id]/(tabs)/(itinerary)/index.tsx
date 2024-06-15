@@ -27,11 +27,17 @@ import {
   calendarViewLabels,
   monthNames,
 } from "@/types";
+import { useForm, Controller } from "react-hook-form";
+import { TimePickerModal } from "react-native-paper-dates";
+import { timeRange, dateRange } from "@/types";
+import { TimeRangeSchema } from "@/validation/types";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const Itinerary = () => {
   const { id } = useGlobalSearchParams();
   const [savedActivityId, setSavedActivityId] = useState("");
   const [bannerModalVisible, setBannerModalVisible] = useState(false);
+  const [timeModalVisible, setTimeModalVisible] = useState(false);
 
   const [activities, setActivities] = useState<ActivityProps[] | []>([]);
   const [eventsOnCalendar, setEventsOnCalendar] = useState<Event[]>([]);
@@ -43,17 +49,84 @@ const Itinerary = () => {
   const [tripDate, setTripDate] = useState<TripDate>();
   const [datesConsecutiveList, setDatesConsecutiveList] = useState<Date[]>([]);
   const [currentDateUpdate, setCurrentDateUpdate] = useState<Date | null>(null);
-  const [dateForUpdateForm, setDateForUpdateForm] = useState(new Date());
+  const [dateForUpdateForm, setDateForUpdateForm] = useState<dateRange>({
+    startDate: undefined,
+    endDate: undefined,
+  });
+  const [startTimeModalOpen, setStartTimeModalOpen] = useState(false);
+  const [endTimeModalOpen, setEndTimeModalOpen] = useState(false);
+  const [shouldUpdateTime, setShouldUpdateTime] = useState(false);
+  const {
+    formState: { errors },
+    control,
+    reset,
+  } = useForm({
+    resolver: zodResolver(TimeRangeSchema),
+  });
+  const [formData, setFormData] = useState<timeRange>({
+    startTime: {
+      hours: undefined,
+      minutes: undefined,
+    },
+    endTime: {
+      hours: undefined,
+      minutes: undefined,
+    },
+  });
+
+  useEffect(() => {
+    console.log("formData", formData);
+    reset({ ...formData });
+  }, [formData]);
+
+  // //functions for time picker
+  const onDismissTime = useCallback(
+    (type: String) => {
+      if (type === "start") {
+        setStartTimeModalOpen(false);
+      } else {
+        setEndTimeModalOpen(false);
+      }
+    },
+    [setStartTimeModalOpen, setEndTimeModalOpen],
+  );
+
+  const onConfirmStartTime = useCallback(
+    ({ hours, minutes }: { hours: number; minutes: number }) => {
+      setFormData(
+        (prevFormData) =>
+          ({
+            ...prevFormData,
+            startTime: {
+              hours: hours,
+              minutes: minutes,
+            },
+          }) as timeRange,
+      );
+      setStartTimeModalOpen(false);
+    },
+    [setStartTimeModalOpen, setFormData],
+  );
+
+  const onConfirmEndTime = useCallback(
+    ({ hours, minutes }: { hours: number; minutes: number }) => {
+      setFormData(
+        (prevFormData) =>
+          ({
+            ...prevFormData,
+            endTime: {
+              hours: hours,
+              minutes: minutes,
+            },
+          }) as timeRange,
+      );
+      setEndTimeModalOpen(false);
+    },
+    [setEndTimeModalOpen, setFormData],
+  );
 
   const flatlistRef = useRef<FlatList>(null);
 
-  // May use these for search activity:
-  // const [query, setQuery] = useState("scenery");
-  // const [searchBarValue, setSearchBarValue] = useState("");
-  // const updateQuery = (query: string) => {
-  //   setQuery(query);
-  //   setSearchBarValue(query);
-  // };
   interface GroupedEvents {
     [key: string]: Event[];
   }
@@ -96,7 +169,6 @@ const Itinerary = () => {
     }
   };
 
-  // Fetch activities
   useEffect(() => {
     const getActivities = async ({ id }: { id: string }) => {
       try {
@@ -123,21 +195,26 @@ const Itinerary = () => {
     getActivities({ id });
   }, [savedActivityId]);
 
-  // Update new time for activity
+  // Update a single activity
   useEffect(() => {
-    const updateCalendarStatus = async ({
+    const updateActivityOnBackend = async ({
       id,
       activityid,
-      date,
+      startTime,
+      endTime,
+      calendarStatus,
     }: {
       id: string;
       activityid: string;
-      date: string;
+      startTime: Date;
+      endTime: Date;
+      calendarStatus: boolean;
     }) => {
       try {
         const req = {
-          startTime: date,
-          endTime: date,
+          startTime: startTime,
+          endTime: endTime,
+          isOnCalendar: calendarStatus,
         };
         const response = await fetch(
           `http://localhost:3000/trips/${id}/activities/${activityid}/toggle`,
@@ -150,7 +227,7 @@ const Itinerary = () => {
           },
         );
         if (!response.ok) {
-          throw new Error("Failed to fetch activities");
+          throw new Error("Failed to update activity");
         }
       } catch (error: any) {
         console.error(
@@ -160,7 +237,7 @@ const Itinerary = () => {
       }
     };
 
-    const moveNewEventToCalendar = (eventId: string) => {
+    const moveNewEventToItineraryUI = async (eventId: string) => {
       // Find the event in activitiesNotOnCalendar
       const eventToMove = activitiesNotOnCalendar.find(
         (event) => event.id === eventId,
@@ -170,8 +247,8 @@ const Itinerary = () => {
         // Update the event to indicate it is now on the calendar
         const transformedEvent: Event = {
           title: eventToMove.name,
-          start: dateForUpdateForm,
-          end: dateForUpdateForm,
+          start: dateForUpdateForm.startDate,
+          end: dateForUpdateForm.endDate,
           children: null,
           activityid: eventToMove.id,
         };
@@ -183,18 +260,102 @@ const Itinerary = () => {
         );
       }
     };
-    if (id && savedActivityId) {
-      updateCalendarStatus({
+
+    const updateTimeState = async (eventId: string) => {
+      console.log("updateEventTime called for eventId:", eventId);
+      // Find the event in activitiesNotOnCalendar
+      const eventToUpdate = eventsOnCalendar.find(
+        (event) => event.activityid === eventId,
+      );
+
+      if (eventToUpdate) {
+        const startDay = eventToUpdate.start.getDate();
+        const startMonth = eventToUpdate.start.getMonth();
+        const startYear = eventToUpdate.start.getFullYear();
+
+        const endDay = eventToUpdate.end.getDate();
+        const endMonth = eventToUpdate.end.getMonth();
+        const endYear = eventToUpdate.end.getFullYear();
+
+        // Create new Date objects with the day, month, and year from eventToMove.start and eventToMove.end,
+        // and the hours and minutes from formData
+        const newStart = new Date(
+          startYear,
+          startMonth,
+          startDay,
+          formData.startTime.hours,
+          formData.startTime.minutes,
+        );
+        const newEnd = new Date(
+          endYear,
+          endMonth,
+          endDay,
+          formData.endTime.hours,
+          formData.endTime.minutes,
+        );
+
+        return { startDate: newStart, endDate: newEnd };
+      }
+    };
+
+    const updateEventTimeOnFrontend = (
+      eventId: string,
+      newDates: { startDate: Date; endDate: Date },
+    ) => {
+      const eventToUpdateTime = eventsOnCalendar.find(
+        (event) => event.activityid === eventId,
+      );
+      if (eventToUpdateTime) {
+        const transformedEvent: Event = {
+          title: eventToUpdateTime.title,
+          start: newDates.startDate,
+          end: newDates.endDate,
+          children: eventToUpdateTime.children,
+          activityid: eventToUpdateTime.activityid,
+        };
+        setEventsOnCalendar((prevEvents) =>
+          prevEvents.map((event) =>
+            event.activityid === transformedEvent.activityid
+              ? transformedEvent
+              : event,
+          ),
+        );
+      }
+    };
+
+    const updateCalendarStatusAndMoveEvent = async (eventId: string) => {
+      try {
+        const newDates = await updateTimeState(eventId);
+        if (newDates) {
+          updateEventTimeOnFrontend(eventId, newDates);
+          updateActivityOnBackend({
+            id,
+            activityid: eventId,
+            startTime: newDates.startDate,
+            endTime: newDates.endDate,
+            calendarStatus: true,
+          });
+        }
+      } catch (error) {
+        console.error("Error in updating event and moving to calendar:", error);
+      }
+    };
+
+    if (id && savedActivityId && !shouldUpdateTime) {
+      updateActivityOnBackend({
         id,
         activityid: savedActivityId,
-        date: dateForUpdateForm.toISOString(),
-      })
-        .then(() => moveNewEventToCalendar(savedActivityId))
-        .catch((error) =>
-          console.error("Error in moving event to calendar:", error),
-        );
+        startTime: dateForUpdateForm.startDate,
+        endTime: dateForUpdateForm.endDate,
+        calendarStatus: true,
+      }).then(() => moveNewEventToItineraryUI(savedActivityId));
     }
-  }, [savedActivityId]);
+
+    if (shouldUpdateTime) {
+      updateCalendarStatusAndMoveEvent(savedActivityId);
+      setShouldUpdateTime(false);
+    }
+  }, [savedActivityId, shouldUpdateTime]);
 
   // Set list of ascending dates from the start date
   useEffect(() => {
@@ -297,7 +458,6 @@ const Itinerary = () => {
   const handleChangeDate: DateRangeHandler = useCallback(
     ([start, end]: [Date, Date]) => {
       setCurrentDate(start);
-      // console.log("Current date updated:", start.toISOString());
     },
     [],
   );
@@ -486,17 +646,36 @@ const Itinerary = () => {
                 {/* Render events for this date */}
                 {getEventsForDate(date).length > 0 ? (
                   getEventsForDate(date).map((event: Event) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        router.push(
-                          `trips/${id}/(itinerary)/${event.activityid}`,
-                        );
-                      }}
-                      key={event.activityid}
-                    >
-                      <View style={styles.eventContainer}>
-                        <Text style={styles.h4}>{event.title}</Text>
-                        {event.start.getTime() !== event.end.getTime() && (
+                    // <TouchableOpacity
+                    //   // onPress={() => {
+                    //   //   router.push(
+                    //   //     `trips/${id}/(itinerary)/${event.activityid}`,
+                    //   //   );
+                    //   // }}
+                    //   key={event.activityid}
+                    // >
+                    <View style={styles.eventContainer}>
+                      <Text style={styles.h4}>{event.title}</Text>
+                      {/* if start time is similar to end time, the activity's time is not set yet */}
+                      {event.start.getTime() !== event.end.getTime() &&
+                      event.start != undefined &&
+                      event.end != undefined ? (
+                        <TouchableOpacity
+                          onPress={() => {
+                            setFormData({
+                              startTime: {
+                                hours: undefined,
+                                minutes: undefined,
+                              },
+                              endTime: {
+                                hours: undefined,
+                                minutes: undefined,
+                              },
+                            });
+                            setSavedActivityId(event.activityid);
+                            setTimeModalVisible(true);
+                          }}
+                        >
                           <Text style={styles.p}>
                             {new Date(event.start).toLocaleTimeString([], {
                               hour: "2-digit",
@@ -508,10 +687,201 @@ const Itinerary = () => {
                               minute: "2-digit",
                             })}
                           </Text>
-                        )}
-                        <View>{event.children}</View>
-                      </View>
-                    </TouchableOpacity>
+                        </TouchableOpacity>
+                      ) : (
+                        <TouchableOpacity
+                          onPress={() => {
+                            setFormData({
+                              startTime: {
+                                hours: undefined,
+                                minutes: undefined,
+                              },
+                              endTime: {
+                                hours: undefined,
+                                minutes: undefined,
+                              },
+                            });
+                            setSavedActivityId(event.activityid);
+                            setTimeModalVisible(true);
+                          }}
+                        >
+                          <Text>Add time</Text>
+                        </TouchableOpacity>
+                      )}
+                      <View>{event.children}</View>
+                      <Modal
+                        animationType="slide"
+                        visible={timeModalVisible}
+                        transparent={true}
+                      >
+                        <View style={{ alignItems: "center", top: "20%" }}>
+                          <View style={styles.modalView}>
+                            <SafeAreaView style={styles.calendarViewContainer}>
+                              <View
+                                style={{
+                                  justifyContent: "space-around",
+                                  flex: 1,
+                                  alignItems: "center",
+                                  flexDirection: "row",
+                                  marginVertical: 10,
+                                }}
+                              >
+                                <View
+                                  style={{
+                                    flex: 1,
+                                    marginRight: 5,
+                                    flexDirection: "column",
+                                  }}
+                                >
+                                  <Text className="font-semibold text-base">
+                                    Start time
+                                  </Text>
+                                  <TouchableOpacity
+                                    onPress={() => setStartTimeModalOpen(true)}
+                                  >
+                                    <Text
+                                      style={{
+                                        fontSize: 15,
+                                        color: "black",
+                                        backgroundColor: "#E6E6E6",
+                                        padding: 15,
+                                        marginTop: 5,
+                                        borderRadius: 10,
+                                        overflow: "hidden",
+                                      }}
+                                    >
+                                      {typeof formData.startTime.hours ===
+                                        "number" &&
+                                      typeof formData.startTime.minutes ===
+                                        "number"
+                                        ? new Date(
+                                            1970,
+                                            0,
+                                            1,
+                                            formData.startTime.hours,
+                                            formData.startTime.minutes,
+                                          ).toLocaleTimeString("en-US", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                          })
+                                        : ""}
+                                    </Text>
+                                  </TouchableOpacity>
+                                  <Controller
+                                    control={control}
+                                    name={"startTime"}
+                                    render={({ field: { onChange } }) => (
+                                      <TimePickerModal
+                                        visible={startTimeModalOpen}
+                                        onDismiss={() => {
+                                          onDismissTime("start");
+                                        }}
+                                        onConfirm={(startTime) => {
+                                          onChange(startTime);
+                                          onConfirmStartTime(startTime);
+                                        }}
+                                        hours={12}
+                                        minutes={0}
+                                      />
+                                    )}
+                                  />
+                                  {errors.startTime && (
+                                    <Text className="text-red-500">
+                                      {errors.startTime.message?.toString()}
+                                    </Text>
+                                  )}
+                                </View>
+                                <View
+                                  style={{
+                                    flex: 1,
+                                    marginLeft: 5,
+                                    flexDirection: "column",
+                                  }}
+                                >
+                                  <Text className="font-semibold text-base">
+                                    End time
+                                  </Text>
+                                  <TouchableOpacity
+                                    onPress={() => setEndTimeModalOpen(true)}
+                                  >
+                                    <Text
+                                      style={{
+                                        fontSize: 15,
+                                        color: "black",
+                                        backgroundColor: "#E6E6E6",
+                                        padding: 15,
+                                        marginTop: 5,
+                                        borderRadius: 10,
+                                        overflow: "hidden",
+                                      }}
+                                    >
+                                      {typeof formData.endTime.hours ===
+                                        "number" &&
+                                      typeof formData.endTime.minutes ===
+                                        "number"
+                                        ? new Date(
+                                            1970,
+                                            0,
+                                            1,
+                                            formData.endTime.hours,
+                                            formData.endTime.minutes,
+                                          ).toLocaleTimeString("en-US", {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                          })
+                                        : ""}
+                                    </Text>
+                                  </TouchableOpacity>
+                                  <Controller
+                                    control={control}
+                                    name={"endTime"}
+                                    render={({ field: { onChange } }) => (
+                                      <TimePickerModal
+                                        visible={endTimeModalOpen}
+                                        onDismiss={() => {
+                                          onDismissTime("end");
+                                        }}
+                                        onConfirm={(endTime) => {
+                                          onConfirmEndTime(endTime);
+                                          onChange(endTime);
+                                        }}
+                                        hours={12}
+                                        minutes={0}
+                                        locale="en"
+                                      />
+                                    )}
+                                  />
+                                  {errors.endTime && (
+                                    <Text className="text-red-500">
+                                      {errors.endTime.message?.toString()}
+                                    </Text>
+                                  )}
+                                </View>
+                              </View>
+                            </SafeAreaView>
+                            <Pressable
+                              style={styles.cancelButton}
+                              onPress={() => {
+                                // setSavedActivityId(event.activityid);
+                                if (
+                                  formData.startTime.hours !== undefined &&
+                                  formData.startTime.minutes !== undefined &&
+                                  formData.endTime.hours !== undefined &&
+                                  formData.endTime.minutes !== undefined
+                                ) {
+                                  setShouldUpdateTime(true);
+                                }
+                                setTimeModalVisible(!timeModalVisible);
+                              }}
+                            >
+                              <Ionicons name="close" size={24} color="black" />
+                            </Pressable>
+                          </View>
+                        </View>
+                      </Modal>
+                    </View>
+
+                    // </TouchableOpacity>
                   ))
                 ) : (
                   <Text style={{ marginVertical: 10, fontSize: 18 }}>
@@ -524,10 +894,11 @@ const Itinerary = () => {
                     input={activitiesNotOnCalendar}
                     saveActivityId={(activityId: string) => {
                       setSavedActivityId(activityId);
-                      setDateForUpdateForm(currentDateUpdate);
+                      setDateForUpdateForm({
+                        startDate: currentDateUpdate,
+                        endDate: currentDateUpdate,
+                      });
                       setCurrentDateUpdate(null);
-                      console.log("currentdateu[update before modal", date);
-                      console.log("saved id from modal", activityId);
                     }}
                     isVisible={bannerModalVisible}
                     setIsVisible={() => {
@@ -659,11 +1030,3 @@ const styles = StyleSheet.create({
   },
 });
 export default Itinerary;
-
-// export default class Itinerary extends React.Component {
-//   render() {
-//       return (
-//           <AgendaList />
-//       )
-//   }
-// }
