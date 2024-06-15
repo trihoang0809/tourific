@@ -717,12 +717,36 @@ const Itinerary = () => {
               ))}
             </ScrollView>
             <FlatList
+              // style={{backgroundColor: '#e9e9e9'}}
               data={datesConsecutiveList}
+              contentContainerStyle={{ paddingBottom: 100 }}
               renderItem={({ item: date, index }) => (
+                <SafeAreaView style={{ flex: 1, backgroundColor: "#e9e9e9" }}>
                 <View key={index} style={styles.itineraryContainer}>
-                  <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                    {`${new Date(date).toLocaleDateString(undefined, { weekday: "short" })} ${new Date(date).toLocaleDateString(undefined, { month: "numeric" })}/${new Date(date).toLocaleDateString(undefined, { day: "numeric" })} `}
-                  </Text>
+                  <View style={styles.row}>
+                    <Text style={{ fontSize: 20, fontWeight: "bold", paddingVertical: 10 }}>
+                      {`${new Date(date).toLocaleDateString(undefined, { weekday: "short" })} ${new Date(date).toLocaleDateString(undefined, { month: "numeric" })}/${new Date(date).toLocaleDateString(undefined, { day: "numeric" })} `}
+                    </Text>
+                    <TouchableOpacity
+                      style={{
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: 35,
+                        height: 35,
+                        borderRadius: 35,
+                        backgroundColor: "#006ee6",
+                        shadowOffset: { width: 1, height: 1 },
+                        shadowColor: "#333",
+                        shadowOpacity: 0.3,
+                        shadowRadius: 2,
+                      }}
+                      onPress={() => {
+                        handleDateSelection(date);
+                      }}
+                    >
+                      <Ionicons name="add" size={25} color="white" />
+                    </TouchableOpacity>
+                  </View>
                   {/* Render events for this date */}
                   {getEventsForDate(date).length > 0 ? (
                     getEventsForDate(date).map((event: Event) => (
@@ -967,8 +991,8 @@ const Itinerary = () => {
                       // </TouchableOpacity>
                     ))
                   ) : (
-                    <Text style={{ marginVertical: 10, fontSize: 18 }}>
-                      No activities for this date yet!
+                    <Text style={{ marginVertical: 10, fontSize: 16 }}>
+                      No activities yet!
                     </Text>
                   )}
                   {currentDateUpdate && (
@@ -990,27 +1014,8 @@ const Itinerary = () => {
                       }}
                     />
                   )}
-                  <TouchableOpacity
-                    onPress={() => {
-                      handleDateSelection(date);
-                    }}
-                  >
-                    <SearchBar
-                      placeholder="Add an activity..."
-                      // onChangeText={updateQuery}
-                      // value={searchBarValue}
-                      lightTheme={true}
-                      round={true}
-                      containerStyle={{
-                        backgroundColor: "white",
-                        borderTopColor: "white",
-                        borderBottomColor: "white",
-                        padding: 0,
-                      }}
-                      inputStyle={styles.h4}
-                    />
-                  </TouchableOpacity>
                 </View>
+                </SafeAreaView>
               )}
               keyExtractor={(item, index) => index.toString()}
               ref={flatlistRef}
@@ -1133,7 +1138,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   itineraryContainer: {
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    backgroundColor: 'white',
+    marginBottom: 15,
   },
   eventContainer: {
     backgroundColor: "#006ee6",
