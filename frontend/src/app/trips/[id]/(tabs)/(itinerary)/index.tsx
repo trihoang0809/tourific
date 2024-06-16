@@ -450,7 +450,7 @@ const Itinerary = () => {
       .filter((activity) => activity.isOnCalendar)
       .map((activity) => {
         const eventNotes = activity.location ? (
-          <View style={{ marginTop: 3 }}>
+          <View>
             {activity.location.address ? (
               <Text style={styles.p}>{activity.location.address}</Text>
             ) : null}
@@ -581,7 +581,7 @@ const Itinerary = () => {
           style={[
             styles.row,
             calendarMode === "itinerary"
-              ? { justifyContent: "center" }
+              ? { justifyContent: "center", margin: 10  }
               : { justifyContent: "space-between" },
           ]}
         >
@@ -787,28 +787,28 @@ const Itinerary = () => {
                                   <View style={{ flex: 1, marginRight: 10 }}>
                                     <Text style={styles.h4}>{event.title}</Text>
                                     {/* if start time is similar to end time, the activity's time is not set yet */}
-                                    {event.start.getTime() !==
-                                      event.end.getTime() &&
-                                    event.start != undefined &&
-                                    event.end != undefined ? (
-                                      <TouchableOpacity
-                                        style={styles.setField}
-                                        onPress={() => {
-                                          setFormData({
-                                            startTime: {
-                                              hours: undefined,
-                                              minutes: undefined,
-                                            },
-                                            endTime: {
-                                              hours: undefined,
-                                              minutes: undefined,
-                                            },
-                                          });
-                                          setSavedActivityId(event.activityid);
-                                          setTimeModalVisible(true);
-                                        }}
-                                      >
-                                        <Text style={styles.p}>
+                                    <TouchableOpacity
+                                      style={[styles.setField, {backgroundColor: 'lightblue'}]}
+                                      onPress={() => {
+                                        setFormData({
+                                          startTime: {
+                                            hours: undefined,
+                                            minutes: undefined,
+                                          },
+                                          endTime: {
+                                            hours: undefined,
+                                            minutes: undefined,
+                                          },
+                                        });
+                                        setSavedActivityId(event.activityid);
+                                        setTimeModalVisible(true);
+                                      }}
+                                    >
+                                      {event.start.getTime() !==
+                                        event.end.getTime() &&
+                                      event.start != undefined &&
+                                      event.end != undefined ? (
+                                        <Text style={styles.pBlack}>
                                           {new Date(
                                             event.start,
                                           ).toLocaleTimeString([], {
@@ -823,29 +823,11 @@ const Itinerary = () => {
                                             minute: "2-digit",
                                           })}
                                         </Text>
-                                      </TouchableOpacity>
-                                    ) : (
-                                      <TouchableOpacity
-                                        style={styles.setField}
-                                        onPress={() => {
-                                          setFormData({
-                                            startTime: {
-                                              hours: undefined,
-                                              minutes: undefined,
-                                            },
-                                            endTime: {
-                                              hours: undefined,
-                                              minutes: undefined,
-                                            },
-                                          });
-                                          setSavedActivityId(event.activityid);
-                                          setTimeModalVisible(true);
-                                        }}
-                                      >
-                                        <Text style={styles.p}>Add time</Text>
-                                      </TouchableOpacity>
-                                    )}
-                                    <View>{event.children}</View>
+                                      ) : (
+                                        <Text style={styles.pBlack}>Add time</Text>
+                                      )}
+                                    </TouchableOpacity>
+                                    <View style={[styles.setField, {backgroundColor: 'darkblue'}]}>{event.children}</View>
                                     <Modal
                                       animationType="fade"
                                       visible={timeModalVisible}
@@ -1130,6 +1112,10 @@ const styles = StyleSheet.create({
   },
   p: {
     fontSize: 12,
+    color: "white",
+  },
+  pBlack: {
+    fontSize: 12,
     color: "black",
   },
   row: {
@@ -1143,6 +1129,7 @@ const styles = StyleSheet.create({
     borderColor: "#006ee6",
     borderRadius: 50,
     padding: 4,
+    margin: 10,
   },
   monthContainer: {
     flexDirection: "row",
@@ -1238,10 +1225,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   setField: {
-    backgroundColor: "lightblue",
     alignSelf: "flex-start",
     padding: 3,
     marginVertical: 5,
+    borderRadius: 5,
   },
 });
 export default Itinerary;

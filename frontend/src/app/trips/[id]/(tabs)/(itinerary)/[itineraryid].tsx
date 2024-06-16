@@ -11,16 +11,13 @@ import { Rating } from "react-native-ratings";
 const ViewActivity = () => {
   const { id } = useGlobalSearchParams();
   console.log("id (view activity):", id);
-
   const { itineraryid } = useGlobalSearchParams();
   console.log("itinerary-id (view activity):", itineraryid);
-
   const [isOnCalendar, setIsOnCalendar] = useState(false);
   const [liked, setLiked] = React.useState(false);
   const toggleLike = () => {
     setLiked(!liked);
   };
-
   const [activity, setActivity] = useState({
     name: "",
     description: "",
@@ -69,29 +66,17 @@ const ViewActivity = () => {
 
   return (
     <View style={{ height: Dimensions.get("window").height }}>
-      {/* <Stack.Screen
-    options={{
-      title: '',
-      headerShown: true,
-      headerRight: () => (
-        <Link href={`/trip/create?id=${id}`}>
-          <Feather
-            onPressIn={showMoreSetting}
-            onPressOut={notShowMoreSetting}
-            name="edit-2"
-            size={24}
-            color="black" />
-        </Link>
-      ),
-    }}
-  /> */}
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.imageContainer}>
           <Image style={styles.image} source={favicon} />
           <View style={styles.likeContainer}>
             <Text style={styles.h4}>{activity.netUpvotes}</Text>
             <TouchableOpacity style={styles.heartIcon} onPress={toggleLike}>
-              <Ionicons name={liked ? 'heart' : 'heart-outline'} color='red' size={25} />
+              <Ionicons
+                name={liked ? "heart" : "heart-outline"}
+                color="red"
+                size={25}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -140,7 +125,11 @@ const ViewActivity = () => {
                   {/* {trip.startDate.getHours() % 12 || 12}:{trip.startDate.getMinutes().toString().padStart(2, '0')} {trip.startDate.getHours() >= 12 ? 'PM' : 'AM'} */}
                 </Text>
               </View>
-              <Ionicons name="arrow-forward-outline" size={25} color="#006ee6" />
+              <Ionicons
+                name="arrow-forward-outline"
+                size={25}
+                color="#006ee6"
+              />
               <View style={styles.dateContainer}>
                 <Text style={[styles.h3, { marginLeft: 10 }]}>
                   {new Date(activity.endTime).toLocaleString("en-US", {
@@ -160,14 +149,14 @@ const ViewActivity = () => {
             <Text style={[styles.h4, { marginLeft: 35 }]}>
               {DateTime.local().zoneName}
             </Text>
-            
-            <TouchableOpacity
+
+            {/* <TouchableOpacity
               onPress={() => setIsOnCalendar(!isOnCalendar)}
               style={{
-                width: '100%',
-                backgroundColor: isOnCalendar ? '#006ee6' : '#D3D3D3',
+                width: "100%",
+                backgroundColor: isOnCalendar ? "#006ee6" : "#D3D3D3",
                 padding: 10,
-                alignItems: 'center',
+                alignItems: "center",
                 borderRadius: 10,
                 shadowOffset: { width: 1, height: 1 },
                 shadowColor: "#333",
@@ -177,18 +166,28 @@ const ViewActivity = () => {
               }}
             >
               {isOnCalendar ? (
-                <Text style={{ color: 'white' }}>Added to Calendar</Text>
+                <Text style={{ color: "white" }}>Added to Calendar</Text>
               ) : (
-                <Text style={{ color: 'black', borderColor: 'black' }}>Add to Calendar</Text>
+                <Text style={{ color: "black", borderColor: "black" }}>
+                  Add to Calendar
+                </Text>
               )}
-            </TouchableOpacity>
-            <View>
-              <Text style={styles.h2}>Description</Text>
-              <Text style={styles.h4}>{activity.description}</Text>
-            </View>
+            </TouchableOpacity> */}
+            {activity.description && (
+              <View>
+                <Text style={styles.h2}>Description</Text>
+                <Text style={styles.h4}>{activity.description}</Text>
+              </View>
+            )}
             <View>
               <Text style={styles.h2}>Notes</Text>
-              <Text style={styles.h4}>{activity.notes}</Text>
+              <TouchableOpacity>
+                {activity.notes ? (
+                  <Text style={styles.h4}>{activity.notes}</Text>
+                ) : (
+                  <Text style={styles.h4}>Add notes</Text>
+                )}
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -208,16 +207,16 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
   },
   imageContainer: {
-    position: 'relative',
+    position: "relative",
   },
   likeContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    padding: 5, 
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
+    padding: 5,
     borderRadius: 5,
   },
   heartIcon: {
@@ -260,12 +259,6 @@ const styles = StyleSheet.create({
     marginTop: -12,
     paddingTop: 6,
   },
-  // innerView: {
-  //   paddingHorizontal: 30,
-  //   paddingVertical: 5,
-  //   height: 'auto',
-  // },
-
   row: {
     flexDirection: "row",
     marginTop: 18,
