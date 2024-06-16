@@ -101,13 +101,15 @@ const Itinerary = () => {
     });
 
     const closeSwipeable = () => {
-      updateActivityOnBackend({
-        id,
-        activityid: event.activityid,
-        startTime: new Date(),
-        endTime: new Date(),
-        calendarStatus: false,
-      });
+      if (typeof id === "string") {
+        updateActivityOnBackend({
+          id,
+          activityid: event.activityid,
+          startTime: new Date(),
+          endTime: new Date(),
+          calendarStatus: false,
+        });
+      }
       setEventsOnCalendar((prevEvents) =>
         prevEvents.filter((e) => e.activityid !== event.activityid),
       );
@@ -268,7 +270,9 @@ const Itinerary = () => {
         console.error("Error fetching activities:", error.toString());
       }
     };
-    getActivities({ id });
+    if (typeof id === "string") {
+      getActivities({ id });
+    }
   }, [savedActivityId]);
 
   const updateActivityOnBackend = async ({
@@ -319,7 +323,7 @@ const Itinerary = () => {
         (event) => event.id === eventId,
       );
 
-      if (eventToMove) {
+      if (eventToMove && dateForUpdateForm.startDate && dateForUpdateForm.endDate) {
         // Update the event to indicate it is now on the calendar
         const transformedEvent: Event = {
           title: eventToMove.name,
@@ -402,7 +406,7 @@ const Itinerary = () => {
     const updateCalendarStatusAndMoveEvent = async (eventId: string) => {
       try {
         const newDates = await updateTimeState(eventId);
-        if (newDates) {
+        if (newDates && typeof id === "string") {
           updateEventTimeOnFrontend(eventId, newDates);
           updateActivityOnBackend({
             id,
@@ -417,7 +421,7 @@ const Itinerary = () => {
       }
     };
 
-    if (id && savedActivityId && !shouldUpdateTime) {
+    if (id && savedActivityId && !shouldUpdateTime && typeof id === "string" && dateForUpdateForm.startDate && dateForUpdateForm.endDate) {
       updateActivityOnBackend({
         id,
         activityid: savedActivityId,
@@ -548,19 +552,16 @@ const Itinerary = () => {
     },
     typography: {
       xs: {
-        fontWeight: "400",
         fontSize: 12,
         lineHeight: 16,
         letterSpacing: 0.5,
       },
       sm: {
-        fontWeight: "400",
         fontSize: 14,
         lineHeight: 20,
         letterSpacing: 0.25,
       },
       xl: {
-        fontWeight: "500",
         fontSize: 24,
         lineHeight: 28,
         letterSpacing: 0.15,
@@ -581,7 +582,7 @@ const Itinerary = () => {
           style={[
             styles.row,
             calendarMode === "itinerary"
-              ? { justifyContent: "center", margin: 10  }
+              ? { justifyContent: "center", margin: 10 }
               : { justifyContent: "space-between" },
           ]}
         >
@@ -788,7 +789,10 @@ const Itinerary = () => {
                                     <Text style={styles.h4}>{event.title}</Text>
                                     {/* if start time is similar to end time, the activity's time is not set yet */}
                                     <TouchableOpacity
-                                      style={[styles.setField, {backgroundColor: 'lightblue'}]}
+                                      style={[
+                                        styles.setField,
+                                        { backgroundColor: "lightblue" },
+                                      ]}
                                       onPress={() => {
                                         setFormData({
                                           startTime: {
@@ -824,10 +828,19 @@ const Itinerary = () => {
                                           })}
                                         </Text>
                                       ) : (
-                                        <Text style={styles.pBlack}>Add time</Text>
+                                        <Text style={styles.pBlack}>
+                                          Add time
+                                        </Text>
                                       )}
                                     </TouchableOpacity>
-                                    <View style={[styles.setField, {backgroundColor: 'darkblue'}]}>{event.children}</View>
+                                    <View
+                                      style={[
+                                        styles.setField,
+                                        { backgroundColor: "darkblue" },
+                                      ]}
+                                    >
+                                      {event.children}
+                                    </View>
                                     <Modal
                                       animationType="fade"
                                       visible={timeModalVisible}

@@ -60,7 +60,9 @@ const ViewActivity = () => {
   };
 
   useEffect(() => {
-    getActivity({ id, itineraryid });
+    if (typeof id === "string" && typeof itineraryid === "string") {
+      getActivity({ id, itineraryid });
+    }
     setIsOnCalendar(activity.isOnCalendar);
   }, []);
 
