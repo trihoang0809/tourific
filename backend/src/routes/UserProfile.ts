@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
     const users = await prisma.user.findMany();
     res.json(users);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while fetching activities." });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while fetching users." });
   }
 });
 
@@ -39,12 +39,13 @@ router.get("/:userId", async (req, res) => {
 
 // Create a user profile
 router.post("/", async (req, res) => {
-  const { userName, password, firstName, lastName, dateOfBirth, avatar } = req.body;
+  const { userName, email, password, firstName, lastName, dateOfBirth, avatar } = req.body;
 
   try {
     const user = await prisma.user.create({
       data: {
         userName,
+        email,
         password,
         firstName,
         lastName,

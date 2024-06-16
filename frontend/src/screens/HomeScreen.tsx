@@ -3,22 +3,28 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   ScrollView,
-  Button,
-  Pressable,
+  TouchableOpacity,
+  Image,
+  Dimensions,
 } from "react-native";
-import { TripCard } from "../components/TripCard";
+import { TripCard } from "../components/TripCard/TripCard";
 import { HomeScreenHeader } from "../components/HomeScreenHeader";
 import { useState, useEffect } from "react";
 import { UserProps, Trip } from "../types";
 import { Link, router } from "expo-router";
-import { serverURL } from "@/utils";
+import { EXPO_PUBLIC_HOST_URL, getRecentTrips, randomizeCover } from "@/utils";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import TripCardRect from "@/components/TripCard/TripCardRect";
+import { headerImage } from "@/utils/constants";
+import Style from "Style";
 
+const screenw = Dimensions.get("window").width;
+const titleWidth = screenw - screenw * 0.96;
 export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [ongoingTrips, setOngoingTrips] = useState<Trip[]>([]);
   const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
-  const serverUrl = serverURL();
   useEffect(() => {
     const fetchTrips = async () => {
       const cleanData = (data: Trip[]) => {
@@ -40,13 +46,22 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
       };
 
       try {
-        const ongoing = await fetch(serverUrl + "trips?ongoing=true");
-        const upcoming = await fetch(serverUrl + "trips?upcoming=true");
+        const ongoing = await fetch(
+          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`,
+        );
+        const upcoming = await fetch(
+          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?upcoming=true`,
+        );
         const ongoingData = await ongoing.json();
         const upcomingData = await upcoming.json();
 
+<<<<<<< HEAD
         setOngoingTrips(cleanData(ongoingData));
         setUpcomingTrips(cleanData(upcomingData));
+=======
+        setOngoingTrips(ongoingData);
+        setUpcomingTrips(getRecentTrips(upcomingData));
+>>>>>>> origin/main
       } catch (error) {
         console.error("Failed to fetch trips:", error);
       }
@@ -55,42 +70,70 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   }, []);
 
   return (
-    <ScrollView style={styles.container}>
-      <HomeScreenHeader user={user} />
-      <Text style={styles.greeting}>Welcome back, {user.firstName}!</Text>
-      <Text style={styles.title}>Ongoing Trips</Text>
-      <ScrollView horizontal={true} style={styles.tripScroll}>
-        {ongoingTrips.length > 0 ? (
-          ongoingTrips.map((trip) => (
-            <TripCard key={trip.id} trip={trip} height={250} width={400} />
-          ))
-        ) : (
-          <Text style={styles.noTrip}>No ongoing trips</Text>
-        )}
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView style={styles.container}>
+        <HomeScreenHeader user={user} />
+        <Text style={styles.greeting}>Hey 👋, {user.firstName}!</Text>
+        <View style={{ height: 180 }}>
+          <Image
+            source={{
+              uri: randomizeCover(headerImage),
+            }}
+            style={{ height: 180, position: "absolute", width: "100%", top: 0 }} // Image is positioned absolutely and aligned to the top
+            resizeMode="cover"
+          />
+        </View>
+        <View style={{ marginTop: -5 }}>
+          <View style={styles.inline}>
+            <Text style={styles.title}>Ongoing Trips</Text>
+            <Text
+              onPress={() => {
+                router.replace("/trips/ongoing");
+              }}
+            >
+              See all
+            </Text>
+          </View>
+          <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            style={styles.tripScroll}
+          >
+            {ongoingTrips.length > 0 ? (
+              ongoingTrips.map((trip) => (
+                <TripCard key={trip.id} trip={trip} height={250} width={300} />
+              ))
+            ) : (
+              <Text style={styles.noTrip}>No ongoing trips</Text>
+            )}
+          </ScrollView>
+        </View>
+        <View style={{ marginTop: -5 }}>
+          <View style={styles.inline}>
+            <Text style={styles.title}>Upcoming Trips</Text>
+            <Text
+              onPress={() => {
+                router.replace("/trips/upcoming");
+              }}
+            >
+              See all
+            </Text>
+          </View>
+          <ScrollView style={{ paddingHorizontal: 10 }}>
+            {upcomingTrips.slice(0, 3).map((trip) => (
+              <View style={{ padding: 5, alignItems: "center" }}>
+                <TripCardRect key={trip.id} trip={trip} height={100} />
+              </View>
+            ))}
+          </ScrollView>
+        </View>
       </ScrollView>
-
-      <Pressable style={styles.buttonContainer}>
-        <Link href="/trips/create" style={styles.button}>
-          <Text style={styles.buttonText}>Create a new trip</Text>
+      <TouchableOpacity style={Style.addIcon}>
+        <Link href="/trips/create">
+          <Ionicons name="add" size={40} color="white" />
         </Link>
-      </Pressable>
-
-      <View style={styles.upcoming}>
-        <Text style={styles.title}>Upcoming Trips</Text>
-        <Button
-          title="See all"
-          onPress={() => {
-            router.push("/trips/upcoming");
-          }}
-        />
-      </View>
-
-      <ScrollView horizontal={true} style={styles.tripScroll}>
-        {upcomingTrips.map((trip) => (
-          <TripCard key={trip.id} trip={trip} height={200} width={200} />
-        ))}
-      </ScrollView>
-    </ScrollView>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 };
 
@@ -99,19 +142,22 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   greeting: {
-    justifyContent: "flex-start",
-    fontSize: 18,
-    marginBottom: 20,
+    marginLeft: 20,
+    fontSize: 15,
+    marginBottom: 10,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
-    padding: 10,
+    marginBottom: 5,
   },
-  tripScroll: {},
+  tripScroll: {
+    marginVertical: 4,
+  },
   noTrip: {
     fontSize: 16,
     color: "red",
+    textAlign: "center",
   },
   buttonContainer: {
     width: "100%",
@@ -138,10 +184,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-  upcoming: {
+  inline: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 10,
+    marginTop: 20,
+    marginHorizontal: titleWidth,
   },
 });
