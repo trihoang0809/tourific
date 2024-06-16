@@ -53,15 +53,77 @@ const ActivitiesScreen = () => {
             data.location.longitude,
             data.location.radius,
           );
-          setActivities(fetchedActivities);
-          setFilteredActivities(fetchedActivities);
+
+          return fetchedActivities;
           //await saveActivitiesToBackend(fetchedActivities);
+          // console.log(userActivity);
+          // setFilteredActivities(temp);
         }
       } catch (error: any) {
         console.error("Error fetching trip:", error.toString());
+        return [];
       }
     };
-    getTripAndActivities();
+
+    // Fetch user data (proposed activities)
+    const getActivities = async () => {
+      try {
+        const response = await fetch(
+          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/activities`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            // body: JSON.stringify(req),
+          },
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch trip");
+        }
+
+        const data = await response.json();
+
+        for (let i = 0; i < data.length; ++i) {
+          data[i] = {
+            id: data[i].id,
+            name: data[i].name,
+            description: data[i].description,
+            imageUrl:
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlCeVhPcF0B061dWx6Y2p6ZshztnAoVQI59g&s",
+            startTime: data[i].startTime,
+            endTime: data[i].endTime,
+            location: data[i].location,
+            notes: data[i].notes,
+            netUpvotes: data[i].netUpvotes,
+            isOnCalendar: data[i].isOnCalendar,
+            category: data[i].category,
+            rating: data[i].rating,
+          };
+        }
+
+        return data;
+      } catch (error: any) {
+        console.error("Error fetching trip:", error.toString());
+        return [];
+      }
+    };
+
+    // Combine two data
+    const fetchData = async () => {
+      try {
+        const ggData = await getTripAndActivities();
+        const userData = await getActivities();
+
+        const combinedData = userData.concat(ggData);
+        setActivities(combinedData);
+        setFilteredActivities(combinedData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
   }, [id]);
 
   // const saveActivitiesToBackend = async (activities: ActivityProps[]) => {
