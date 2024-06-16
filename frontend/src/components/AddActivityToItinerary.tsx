@@ -93,6 +93,10 @@ const AddActivityToItinerary = ({
                           width: "100%",
                           borderRadius: 8,
                           marginBottom: 15,
+                          shadowOffset: { width: 1, height: 1 },
+                          shadowColor: "#333",
+                          shadowOpacity: 0.3,
+                          shadowRadius: 2,
                         }}
                         onPress={() => {
                           console.log(
@@ -180,10 +184,6 @@ const AddActivityToItinerary = ({
 export default AddActivityToItinerary;
 
 const styles = StyleSheet.create({
-  h1: {
-    fontWeight: "600",
-    fontSize: 18,
-  },
   modalText: {
     fontSize: 18,
     overflow: "hidden",
@@ -195,10 +195,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     lineHeight: 22,
   },
-  p: {
-    fontSize: 12,
-    color: "white",
-  },
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -208,16 +204,6 @@ const styles = StyleSheet.create({
   closeButton: {
     position: "absolute",
     right: 10,
-  },
-  text: {
-    textAlign: "center",
-    flex: 1,
-    fontWeight: "500",
-    fontSize: 18,
-  },
-  note: {
-    alignSelf: "center",
-    fontSize: 15,
   },
   likeContainer: {
     position: "absolute",
