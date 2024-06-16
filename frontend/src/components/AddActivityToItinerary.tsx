@@ -39,120 +39,138 @@ const AddActivityToItinerary = ({
 
   return (
     <Modal animationType="slide" visible={isVisible}>
-      <SafeAreaView style={{ flex: 1, height: "100%" }}>
-        <View style={styles.row}>
-          <Text style={[styles.modalText, { paddingLeft: 15 }]}>
-            What to do on {currentDateUpdate.toLocaleDateString()}?
-          </Text>
-          <Pressable
-            style={styles.closeButton}
-            onPress={() => setIsVisible(false)}
-          >
-            <Ionicons name="close" size={24} color="black" />
-          </Pressable>
-        </View>
-        <View
-          style={{ backgroundColor: "#e9e9e9", padding: 20, marginBottom: 100 }}
-        >
-          <SearchBar
-            placeholder="Search from upvoted activities..."
-            onChangeText={updateQuery}
-            value={searchBarValue}
-            lightTheme={true}
-            round={true}
-            containerStyle={{
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ flex: 1 }}>
+          <View style={styles.row}>
+            <Text style={[styles.modalText, { paddingLeft: 15 }]}>
+              What to do on {currentDateUpdate.toLocaleDateString()}?
+            </Text>
+            <Pressable
+              style={styles.closeButton}
+              onPress={() => setIsVisible(false)}
+            >
+              <Ionicons name="close" size={24} color="black" />
+            </Pressable>
+          </View>
+          <View
+            style={{
               backgroundColor: "#e9e9e9",
-              justifyContent: "space-around",
-              borderTopColor: "#e9e9e9",
-              borderBottomColor: "#e9e9e9",
-              padding: 0,
-              paddingBottom: 20,
+              padding: 20,
+              height: "100%",
+              flex: 1,
             }}
-            inputContainerStyle={{ backgroundColor: "white" }}
-            inputStyle={{ backgroundColor: "white", fontSize: 16 }}
-            leftIconContainerStyle={{ backgroundColor: "white" }}
-          />
-          <ScrollView>
-            <View>
-              {filteredActivities.length > 0 ? (
-                filteredActivities.map((activity: ActivityProps) => {
-                  return (
-                    <TouchableOpacity
-                      style={{
-                        backgroundColor: "white",
-                        paddingHorizontal: 5,
-                        width: "100%",
-                        borderRadius: 8,
-                        marginBottom: 15,
-                      }}
-                      onPress={() => {
-                        console.log(
-                          "current date in add activity modal, ",
-                          currentDateUpdate,
-                        );
-                        saveActivityId(activity.id);
-                        setIsVisible(false);
-                      }}
-                    >
-                      <View style={styles.row}>
-                        <View style={{ flex: 1, marginRight: 10 }}>
-                          <Text style={styles.modalText}>{activity.name}</Text>
-                          {/* {activity.location.address && (
+          >
+            <SearchBar
+              placeholder="Search from upvoted activities..."
+              onChangeText={updateQuery}
+              value={searchBarValue}
+              lightTheme={true}
+              round={true}
+              containerStyle={{
+                backgroundColor: "#e9e9e9",
+                justifyContent: "space-around",
+                borderTopColor: "#e9e9e9",
+                borderBottomColor: "#e9e9e9",
+                padding: 0,
+                paddingBottom: 20,
+              }}
+              inputContainerStyle={{ backgroundColor: "white" }}
+              inputStyle={{ backgroundColor: "white", fontSize: 16 }}
+              leftIconContainerStyle={{ backgroundColor: "white" }}
+            />
+            <ScrollView
+              style={{ flex: 1 }}
+              contentContainerStyle={{ flexGrow: 1 }}
+            >
+              <View>
+                {filteredActivities.length > 0 ? (
+                  filteredActivities.map((activity: ActivityProps) => {
+                    return (
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: "white",
+                          paddingHorizontal: 5,
+                          width: "100%",
+                          borderRadius: 8,
+                          marginBottom: 15,
+                        }}
+                        onPress={() => {
+                          console.log(
+                            "current date in add activity modal, ",
+                            currentDateUpdate,
+                          );
+                          saveActivityId(activity.id);
+                          setIsVisible(false);
+                        }}
+                      >
+                        <View style={styles.row}>
+                          <View style={{ flex: 1, marginRight: 10 }}>
+                            <Text style={styles.modalText}>
+                              {activity.name}
+                            </Text>
+                            {/* {activity.location.address && (
                             <Text>{activity.location.address}</Text>
                           )} */}
-                          {activity.location.citystate && (
-                            <View
-                              style={{
-                                backgroundColor: "lightblue",
-                                alignSelf: "flex-start",
-                                padding: 3,
-                                marginVertical: 5,
-                              }}
-                            >
-                              <Text
-                                numberOfLines={1}
-                                style={{ color: "darkblue" }}
+                            {activity.location.citystate && (
+                              <View
+                                style={{
+                                  backgroundColor: "lightblue",
+                                  alignSelf: "flex-start",
+                                  padding: 3,
+                                  marginVertical: 5,
+                                }}
                               >
-                                {activity.location.citystate}
+                                <Text
+                                  numberOfLines={1}
+                                  style={{ color: "darkblue" }}
+                                >
+                                  {activity.location.citystate}
+                                </Text>
+                              </View>
+                            )}
+                            {activity.description && (
+                              <Text numberOfLines={3}>
+                                {activity.description}
                               </Text>
+                            )}
+                          </View>
+                          <View style={{ width: 100, height: 100 }}>
+                            <Image
+                              key={activity.id}
+                              source={{
+                                uri: "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400",
+                              }}
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                borderRadius: 8,
+                              }}
+                            />
+                            <View style={styles.likeContainer}>
+                              <Text style={styles.h4}>
+                                {activity.netUpvotes}
+                              </Text>
+                              <TouchableOpacity style={styles.heartIcon}>
+                                <Ionicons
+                                  name={"heart"}
+                                  color="red"
+                                  size={18}
+                                />
+                              </TouchableOpacity>
                             </View>
-                          )}
-                          {activity.description && (
-                            <Text numberOfLines={3}>
-                              {activity.description}
-                            </Text>
-                          )}
-                        </View>
-                        <View style={{ width: 100, height: 100 }}>
-                          <Image
-                            key={activity.id}
-                            source={{
-                              uri: "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400",
-                            }}
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              borderRadius: 8,
-                            }}
-                          />
-                          <View style={styles.likeContainer}>
-                            <Text style={styles.h4}>{activity.netUpvotes}</Text>
-                            <TouchableOpacity style={styles.heartIcon}>
-                              <Ionicons name={"heart"} color="red" size={18} />
-                            </TouchableOpacity>
                           </View>
                         </View>
-                      </View>
-                    </TouchableOpacity>
-                  );
-                })
-              ) : (
-                <Text style={{ fontSize: 18 }}>
-                  Visit Suggestion page to upvote activities!
-                </Text>
-              )}
-            </View>
-          </ScrollView>
+                      </TouchableOpacity>
+                    );
+                  })
+                ) : (
+                  <Text style={{ fontSize: 18 }}>
+                    Visit Suggestion page to upvote activities!
+                  </Text>
+                )}
+              </View>
+            </ScrollView>
+          </View>
         </View>
       </SafeAreaView>
     </Modal>
