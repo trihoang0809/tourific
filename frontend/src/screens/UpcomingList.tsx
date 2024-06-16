@@ -56,43 +56,6 @@ export const ListFilteredCards = ({ isUpcoming }: listprops) => {
 
   //Fetching data
   useEffect(() => {
-<<<<<<< HEAD
-    Dimensions.addEventListener("change", ({ window: { width, height } }) => {
-      //Get window size every render
-      setWindowHeight(height);
-      setWindowWidth(width);
-
-      //Adjust the number of columns of FlatList based on window size
-      //width of the window/(trip card width + horizontal margin)
-      setNumCols(Math.floor(width / (tripCardWidth + 40)));
-    });
-
-    const cleanData = (data: Trip[]) => {
-      let cleanedData: Trip[] = [];
-      let index = 0;
-      for (let trip of data) {
-        let format: Trip = {
-          id: trip.id,
-          name: trip.name,
-          location: trip.location,
-          startDate: new Date(trip.startDate),
-          endDate: new Date(trip.endDate),
-          image: trip.image,
-        };
-
-        cleanedData.push(format);
-      }
-      return cleanedData;
-    };
-
-    const getData = async () => {
-      try {
-        const link = serverUrl + "trips?upcoming=true";
-        const upcoming = await fetch(link);
-        let data = await upcoming.json();
-        data = cleanData(data);
-        setUpcoming(data);
-=======
     const getData = async () => {
       try {
         const link = isUpcoming
@@ -101,7 +64,6 @@ export const ListFilteredCards = ({ isUpcoming }: listprops) => {
         const upcoming = await fetch(link);
         let data = await upcoming.json();
         setUpcoming(getRecentTrips(data));
->>>>>>> origin/main
       } catch (error) {
         console.log(error);
       }
