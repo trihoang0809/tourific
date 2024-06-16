@@ -25,7 +25,6 @@ const titleWidth = screenw - screenw * 0.96;
 export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [ongoingTrips, setOngoingTrips] = useState<Trip[]>([]);
   const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
-
   useEffect(() => {
     const fetchTrips = async () => {
       try {

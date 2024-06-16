@@ -46,16 +46,19 @@ export default function CreateTripScreen() {
 
   // check if there's an id -> if there's id meaning trip has been created
   const isUpdating = !!idString; // id is type of string
-  
+
   //fetch trip if exist
   async function setTripIfExist(tripId: string) {
     try {
-      const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${tripId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${tripId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch trip");
@@ -82,41 +85,39 @@ export default function CreateTripScreen() {
         location: data.location,
         image: {
           url: savedPhoto,
-        }
+        },
       });
     } catch (error: any) {
       console.error("Error fetching trip:", error.toString());
     }
-  };
+  }
 
   //trip data for form
-  const [formData, setFormData] = useState<TripData | null>(
-    {
-      name: "",
-      dateRange: {
-        startDate: new Date(),
-        endDate: new Date(),
-      },
-      startTime: {
-        hours: 8,
-        minutes: 15,
-      },
-      endTime: {
-        hours: 10,
-        minutes: 30,
-      },
-      location: {
-        address: '',
-        citystate: '',
-        latitude: 0,
-        longitude: 0,
-        radius: 0
-      },
-      image: {
-        url: savedPhoto
-      }
-    }
-  );
+  const [formData, setFormData] = useState<TripData | null>({
+    name: "",
+    dateRange: {
+      startDate: new Date(),
+      endDate: new Date(),
+    },
+    startTime: {
+      hours: 8,
+      minutes: 15,
+    },
+    endTime: {
+      hours: 10,
+      minutes: 30,
+    },
+    location: {
+      address: "",
+      citystate: "",
+      latitude: 0,
+      longitude: 0,
+      radius: 0,
+    },
+    image: {
+      url: savedPhoto,
+    },
+  });
 
   useEffect(() => {
     if (isUpdating) {
@@ -154,11 +155,14 @@ export default function CreateTripScreen() {
     if (isUpdating) {
       // UPDATING
       try {
-        const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${idString}`, {
-          method: "PUT",
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(req),
-        });
+        const response = await fetch(
+          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${idString}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(req),
+          },
+        );
 
         if (!response.ok) {
           throw new Error("Failed to update trip");
@@ -169,8 +173,8 @@ export default function CreateTripScreen() {
             text: "Go back home",
             onPress: () => {
               router.push("/");
-            }
-          }
+            },
+          },
         ]);
       } catch (error: any) {
         console.error("Error updating trip:", error.toString());
@@ -178,13 +182,15 @@ export default function CreateTripScreen() {
     } else {
       // CREATING
       try {
-        const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const response = await fetch(
+          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
           },
-          body: JSON.stringify(req),
-        });
+        );
         if (!response.ok) {
           throw new Error(
             `Failed to create trip: ${response.status} ${response.statusText}`,
@@ -193,7 +199,10 @@ export default function CreateTripScreen() {
         // Optionally, you can handle the response here
         const data = await response.json();
         Alert.alert("Alert Title", "Create Trip Successfully", [
-          { text: "Go back home page", onPress: () => <Link href={"/trips"} /> },
+          {
+            text: "Go back home page",
+            onPress: () => <Link href={"/trips"} />,
+          },
         ]);
       } catch (error: any) {
         console.error("Error creating trip:", error.toString());
@@ -212,7 +221,7 @@ export default function CreateTripScreen() {
   }, [setOpen]);
 
   const onConfirm = useCallback(
-    ({ startDate, endDate }: { startDate: Date; endDate: Date; }) => {
+    ({ startDate, endDate }: { startDate: Date; endDate: Date }) => {
       setOpen(false);
       // Check if startDate and endDate are already set in formData
       setFormData(
@@ -242,7 +251,7 @@ export default function CreateTripScreen() {
   );
 
   const onConfirmStartTime = useCallback(
-    ({ hours, minutes }: { hours: number; minutes: number; }) => {
+    ({ hours, minutes }: { hours: number; minutes: number }) => {
       setFormData(
         (prevFormData) =>
           ({
@@ -259,7 +268,7 @@ export default function CreateTripScreen() {
   );
 
   const onConfirmEndTime = useCallback(
-    ({ hours, minutes }: { hours: number; minutes: number; }) => {
+    ({ hours, minutes }: { hours: number; minutes: number }) => {
       setFormData(
         (prevFormData) =>
           ({
@@ -291,7 +300,7 @@ export default function CreateTripScreen() {
       <Stack.Screen
         options={{
           headerShown: true,
-          title: ' ',
+          title: " ",
         }}
       />
       <ScrollView nestedScrollEnabled={true}>
@@ -465,21 +474,21 @@ export default function CreateTripScreen() {
                     }}
                   >
                     {typeof formData?.startTime.hours === "number" &&
-                      typeof formData.startTime.minutes === "number"
+                    typeof formData.startTime.minutes === "number"
                       ? new Date(
-                        1970,
-                        0,
-                        1,
-                        formData.startTime.hours,
-                        formData.startTime.minutes,
-                      ).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
+                          1970,
+                          0,
+                          1,
+                          formData.startTime.hours,
+                          formData.startTime.minutes,
+                        ).toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
                       : new Date(1970, 0, 1, 8, 0).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                   </Text>
                 </TouchableOpacity>
                 <Controller
@@ -521,21 +530,21 @@ export default function CreateTripScreen() {
                     }}
                   >
                     {typeof formData?.endTime.hours === "number" &&
-                      typeof formData.endTime.minutes === "number"
+                    typeof formData.endTime.minutes === "number"
                       ? new Date(
-                        1970,
-                        0,
-                        1,
-                        formData.endTime.hours,
-                        formData.endTime.minutes,
-                      ).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
+                          1970,
+                          0,
+                          1,
+                          formData.endTime.hours,
+                          formData.endTime.minutes,
+                        ).toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
                       : new Date(1970, 0, 1, 8, 0).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                   </Text>
                 </TouchableOpacity>
                 <Controller
@@ -568,27 +577,32 @@ export default function CreateTripScreen() {
             {/* select location and showing map */}
             <View style={{ marginVertical: 10 }}>
               <Text className="font-semibold text-base">Location name</Text>
-              {isUpdating ?
+              {isUpdating ? (
                 <TextInput
-                  value={`${formData?.location.address ? formData.location.address + ', ' : ''} ${formData?.location.citystate ? formData.location.citystate : ''}`}
+                  value={`${formData?.location.address ? formData.location.address + ", " : ""} ${formData?.location.citystate ? formData.location.citystate : ""}`}
                   editable={false}
                 />
-                : <Controller
+              ) : (
+                <Controller
                   control={control}
                   name={"location"}
-                  defaultValue={`${formData?.location.address ? formData.location.address + ', ' : ''}${formData?.location.citystate ? formData.location.citystate : ''}`}
+                  defaultValue={`${formData?.location.address ? formData.location.address + ", " : ""}${formData?.location.citystate ? formData.location.citystate : ""}`}
                   render={({ field: { onChange, value } }) => (
                     <GooglePlacesInput
                       onLocationSelect={(value) => {
                         onLocationSelect(value);
                         onChange(value);
                       }}
-                      value={`${getValues("location.address" + ', ')}${getValues("location.citystate")}`}
+                      value={`${getValues("location.address" + ", ")}${getValues("location.citystate")}`}
                     />
                   )}
                 />
-              }
-              {errors.location && <Text className="text-red-500">{errors.location?.message?.toString()}</Text>}
+              )}
+              {errors.location && (
+                <Text className="text-red-500">
+                  {errors.location?.message?.toString()}
+                </Text>
+              )}
             </View>
             <Button
               title={isUpdating ? "Save edit" : "Create Trip"}
@@ -599,4 +613,4 @@ export default function CreateTripScreen() {
       </ScrollView>
     </View>
   );
-};
+}

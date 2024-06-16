@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   TextInput,
   Text,
+  SafeAreaView
 } from "react-native";
 import { useState, useEffect } from "react";
 import { useGlobalSearchParams } from "expo-router";
@@ -125,7 +126,7 @@ const ActivitiesScreen = () => {
   };
 
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
         height: Dimensions.get("window").height,
@@ -227,7 +228,7 @@ const ActivitiesScreen = () => {
       >
         <Ionicons name="add" size={25} color="white" />
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 

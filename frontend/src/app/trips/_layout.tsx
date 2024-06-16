@@ -8,6 +8,10 @@ const Layout = () => {
         name="[id]"
         options={{ title: "Testing", headerShown: false }}
       />
+      <Stack.Screen
+        name="upcoming"
+        options={{ title: "Upcoming", headerShown: false }}
+      />
     </Stack>
   );
 };
