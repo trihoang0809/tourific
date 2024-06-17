@@ -61,6 +61,7 @@ const RegisterScreen = () => {
     try {
       const userCredential = await registerWithEmail(email, password);
       const user = userCredential.user;
+      const firebaseUserId = user.uid;
 
       // Upload user data to MongoDB
       const response = await fetch("http://localhost:3000/user", {
@@ -76,6 +77,7 @@ const RegisterScreen = () => {
           lastName,
           dateOfBirth: dateOfBirth.toISOString().split("T")[0], // Format date as YYYY-MM-DD
           avatar,
+          firebaseUserId,
         }),
       });
       setLoading(false); // Hide loading spinner

@@ -5,6 +5,7 @@ import { validateData } from "../middleware/validationMiddleware";
 import { tripCreateSchema } from "../schemas/tripSchema";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { StatusCodes } from "http-status-codes";
+import { verifyToken } from "src/middleware/authMiddleware";
 
 // const express = require('express')
 const router = express.Router();
@@ -14,49 +15,46 @@ export interface TripParams {
   tripId: string;
 }
 
+router.use(verifyToken);
+
 // Activites of a trip
 router.use("/:tripId/activities", ActivityRouter);
 
 // Get all trips
 router.get("/", async (req, res) => {
+  const { userId } = req.body;
+
   try {
-    let queryConditions = {};
+    let queryConditions: any = {
+      where: {
+        participantsID: {
+          has: userId,
+        },
+      },
+    };
     const now = new Date();
 
     if (req.query.ongoing === "true") {
-      queryConditions = {
-        where: {
-          AND: [
-            {
-              startDate: {
-                lt: now,
-              },
-            },
-            {
-              endDate: {
-                gt: now,
-              },
-            },
-          ],
-        },
-      };
-    } else if (req.query.past === "true") {
-      queryConditions = {
-        where: {
-          endDate: {
+      queryConditions.where.AND = [
+        {
+          startDate: {
             lt: now,
           },
         },
-      };
-    } else if (req.query.upcoming === "true") {
-      queryConditions = {
-        where: {
-          startDate: {
+        {
+          endDate: {
             gt: now,
           },
         },
+      ];
+    } else if (req.query.past === "true") {
+      queryConditions.where.endDate = {
+        lt: now,
       };
-      // console.log(now);
+    } else if (req.query.upcoming === "true") {
+      queryConditions.where.startDate = {
+        gt: now,
+      };
     }
 
     const trips = await prisma.trip.findMany(queryConditions);
@@ -64,25 +62,6 @@ router.get("/", async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "An error occurred while fetching trips." });
-  }
-});
-
-router.post("/", async (req, res) => {
-  const { name, startDate, endDate, location, image } = req.body;
-  try {
-    const trip = await prisma.trip.create({
-      data: {
-        name,
-        startDate,
-        endDate,
-        location,
-        image,
-      },
-    });
-    res.status(201).json(trip);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "An error occurred while creating the trip." });
   }
 });
 
@@ -94,6 +73,9 @@ router.get("/:id", async (req, res) => {
       where: {
         id,
       },
+      include: {
+        activities: true, // Include activities associated with the trip
+      },
     });
     res.status(StatusCodes.OK).json(trip);
   } catch (error) {
@@ -103,7 +85,7 @@ router.get("/:id", async (req, res) => {
 
 // Create a new trip
 router.post("/", validateData(tripCreateSchema), async (req, res) => {
-  const { name, startDate, endDate, location } = req.body;
+  const { name, startDate, endDate, location, image, userId } = req.body;
   try {
     const trip = await prisma.trip.create({
       data: {
@@ -111,6 +93,8 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
         startDate,
         endDate,
         location,
+        image,
+        participantsID: [userId],
       },
     });
     res.status(StatusCodes.CREATED).json(trip);
@@ -127,19 +111,32 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
 });
 
 // Update an existing trip
-router.put("/:id", async (req, res) => {
+router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
   const { id } = req.params;
-  const { name, startDate, endDate, location } = req.body;
+  console.log("id", id);
+  const { name, startDate, endDate, location, image } = req.body;
+  console.log(req.body);
+  const isValidID = await prisma.trip.findUnique({
+    where: {
+      id: id,
+    },
+  });
+
+  if (!isValidID) {
+    return res.status(404).json({ error: "Trip does not exist" });
+  }
+
   try {
     const trip = await prisma.trip.update({
       where: {
         id,
       },
       data: {
-        name,
-        startDate,
-        endDate,
-        location,
+        name: name,
+        startDate: startDate,
+        endDate: endDate,
+        location: location,
+        image,
       },
     });
     res.status(StatusCodes.OK).json(trip);

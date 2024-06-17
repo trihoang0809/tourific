@@ -41,7 +41,7 @@ router.get("/:userId", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { userName, email, password, firstName, lastName, dateOfBirth, avatar } = req.body;
+  const { userName, email, password, firstName, lastName, dateOfBirth, avatar, firebaseUserId } = req.body;
 
   // Validate the email format and password strength
   const emailRegex = /\S+@\S+\.\S+/;
@@ -86,6 +86,7 @@ router.post("/", async (req, res) => {
         lastName,
         dateOfBirth: parsedDateOfBirth,
         avatar,
+        firebaseUserId,
       },
     });
     res.status(StatusCodes.CREATED).json(user);

@@ -31,6 +31,7 @@ const RootNavigation = () => {
         name="home"
         options={{ title: "Home Screen", headerShown: false }}
       />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
     </Stack>
   );
 };

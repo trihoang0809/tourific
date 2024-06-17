@@ -1,6 +1,4 @@
-import { User } from '@/types';
-// import { ProposedActivities } from '@/screens/ProposedActivities';
-
+import { User } from "@/types";
 
 export const sampleUser: User = {
   id: "u1",
@@ -15,13 +13,16 @@ export const sampleUser: User = {
       location: {
         address: "123 Beach Ave",
         citystate: "Sunnydale",
+        latitude: 0,
+        longitude: 0,
+        radius: 300,
       },
       startDate: new Date("2023-07-01"), // Correcting to Date objects
       endDate: new Date("2023-07-14"), // Correcting to Date objects
       image: {
         height: 600,
         width: 800,
-        url: "https://example.com/path/to/beach.jpg",
+        url: "https://static1.thetravelimages.com/wordpress/wp-content/uploads/2023/10/northern-lights-aurora-in-banff-canada.jpg",
       },
     },
     {
@@ -30,6 +31,9 @@ export const sampleUser: User = {
       location: {
         address: "321 Mountain Rd",
         citystate: "Snowville",
+        latitude: 0,
+        longitude: 0,
+        radius: 300,
       },
       startDate: new Date("2023-12-01"), // Correcting to Date objects
       endDate: new Date("2023-12-10"), // Correcting to Date objects
@@ -49,5 +53,3 @@ export const sampleUser: User = {
     url: "https://scontent-hou1-1.xx.fbcdn.net/v/t1.6435-9/67549543_1677313342402190_2404123813840158720_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=5f2048&_nc_ohc=pDHdI8PBFUwAb5JLH3r&_nc_ht=scontent-hou1-1.xx&oh=00_AfD5qhcs4aJFMg8m7IrWQWCU-WdOUiJD_vOruMURm0JLMA&oe=664D6F85",
   },
 };
-
-export default sampleUser;
