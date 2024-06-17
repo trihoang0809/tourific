@@ -5,7 +5,7 @@ import { validateData } from "../middleware/validationMiddleware";
 import { tripCreateSchema } from "../schemas/tripSchema";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { StatusCodes } from "http-status-codes";
-import { verifyToken } from "src/middleware/authMiddleware";
+import { verifyToken } from "../middleware/authMiddleware";
 
 // const express = require('express')
 const router = express.Router();
