@@ -11,7 +11,6 @@ import {
 import { material } from "react-native-typography";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { defaultAvatar } from "@/utils";
 
 interface userIDProps {
   userID: string;

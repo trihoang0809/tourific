@@ -172,15 +172,6 @@ export const UserProfileEdit: React.FC<editProps> = ({ method, id = "" }) => {
     hideDOBDatePicker();
   };
 
-  // Format the Date
-  const formatDate = (date: Date) => {
-    if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
-      return "Invalid date"; // Handle invalid dates
-    }
-    const month = date.toLocaleString("default", { month: "short" });
-    return `${date.getDate()} ${month}, ${date.getFullYear()}`;
-  };
-
   // Pick photo
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -195,36 +186,8 @@ export const UserProfileEdit: React.FC<editProps> = ({ method, id = "" }) => {
 
     if (!result.canceled) {
       setAvatar({ height: 200, width: 200, url: result.assets[0].uri });
-      // uploadImage();
     }
   };
-
-  // upload image to firebase storage
-  // const uploadImage = async () => {
-  //   try {
-  //     const { uri } = await FileSystem.getInfoAsync(avatar.url);
-  //     const blob = await new Promise((resolve, reject) => {
-  //       const xhr = new XMLHttpRequest();
-  //       xhr.onload = () => {
-  //         resolve(xhr.response);
-  //       };
-  //       xhr.onerror = (e) => {
-  //         reject(new TypeError("Network request failed"));
-  //       };
-  //       xhr.responseType = "blob";
-  //       xhr.open("GET", uri, true);
-  //       xhr.send(null);
-  //     });
-  //     const filename = avatar.url.substring(avatar.url.lastIndexOf("/") + 1);
-  //     const ref = firebase
-  //       .storage()
-  //       .ref()
-  //       .child("users/avatars/" + filename);
-  //     await ref.put(blob);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 
   return (
     <ScrollView style={styles.formContainer}>
