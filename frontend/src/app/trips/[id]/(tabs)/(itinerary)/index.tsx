@@ -11,6 +11,7 @@ import {
   Animated,
   TouchableWithoutFeedback,
   Image,
+  Alert
 } from "react-native";
 import { useGlobalSearchParams, router } from "expo-router";
 import { Calendar, DateRangeHandler } from "react-native-big-calendar";
@@ -19,6 +20,7 @@ import { StyleSheet } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { add, differenceInDays } from "date-fns";
 import AddActivityToItinerary from "@/components/AddActivityToItinerary";
 import {
@@ -127,7 +129,23 @@ const Itinerary = () => {
 
     return (
       <View style={{ marginVertical: 3 }}>
-        <RectButton style={styles.deleteButton} onPress={closeSwipeable}>
+        <RectButton
+          style={styles.deleteButton}
+          onPress={() => {
+            Alert.alert(
+              "Confirm Delete",
+              "Are you sure you want to remove this event?",
+              [
+                {
+                  text: "Cancel",
+                  style: "cancel",
+                },
+                { text: "OK", onPress: () => closeSwipeable() },
+              ],
+              { cancelable: false },
+            );
+          }}
+        >
           <Animated.Text
             style={[
               styles.actionText,
@@ -323,7 +341,11 @@ const Itinerary = () => {
         (event) => event.id === eventId,
       );
 
-      if (eventToMove && dateForUpdateForm.startDate && dateForUpdateForm.endDate) {
+      if (
+        eventToMove &&
+        dateForUpdateForm.startDate &&
+        dateForUpdateForm.endDate
+      ) {
         // Update the event to indicate it is now on the calendar
         const transformedEvent: Event = {
           title: eventToMove.name,
@@ -421,7 +443,14 @@ const Itinerary = () => {
       }
     };
 
-    if (id && savedActivityId && !shouldUpdateTime && typeof id === "string" && dateForUpdateForm.startDate && dateForUpdateForm.endDate) {
+    if (
+      id &&
+      savedActivityId &&
+      !shouldUpdateTime &&
+      typeof id === "string" &&
+      dateForUpdateForm.startDate &&
+      dateForUpdateForm.endDate
+    ) {
       updateActivityOnBackend({
         id,
         activityid: savedActivityId,
@@ -725,36 +754,28 @@ const Itinerary = () => {
               renderItem={({ item: date, index }) => (
                 <SafeAreaView style={{ flex: 1, backgroundColor: "#e9e9e9" }}>
                   <View key={index} style={styles.itineraryContainer}>
-                    <View style={styles.row}>
+                    <TouchableOpacity
+                      style={[styles.row, { justifyContent: "flex-start" }]}
+                      onPress={() => {
+                        handleDateSelection(date);
+                      }}
+                    >
                       <Text
                         style={{
-                          fontSize: 20,
+                          fontSize: 24,
                           fontWeight: "bold",
                           paddingVertical: 10,
                         }}
                       >
                         {`${new Date(date).toLocaleDateString(undefined, { weekday: "short" })} ${new Date(date).toLocaleDateString(undefined, { month: "numeric" })}/${new Date(date).toLocaleDateString(undefined, { day: "numeric" })} `}
                       </Text>
-                      <TouchableOpacity
-                        style={{
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: 35,
-                          height: 35,
-                          borderRadius: 35,
-                          backgroundColor: "#006ee6",
-                          shadowOffset: { width: 1, height: 1 },
-                          shadowColor: "#333",
-                          shadowOpacity: 0.3,
-                          shadowRadius: 2,
-                        }}
-                        onPress={() => {
-                          handleDateSelection(date);
-                        }}
-                      >
-                        <Ionicons name="add" size={25} color="white" />
-                      </TouchableOpacity>
-                    </View>
+
+                      <MaterialIcons
+                        name="add-circle-outline"
+                        size={24}
+                        color="black"
+                      />
+                    </TouchableOpacity>
                     {/* Render events for this date */}
                     {getEventsForDate(date).length > 0 ? (
                       getEventsForDate(date).map(
@@ -783,11 +804,22 @@ const Itinerary = () => {
                                 );
                               }}
                             >
-                              <View style={styles.eventContainer}>
-                                <View style={styles.row}>
+                              <View
+                                style={[
+                                  styles.eventContainer,
+                                  index === getEventsForDate(date).length - 1 &&
+                                    styles.lastEvent,
+                                ]}
+                              >
+                                <View
+                                  style={[
+                                    styles.row,
+                                    { alignItems: "flex-start" },
+                                  ]}
+                                >
                                   <View style={{ flex: 1, marginRight: 10 }}>
                                     <Text style={styles.h4}>{event.title}</Text>
-                                    {/* if start time is similar to end time, the activity's time is not set yet */}
+                                    {/* if start time is similar to end timef, the activity's time is not set yet */}
                                     <TouchableOpacity
                                       style={[
                                         styles.setField,
@@ -1038,7 +1070,7 @@ const Itinerary = () => {
                                       </View>
                                     </Modal>
                                   </View>
-                                  <View style={{ width: 100, height: 80 }}>
+                                  {/* <View style={{ width: 100, height: 80 }}>
                                     <Image
                                       key={index}
                                       source={{
@@ -1050,12 +1082,18 @@ const Itinerary = () => {
                                         borderRadius: 8,
                                       }}
                                     />
+                                  </View> */}
+                                  <View style={{ padding: 5 }}>
+                                    <AntDesign
+                                      name="right"
+                                      size={20}
+                                      color="gray"
+                                    />
                                   </View>
                                 </View>
                               </View>
                             </TouchableWithoutFeedback>
                           </Swipeable>
-                          // </TouchableOpacity>
                         ),
                       )
                     ) : (
@@ -1217,13 +1255,15 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   eventContainer: {
-    padding: 10,
-    marginVertical: 3,
+    paddingVertical: 10,
     backgroundColor: "white",
     width: "100%",
-    borderRadius: 8,
-    borderColor: "black",
-    borderWidth: 1,
+    borderTopWidth: 1,
+    borderTopColor: "#a9a9a9",
+  },
+  lastEvent: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#a9a9a9",
   },
   deleteButton: {
     flex: 1,
