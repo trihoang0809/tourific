@@ -347,11 +347,22 @@ const Itinerary = () => {
         dateForUpdateForm.endDate
       ) {
         // Update the event to indicate it is now on the calendar
+        const eventNotes = eventToMove.location ? (
+          <View>
+            {eventToMove.location.address ? (
+              <Text style={styles.p}>{eventToMove.location.address}</Text>
+            ) : null}
+            {eventToMove.location.citystate ? (
+              <Text style={styles.p}>{eventToMove.location.citystate}</Text>
+            ) : null}
+          </View>
+        ) : null;
+        
         const transformedEvent: Event = {
           title: eventToMove.name,
           start: dateForUpdateForm.startDate,
           end: dateForUpdateForm.endDate,
-          children: null,
+          children: eventNotes,
           activityid: eventToMove.id,
         };
 
