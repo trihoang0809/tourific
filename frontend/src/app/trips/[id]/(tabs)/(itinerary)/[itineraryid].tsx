@@ -67,8 +67,8 @@ const ViewActivity = () => {
   }, []);
 
   return (
-    <View style={{ height: Dimensions.get("window").height }}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+    <View style={{ height: Dimensions.get("window").height, flex: 1 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.imageContainer}>
           <Image style={styles.image} source={favicon} />
           <View style={styles.likeContainer}>
@@ -183,7 +183,7 @@ const ViewActivity = () => {
             )}
             <View>
               <Text style={styles.h2}>Notes</Text>
-              <TouchableOpacity>
+              <TouchableOpacity style={{paddingBottom: 20}}>
                 {activity.notes ? (
                   <Text style={styles.h4}>{activity.notes}</Text>
                 ) : (
