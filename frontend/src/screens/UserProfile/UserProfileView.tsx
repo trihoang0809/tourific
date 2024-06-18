@@ -11,6 +11,7 @@ import {
 import { material } from "react-native-typography";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { defaultAvatar } from "@/utils";
 
 interface userIDProps {
   userID: string;
@@ -51,7 +52,8 @@ const UserProfileView = (userID: userIDProps) => {
 
         <View style={styles.avatarContainer}>
           <Image
-            source={{ uri: userProfile?.avatar.url }}
+            // source={{ uri: userProfile?.avatar.url }}
+            source={{ uri: defaultAvatar }}
             style={styles.avatar}
           />
         </View>
