@@ -59,6 +59,11 @@ export interface ActivityProps {
   isOnCalendar: boolean;
   category: string[];
   rating?: number;
+  image?: {
+    height: number;
+    width: number;
+    url: string;
+  };
 }
 export type Trip = {
   id: string;
@@ -157,6 +162,7 @@ export interface Event {
   end: Date;
   children: JSX.Element | null;
   activityid: string;
+  url: string;
 }
 
 export interface TripDate {

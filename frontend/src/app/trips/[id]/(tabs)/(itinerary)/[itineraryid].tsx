@@ -27,6 +27,9 @@ const ViewActivity = () => {
     notes: "",
     netUpvotes: 0,
     isOnCalendar: false,
+    image: {
+      url: "",
+    },
   });
 
   const getActivity = async ({
@@ -70,7 +73,14 @@ const ViewActivity = () => {
     <View style={{ height: Dimensions.get("window").height, flex: 1 }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.imageContainer}>
-          <Image style={styles.image} source={favicon} />
+          <Image
+            style={styles.image}
+            source={{
+              uri: activity.image?.url
+                ? activity.image?.url
+                : "https://images.unsplash.com/photo-1600456899121-68eda5705257?q=80&w=2757&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            }}
+          />
           <View style={styles.likeContainer}>
             <Text style={styles.h4}>{activity.netUpvotes}</Text>
             <TouchableOpacity style={styles.heartIcon} onPress={toggleLike}>
@@ -183,7 +193,7 @@ const ViewActivity = () => {
             )}
             <View>
               <Text style={styles.h2}>Notes</Text>
-              <TouchableOpacity style={{paddingBottom: 20}}>
+              <TouchableOpacity style={{ paddingBottom: 20 }}>
                 {activity.notes ? (
                   <Text style={styles.h4}>{activity.notes}</Text>
                 ) : (

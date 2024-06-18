@@ -11,7 +11,7 @@ import {
   Animated,
   TouchableWithoutFeedback,
   Image,
-  Alert
+  Alert,
 } from "react-native";
 import { useGlobalSearchParams, router } from "expo-router";
 import { Calendar, DateRangeHandler } from "react-native-big-calendar";
@@ -357,13 +357,16 @@ const Itinerary = () => {
             ) : null}
           </View>
         ) : null;
-        
+
         const transformedEvent: Event = {
           title: eventToMove.name,
           start: dateForUpdateForm.startDate,
           end: dateForUpdateForm.endDate,
           children: eventNotes,
           activityid: eventToMove.id,
+          url: eventToMove.image?.url
+            ? eventToMove.image?.url
+            : "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400",
         };
 
         // Update the state
@@ -425,6 +428,9 @@ const Itinerary = () => {
           end: newDates.endDate,
           children: eventToUpdateTime.children,
           activityid: eventToUpdateTime.activityid,
+          url: eventToUpdateTime.url
+            ? eventToUpdateTime.url
+            : "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400",
         };
         setEventsOnCalendar((prevEvents) =>
           prevEvents.map((event) =>
@@ -509,6 +515,9 @@ const Itinerary = () => {
           end: new Date(activity.endTime),
           children: eventNotes,
           activityid: activity.id,
+          url: activity.image?.url
+            ? activity.image?.url
+            : "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400",
         };
       });
     const notOnCalendar = activities.filter(
@@ -759,7 +768,6 @@ const Itinerary = () => {
               ))}
             </ScrollView>
             <FlatList
-              // style={{backgroundColor: '#e9e9e9'}}
               data={datesConsecutiveList}
               contentContainerStyle={{ paddingBottom: 100 }}
               renderItem={({ item: date, index }) => (
@@ -822,12 +830,7 @@ const Itinerary = () => {
                                     styles.lastEvent,
                                 ]}
                               >
-                                <View
-                                  style={[
-                                    styles.row,
-                                    { alignItems: "flex-start" },
-                                  ]}
-                                >
+                                <View style={styles.row}>
                                   <View style={{ flex: 1, marginRight: 10 }}>
                                     <Text style={styles.h4}>{event.title}</Text>
                                     {/* if start time is similar to end timef, the activity's time is not set yet */}
@@ -879,7 +882,10 @@ const Itinerary = () => {
                                     <View
                                       style={[
                                         styles.setField,
-                                        { backgroundColor: "darkblue" },
+                                        {
+                                          backgroundColor: "darkblue",
+                                          height: 20,
+                                        },
                                       ]}
                                     >
                                       {event.children}
@@ -1081,11 +1087,11 @@ const Itinerary = () => {
                                       </View>
                                     </Modal>
                                   </View>
-                                  {/* <View style={{ width: 100, height: 80 }}>
+                                  <View style={{ width: 100, height: 80 }}>
                                     <Image
                                       key={index}
                                       source={{
-                                        uri: "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400",
+                                        uri: event.url,
                                       }}
                                       style={{
                                         width: "100%",
@@ -1093,7 +1099,7 @@ const Itinerary = () => {
                                         borderRadius: 8,
                                       }}
                                     />
-                                  </View> */}
+                                  </View>
                                   <View style={{ padding: 5 }}>
                                     <AntDesign
                                       name="right"
