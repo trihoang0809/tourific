@@ -1,18 +1,17 @@
 import { User } from "@/types";
 import { useEffect, useState } from "react";
 import {
-  Platform,
   ScrollView,
   View,
   StyleSheet,
   Text,
   Image,
   Pressable,
-  TouchableOpacity,
 } from "react-native";
 import { material } from "react-native-typography";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { defaultAvatar } from "@/utils";
 
 interface userIDProps {
   userID: string;
@@ -21,20 +20,16 @@ interface userIDProps {
 const UserProfileView = (userID: userIDProps) => {
   const [userProfile, setUserProfile] = useState<User>();
   const [selectedValue, setSelectedValue] = useState("Trips");
-
+  const serverUrl = process.env.EXPO_PUBLIC_HOST_URL;
   // Fetching data
   useEffect(() => {
-    // Let ios as default
-    let serverUrl = "http://localhost:3000";
-
-    if (Platform.OS === "android") serverUrl = "http://10.0.2.2:3000";
-
     const getData = async () => {
       try {
-        const link = serverUrl + "/" + userID.userID;
+        const link = `http://${serverUrl}:3000/user/` + userID.userID;
         const profile = await fetch(link);
         let data = await profile.json();
         setUserProfile(data);
+        console.log(userProfile?.avatar.url);
       } catch (error) {
         console.log("An error happen while fetching data");
         console.log(error);
@@ -182,8 +177,6 @@ const styles = StyleSheet.create({
   },
 
   editContainer: {
-    // width: 150,
-    // height: 40,
     borderWidth: 1,
     borderRadius: 15,
     alignItems: "center",
