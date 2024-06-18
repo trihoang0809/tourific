@@ -52,34 +52,7 @@ export const ListFilteredCards = ({ isUpcoming }: listprops) => {
   }, []);
 
   //Search Bar algorithm
-  let thresholdName = 0;
-  let thresholdLocation = 0;
-  const generate_ngrams = (text: String, n: number = 2) => {
-    let ngrams = [];
-    for (let i = 0; i < text.length - n + 1; ++i) {
-      ngrams.push(text.slice(i, i + n));
-    }
-    return ngrams;
-  };
-
-  const calculate_ngrams_score = (
-    text1: String,
-    text2: String,
-    n: number = 2,
-  ) => {
-    let text1_ngrams = new Set(generate_ngrams(text1, n));
-    let text2_ngrams = new Set(generate_ngrams(text2, n));
-    let intersection = new Set();
-    let union = new Set(text2_ngrams);
-
-    for (let x of text1_ngrams)
-      if (text2_ngrams.has(x)) intersection.add(x);
-      else union.add(x);
-    console.log(text1);
-    console.log(text2);
-    console.log(intersection.size);
-    return intersection.size / union.size;
-  };
+  let threshold = 0.3;
 
   //calculate levenshtein distance
   const levenshtein_distance = (word1: string, word2: string): number => {
@@ -123,32 +96,16 @@ export const ListFilteredCards = ({ isUpcoming }: listprops) => {
     return dp[word1.length][word2.length];
   };
 
-  //Dynamic threshold
-  const setThreshold = (text: String) => {
-    if (text.length < 50) return 0.25;
-    else if (text.length >= 50 && text.length < 100) return 0.5;
-    else return 0.7;
-  };
-
   //Combined Result
-  const combinedScore = (
-    user_input: String,
-    data_string: String,
-    n: number = 2,
-  ) => {
-    let ngram = calculate_ngrams_score(
-      user_input.toUpperCase(),
-      data_string.toUpperCase(),
-      n,
-    );
+  const normalizedScore = (user_input: String, data_string: String) => {
     let levDistance = levenshtein_distance(
       String(user_input).toUpperCase(),
       String(data_string).toUpperCase(),
     );
-    levDistance = 1 / (1 + levDistance); // Normalize Levenshtein distance to similarity
-    let combined_score = (ngram + levDistance) / 2;
-    // let combined_score = ngram;
-    return combined_score;
+    levDistance =
+      1 - levDistance / Math.max(user_input.length, data_string.length); // Normalize Levenshtein distance to similarity
+
+    return levDistance;
   };
 
   //Seperate word
@@ -160,12 +117,13 @@ export const ListFilteredCards = ({ isUpcoming }: listprops) => {
     for (let i = 0; i < word1.length; ++i) {
       let wordScore = 0;
       for (let j = 0; j < word2.length; ++j) {
-        wordScore = Math.max(wordScore, combinedScore(word1[i], word2[j], 2));
+        wordScore = Math.max(wordScore, normalizedScore(word1[i], word2[j]));
       }
 
       score += wordScore;
     }
 
+    console.log(data + " " + score / word1.length);
     return score / word1.length;
   };
 
@@ -178,19 +136,13 @@ export const ListFilteredCards = ({ isUpcoming }: listprops) => {
         " " +
         upcomingTrips[i].location.citystate;
 
-      thresholdName = setThreshold(input);
-      thresholdLocation = setThreshold(input);
-
       let tripNameScore = similarity_score(input, upcomingTrips[i].name);
       let tripLocationScore = similarity_score(input, locationName);
 
-      if (
-        tripNameScore >= thresholdName ||
-        tripLocationScore >= thresholdLocation
-      )
+      if (tripNameScore >= threshold || tripLocationScore >= threshold)
         filteredTrips.push(upcomingTrips[i]);
     }
-
+    console.log("-------------");
     setFilterTrips(filteredTrips);
   };
 
