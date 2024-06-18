@@ -52,7 +52,7 @@ export const ListFilteredCards = ({ isUpcoming }: listprops) => {
   }, []);
 
   //Search Bar algorithm
-  let threshold = 0.3;
+  let threshold = 0.1;
 
   //calculate levenshtein distance
   const levenshtein_distance = (word1: string, word2: string): number => {
@@ -138,6 +138,10 @@ export const ListFilteredCards = ({ isUpcoming }: listprops) => {
 
       let tripNameScore = similarity_score(input, upcomingTrips[i].name);
       let tripLocationScore = similarity_score(input, locationName);
+
+      // Dynamic threshold
+      if (input.length <= 3) threshold = 0.1 * input.length;
+      else threshold = 0.5;
 
       if (tripNameScore >= threshold || tripLocationScore >= threshold)
         filteredTrips.push(upcomingTrips[i]);
