@@ -1,5 +1,5 @@
-import express from "express";
-import { PrismaClient } from "@prisma/client";
+import express, { Request } from "express";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
 
 const router = express.Router();
@@ -118,7 +118,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 // Add a friend
-router.post("/add-friend", async (req, res) => {
+router.post("/friend", async (req, res) => {
   const { friendId } = req.body;
   const userId = userID;
   try {
@@ -136,35 +136,45 @@ router.post("/add-friend", async (req, res) => {
   }
 });
 
-// view all friend requests
-router.get("/friend/requests", async (req, res) => {
+// get friend requests by status
+// get list of friends: /friend?status=ACCEPTED
+// get pending friend requests: /friend?status=PENDING 
+router.get("/friend", async (req: Request, res) => {
   const userId = userID;
+  const { status } = req.query;
   try {
-    const friendRequests = await prisma.friendship.findMany({
-      where: {
-        receiverID: userId,
-        friendStatus: "PENDING",
-      },
-    });
-    res.status(StatusCodes.OK).json(friendRequests);
-  }
-  catch (error) {
-    console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting friend requests." });
-  }
-});
-
-// get all sent friend requests
-router.get("/friend/sent-requests", async (req, res) => {
-  const userId = userID;
-  try {
-    const sentRequests = await prisma.friendship.findMany({
-      where: {
-        senderID: userId,
-        friendStatus: "PENDING",
-      },
-    });
-    res.status(StatusCodes.OK).json(sentRequests);
+    if (status === "ACCEPTED") {
+      const friends = await prisma.friendship.findMany({
+        where: {
+          // get all friends that have accepted the friend request
+          OR: [
+            {
+              senderID: userId,
+              friendStatus: "ACCEPTED",
+              receiverID: {
+                not: userId
+              }
+            },
+            {
+              receiverID: userId,
+              friendStatus: "ACCEPTED",
+              senderID: {
+                not: userId
+              }
+            },
+          ],
+        },
+      });
+      res.status(StatusCodes.OK).json(friends);
+    } else if (status === "PENDING") {
+      const friendRequests = await prisma.friendship.findMany({
+        where: {
+          receiverID: userId,
+          friendStatus: "PENDING",
+        },
+      });
+      res.status(StatusCodes.OK).json(friendRequests);
+    }
   }
   catch (error) {
     console.log(error);
@@ -172,85 +182,54 @@ router.get("/friend/sent-requests", async (req, res) => {
   }
 });
 
-// accept a friend request
-router.patch("/friend/accept", async (req, res) => {
+// accept or decline a friend request
+// to accept: /friend?accept=true 
+// to reject: /friend?accept=false
+router.patch("/friend", async (req, res) => {
   const { friendId } = req.body;
+  const { accept } = req.query;
   const userId = userID;
   try {
-    const friend = await prisma.friendship.update({
-      where: {
-        receiverID_senderID: {
-          senderID: friendId,
-          receiverID: userId,
-        },
-      },
-      data: {
-        friendStatus: "ACCEPTED",
-      },
-    });
-    res.status(StatusCodes.OK).json(friend);
-  }
-  catch (error) {
-    console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while accepting a friend." });
-  }
-});
-
-// reject a friend request
-router.patch("/friend/reject", async (req, res) => {
-  const { friendId } = req.body;
-  const userId = userID;
-  try {
-    const friend = await prisma.friendship.update({
-      where: {
-        receiverID_senderID: {
-          senderID: friendId,
-          receiverID: userId,
-        },
-      },
-      data: {
-        friendStatus: "REJECTED",
-      },
-    });
-    res.status(StatusCodes.OK).json(friend);
-  }
-  catch (error) {
-    console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while rejecting a friend." });
-  }
-});
-
-// get all friends
-router.get("/:userId/friends", async (req, res) => {
-  const { userId } = req.params;
-  try {
-    const friends = await prisma.friendship.findMany({
-      where: {
-        // get all friends that have accepted the friend request
-        OR: [
-          {
-            senderID: userId,
-            friendStatus: "ACCEPTED",
-            receiverID: {
-              not: userId
-            }
-          },
-          {
+    if (accept === "true") {
+      const friend = await prisma.friendship.update({
+        where: {
+          receiverID_senderID: {
+            senderID: friendId,
             receiverID: userId,
-            friendStatus: "ACCEPTED",
-            senderID: {
-              not: userId
-            }
           },
-        ],
-      },
-    });
-    res.status(StatusCodes.OK).json(friends);
+        },
+        data: {
+          friendStatus: "ACCEPTED"
+        },
+      });
+      res.status(StatusCodes.OK).json(friend);
+    } else {
+      const rejectFriend = await prisma.friendship.delete({
+        where: {
+          receiverID_senderID: {
+            senderID: friendId,
+            receiverID: userId,
+          },
+        },
+      });
+      res.status(StatusCodes.OK).json(rejectFriend);
+    }
   }
   catch (error) {
     console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting friends." });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while accepting/declining a friend." });
   }
 });
 
+// get all sent friend requests
+router.get("/friend/sent-requests", async (req, res) => {
+  const userId = userID;
+  const sentRequests = await prisma.friendship.findMany({
+    where: {
+      senderID: userId,
+      friendStatus: status as Prisma.EnumStatusFilter<"Friendship"> | undefined,
+    },
+  });
+  res.status(StatusCodes.OK).json(sentRequests);
+});
 export default router;
