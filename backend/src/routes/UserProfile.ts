@@ -1,5 +1,5 @@
-import express, { Request } from "express";
-import { Prisma, PrismaClient } from "@prisma/client";
+import express from "express";
+import { PrismaClient } from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
 
 const router = express.Router();
@@ -136,45 +136,32 @@ router.post("/friend", async (req, res) => {
   }
 });
 
-// get friend requests by status
-// get list of friends: /friend?status=ACCEPTED
-// get pending friend requests: /friend?status=PENDING 
-router.get("/friend", async (req: Request, res) => {
+// get all friends
+router.get("/friend", async (req, res) => {
   const userId = userID;
-  const { status } = req.query;
   try {
-    if (status === "ACCEPTED") {
-      const friends = await prisma.friendship.findMany({
-        where: {
-          // get all friends that have accepted the friend request
-          OR: [
-            {
-              senderID: userId,
-              friendStatus: "ACCEPTED",
-              receiverID: {
-                not: userId
-              }
-            },
-            {
-              receiverID: userId,
-              friendStatus: "ACCEPTED",
-              senderID: {
-                not: userId
-              }
-            },
-          ],
-        },
-      });
-      res.status(StatusCodes.OK).json(friends);
-    } else if (status === "PENDING") {
-      const friendRequests = await prisma.friendship.findMany({
-        where: {
-          receiverID: userId,
-          friendStatus: "PENDING",
-        },
-      });
-      res.status(StatusCodes.OK).json(friendRequests);
-    }
+    const friends = await prisma.friendship.findMany({
+      where: {
+        // get all friends that have accepted the friend request
+        OR: [
+          {
+            senderID: userId,
+            friendStatus: "ACCEPTED",
+            receiverID: {
+              not: userId
+            }
+          },
+          {
+            receiverID: userId,
+            friendStatus: "ACCEPTED",
+            senderID: {
+              not: userId
+            }
+          },
+        ],
+      },
+    });
+    res.status(StatusCodes.OK).json(friends);
   }
   catch (error) {
     console.log(error);
@@ -221,15 +208,38 @@ router.patch("/friend", async (req, res) => {
   }
 });
 
-// get all sent friend requests
+// get all sent requests
 router.get("/friend/sent-requests", async (req, res) => {
   const userId = userID;
-  const sentRequests = await prisma.friendship.findMany({
-    where: {
-      senderID: userId,
-      friendStatus: status as Prisma.EnumStatusFilter<"Friendship"> | undefined,
-    },
-  });
-  res.status(StatusCodes.OK).json(sentRequests);
+  try {
+    const sentRequests = await prisma.friendship.findMany({
+      where: {
+        senderID: userId,
+        friendStatus: 'PENDING',
+      },
+    });
+    res.status(StatusCodes.OK).json(sentRequests);
+  } catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting sent friend requests." });
+  }
 });
+
+// get all pending requests
+router.get("/friend/pending-requests", async (req, res) => {
+  const userId = userID;
+  try {
+    const pendingRequests = await prisma.friendship.findMany({
+      where: {
+        receiverID: userId,
+        friendStatus: 'PENDING',
+      },
+    });
+    res.status(StatusCodes.OK).json(pendingRequests);
+  } catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting pending friend requests." });
+  }
+});
+
 export default router;
