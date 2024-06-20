@@ -20,7 +20,7 @@ export interface TripParams {
 }
 
 // temporary for testing until auth done
-const userID = "6661308f193a6cd9e0ea4d36";
+const userID = "6669267e34f4cab1d9ddd751";
 
 // Activites of a trip
 router.use("/:tripId/activities", ActivityRouter);
@@ -223,26 +223,40 @@ router.get("/:id/non-participants", async (req, res) => {
     // Fetch all friends of the user where the friendship status is ACCEPTED
     const friends = await prisma.friendship.findMany({
       where: {
+        // get all friends that have accepted the friend request
         OR: [
-          { receiverID: userId, friendStatus: 'ACCEPTED' },
-          { senderID: userId, friendStatus: 'ACCEPTED' }
-        ]
+          {
+            senderID: userId,
+            friendStatus: "ACCEPTED",
+            receiverID: {
+              not: userId
+            }
+          },
+          {
+            receiverID: userId,
+            friendStatus: "ACCEPTED",
+            senderID: {
+              not: userId
+            }
+          },
+        ],
       },
       include: {
         receiver: true,
+        sender: true,
       }
     });
+
     console.log("friends", friends);
 
     if (!friends || friends.length === 0) {
       return res.status(StatusCodes.NOT_FOUND).json({ error: "No friends found" });
     }
 
-    // Fetch all trip members who have not ACCEPTED the invitation
+    // Fetch all trip invitation regarding status of the trip
     const participants = await prisma.tripMember.findMany({
       where: {
         tripId: tripId,
-        // status: { not: 'ACCEPTED' }
       },
       select: {
         inviteeId: true,
@@ -259,14 +273,17 @@ router.get("/:id/non-participants", async (req, res) => {
     // Map participants to their status
     const participantIdsToStatus = new Map(participants.map(p => [p.inviteeId, p.status]));
 
+    console.log("part map", participantIdsToStatus);
+
     // Filter and prepare data for friends not fully accepted into the trip
     const contactsNotInTrip = friends.reduce((acc: any, friend) => {
-      const friendId = friend.receiverID === userId ? friend.senderID : friend.receiverID;
-      const status = participantIdsToStatus.get(friendId);
+      const friendId = friend.receiverID === userId ? friend.sender : friend.receiver;
+      console.log("friendId", friendId);
+      const status = participantIdsToStatus.get(friendId.id);
 
       if (!status || status !== 'ACCEPTED') {  // Check if not part of the trip or not accepted
         acc.push({
-          receiver: friend.receiver,
+          nonParticipant: friendId,
           status: status || 'NOT_INVITED'  // Provide status or 'NOT_INVITED' if no status found
         });
       }

@@ -172,11 +172,11 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
           <Ionicons name="add" size={40} color="white" />
         </Link>
       </TouchableOpacity>
-      <ScrollView>
+      <View>
         {invitation.map((invite: Invitation) => (
           <InvitationCard key={invite.id} invitation={invite} onAccept={onAccept} onDecline={onDecline} />
         ))}
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 };

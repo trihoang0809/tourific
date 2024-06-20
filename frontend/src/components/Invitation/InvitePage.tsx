@@ -12,7 +12,7 @@ const screenHeight = Dimensions.get("window").height;
 
 const InvitePage = () => {
   const { id } = useLocalSearchParams();
-  const userId = "6661308f193a6cd9e0ea4d36";
+  const userId = "6669267e34f4cab1d9ddd751";
   const [searchTerm, setSearchTerm] = useState("");
   const [friendList, setFriendList] = useState<User[]>([]);
   const [friendsToInvite, setFriendsToInvite] = useState<FriendRequest[]>([]);
@@ -46,6 +46,7 @@ const InvitePage = () => {
 
   const getFriendsToInvite = async () => {
     try {
+      console.log("tripid", id);
       const usersToInvite = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/non-participants`, {
         method: "GET",
         headers: {
@@ -98,7 +99,7 @@ const InvitePage = () => {
       });
 
       if (response.ok) {
-        setFriendsToInvite(prev => prev.filter(user => !invitations.includes(user.receiver.id)));
+        setFriendsToInvite(prev => prev.filter(user => !invitations.includes(user.nonParticipant.id)));
         alert('Invitations sent successfully!');
       } else {
         throw new Error("Failed to send invitations");
@@ -112,11 +113,12 @@ const InvitePage = () => {
     router.push(`/trips/${id}`);
   };
 
+  console.log("friendsToInvite", friendsToInvite);
+
   return (
     <SafeAreaView
       style={{ height: screenHeight, flexDirection: 'column', backgroundColor: 'white' }}
     >
-
       {friendList?.length > 0 ?
         <>
           <Text style={{ fontSize: 25, fontWeight: 'bold', textAlign: 'center', marginVertical: 10 }}>
@@ -137,11 +139,11 @@ const InvitePage = () => {
           <View style={{ flex: 1 }}>
             {friendsToInvite.map((user, index) => (
               <ContactCard
-                user={user.receiver}
+                user={user.nonParticipant}
                 status={user.status}
                 key={index}
-                isChecked={isChecked(user.receiver.id)}
-                setChecked={(e) => setChecked(e, user.receiver.id)} />
+                isChecked={isChecked(user.nonParticipant.id)}
+                setChecked={(e) => setChecked(e, user.nonParticipant.id)} />
             ))
             }
           </View>

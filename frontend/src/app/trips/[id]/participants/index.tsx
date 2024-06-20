@@ -1,19 +1,19 @@
-import { View } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import React from 'react';
 import InvitePage from '@/components/Invitation/InvitePage';
-import { MaterialIcons } from '@expo/vector-icons';
-import { Stack, router } from 'expo-router';
+import { Stack } from 'expo-router';
 
 const index = () => {
   return (
-    <View>
+    <SafeAreaView>
       <Stack.Screen
         options={{
-          headerShown: false,
+          headerShown: true,
+          title: '',
         }}
       />
       <InvitePage />
-    </View>
+    </SafeAreaView>
   );
 };
 

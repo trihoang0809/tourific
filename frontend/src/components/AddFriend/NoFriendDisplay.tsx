@@ -1,6 +1,6 @@
 import { solotravel } from '@/constants/images';
 import React from 'react';
-import { View, Text, Image, StyleSheet, Button, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 
 const NoFriendDisplay = () => {
   return (

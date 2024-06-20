@@ -17,7 +17,7 @@ const AvatarGroup = ({ users, size }: AvatarGroupProps) => {
       }}
     >
       {displayUsers?.map((user, index) => (
-        <View key={user?.invitee?.id} style={{ marginLeft: index === 0 ? 0 : -(size / 4) }}>
+        <View key={user?.invitee?.id} style={{ marginLeft: index === 0 ? 0 : -(50 / 4) }}>
           <AvatarCard user={user?.invitee} size={size} />
         </View>
       ))}
@@ -27,7 +27,7 @@ const AvatarGroup = ({ users, size }: AvatarGroupProps) => {
           width: size,
           height: size,
           borderRadius: 9999,
-          marginLeft: -(size / 4),
+          marginLeft: -(50 / 4),
         }]}>
           <Text style={styles.additionalText}>+{additionalCount}</Text>
         </View>

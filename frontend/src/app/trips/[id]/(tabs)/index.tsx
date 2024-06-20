@@ -7,15 +7,11 @@ import {
   StyleSheet,
   SafeAreaView,
 } from "react-native";
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Stack, router, useGlobalSearchParams } from "expo-router";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from 'luxon';
-import BottomSlider from "@/components/BottomSheet/BottomSlider";
-import {
-  BottomSheetModal,
-} from '@gorhom/bottom-sheet';
 import AvatarGroup from "@/components/Avatar/AvatarGroup";
 import SplashScreen from "@/components/Loading/SplashScreen";
 
@@ -41,23 +37,6 @@ const TripDetailsScreen = () => {
   const serverUrl = EXPO_PUBLIC_HOST_URL;
   const defaultUri =
     "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400";
-
-
-  // ref
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-
-  // callbacks
-  const handlePresentModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.present();
-  }, []);
-
-  const handleDismissModalPress = useCallback(() => {
-    bottomSheetModalRef.current?.dismiss();
-  }, []);
-
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index);
-  }, []);
 
   const getTrip = async ({ id: text }: { id: string; }) => {
     try {
@@ -138,7 +117,7 @@ const TripDetailsScreen = () => {
                 headerRight: () => (
                   // <Link href={`/trips/create?id=${id}`}>
                   <>
-                    <TouchableOpacity onPress={handlePresentModalPress}>
+                    <TouchableOpacity onPress={() => <Link href={`/trips/create?id=${id}`} />}>
                       <Feather
                         name="edit-2"
                         size={20}
@@ -265,13 +244,6 @@ const TripDetailsScreen = () => {
                 </View>
               </View>
             </ScrollView>
-            <View style={{ flex: 1, paddingTop: 200 }}>
-              <BottomSlider
-                ref={bottomSheetModalRef}
-                handlePresentModalPress={handlePresentModalPress}
-                handleSheetChanges={handleSheetChanges}
-              />
-            </View>
           </>
         )}
     </SafeAreaView >
