@@ -16,4 +16,8 @@ const Layout = () => {
   );
 };
 
+<<<<<<< HEAD
 export default Layout;
+=======
+export default Layout;
+>>>>>>> kha/activityCreate
