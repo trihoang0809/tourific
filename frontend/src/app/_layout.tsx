@@ -8,7 +8,14 @@ const RootNavigation = () => {
         name='trips'
         options={{ title: 'Trip', headerShown: false }}
       />
-      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="index"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="friends"
+        options={{ headerShown: false }}
+      />
     </Stack>
   );
 };

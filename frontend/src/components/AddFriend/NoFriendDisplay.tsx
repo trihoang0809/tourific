@@ -14,13 +14,12 @@ const NoFriendDisplay = () => {
         resizeMode="contain"
       />
       <Text style={styles.mainText}>Looks like you have no friends!</Text>
-      <Text style={styles.subText}>Invite your friends to join the team!</Text>
-      <TouchableOpacity style={styles.button}>
+      <Text style={styles.subText}>Add more friends and invite them to your trip!</Text>
+      {/* <TouchableOpacity style={styles.button}>
         <Text style={styles.buttonText}>Give permission to access your contacts to invite your friends</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <TouchableOpacity style={styles.inviteButton}>
-        {/* another user story implement later */}
-        <Text style={styles.inviteButtonText}>Invite friends</Text>
+        <Text style={styles.inviteButtonText}>Add more friends</Text>
       </TouchableOpacity>
     </View>
   );

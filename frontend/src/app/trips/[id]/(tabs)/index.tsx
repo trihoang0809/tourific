@@ -14,6 +14,8 @@ import { Dimensions } from "react-native";
 import { DateTime } from 'luxon';
 import AvatarGroup from "@/components/Avatar/AvatarGroup";
 import SplashScreen from "@/components/Loading/SplashScreen";
+import AvatarCard from "@/components/Avatar/AvatarCard";
+import { Avatar } from "react-native-paper";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 const width = Dimensions.get("window").width; //full width
@@ -86,17 +88,26 @@ const TripDetailsScreen = () => {
     } finally {
       setIsLoading(false);
     }
-
   };
 
-  console.log("trip", trip.participants);
+  console.log("trip2", trip.participants);
   useEffect(() => {
-    console.log("id", id);
-    getTrip({ id });
-    getParticipants();
+    Promise.all([
+      getTrip({ id }),
+      getParticipants()
+    ])
+      .then(() => {
+        console.log("All data fetched");
+      })
+      .catch(error => {
+        console.error("Error in fetching data:", error);
+      })
+      .finally(() => {
+        setIsLoading(false);  // Set loading to false only after both promises resolve
+      });
   }, [id]);
 
-  console.log("trip", trip);
+  // console.log("trip", trip);
   return (
     <SafeAreaView>
       {
@@ -225,15 +236,34 @@ const TripDetailsScreen = () => {
                       {DateTime.local().zoneName}
                     </Text>
                     <Text style={styles.h2}>Participants</Text>
-                    <View style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-                      <AvatarGroup users={trip.participants} />
+                    <View style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      gap: 30,
+                      flexWrap: 'wrap',
+                      marginTop: 10
+                    }}>
+                      {
+                        trip.participants && trip.participants.length > 0 &&
+                        trip.participants.map((user, index) => (
+                          <View key={user?.invitee?.id} style={{}}>
+                            <Avatar.Image
+                              size={50}
+                              source={{ uri: user?.invitee?.avatar?.url }}
+                            />
+                            <Text>
+                              {`${user?.invitee?.firstName} ${user?.invitee?.lastName}`}
+                            </Text>
+                          </View>
+                        ))
+                      }
+                      {/* <AvatarGroup users={trip.participants} /> */}
                       <TouchableOpacity
                         style={[styles.additionalAvatar,
                         {
                           width: 50,
                           height: 50,
                           borderRadius: 9999,
-                          marginLeft: 10,
                         }]}
                         onPress={() => router.navigate(`/trips/${id}/participants`)}
                       >

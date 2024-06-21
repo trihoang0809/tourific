@@ -119,7 +119,7 @@ const InvitePage = () => {
     <SafeAreaView
       style={{ height: screenHeight, flexDirection: 'column', backgroundColor: 'white' }}
     >
-      {friendList?.length > 0 ?
+      {friendsToInvite?.length > 0 ?
         <>
           <Text style={{ fontSize: 25, fontWeight: 'bold', textAlign: 'center', marginVertical: 10 }}>
             Invite friends to the trip
