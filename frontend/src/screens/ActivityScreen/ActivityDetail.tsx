@@ -24,7 +24,7 @@ import {
 } from "@expo/vector-icons";
 import React, { useState, useEffect } from "react";
 import GoogleMapInput from "@/components/GoogleMaps/GoogleMapInput";
-import { formatDate, serverURL, weekday } from "@/utils";
+import { weekday } from "@/utils";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { router } from "expo-router";
@@ -36,7 +36,6 @@ interface Actprops {
 }
 
 export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
-  const serverUrl = serverURL();
   const [activityData, setActivityData] = useState(any);
   const [noteEdit, setNoteEdit] = useState(false);
   const [note, setNote] = useState("");
@@ -53,7 +52,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
     const getActivity = async () => {
       try {
         const response = await fetch(
-          serverUrl + `trips/${id.tripId}/activities/${id.actID}`,
+          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id.tripId}/activities/${id.actID}`,
           {
             method: "GET",
             headers: {
@@ -64,7 +63,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
         );
         const data = await response.json();
         setActivityData(data);
-        console.log(data);
+        console.log(id.tripId + " " + id.actID);
       } catch (error) {
         console.log(error);
       }
@@ -144,7 +143,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
       if (!response.ok) {
         throw new Error("Failed to delete activity");
       } else {
-        router.push("../activities");
+        router.push("(activities)/index");
       }
     } catch (error: any) {
       console.error("Error deleting activity:", error.toString());
@@ -182,7 +181,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
             uri: coverImage,
           }}
         >
-          <Pressable onPress={() => router.push("../activities")}>
+          <Pressable onPress={() => router.push("../index")}>
             <Ionicons
               name="chevron-back-outline"
               size={35}
@@ -397,28 +396,27 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
         {/* Description */}
         <View style={styles.informationBlock}>
           <Text style={{ fontSize: 20 }} numberOfLines={descriptionSeeMore}>
-            {activityData.description !== ""
-              ? activityData.description
-              : "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."}
+            {activityData.description}
           </Text>
-          {descriptionSeeMore < 10000000 && (
-            <TouchableWithoutFeedback
-              onPress={() =>
-                setDescriptionSeeMore(descriptionSeeMore + 10000000)
-              }
-            >
-              <Text
-                style={{
-                  fontSize: 20,
-                  borderBottomWidth: 1,
-                  fontWeight: "bold",
-                  width: 86,
-                }}
+          {descriptionSeeMore < 10000000 &&
+            activityData.description?.length > 100 && (
+              <TouchableWithoutFeedback
+                onPress={() =>
+                  setDescriptionSeeMore(descriptionSeeMore + 10000000)
+                }
               >
-                See More
-              </Text>
-            </TouchableWithoutFeedback>
-          )}
+                <Text
+                  style={{
+                    fontSize: 20,
+                    borderBottomWidth: 1,
+                    fontWeight: "bold",
+                    width: 86,
+                  }}
+                >
+                  See More
+                </Text>
+              </TouchableWithoutFeedback>
+            )}
         </View>
 
         {/* Note */}
@@ -514,8 +512,9 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
                   borderWidth: 1,
                   backgroundColor: "white",
                   borderRadius: 4,
-                  fontSize: 18,
+                  fontSize: 23,
                   margin: 5,
+                  textAlign: "center",
                 }}
               >
                 {category}
@@ -542,8 +541,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 35,
-    // alignSelf: "center",
+    fontSize: 40,
     color: "black",
     fontWeight: "bold",
   },
@@ -568,9 +566,6 @@ const styles = StyleSheet.create({
     borderBottomColor: "white",
     borderStyle: "solid",
     position: "absolute",
-    // right: 3,
-    // zIndex: 1,
-    // position: "relative",
   },
 
   messageBox: {
