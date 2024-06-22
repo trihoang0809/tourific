@@ -71,8 +71,6 @@ router.get("/all-sent", async (req: Request, res) => {
   }
 });
 
-// will need get sent invitationa by status but will implement later
-
 // get an invitation by status
 // example endpoint: /invite?status=PENDING
 router.get("/", async (req: Request<InvitationParams>, res) => {
@@ -90,11 +88,6 @@ router.get("/", async (req: Request<InvitationParams>, res) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting invitatiion." });
   }
 });
-
-// DELETE/CANCEL an invitation
-// Cannot delete an invitation, but we can kick members 
-// out of the trip
-
 
 // invite users, accept list of users' id
 router.post("/:tripId", async (req: Request<InvitationParams>, res) => {
@@ -175,9 +168,10 @@ router.post("/:tripId", async (req: Request<InvitationParams>, res) => {
 });
 
 // accept or decline invite to join group
-// endpoint: /trips/tripId/accept
-router.patch("/:invitationId/accept", async (req: Request<InvitationParams>, res) => {
+// endpoint: /trips/tripId?status=ACCEPTED or /trips/tripId?status=REJECTED
+router.patch("/:invitationId", async (req: Request<InvitationParams>, res) => {
   const { invitationId } = req.params;
+  const { status } = req.query;
   try {
     const result = await prisma.$transaction(async (prisma) => {
       const invitation = await prisma.tripMember.findUnique({
@@ -186,44 +180,14 @@ router.patch("/:invitationId/accept", async (req: Request<InvitationParams>, res
       });
 
       if (!invitation || invitation.status !== 'PENDING') {
-        throw new Error("Invitation cannot be accepted");
+        throw new Error("Invitation cannot be accepted/rejected");
       }
 
       return await prisma.tripMember.update({
         where: { id: invitationId },
-        data: { status: 'ACCEPTED' },
+        data: { status: status as Status },
       });
     });
-
-    res.status(StatusCodes.OK).json(result);
-  } catch (error) {
-    console.error("Failed to accept trip invitation:", error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Internal server error");
-  }
-});
-
-
-// accept or decline invite to join group
-// endpoint: /trips/tripId/decline
-router.patch("/:invitationId/decline", async (req: Request<InvitationParams>, res) => {
-  const { invitationId } = req.params;
-  try {
-    const result = await prisma.$transaction(async (prisma) => {
-      const invitation = await prisma.tripMember.findUnique({
-        where: { id: invitationId },
-        select: { status: true }
-      });
-
-      if (!invitation || invitation.status !== 'PENDING') {
-        throw new Error("Invitation cannot be declined");
-      }
-
-      return await prisma.tripMember.update({
-        where: { id: invitationId },
-        data: { status: 'REJECTED' },
-      });
-    });
-
     res.status(StatusCodes.OK).json(result);
   } catch (error) {
     console.error("Failed to accept trip invitation:", error);

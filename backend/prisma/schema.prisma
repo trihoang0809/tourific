@@ -37,11 +37,11 @@ model TripMember {
 
 
 type Location {
-  address String?
+  address String
   citystate String @default("")
   latitude Float
   longitude Float
-  radius Float?
+  radius Float
 }
 
 model User {
@@ -83,7 +83,7 @@ model Activity {
   startTime DateTime
   endTime DateTime
   location Location
-  notes String
+  notes String[]
   netUpvotes Int @default(0)
   isOnCalendar Boolean @default(false)
   category String[]

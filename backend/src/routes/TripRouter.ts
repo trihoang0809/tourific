@@ -20,7 +20,7 @@ export interface TripParams {
 }
 
 // temporary for testing until auth done
-const userID = "6669267e34f4cab1d9ddd751";
+const userID = "6661308f193a6cd9e0ea4d36";
 
 // Activites of a trip
 router.use("/:tripId/activities", ActivityRouter);
@@ -87,7 +87,6 @@ router.get("/", async (req: Request<TripParams>, res) => {
 router.post("/", validateData(tripCreateSchema), async (req, res) => {
   try {
     const { name, startDate, endDate, location, image } = req.body;
-    console.log(req.body);
     const trip = await prisma.trip.create({
       data: {
         name,
@@ -125,9 +124,6 @@ router.get("/:id", async (req, res) => {
       where: {
         id,
       },
-      include: {
-        activities: true, // Include activities associated with the trip
-      },
     });
     res.status(StatusCodes.OK).json(trip);
   } catch (error) {
@@ -139,12 +135,10 @@ router.get("/:id", async (req, res) => {
 router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("id", id);
     const { name, startDate, endDate, location, image } = req.body;
-    console.log(req.body);
     const isValidID = await prisma.trip.findUnique({
       where: {
-        id: id,
+        id,
       },
     });
 
@@ -157,11 +151,11 @@ router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
         id,
       },
       data: {
-        name: name,
-        startDate: startDate,
-        endDate: endDate,
-        location: location,
-        image,
+        name,
+        startDate,
+        endDate,
+        location,
+        image
       },
     });
     res.status(StatusCodes.OK).json(trip);
@@ -223,37 +217,22 @@ router.get("/:id/non-participants", async (req, res) => {
     // Fetch all friends of the user where the friendship status is ACCEPTED
     const friends = await prisma.friendship.findMany({
       where: {
-        // get all friends that have accepted the friend request
         OR: [
-          {
-            senderID: userId,
-            friendStatus: "ACCEPTED",
-            receiverID: {
-              not: userId
-            }
-          },
-          {
-            receiverID: userId,
-            friendStatus: "ACCEPTED",
-            senderID: {
-              not: userId
-            }
-          },
-        ],
+          { receiverID: userId, friendStatus: 'ACCEPTED' },
+          { senderID: userId, friendStatus: 'ACCEPTED' }
+        ]
       },
       include: {
         receiver: true,
-        sender: true,
       }
     });
-
     console.log("friends", friends);
 
     if (!friends || friends.length === 0) {
       return res.status(StatusCodes.NOT_FOUND).json({ error: "No friends found" });
     }
 
-    // Fetch all trip invitation regarding status of the trip
+    // Fetch all trip members
     const participants = await prisma.tripMember.findMany({
       where: {
         tripId: tripId,
@@ -264,8 +243,6 @@ router.get("/:id/non-participants", async (req, res) => {
       }
     });
 
-    console.log("part", participants);
-
     if (!participants) {
       return res.status(StatusCodes.NOT_FOUND).json({ error: "Trip not found" });
     }
@@ -273,18 +250,15 @@ router.get("/:id/non-participants", async (req, res) => {
     // Map participants to their status
     const participantIdsToStatus = new Map(participants.map(p => [p.inviteeId, p.status]));
 
-    console.log("part map", participantIdsToStatus);
-
     // Filter and prepare data for friends not fully accepted into the trip
     const contactsNotInTrip = friends.reduce((acc: any, friend) => {
-      const friendId = friend.receiverID === userId ? friend.sender : friend.receiver;
-      console.log("friendId", friendId);
-      const status = participantIdsToStatus.get(friendId.id);
+      const friendId = friend.receiverID === userId ? friend.senderID : friend.receiverID;
+      const status = participantIdsToStatus.get(friendId);
 
-      if (!status || status !== 'ACCEPTED') {  // Check if not part of the trip or not accepted
+      if (!status || status !== 'ACCEPTED') {  // check if not part of the trip or not accepted
         acc.push({
-          nonParticipant: friendId,
-          status: status || 'NOT_INVITED'  // Provide status or 'NOT_INVITED' if no status found
+          receiver: friend.receiver,
+          status: status || 'NOT_INVITED'  // return status or 'NOT_INVITED' if no status found (user has not been invited)
         });
       }
       return acc;
@@ -296,9 +270,5 @@ router.get("/:id/non-participants", async (req, res) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Server error");
   }
 });
-
-
-// DELETE PARTICIPANT OUT OF TRIPS
-
 
 export default router;
