@@ -9,8 +9,6 @@ export default function App() {
     <View className="flex-1 bg-white">
       <HomeScreen user={sampleUser} />
       {/* <Link href="/trips/6647d51b93fc814d91bbaf9e/invite">Invite page</Link> */}
-      <Link href="/friends/search">Invite page</Link>
-
     </View>
   );
 }
