@@ -12,9 +12,7 @@ import { Link, Stack, router, useGlobalSearchParams } from "expo-router";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from 'luxon';
-import AvatarGroup from "@/components/Avatar/AvatarGroup";
 import SplashScreen from "@/components/Loading/SplashScreen";
-import AvatarCard from "@/components/Avatar/AvatarCard";
 import { Avatar } from "react-native-paper";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
@@ -23,8 +21,6 @@ const height = Dimensions.get("window").height; //full height
 
 const TripDetailsScreen = () => {
   const { id } = useGlobalSearchParams();
-  // const id = parseFloat(typeof idString === 'string' ? idString : idString[0]);
-
   const [trip, setTrip] = useState({
     name: "",
     location: { address: "", citystate: "", radius: 0 },
@@ -36,7 +32,6 @@ const TripDetailsScreen = () => {
     image: { url: "" },
   });
   const [isLoading, setIsLoading] = useState(false);
-  const serverUrl = EXPO_PUBLIC_HOST_URL;
   const defaultUri =
     "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400";
 
@@ -59,7 +54,6 @@ const TripDetailsScreen = () => {
       // Optionally, you can handle the response here
       const data = await response.json();
       setTrip(data);
-      console.log("Trip fetch:", data);
     } catch (error: any) {
       console.error("Error fetching trip:", error.toString());
     } finally {
@@ -82,7 +76,6 @@ const TripDetailsScreen = () => {
       }
       const data = await response.json();
       setTrip((prev) => ({ ...prev, participants: data }));
-      // console.log("Participants fetch:", data);
     } catch (error: any) {
       console.error("Error fetching participants:", error.toString());
     } finally {
@@ -90,7 +83,6 @@ const TripDetailsScreen = () => {
     }
   };
 
-  console.log("trip2", trip.participants);
   useEffect(() => {
     Promise.all([
       getTrip({ id }),
@@ -103,11 +95,10 @@ const TripDetailsScreen = () => {
         console.error("Error in fetching data:", error);
       })
       .finally(() => {
-        setIsLoading(false);  // Set loading to false only after both promises resolve
+        setIsLoading(false); 
       });
-  }, [id]);
+  }, []);
 
-  // console.log("trip", trip);
   return (
     <SafeAreaView>
       {
@@ -257,7 +248,6 @@ const TripDetailsScreen = () => {
                           </View>
                         ))
                       }
-                      {/* <AvatarGroup users={trip.participants} /> */}
                       <TouchableOpacity
                         style={[styles.additionalAvatar,
                         {
