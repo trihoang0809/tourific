@@ -73,6 +73,10 @@ const GooglePlacesInput = ({
   return (
     <View>
       <View style={styles.container}>
+        <LocationSearch
+          onLocationSelected={(location) => {
+            setQuery({
+              address: location.address,
               citystate: location.citystate,
             });
           }}
