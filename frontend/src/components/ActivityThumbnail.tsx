@@ -60,7 +60,7 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
   return (
     <Pressable
       onPress={() => {
-        router.push(`../(activities)/${activity.id}`);
+        router.push(`../(activities)/${activity.id + activity.ggMapId}`);
       }}
     >
       <View style={styles.card}>
@@ -107,7 +107,7 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
           <View style={styles.lineContainer}>
             {/* <Ionicons name="location-outline" size={24} color="#006ee6" style={{marginRight: 10}}/> */}
             <Text numberOfLines={2} style={{ flex: 1, overflow: "hidden" }}>
-              {activity.id}
+              {activity.id + activity.ggMapId}
             </Text>
           </View>
         </View>

@@ -54,6 +54,7 @@ export interface GoogleMapInputProps {
 
 export interface ActivityProps {
   id: string;
+  ggMapId: string;
   name: string;
   description: string;
   imageUrl: string;
@@ -66,6 +67,7 @@ export interface ActivityProps {
   category: string[];
   rating?: number;
 }
+
 export type Trip = {
   id: string;
   name: string;

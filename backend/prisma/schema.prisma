@@ -62,6 +62,7 @@ enum FriendStatus {
 
 model Activity {
   id String @id @default(auto()) @map("_id") @db.ObjectId
+  ggMapId String @default("")
   name String
   description String
   startTime DateTime

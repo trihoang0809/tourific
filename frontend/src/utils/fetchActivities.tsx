@@ -22,7 +22,8 @@ export const fetchActivities = async (
     const data = await response.json();
     console.log(data.results[0]);
     const activitiesData: ActivityProps[] = data.results.map((place: any) => ({
-      id: place.place_id,
+      id: "",
+      ggMapId: place.place_id,
       name: place.name,
       description: "",
       imageUrl: getImageUrl(place.photos, GOOGLE_PLACES_API_KEY),
