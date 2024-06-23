@@ -181,7 +181,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
             uri: coverImage,
           }}
         >
-          <Pressable onPress={() => router.push("../index")}>
+          <Pressable onPress={() => router.back()}>
             <Ionicons
               name="chevron-back-outline"
               size={35}
