@@ -25,8 +25,15 @@ const GooglePlacesInput = ({
   });
   const mapRef = useRef(null);
   const [radius, setRadius] = useState(30000);
+  const [sliderTimeoutId, setSliderTimeoutId] = useState<NodeJS.Timeout | null>(
+    null,
+  );
   const handleSliderChange = (value: number) => {
-    setRadius(value);
+    if (sliderTimeoutId) clearTimeout(sliderTimeoutId);
+    const newTimeoutId = setTimeout(() => {
+      setRadius(value);
+    }, 100);
+    setSliderTimeoutId(newTimeoutId);
   };
   const [mapData, setMapData] = useState({
     address: query.address,
