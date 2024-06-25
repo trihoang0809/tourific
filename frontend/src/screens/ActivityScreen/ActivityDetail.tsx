@@ -29,10 +29,12 @@ import { weekday } from "@/utils";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { router } from "expo-router";
 import { any } from "zod";
+import { ActivityProps } from "@/types";
 
 interface Actprops {
   tripId: String;
   actID: String;
+  ggMapId: String;
 }
 
 export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
@@ -48,6 +50,9 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
     "https://media.istockphoto.com/id/904172104/photo/weve-made-it-all-this-way-i-am-proud.jpg?s=612x612&w=0&k=20&c=MewnsAhbeGRcMBN9_ZKhThmqPK6c8nCT8XYk5ZM_hdg=";
   const [descriptionSeeMore, setDescriptionSeeMore] = useState(3);
   const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
+  const GOOGLE_PLACES_API_KEY =
+    process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY || "undefined";
+
   useEffect(() => {
     const getActivity = async () => {
       try {
@@ -68,7 +73,43 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
         console.log(error);
       }
     };
-    getActivity();
+
+    const getGGMapActivity = async () => {
+      try {
+        const descriptionUrl = `https://maps.googleapis.com/maps/api/place/details/json?fields=editorial_summary&place_id=${id.ggMapId}&key=${GOOGLE_PLACES_API_KEY}`;
+        const description = await fetch(descriptionUrl);
+        const descriptionData = await description.json();
+
+        const placeDetailUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${id.ggMapId}&key=${GOOGLE_PLACES_API_KEY}`;
+        const placeDetail = await fetch(placeDetailUrl);
+        const placeData = await placeDetail.json();
+        console.log(descriptionData);
+        const activitiesData = {
+          id: "",
+          ggMapId: placeData.result.place_id,
+          name: placeData.result.name,
+          description: descriptionData.result.editorial_summary.overview,
+          imageUrl: "",
+          location: {
+            address: placeData.result.vicinity,
+            latitude: placeData.result.geometry.location.lat,
+            longitude: placeData.result.geometry.location.lng,
+          },
+          notes: "",
+          netUpvotes: 0,
+          isOnCalendar: false,
+          category: placeData.result.types,
+          rating: placeData.result.rating,
+        };
+
+        setActivityData(activitiesData);
+      } catch (error) {
+        console.error("Error fetching activities:", error);
+      }
+    };
+
+    if (id.ggMapId === "") getActivity();
+    else getGGMapActivity();
   }, []);
   const activityStartDate = new Date(activityData.startTime);
 

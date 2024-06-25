@@ -20,7 +20,6 @@ export const fetchActivities = async (
     const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude}%2C${longitude}&radius=${radius}&key=${GOOGLE_PLACES_API_KEY}`;
     const response = await fetch(url);
     const data = await response.json();
-    console.log(data.results[0]);
     const activitiesData: ActivityProps[] = data.results.map((place: any) => ({
       id: "",
       ggMapId: place.place_id,

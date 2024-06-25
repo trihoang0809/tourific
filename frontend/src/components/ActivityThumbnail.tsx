@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Pressable,
 } from "react-native";
-import { useState } from "react";
+import { act, useState } from "react";
 import { Dimensions } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Rating } from "react-native-ratings";
@@ -60,7 +60,10 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
   return (
     <Pressable
       onPress={() => {
-        router.push(`../(activities)/${activity.id + activity.ggMapId}`);
+        router.push({
+          pathname: `../(activities)/${activity.id + activity.ggMapId}`,
+          params: { ggMapId: activity.ggMapId },
+        });
       }}
     >
       <View style={styles.card}>
