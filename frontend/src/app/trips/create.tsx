@@ -172,7 +172,6 @@ export default function CreateTripScreen() {
           {
             text: "Ok!",
             onPress: () => {
-              // router.push("/");
               router.back()
             },
           },
