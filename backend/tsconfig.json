@@ -4,6 +4,7 @@
     "baseUrl": ".",
     "target": "esnext",
     "module": "commonjs",
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
