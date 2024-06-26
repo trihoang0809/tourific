@@ -4,7 +4,7 @@ import {
   TouchableOpacity,
   TextInput,
   Text,
-  SafeAreaView
+  SafeAreaView,
 } from "react-native";
 import { useState, useEffect } from "react";
 import { useGlobalSearchParams } from "expo-router";
@@ -55,7 +55,7 @@ const ActivitiesScreen = () => {
           );
           setActivities(fetchedActivities);
           setFilteredActivities(fetchedActivities);
-          //await saveActivitiesToBackend(fetchedActivities);
+          await saveActivitiesToBackend(fetchedActivities);
         }
       } catch (error: any) {
         console.error("Error fetching trip:", error.toString());
@@ -64,42 +64,37 @@ const ActivitiesScreen = () => {
     getTripAndActivities();
   }, [id]);
 
-  // const saveActivitiesToBackend = async (activities: ActivityProps[]) => {
-  //   const promises = activities.map(async (activity) => {
-  //     const response = await fetch(
-  //       `http://localhost:3000/trips/${id}/activities`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           name: activity.name,
-  //           description: activity.description,
-  //           startTime: new Date(),
-  //           endTime: new Date(),
-  //           location: {
-  //             citystate: activity.location.citystate,
-  //             latitude: activity.location.latitude,
-  //             longitude: activity.location.longitude,
-  //           },
-  //           notes: activity.notes,
-  //           netUpvotes: activity.netUpvotes,
-  //           isOnCalendar: activity.isOnCalendar,
-  //           category: activity.category,
-  //           rating: activity.rating,
-  //         }),
-  //       },
-  //     );
-  //     return response.json();
-  //   });
-  //   try {
-  //     //const newActivities = await Promise.all(promises);
-  //     //setActivities(newActivities); // Update the activities state with new data including IDs
-  //   } catch (error) {
-  //     console.error("Error saving activities:", error);
-  //   }
-  // };
+  const saveActivitiesToBackend = async (activities: ActivityProps[]) => {
+    const promises = activities.map(async (activity) => {
+      const response = await fetch(
+        `http://localhost:3000/trips/${id}/activities`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: activity.name,
+            description: activity.description,
+            startTime: new Date(),
+            endTime: new Date(),
+            location: {
+              citystate: activity.location.citystate,
+              latitude: activity.location.latitude,
+              longitude: activity.location.longitude,
+            },
+            notes: activity.notes,
+            netUpvotes: activity.netUpvotes,
+            isOnCalendar: activity.isOnCalendar,
+            category: activity.category,
+            rating: activity.rating,
+            googlePlacesId: activity.googlePlacesId,
+          }),
+        },
+      );
+      return response.json();
+    });
+  };
 
   const handleSelectCategory = (category: string) => {
     setSelectedCategory(category);

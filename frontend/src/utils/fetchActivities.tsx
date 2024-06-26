@@ -35,6 +35,7 @@ export const fetchActivities = async (
       isOnCalendar: false,
       category: place.types,
       rating: place.rating,
+      googlePlacesId: place.place_id,
     }));
     return activitiesData;
   } catch (error) {

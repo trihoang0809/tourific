@@ -21,8 +21,7 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
     try {
       const newLikedState = !liked;
       const newUpvotes = newLikedState ? upvotes + 1 : upvotes - 1;
-      const url = `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${tripId}/activities/${activity.id}`;
-      console.log(url);
+      const url = `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${tripId}/activities/updateUpvotes/${activity.googlePlacesId}`;
       // Send PUT request to backend
       const response = await fetch(url, {
         method: "PUT",
@@ -41,6 +40,7 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
       if (response.ok) {
         setLiked(newLikedState);
         setUpvotes(data.netUpvotes); // Update the state based on the response
+        console.log("new net upvotes: ", upvotes);
       } else {
         throw new Error(data.error || "Failed to update the activity");
       }

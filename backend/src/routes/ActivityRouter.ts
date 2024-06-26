@@ -49,7 +49,7 @@ router.get("/:activityId", async (req: Request<ActivityParams>, res) => {
 // Create a new activity
 router.post("/", async (req: Request<ActivityParams>, res) => {
   const { tripId } = req.params;
-  const { name, description, startTime, endTime, location, notes, image } = req.body;
+  const { name, description, startTime, endTime, location, notes, image, googlePlacesId } = req.body;
 
   if (!tripId) {
     res.status(404).json({ error: "ID does not exist" });
@@ -68,6 +68,7 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
             endTime,
             location,
             notes,
+            googlePlacesId,
             // image,
           },
         },
@@ -112,6 +113,31 @@ router.put("/:activityId", async (req: Request<ActivityParams>, res) => {
       },
     });
     res.status(200).json(activity);
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred while updating the activity." });
+  }
+});
+
+// Update an activity by googlePlacesId
+router.put("/updateUpvotes/:googlePlacesId", async (req: Request, res) => {
+  const { googlePlacesId } = req.params;
+  const { netUpvotes } = req.body;
+
+  try {
+    const activity = await prisma.activity.updateMany({
+      where: {
+        googlePlacesId: googlePlacesId,
+      },
+      data: {
+        netUpvotes,
+      },
+    });
+
+    if (activity.count === 0) {
+      return res.status(404).json({ error: "Activity does not exist" });
+    }
+
+    res.status(200).json({ netUpvotes });
   } catch (error) {
     res.status(500).json({ error: "An error occurred while updating the activity." });
   }

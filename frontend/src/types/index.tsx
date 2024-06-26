@@ -7,17 +7,17 @@ export interface TripData {
     endDate: Date;
   };
   startTime: {
-    hours: number,
-    minutes: number,
+    hours: number;
+    minutes: number;
   };
   endTime: {
-    hours: number,
-    minutes: number,
+    hours: number;
+    minutes: number;
   };
   location: MapData;
   image: {
     url: String;
-  }
+  };
 }
 
 export type MapData = {
@@ -59,6 +59,7 @@ export interface ActivityProps {
   isOnCalendar: boolean;
   category: string[];
   rating?: number;
+  googlePlacesId: string;
 }
 export type Trip = {
   id: string;
