@@ -83,6 +83,7 @@ export type User = {
   id: string;
   userName: string;
   password: string;
+  firebaseUserId: string;
   friendRequestReceived: any[]; // Specify the type if known
   tripID: string[];
   trips: Trip[];

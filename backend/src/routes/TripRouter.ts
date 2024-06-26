@@ -22,13 +22,15 @@ router.use("/:tripId/activities", ActivityRouter);
 
 // Get all trips
 router.get("/", async (req, res) => {
-  const { userId } = req.body;
+  console.log("Request body: ", req);
+  const { firebaseUserId } = req.body;
+  console.log("firebase User Id: ", firebaseUserId);
 
   try {
     let queryConditions: any = {
       where: {
         participantsID: {
-          has: userId,
+          has: firebaseUserId,
         },
       },
     };
@@ -56,7 +58,7 @@ router.get("/", async (req, res) => {
         gt: now,
       };
     }
-
+    console.log("query conditions: ", queryConditions);
     const trips = await prisma.trip.findMany(queryConditions);
     res.json(trips);
   } catch (err) {

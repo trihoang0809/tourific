@@ -19,6 +19,7 @@ export const registerWithEmail = async (
     password,
   );
   const token = await userCredential.user.getIdToken();
+  console.log("Storing token:", token);
   await storeToken(token); // Store the token
   return userCredential;
 };
@@ -33,6 +34,7 @@ export const loginWithEmail = async (
     password,
   );
   const token = await userCredential.user.getIdToken();
+  console.log("Storing token:", token);
   await storeToken(token); // Store the token
   return userCredential;
 };

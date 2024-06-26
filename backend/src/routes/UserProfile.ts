@@ -40,6 +40,7 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
+// Create a user profile
 router.post("/", async (req, res) => {
   const { userName, email, password, firstName, lastName, dateOfBirth, avatar, firebaseUserId } = req.body;
 

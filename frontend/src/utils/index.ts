@@ -167,6 +167,7 @@ export const categories: Record<string, string[]> = {
 export const storeToken = async (token: string) => {
   try {
     await AsyncStorage.setItem("userToken", token);
+    console.log("Token stored successfully ", token);
   } catch (error) {
     console.error("Error storing the token:", error);
   }
@@ -175,7 +176,9 @@ export const storeToken = async (token: string) => {
 // Function to retrieve the token
 export const getToken = async (): Promise<string | null> => {
   try {
-    return await AsyncStorage.getItem("userToken");
+    const token = AsyncStorage.getItem("userToken");
+    console.log("Retrieved token: ", token);
+    return await token;
   } catch (error) {
     console.error("Error retrieving the token:", error);
     return null;
@@ -185,7 +188,9 @@ export const getToken = async (): Promise<string | null> => {
 // Function to decode the token
 export const decodeToken = (token: string): any => {
   try {
-    return jwtDecode(token);
+    const decoded = jwtDecode(token);
+    console.log("Decoded token:", decoded);
+    return decoded;
   } catch (error) {
     console.error("Error decoding the token:", error);
     return null;
@@ -197,7 +202,9 @@ export const getUserIdFromToken = async (): Promise<string | null> => {
   const token = await getToken();
   if (token) {
     const decodedToken = decodeToken(token);
-    return decodedToken.userId || null;
+    const userId = decodedToken.user_id || decodedToken.sub; // Firebase stores user ID in 'sub'
+    console.log("Decoded userId: ", userId);
+    return userId || null;
   }
   return null;
 };

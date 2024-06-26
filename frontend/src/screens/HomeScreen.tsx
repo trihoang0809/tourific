@@ -19,21 +19,52 @@ import { Ionicons } from "@expo/vector-icons";
 import TripCardRect from "@/components/TripCard/TripCardRect";
 import { headerImage } from "@/utils/constants";
 import Style from "Style";
+import { getUserIdFromToken, getToken } from "@/utils";
 
 const screenw = Dimensions.get("window").width;
 const titleWidth = screenw - screenw * 0.96;
 export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [ongoingTrips, setOngoingTrips] = useState<Trip[]>([]);
   const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const id = await getUserIdFromToken();
+      console.log("user Id logged in: ", id);
+      setUserId(id);
+    };
+    fetchUserId();
+  }, []);
+
   useEffect(() => {
     const fetchTrips = async () => {
+      if (!userId) {
+        console.error("User ID is null");
+        return;
+      }
       try {
+        const headers = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${await getToken()}`,
+        };
+        console.log("Headers:  ", headers);
+
         const ongoing = await fetch(
           `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`,
+          { headers },
         );
+        console.log("ongoingggg: ", ongoing);
+        const ongoingText = await ongoing.text();
+        console.log("Ongoing trips response text:", ongoingText);
+
         const upcoming = await fetch(
           `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?upcoming=true`,
+          { headers },
         );
+        console.log("upcomingggg: ", upcoming);
+        const upcomingText = await upcoming.text();
+        console.log("Upcoming trips response text:", upcomingText);
+
         const ongoingData = await ongoing.json();
         const upcomingData = await upcoming.json();
 
@@ -43,8 +74,11 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
         console.error("Failed to fetch trips:", error);
       }
     };
-    fetchTrips();
-  }, []);
+    if (userId) {
+      console.log("got user id: ", userId);
+      fetchTrips();
+    }
+  }, [userId]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
