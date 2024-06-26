@@ -25,15 +25,8 @@ const GooglePlacesInput = ({
   });
   const mapRef = useRef(null);
   const [radius, setRadius] = useState(30000);
-  const [sliderTimeoutId, setSliderTimeoutId] = useState<NodeJS.Timeout | null>(
-    null,
-  );
   const handleSliderChange = (value: number) => {
-    if (sliderTimeoutId) clearTimeout(sliderTimeoutId);
-    const newTimeoutId = setTimeout(() => {
-      setRadius(value);
-    }, 100);
-    setSliderTimeoutId(newTimeoutId);
+    setRadius(value);
   };
   const [mapData, setMapData] = useState({
     address: query.address,
@@ -92,9 +85,8 @@ const GooglePlacesInput = ({
       <Slider
         minimumValue={800}
         maximumValue={50000}
-        //step={1}
         value={radius}
-        onValueChange={handleSliderChange}
+        onSlidingComplete={handleSliderChange}
       />
       <Text className="font-semibold text-base">
         Current radius: {(radius * 0.000621371).toFixed(2)} miles
