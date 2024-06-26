@@ -5,12 +5,14 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
+  Pressable,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { Link, Stack, router, useGlobalSearchParams } from "expo-router";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from "luxon";
+import { activityData } from "@/utils/prepareData";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 const width = Dimensions.get("window").width; //full width
@@ -192,6 +194,14 @@ const TripDetailsScreen = () => {
                 {DateTime.local().zoneName}
               </Text>
               <Text style={styles.h2}>Participants</Text>
+              <Pressable
+                onPress={() => {
+                  console.log(id);
+                  activityData(String(id));
+                }}
+              >
+                <Text>Click</Text>
+              </Pressable>
             </View>
           </View>
         </View>
