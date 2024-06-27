@@ -5,6 +5,7 @@ import { validateData } from "../middleware/validationMiddleware";
 import { tripCreateSchema } from "../schemas/tripSchema";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { StatusCodes } from "http-status-codes";
+import { generateSchedule } from "../middleware/schedule";
 
 // const express = require('express')
 const router = express.Router();
@@ -16,6 +17,27 @@ export interface TripParams {
 
 // Activites of a trip
 router.use("/:tripId/activities", ActivityRouter);
+
+//Create Schedule
+router.post("/:id/schedule", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { distance } = req.body;
+    let schedule = await generateSchedule(distance);
+    // let validJsonString = schedule.replace(/'/g, '"');
+    // validJsonString = validJsonString.replace(/'/g, '"');
+    // console.log(validJsonString);
+    // console.log(schedule);
+    // let data = JSON.parse(validJsonString);
+    // console.log(data);
+    // schedule = '{"route": [0, 4, 1, 2, 3, 6, 7, 5], "cost": 1400719}';
+    let data = JSON.parse(schedule);
+    console.log(data.route);
+    res.json({ route: data.route, cost: data.cost });
+  } catch (error) {
+    console.log("An error occur while creating schedule: " + error);
+  }
+});
 
 // Get all trips
 router.get("/", async (req, res) => {

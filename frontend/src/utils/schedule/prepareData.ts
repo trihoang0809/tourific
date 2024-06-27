@@ -1,5 +1,3 @@
-import { ActivityProps } from "@/types";
-
 export const activityData = async (tripId: String) => {
   const GOOGLE_PLACES_API_KEY =
     process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY || "undefined";
@@ -7,7 +5,6 @@ export const activityData = async (tripId: String) => {
 
   // Fetch trip's activities
   const getChosenActivity = async () => {
-    console.log(tripId);
     const url = `http://${serverUrl}:3000/trips/${tripId}/activities`;
     try {
       const response = await fetch(url, {
@@ -66,7 +63,6 @@ export const activityData = async (tripId: String) => {
   };
 
   let userActivityData = await getChosenActivity();
-  console.log(userActivityData.length);
   let userActivityDistance: any = [];
 
   for (let i = 0; i < userActivityData.length; ++i) {
@@ -88,5 +84,5 @@ export const activityData = async (tripId: String) => {
     }
   }
 
-  console.log(userActivityDistance);
+  return userActivityDistance;
 };

@@ -1,19 +1,20 @@
-import numpy as np
 from python_tsp.exact import solve_tsp_dynamic_programming
 from python_tsp.heuristics import solve_tsp_lin_kernighan
+# import numpy as np
+# dist_matrix = np.array([
+#     [0, 29, 20, 21],
+#     [29, 0, 15, 17],
+#     [20, 15, 0, 28],
+#     [21, 17, 28, 0]
+# ])
 
+def route(distance_matrix):
+  if len(distance_matrix) <= 12:
+    route, cost = solve_tsp_dynamic_programming(distance_matrix)
+  else:
+    route, cost = solve_tsp_lin_kernighan(distance_matrix)
 
-distance_matrix = np.array([
-    [0,  5, 4, 10],
-    [5,  0, 8,  5],
-    [4,  8, 0,  3],
-    [10, 5, 3,  0]
-])
+  result = f'{{"route": {route}, "cost": {cost}}}'
 
-if len(distance_matrix) <= 12:
-  route, cost = solve_tsp_dynamic_programming(distance_matrix)
-else:
-  route, cost = solve_tsp_lin_kernighan(distance_matrix)
+  print(result, end='')
 
-print(route)
-print(cost)
