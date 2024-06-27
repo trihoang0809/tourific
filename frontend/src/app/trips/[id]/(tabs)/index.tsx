@@ -36,7 +36,11 @@ const TripDetailsScreen = () => {
   // more setting icon
   const [modalEditVisible, setModalEditVisible] = useState(false);
 
-  const getTrip = async ({ id: text }: { id: string }) => {
+  const getTrip = async ({
+    id: text,
+  }: {
+    id: string | string[] | undefined;
+  }) => {
     try {
       console.log(EXPO_PUBLIC_HOST_URL);
       const response = await fetch(
@@ -102,7 +106,7 @@ const TripDetailsScreen = () => {
               size={24}
               color="black"
               style={{ marginLeft: 10 }}
-              onPress={() => router.navigate("/")}
+              onPress={() => router.navigate("/home")}
             />
           ),
         }}

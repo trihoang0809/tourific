@@ -16,12 +16,40 @@ model Trip {
   location Location?
   startDate DateTime? @default(now())
   endDate DateTime?
-  pendingInvitations String[]
-  participants User[] @relation(fields: [participantsID], references: [id])
+  participants TripMember[]
   activities Activity[]
-  participantsID String[] @db.ObjectId
+  participantsID String[]
   image Photo?
 }
+
+model TripMember {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  tripId   String @db.ObjectId
+  inviteeId   String @db.ObjectId
+  inviterId String @db.ObjectId
+  status   Status @default(PENDING)
+  
+  trip     Trip @relation(fields: [tripId], references: [id])
+  invitee  User? @relation("InviteeToTripInvitations", fields: [inviteeId], references: [id])
+  inviter  User? @relation("InviterToTripInvitations", fields: [inviterId], references: [id])
+  @@unique([tripId, inviteeId])
+}
+
+model Friendship {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  receiver    User     @relation("friendRequestReceived", fields: [receiverID], references: [id])
+  receiverID  String   @db.ObjectId
+  senderID  String   @db.ObjectId
+  friendStatus    Status @default(PENDING)
+  @@unique([receiverID, senderID])
+}
+
+enum Status {
+  ACCEPTED
+  PENDING
+  REJECTED
+}
+
 
 type Location {
   address String?
@@ -37,22 +65,14 @@ model User {
   email String @unique
   password String
   firebaseUserId    String @unique
-  friendRequestReceived   Friendship[]   @relation("friendRequestReceived")
-  tripID String[] @db.ObjectId
-  trips Trip[] @relation(fields: [tripID], references: [id])
   firstName String
   lastName String
   dateOfBirth DateTime
   avatar Photo
-}
 
-model Friendship {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  receiver    User     @relation("friendRequestReceived", fields: [receiverID], references: [id])
-  receiverID  String   @db.ObjectId
-  senderID  String   @db.ObjectId
-  friendStatus    FriendStatus @default(PENDING)
-  @@unique([receiverID, senderID])
+  inviteeTripInvitations TripMember[] @relation("InviteeToTripInvitations")
+  inviterTripInvitations TripMember[] @relation("InviterToTripInvitations")  
+  friendRequestReceived   Friendship[]   @relation("friendRequestReceived")
 }
 
 enum FriendStatus {

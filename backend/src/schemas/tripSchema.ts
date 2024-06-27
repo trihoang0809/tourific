@@ -28,5 +28,6 @@ export const tripCreateSchema = z.object({
     width: z.number().optional(),
     url: z.string().url({ message: "Please use a URL" }).min(5),
   }),
-  userId: z.string().nonempty("User ID is required"),
+  firebaseUserId: z.string().nonempty("User ID is required"),
+  participantsID: z.array(z.string()).optional(),
 });

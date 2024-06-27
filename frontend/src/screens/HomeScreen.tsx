@@ -43,27 +43,21 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
         return;
       }
       try {
-        const headers = {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${await getToken()}`,
-        };
-        console.log("Headers:  ", headers);
+        // const headers = {
+        //   "Content-Type": "application/json",
+        //   Authorization: `Bearer ${await getToken()}`,
+        // };
+        // console.log("Headers:  ", headers);
 
         const ongoing = await fetch(
-          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`,
-          { headers },
+          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true&firebaseUserId=${userId}`,
+          // { headers },
         );
-        console.log("ongoingggg: ", ongoing);
-        const ongoingText = await ongoing.text();
-        console.log("Ongoing trips response text:", ongoingText);
 
         const upcoming = await fetch(
-          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?upcoming=true`,
-          { headers },
+          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?upcoming=true&firebaseUserId=${userId}`,
+          // { headers },
         );
-        console.log("upcomingggg: ", upcoming);
-        const upcomingText = await upcoming.text();
-        console.log("Upcoming trips response text:", upcomingText);
 
         const ongoingData = await ongoing.json();
         const upcomingData = await upcoming.json();

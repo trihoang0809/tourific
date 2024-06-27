@@ -11,7 +11,7 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
   try {
     const decodedToken = await admin.auth().verifyIdToken(token);
     console.log("decode success: ", decodedToken);
-    req.body.userId = decodedToken.uid; // Attach the userId to the request body
+    req.body.firebaseUserId = decodedToken.uid; // Attach the userId to the request body
   } catch (err) {
     console.log("invalid right here: ", err);
     return res.status(401).send("Invalid Token");

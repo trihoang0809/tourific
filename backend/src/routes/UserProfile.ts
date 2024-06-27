@@ -19,24 +19,24 @@ router.get("/", async (req, res) => {
 });
 
 // Get a user profile
-router.get("/:userId", async (req, res) => {
-  const { userId } = req.params;
+router.get("/:firebaseUserId", async (req, res) => {
+  const { firebaseUserId } = req.params;
   try {
     const userProfile = await prisma.user.findUnique({
       where: {
-        id: userId,
+        firebaseUserId: firebaseUserId,
       },
     });
 
     if (!userProfile) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: `There is no user with Id: ${userId}` });
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: `There is no user with Id: ${firebaseUserId}` });
     }
     res.status(StatusCodes.OK).json(userProfile);
   } catch (error) {
     console.log("Some errors happen while getting user profile");
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: `An error occurred while fetching user profile with Id: ${userId}` });
+      .json({ error: `An error occurred while fetching user profile with Id: ${firebaseUserId}` });
   }
 });
 

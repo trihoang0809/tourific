@@ -15,7 +15,7 @@ export interface TripParams {
   tripId: string;
 }
 
-router.use(verifyToken);
+// router.use(verifyToken);
 
 // Activites of a trip
 router.use("/:tripId/activities", ActivityRouter);
@@ -23,7 +23,7 @@ router.use("/:tripId/activities", ActivityRouter);
 // Get all trips
 router.get("/", async (req, res) => {
   console.log("Request body: ", req);
-  const { firebaseUserId } = req.body;
+  const { firebaseUserId } = req.query;
   console.log("firebase User Id: ", firebaseUserId);
 
   try {
@@ -87,7 +87,7 @@ router.get("/:id", async (req, res) => {
 
 // Create a new trip
 router.post("/", validateData(tripCreateSchema), async (req, res) => {
-  const { name, startDate, endDate, location, image, userId } = req.body;
+  const { name, startDate, endDate, location, image, firebaseUserId } = req.body;
   try {
     const trip = await prisma.trip.create({
       data: {
@@ -96,7 +96,7 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
         endDate,
         location,
         image,
-        participantsID: [userId],
+        participantsID: [firebaseUserId],
       },
     });
     res.status(StatusCodes.CREATED).json(trip);
@@ -114,10 +114,10 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
 
 // Update an existing trip
 router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
+  console.log("start running");
   const { id } = req.params;
-  console.log("id", id);
-  const { name, startDate, endDate, location, image } = req.body;
-  console.log(req.body);
+  const { name, startDate, endDate, location, image, firebaseUserId } = req.body;
+
   const isValidID = await prisma.trip.findUnique({
     where: {
       id: id,
@@ -138,11 +138,15 @@ router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
         startDate: startDate,
         endDate: endDate,
         location: location,
-        image,
+        image: image,
+        participantsID: {
+          push: firebaseUserId, // Add the userId to the participantsID array
+        },
       },
     });
     res.status(StatusCodes.OK).json(trip);
   } catch (error) {
+    console.log(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while updating the trip." });
   }
 });
