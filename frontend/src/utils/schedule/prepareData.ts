@@ -37,7 +37,7 @@ export const activityData = async (tripId: String) => {
           rating: data[i].rating,
         };
       }
-      // console.log(data);
+
       return data;
     } catch (error: any) {
       console.error("Error fetching trip:", error.toString());
@@ -63,26 +63,30 @@ export const activityData = async (tripId: String) => {
   };
 
   let userActivityData = await getChosenActivity();
-  let userActivityDistance: any = [];
 
-  for (let i = 0; i < userActivityData.length; ++i) {
-    userActivityDistance.push([]);
-    for (let j = 0; j < userActivityData.length; ++j)
-      userActivityDistance[i].push(0);
-  }
+  if (userActivityData.length > 0) {
+    let userActivityDistance: any = [];
 
-  for (let i = 0; i < userActivityData.length; ++i) {
-    for (let j = i + 1; j < userActivityData.length; ++j) {
-      const distance = await getDistance(
-        userActivityData[i].location.latitude,
-        userActivityData[i].location.longitude,
-        userActivityData[j].location.latitude,
-        userActivityData[j].location.longitude,
-      );
-      userActivityDistance[i][j] = distance;
-      userActivityDistance[j][i] = distance;
+    for (let i = 0; i < userActivityData.length; ++i) {
+      userActivityDistance.push([]);
+      for (let j = 0; j < userActivityData.length; ++j)
+        userActivityDistance[i].push(0);
     }
-  }
 
-  return userActivityDistance;
+    for (let i = 0; i < userActivityData.length; ++i) {
+      for (let j = i + 1; j < userActivityData.length; ++j) {
+        const distance = await getDistance(
+          userActivityData[i].location.latitude,
+          userActivityData[i].location.longitude,
+          userActivityData[j].location.latitude,
+          userActivityData[j].location.longitude,
+        );
+        userActivityDistance[i][j] = distance;
+        userActivityDistance[j][i] = distance;
+      }
+    }
+
+    // console.log();
+    return userActivityDistance;
+  } else return [];
 };

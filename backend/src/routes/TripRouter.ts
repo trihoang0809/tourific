@@ -21,19 +21,13 @@ router.use("/:tripId/activities", ActivityRouter);
 //Create Schedule
 router.post("/:id/schedule", async (req, res) => {
   try {
-    const { id } = req.params;
     const { distance } = req.body;
-    let schedule = await generateSchedule(distance);
-    // let validJsonString = schedule.replace(/'/g, '"');
-    // validJsonString = validJsonString.replace(/'/g, '"');
-    // console.log(validJsonString);
-    // console.log(schedule);
-    // let data = JSON.parse(validJsonString);
-    // console.log(data);
-    // schedule = '{"route": [0, 4, 1, 2, 3, 6, 7, 5], "cost": 1400719}';
-    let data = JSON.parse(schedule);
-    console.log(data.route);
-    res.json({ route: data.route, cost: data.cost });
+    const schedule = await generateSchedule(distance);
+    const data = JSON.parse(schedule);
+
+    console.log(data);
+
+    res.json(data);
   } catch (error) {
     console.log("An error occur while creating schedule: " + error);
   }

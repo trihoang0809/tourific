@@ -30,7 +30,9 @@ export const scheduleTrip = async (tripId: String) => {
   };
 
   let userActivityDistance: any = await activityData(tripId);
-  let schedule = await getSchedule(userActivityDistance);
-
+  let schedule;
+  if (userActivityDistance.length > 0)
+    schedule = await getSchedule(userActivityDistance);
+  else schedule = { route: [], cost: 0 };
   return schedule;
 };
