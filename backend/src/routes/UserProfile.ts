@@ -1,5 +1,5 @@
 import express, { query } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Status } from "@prisma/client";
 import { StatusCodes } from 'http-status-codes';
 
 const router = express.Router();
@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 // temporary for testing until auth done
 const userID = "6669267e34f4cab1d9ddd751";
 
-// get all user for testing
+// get all user profiles
 router.get("/", async (req, res) => {
   try {
     const userProfile = await prisma.user.findMany();
@@ -121,6 +121,36 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// find a user profile by username and email that matches the text
+router.post("/find", async (req, res) => {
+  const { text } = req.body;
+  try {
+    const user = await prisma.user.findMany({
+      where: {
+        OR: [
+          {
+            userName: {
+              contains: text,
+              mode: 'insensitive',
+            },
+          },
+          {
+            email: {
+              contains: text,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+    });
+    res.status(StatusCodes.OK).json(user);
+  }
+  catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while finding a user." });
+  }
+});
+
 // Add a friend
 router.post("/add-friend", async (req, res) => {
   const { friendId } = req.body;
@@ -190,9 +220,10 @@ router.patch("/friend/reject", async (req, res) => {
   }
 });
 
-// get all friends
+// get all friendship by status
 router.get("/:userId/friends", async (req, res) => {
   const { userId } = req.params;
+  const { status } = req.query;
   try {
     const friends = await prisma.friendship.findMany({
       where: {
@@ -200,14 +231,14 @@ router.get("/:userId/friends", async (req, res) => {
         OR: [
           {
             senderID: userId,
-            friendStatus: "ACCEPTED",
+            friendStatus: status as Status,
             receiverID: {
               not: userId
             }
           },
           {
             receiverID: userId,
-            friendStatus: "ACCEPTED",
+            friendStatus: status as Status,
             senderID: {
               not: userId
             }
