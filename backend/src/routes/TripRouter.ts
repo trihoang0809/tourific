@@ -20,7 +20,7 @@ export interface TripParams {
 }
 
 // temporary for testing until auth done
-const userID = "6669267e34f4cab1d9ddd751";
+const userID = "6661308f193a6cd9e0ea4d36";
 
 // Activites of a trip
 router.use("/:tripId/activities", ActivityRouter);

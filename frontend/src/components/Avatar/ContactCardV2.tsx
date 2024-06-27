@@ -6,17 +6,30 @@ import { Ionicons } from '@expo/vector-icons';
 interface ContactCardV2Props {
   user: User;
   addFriend: (id: string) => void;
-  friendStatus: Status;
+  cancelFriendRequest: (id: string) => void;
 }
 
-const ContactCardV2 = ({ user, addFriend, friendStatus }: ContactCardV2Props) => {
-  let text = null;
-  if (friendStatus === Status.PENDING) {
-    text = 'Pending';
-  } else if (friendStatus === 'ACCEPTED') {
-    text = 'Friend';
+const ContactCardV2 = ({ user, addFriend, cancelFriendRequest }: ContactCardV2Props) => {
+  let content;
+  if (user.friendStatus === "PENDING") {
+    content =
+      <TouchableOpacity
+        onPressIn={() => cancelFriendRequest(user.id)}
+        onPressOut={() => <Text>Cancelled</Text>}>
+        <Text>
+          Cancel Request
+        </Text>
+      </TouchableOpacity>;
+  } else if (user.friendStatus === "ACCEPTED") {
+    content = <Text>Friend</Text>;
   } else {
-    text = null;
+    content =
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPressIn={() => addFriend(user.id)}
+        onPressOut={() => <Text>Cancel request</Text>}>
+        <Ionicons name="person-add" size={24} color="black" />
+      </TouchableOpacity>;
   }
   return (
     <TouchableOpacity style={styles.contactItem}>
@@ -25,14 +38,9 @@ const ContactCardV2 = ({ user, addFriend, friendStatus }: ContactCardV2Props) =>
         <Text style={styles.name}>{user.firstName}</Text>
         <Text style={styles.username}>{user.userName}</Text>
       </View>
-      {
-        text != null ?
-          <Text>{text}</Text>
-          :
-          <TouchableOpacity style={styles.deleteButton} onPressIn={addFriend(user.id)}>
-            <Ionicons name="person-add" size={24} color="black" />
-          </TouchableOpacity>
-      }
+      <View>
+        {content}
+      </View>
     </TouchableOpacity>
   );
 };

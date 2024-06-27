@@ -1,8 +1,9 @@
-import { View, Text, SafeAreaView, TextInput, FlatList } from 'react-native';
+import { View, Text, SafeAreaView, TextInput, FlatList, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import Style from 'Style';
 import { Feather } from '@expo/vector-icons';
 import ContactCardV2 from '../Avatar/ContactCardV2';
+import { FriendRequest, FriendSearch, User } from '@/types';
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 const userId = '6661308f193a6cd9e0ea4d36';
@@ -19,58 +20,7 @@ const SearchFriend = () => {
     }
   };
 
-  // fetch all users
-  // useEffect(() => {
-  //   const searchUser = async (text: string) => {
-  //     if (!text) return;  // Exit early if no search term
-  //     console.log("searchTerm", text);
-  //     try {
-  //       const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/user/find`, {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({ text }),
-  //       });
-  //       const data = await response.json();
-  //       console.log(data);
-  //       if (data.error) {
-  //         throw new Error(data.error);
-  //       }
-  //       setSearchResults(data);
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //       setSearchResults([]);
-  //     }
-  //   };
-
-  //   // find all friendship status
-  //   const friends = async () => {
-  //     try {
-  //       const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/user/${userId}/friends`, {
-  //         method: "GET",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       });
-  //       const data = await response.json();
-  //       console.log(data);
-  //       if (data.error) {
-  //         throw new Error(data.error);
-  //       }
-
-  //       const filterResult = searchResults.filter((result: any) => {
-  //         if (data.find((friend: any) => friend.id === result.id)) {
-  //           filterResult.push({ ...result, status: data.friendStatus });
-  //         } 
-  //       });
-  //       // setSearchResults()
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
-  // }, [searchTerm]);
-
+  // search users
   useEffect(() => {
     const fetchData = async () => {
       if (!searchTerm.trim()) {
@@ -79,8 +29,8 @@ const SearchFriend = () => {
       };
 
       try {
-        // Fetch both resources in parallel
         const [searchResponse, friendsResponse] = await Promise.all([
+          // find username and email by keyword
           fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/user/find`, {
             method: "POST",
             headers: {
@@ -88,6 +38,7 @@ const SearchFriend = () => {
             },
             body: JSON.stringify({ text: searchTerm }),
           }),
+          // find friends by user id
           fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/user/${userId}/friends`, {
             method: "GET",
             headers: {
@@ -102,39 +53,75 @@ const SearchFriend = () => {
           friendsResponse.json(),
         ]);
 
-        console.log("s", searchResults);
-        console.log("f", friendsResults);
-        // Create a map for quick lookup of friend status
-
-        const enhancedS = searchResults.map(user => {
-          const matchingFriend = friendsResults.find(friend => friend.receiverID === user.id || friend.senderID === user.id);
+        // map search results to include friend status
+        const enhancedS = searchResults.map((user: User) => {
+          const matchingFriend = friendsResults.find((friend: FriendRequest) => friend.receiverID === user.id || friend.senderID === user.id);
           return {
             ...user,
             friendStatus: matchingFriend ? matchingFriend.friendStatus : null
           };
         });
 
-        console.log("result", enhancedS);
+        // filter user themselves
+        const filteredS = enhancedS.filter((user: FriendSearch) => user.id !== userId);
 
-        // setSearchResults(result);
+        console.log("result", filteredS);
+
+        setSearchResults(filteredS);
       } catch (error) {
         console.error("Failed to fetch data:", error);
       }
     };
 
-    fetchData();
+    // set timeout to prevent too many requests
+    const timeoutId = setTimeout(() => {
+      fetchData();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
   console.log("searchResults final", searchResults);
 
   const handleAddFriend = async (friendId: string) => {
-    // const request = fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/user/add-friend`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({ friendId: 1 }),
-    // });
+    try {
+      const request = fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/user/friend?add=true`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ friendId: friendId }),
+      });
+
+      if (!request.ok) {
+        Alert.alert("Failed to send friend request");
+      }
+      // const result = await request.json();
+      // console.log("result", result);
+    } catch (error) {
+
+    }
+  };
+
+  const cancelFriendRequest = async (friendId: string) => {
+    try {
+      console.log("frinedi", friendId);
+      const request = fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/user/friend?add=false`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ friendId: friendId }),
+      });
+
+      if (!request.ok) {
+        Alert.alert("Failed to cancel friend request");
+      }
+      const result = await request.json();
+      console.log("result", result);
+    } catch (error) {
+      console.error("Failed to cancel friend request", error);
+    }
   };
   return (
     <SafeAreaView style={{ height: '100%', paddingTop: 40, backgroundColor: '#fff' }}>
@@ -149,13 +136,13 @@ const SearchFriend = () => {
       </View>
       <FlatList
         data={searchResults}
-        keyExtractor={item => item.id}
+        keyExtractor={(item: FriendSearch) => item.id}
         renderItem={({ item }) => (
           <View key={item.id}>
-            <ContactCardV2 user={item} addFriend={handleAddFriend} />
+            <ContactCardV2 user={item} addFriend={handleAddFriend} cancelFriendRequest={cancelFriendRequest} />
           </View>
         )}
-        ListEmptyComponent={<Text>No results found</Text>}
+        ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 10 }}>No results found</Text>}
       />
     </SafeAreaView>
   );
