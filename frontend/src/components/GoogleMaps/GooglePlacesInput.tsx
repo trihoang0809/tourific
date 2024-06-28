@@ -1,6 +1,6 @@
 import Geocoder from "react-native-geocoding";
 import React, { useState, useEffect, useRef } from "react";
-import MapView, { PROVIDER_GOOGLE, Circle } from "react-native-maps";
+import MapView, { Circle } from "react-native-maps";
 import { StyleSheet, View, Dimensions, Text } from "react-native";
 import Slider from "@react-native-community/slider";
 import { GooglePlacesInputProps } from "@/types";
@@ -9,10 +9,8 @@ import { GooglePlacesInputProps } from "@/types";
 const GOOGLE_MAP_API_KEY =
   process.env.EXPO_PUBLIC_GOOGLE_MAP_API_KEY || "undefined";
 import { LocationSearch } from "./LocationSearch";
-import Geocoding from "react-native-geocoding";
 
-const { width, height } = Dimensions.get("window");
-Geocoding.init(GOOGLE_MAP_API_KEY);
+const { width } = Dimensions.get("window");
 
 const GooglePlacesInput = ({
   onLocationSelect,
@@ -72,13 +70,14 @@ const GooglePlacesInput = ({
 
   return (
     <View>
-      <View style={styles.container}>
+      <View>
         <LocationSearch
           onLocationSelected={(location) => {
             setQuery({
               address: location.address,
               citystate: location.citystate,
             });
+            setCenterCircle(location.address + " " + location.citystate);
           }}
           value={value}
         />
@@ -86,9 +85,8 @@ const GooglePlacesInput = ({
       <Slider
         minimumValue={800}
         maximumValue={50000}
-        //step={1}
         value={radius}
-        onValueChange={handleSliderChange}
+        onSlidingComplete={handleSliderChange}
       />
       <Text className="font-semibold text-base">
         Current radius: {(radius * 0.000621371).toFixed(2)} miles
@@ -106,23 +104,19 @@ const GooglePlacesInput = ({
           longitude: coord.longitude,
           latitudeDelta: (radius / 111139) * 3.2,
           longitudeDelta: (radius / 111139) * 3.2,
-          // latitudeDelta: 0.03,
-          // longitudeDelta: 0.03,
         }}
         style={{
           width: width - 40,
           height: width - 40,
         }}
-        provider={PROVIDER_GOOGLE}
         onPress={async (e) => {
-          //console.log(e.nativeEvent.coordinate);
           setCoord({
             latitude: e.nativeEvent.coordinate.latitude,
             longitude: e.nativeEvent.coordinate.longitude,
           });
 
           const { latitude, longitude } = e.nativeEvent.coordinate;
-          const response = await Geocoding.from({ latitude, longitude });
+          const response = await Geocoder.from({ latitude, longitude });
           setQuery({
             address: "",
             citystate: response.results[0].formatted_address,
@@ -131,12 +125,8 @@ const GooglePlacesInput = ({
             const address = response.results[0].formatted_address;
             setCenterCircle(address);
             setQuery({ ...query, address: address });
-            // console.log("new address:", address, " lat long: ", { latitude, longitude });
           }
         }}
-
-        // className="flex-1 -mt-10 z-0"
-        // mapType="mutedStandard"
       >
         <Circle
           center={{
@@ -151,14 +141,5 @@ const GooglePlacesInput = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    // borderWidth: 1,
-    // borderColor: "navy",
-    // borderRadius: 15,
-    // padding: 3,
-  },
-});
 
 export default GooglePlacesInput;

@@ -394,34 +394,42 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
         />
 
         {/* Description */}
-        <View style={styles.informationBlock}>
-          <Text style={{ fontSize: 20 }} numberOfLines={descriptionSeeMore}>
-            {activityData.description}
-          </Text>
-          {descriptionSeeMore < 10000000 &&
-            activityData.description?.length > 100 && (
-              <TouchableWithoutFeedback
-                onPress={() =>
-                  setDescriptionSeeMore(descriptionSeeMore + 10000000)
-                }
-              >
-                <Text
-                  style={{
-                    fontSize: 20,
-                    borderBottomWidth: 1,
-                    fontWeight: "bold",
-                    width: 86,
-                  }}
+        {activityData.description !== "" && (
+          <View style={styles.informationBlock}>
+            <Text style={{ fontSize: 20 }} numberOfLines={descriptionSeeMore}>
+              {activityData.description}
+            </Text>
+            {descriptionSeeMore < 10000000 &&
+              activityData.description?.length > 100 && (
+                <TouchableWithoutFeedback
+                  onPress={() =>
+                    setDescriptionSeeMore(descriptionSeeMore + 10000000)
+                  }
                 >
-                  See More
-                </Text>
-              </TouchableWithoutFeedback>
-            )}
-        </View>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      borderBottomWidth: 1,
+                      fontWeight: "bold",
+                      width: 86,
+                    }}
+                  >
+                    See More
+                  </Text>
+                </TouchableWithoutFeedback>
+              )}
+          </View>
+        )}
 
         {/* Note */}
         <View style={[styles.informationBlock]}>
-          <View style={styles.messageBox}>
+          <Pressable
+            style={[styles.messageBox]}
+            onPress={() => {
+              setNoteEdit(true);
+              setNote(activityData.notes);
+            }}
+          >
             <View
               style={{
                 flexDirection: "row",
@@ -438,21 +446,6 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
               >
                 Note
               </Text>
-              {!noteEdit && (
-                <TouchableWithoutFeedback
-                  onPress={() => {
-                    setNoteEdit(true);
-                    setNote(activityData.notes);
-                  }}
-                >
-                  <Feather
-                    name="edit-2"
-                    size={20}
-                    color="black"
-                    style={{ alignSelf: "center" }}
-                  />
-                </TouchableWithoutFeedback>
-              )}
               {noteEdit && (
                 <View style={{ flexDirection: "row", columnGap: 10 }}>
                   <TouchableWithoutFeedback onPress={() => setNoteEdit(false)}>
@@ -483,7 +476,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
                 </View>
               )}
             </View>
-            {noteEdit === false ? (
+            {!noteEdit ? (
               <Text style={{ fontSize: 20 }}>{activityData.notes}</Text>
             ) : (
               <TextInput
@@ -493,7 +486,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
                 multiline={true}
               ></TextInput>
             )}
-          </View>
+          </Pressable>
         </View>
 
         {/* Categories */}
