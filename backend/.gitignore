@@ -1,3 +1,5 @@
 node_modules
 # Keep environment variables out of version control
 .env
+tourific-51d82-firebase-adminsdk-yjuey-577f74f6ed.json
+.DS_Store

@@ -2,8 +2,9 @@ import { User } from "@/types";
 
 export const sampleUser: User = {
   id: "u1",
-  username: "NickDoan123",
+  userName: "NickDoan123",
   password: "verysecurepassword",
+  firebaseUserId: "",
   friendRequestReceived: [], // Assuming no friend requests for the sample
   tripID: ["t1", "t2"], // IDs of trips; ensure these correspond to actual trips if needed
   trips: [
