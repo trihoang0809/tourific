@@ -84,6 +84,12 @@ export const GGMapActivityDetail: React.FC<Actprops> = (id: Actprops) => {
           category: placeData.result.types,
           rating: placeData.result.rating,
           userRatingNum: placeData.result.user_ratings_total,
+          openNow:
+            placeData.result.opening_hours !== undefined
+              ? placeData.result.opening_hours.open_now === true
+                ? "Open"
+                : "Closed"
+              : undefined,
         };
 
         setActivityData(activitiesData);
@@ -96,7 +102,7 @@ export const GGMapActivityDetail: React.FC<Actprops> = (id: Actprops) => {
   }, []);
   const activityStartDate = new Date(activityData.startTime);
 
-  console.log(activityData.imageUrl);
+  console.log(activityData);
 
   if (activityData.category !== undefined) {
     activityData.category.length === 0
@@ -150,7 +156,6 @@ export const GGMapActivityDetail: React.FC<Actprops> = (id: Actprops) => {
           borderWidth: 1,
           marginTop: -40,
           backgroundColor: "white",
-          // padding: 10,
         }}
       >
         <View style={[styles.informationBlock, { marginTop: 15, rowGap: 10 }]}>
@@ -198,6 +203,10 @@ export const GGMapActivityDetail: React.FC<Actprops> = (id: Actprops) => {
               </Text>
             </View>
           </TouchableWithoutFeedback>
+
+          <Text style={{ fontSize: 20, color: "green" }}>
+            {activityData.openNow !== undefined && activityData.openNow + ""}
+          </Text>
         </View>
 
         {/* Date */}
