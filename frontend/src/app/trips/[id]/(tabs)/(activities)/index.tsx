@@ -7,7 +7,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useState, useEffect } from "react";
-import { router, useGlobalSearchParams } from "expo-router";
+import { router, useGlobalSearchParams, usePathname } from "expo-router";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { Dimensions, StyleSheet } from "react-native";
 import ActivityThumbnail from "@/components/ActivityThumbnail";

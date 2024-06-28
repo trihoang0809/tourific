@@ -15,7 +15,7 @@ import React, { useState, useEffect } from "react";
 import GoogleMapInput from "@/components/GoogleMaps/GoogleMapInput";
 import { Trip } from "@/types";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { router } from "expo-router";
+import { Link, router, usePathname } from "expo-router";
 import { EXPO_PUBLIC_HOST_URL, formatDateTime, tripDate } from "@/utils";
 import GooglePlacesInput from "@/components/GoogleMaps/GooglePlacesInput";
 
@@ -25,7 +25,7 @@ interface props {
 
 export const ProposedActivities: React.FC<props> = (id: props) => {
   const serverUrl = "http://" + EXPO_PUBLIC_HOST_URL + ":3000/";
-
+  const path = usePathname();
   //Declare useState
   const [activityName, setActivityName] = useState("");
   const [activityDescription, setActivityDescription] = useState("");
@@ -66,17 +66,12 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
   }, []);
   //Header render + Return Button + Alert Pop up
   const alertSuccess = () => {
-    Alert.alert("Success", "Good boy", [
+    Alert.alert("Success", "Great!! Have fun with your trip✨️✨️✨️", [
       {
-        text: "Discard",
+        text: "Continue",
         onPress: () => {
-          console.log("Discard --> Continue to edit");
-        },
-      },
-      {
-        text: "Ok",
-        onPress: () => {
-          router.back();
+          let newPath = path.replace("create", "(activities)");
+          router.push(newPath);
         },
       },
     ]);
