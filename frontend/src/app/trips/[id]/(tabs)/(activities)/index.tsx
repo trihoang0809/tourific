@@ -75,32 +75,19 @@ const ActivitiesScreen = () => {
             headers: {
               "Content-Type": "application/json",
             },
-            // body: JSON.stringify(req),
           },
         );
         if (!response.ok) {
           throw new Error("Failed to fetch trip");
         }
 
-        const data = await response.json();
+        let data = await response.json();
 
-        for (let i = 0; i < data.length; ++i) {
-          data[i] = {
-            id: data[i].id,
-            name: data[i].name,
-            description: data[i].description,
-            imageUrl:
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlCeVhPcF0B061dWx6Y2p6ZshztnAoVQI59g&s",
-            startTime: data[i].startTime,
-            endTime: data[i].endTime,
-            location: data[i].location,
-            notes: data[i].notes,
-            netUpvotes: data[i].netUpvotes,
-            isOnCalendar: data[i].isOnCalendar,
-            category: data[i].category,
-            rating: data[i].rating,
-          };
-        }
+        data = data.map((item: any) => ({
+          ...item,
+          imageUrl:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlCeVhPcF0B061dWx6Y2p6ZshztnAoVQI59g&s",
+        }));
 
         return data;
       } catch (error: any) {
