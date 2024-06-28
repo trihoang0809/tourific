@@ -4,20 +4,18 @@ import {
   TextInput,
   StyleSheet,
   TouchableWithoutFeedback,
-  ScrollView,
   Alert,
   Pressable,
   Modal,
+  Button,
 } from "react-native";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { material } from "react-native-typography";
 import React, { useState, useEffect } from "react";
 import GoogleMapInput from "@/components/GoogleMaps/GoogleMapInput";
-import { Trip } from "@/types";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { Link, router, usePathname } from "expo-router";
-import { EXPO_PUBLIC_HOST_URL, formatDateTime, tripDate } from "@/utils";
-import GooglePlacesInput from "@/components/GoogleMaps/GooglePlacesInput";
+import { router, usePathname } from "expo-router";
+import { EXPO_PUBLIC_HOST_URL, tripDate } from "@/utils";
 
 interface props {
   id: String;
@@ -28,7 +26,6 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
   const path = usePathname();
   //Declare useState
   const [activityName, setActivityName] = useState("");
-  const [activityDescription, setActivityDescription] = useState("");
   const [activityNote, setActivityNote] = useState("");
   const [activityLocation, setActivityLocation] = useState({
     address: "",
@@ -42,12 +39,10 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
   const [activityEndDate, setActivityEndDate] = useState(new Date());
   const [startDatePickerVisibility, setStartDatePickerVisibility] =
     useState(false);
-  const [endDatePickerVisibility, setEndDatePickerVisibility] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isFormFilled, setIsFormFilled] = useState(false);
-  const [isNoteSelected, setNoteSelected] = useState(false);
   const [mapVisible, setMapVisible] = useState(false);
-  // setActivityStartDate(new Date(trip.startDate));
+
   useEffect(() => {
     const getTripData = async () => {
       try {
@@ -79,7 +74,6 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
 
   //Submit Button
   const validateForm = () => {
-    // console.log(activityDescription);
     setIsFormFilled(true);
   };
 
@@ -99,7 +93,7 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
             },
             body: JSON.stringify({
               name: activityName,
-              description: activityDescription,
+              description: "",
               startTime: activityStartDate,
               endTime: activityEndDate,
               location: {
@@ -116,7 +110,6 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
 
         //alert Success
         alertSuccess();
-        // console.log(activityNote);
       } catch (error) {
         console.log("An error occured while CREATING new Activity " + error);
       }
@@ -127,14 +120,12 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
   const SubmitButton = () => (
     <TouchableWithoutFeedback onPress={onPressSubmit}>
       <View style={styles.submitButton}>
-        <Text style={[material.headline, { color: "black" }]}>Save</Text>
+        <Text style={[material.headline, { color: "white" }]}>
+          Save and Continue
+        </Text>
       </View>
     </TouchableWithoutFeedback>
   );
-
-  const showStartDatePicker = () => {
-    setStartDatePickerVisibility(true);
-  };
 
   const hideStartDatePicker = () => {
     setStartDatePickerVisibility(false);
@@ -156,28 +147,11 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
             onChangeText={(value) => {
               setActivityName(value);
             }}
-            style={[material.title, { fontSize: 25, fontStyle: "italic" }]}
+            style={[material.title, { fontSize: 30, fontStyle: "italic" }]}
             placeholder="Add a title"
             placeholderTextColor={"grey"}
             value={activityName}
           ></TextInput>
-          {/* Time */}
-
-          <View
-            style={{
-              flexDirection: "row",
-            }}
-          >
-            <Pressable
-              style={[{ flexDirection: "row", flex: 1, alignItems: "center" }]}
-              onPress={showStartDatePicker}
-            >
-              <MaterialCommunityIcons name="timetable" size={22} color="grey" />
-              <Text style={[material.title, { color: "grey", fontSize: 15 }]}>
-                {" " + tripDate(activityStartDate)}
-              </Text>
-            </Pressable>
-          </View>
 
           {/* Map Pressable + Note Creator Button */}
           <View
@@ -190,11 +164,11 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
               style={[{ flexDirection: "row", flex: 1, alignItems: "center" }]}
               onPress={() => setMapVisible(true)}
             >
-              <Entypo name="location-pin" size={22} color="grey" />
+              <Entypo name="location-pin" size={22} color="#5491FC" />
               <Text
                 style={[
                   material.title,
-                  { color: "grey", fontSize: 15, width: "100%" },
+                  { color: "#3774DF", fontSize: 15, width: "100%" },
                 ]}
                 numberOfLines={1}
               >
@@ -205,7 +179,6 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
         </View>
 
         {/* Activity Note input */}
-
         <TextInput
           onChangeText={(value) => {
             setActivityNote(value);
@@ -224,12 +197,7 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
         />
 
         {/* Map Input */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={mapVisible}
-          onRequestClose={() => setMapVisible(false)}
-        >
+        <Modal animationType="slide" transparent={true} visible={mapVisible}>
           <View
             style={{
               flex: 1,
@@ -237,27 +205,35 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
             }}
           >
             <Pressable
-              style={{ height: "20%" }}
+              style={{
+                height: "15%",
+              }}
               onPress={() => setMapVisible(false)}
             ></Pressable>
-            <View style={[styles.modalMapView, { rowGap: 0 }]}>
-              <Text style={[material.title, { alignSelf: "center" }]}>
+            <View style={[styles.modalMapView]}>
+              <Text
+                style={[material.title, { alignSelf: "center", fontSize: 30 }]}
+              >
                 Add a Place
               </Text>
               <View
                 style={{ height: "100%", flex: 2, backgroundColor: "white" }}
               >
                 <GoogleMapInput
-                  onLocationSelect={(location) => {
+                  onLocationSelect={(
+                    location = {
+                      ...activityLocation,
+                    },
+                  ) => {
                     setActivityLocation({
                       address: String(location.address),
                       citystate: String(location.citystate),
                       longitude: location.longitude,
                       latitude: location.latitude,
-                      radius: 0,
+                      radius: location.radius,
                     });
                   }}
-                  value={activityLocation.address + activityLocation.citystate}
+                  value={""}
                   location={activityLocation}
                 />
               </View>
@@ -285,7 +261,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F5F5",
     padding: 10,
     borderRadius: 5,
-    borderWidth: 1,
     flex: 1,
     marginTop: 15,
   },
@@ -294,26 +269,25 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 15,
     backgroundColor: "white",
-    borderWidth: 1,
     borderRadius: 20,
   },
 
   submitButton: {
     alignSelf: "center",
-    alignItems: "center",
     borderWidth: 1,
-    borderStyle: "dashed",
     borderRadius: 10,
-    backgroundColor: "#91A5F5",
-    width: "100%",
-    padding: 5,
+    backgroundColor: "#5491FC",
+    width: "94%",
+    flexDirection: "row",
+    padding: 10,
+    justifyContent: "center",
     marginTop: 20,
   },
 
   modalMapView: {
     backgroundColor: "white",
-    borderTopLeftRadius: 14,
-    borderTopRightRadius: 14,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     flex: 1,
     paddingTop: 30,
     borderWidth: 1,

@@ -19,8 +19,8 @@ const GoogleMapInput = ({
 }: GoogleMapInputProps) => {
   Geocoder.init(GOOGLE_MAP_API_KEY); // use a valid API key
   const [query, setQuery] = useState({
-    address: "",
-    citystate: "",
+    address: location.address,
+    citystate: location.citystate,
   });
   const [coord, setCoord] = useState<{ latitude: number; longitude: number }>({
     latitude: location.latitude,
