@@ -1,10 +1,10 @@
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import React, { useRef, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity } from "react-native";
+import React from "react";
+import { View, Text, FlatList } from "react-native";
 const GOOGLE_MAP_API_KEY =
   process.env.EXPO_PUBLIC_GOOGLE_MAP_API_KEY || "undefined";
 import { DataItem } from "@/types";
-import { AntDesign } from "@expo/vector-icons";
+
 export const LocationSearch = ({
   onLocationSelected,
   value,
@@ -20,9 +20,6 @@ export const LocationSearch = ({
       id: "googlePlacesInput",
       component: (
         <GooglePlacesAutocomplete
-          textInputProps={{
-            value: value === "undefined" ? null : value,
-          }}
           placeholder="Search a location"
           onPress={(data, details = null) => {
             console.log("location", data);
@@ -42,12 +39,6 @@ export const LocationSearch = ({
             language: "en",
           }}
           styles={{
-            // container: {
-            //   backgroundColor: 'E6E6E6',
-            // },
-            // textInputContainer: {
-            //   backgroundColor: 'E6E6E6',
-            // },
             textInput: {
               color: "black",
               fontSize: 15,
@@ -56,9 +47,6 @@ export const LocationSearch = ({
               marginTop: 5,
               borderRadius: 10,
             },
-            // predefinedPlacesDescription: {
-            //   color: '#1faadb',
-            // }
           }}
         />
       ),

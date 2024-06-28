@@ -1,4 +1,4 @@
-import { ActivityDetail } from "@/screens/ActivityScreen/ActivityDetail";
+import { GGMapActivityDetail } from "@/screens/ActivityScreen/GGMapActivityDetail";
 import { useGlobalSearchParams, useLocalSearchParams } from "expo-router";
 
 const viewActivity = () => {
@@ -6,11 +6,11 @@ const viewActivity = () => {
   const { activityid } = useGlobalSearchParams();
   const { ggMapId } = useLocalSearchParams();
   return (
-    <ActivityDetail
+    <GGMapActivityDetail
       tripId={String(id)}
       actID={String(activityid)}
       ggMapId={String(ggMapId)}
-    ></ActivityDetail>
+    ></GGMapActivityDetail>
   );
 };
 

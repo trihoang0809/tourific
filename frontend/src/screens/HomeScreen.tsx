@@ -27,24 +27,6 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
   useEffect(() => {
     const fetchTrips = async () => {
-      const cleanData = (data: Trip[]) => {
-        let cleanedData: Trip[] = [];
-        let index = 0;
-        for (let trip of data) {
-          let format: Trip = {
-            id: trip.id,
-            name: trip.name,
-            location: trip.location,
-            startDate: new Date(trip.startDate),
-            endDate: new Date(trip.endDate),
-            image: trip.image,
-          };
-
-          cleanedData.push(format);
-        }
-        return cleanedData;
-      };
-
       try {
         const ongoing = await fetch(
           `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`,
@@ -83,7 +65,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             <Text style={styles.title}>Ongoing Trips</Text>
             <Text
               onPress={() => {
-                router.replace("/trips/ongoing");
+                router.navigate("/trips/ongoing");
               }}
             >
               See all
@@ -108,7 +90,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             <Text style={styles.title}>Upcoming Trips</Text>
             <Text
               onPress={() => {
-                router.replace("/trips/upcoming");
+                router.navigate("/trips/upcoming");
               }}
             >
               See all
