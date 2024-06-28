@@ -24,14 +24,14 @@ const Header = ({ isUpcoming }: listprops) => (
   <View>
     <StatusBar backgroundColor="black" />
     <View style={styles.headerConainner}>
-      <View style={styles.headerTitle}>
+      {/* <View style={styles.headerTitle}>
         <TouchableWithoutFeedback onPress={onPressCategory}>
           <AntDesign name="left" size={24} color="blue" />
         </TouchableWithoutFeedback>
         <Text style={{ fontSize: 22, marginLeft: 10 }}>
           {isUpcoming ? "Upcoming Trips" : "Ongoing Trips"}
         </Text>
-      </View>
+      </View> */}
       <View style={styles.userInput}>
         <MaterialIcons name="search" size={24} color="black" />
         <TextInput
