@@ -22,18 +22,14 @@ export const LocationSearch = ({
       id: "googlePlacesInput",
       component: (
         <GooglePlacesAutocomplete
-          textInputProps={{
-            value: value === "undefined" ? null : value,
-            onChangeText: onChange,
-          }}
           placeholder="Search a location"
           onPress={(data, details = null) => {
-            // console.log("location", data);
-            // console.log("street", data.structured_formatting.main_text);
-            // console.log(
-            //   "city-level location",
-            //   data.structured_formatting.secondary_text,
-            // );
+            console.log("location", data);
+            console.log("street", data.structured_formatting.main_text);
+            console.log(
+              "city-level location",
+              data.structured_formatting.secondary_text,
+            );
             onLocationSelected({
               address: data.structured_formatting.main_text,
               citystate: data.structured_formatting.secondary_text,
@@ -50,24 +46,14 @@ export const LocationSearch = ({
             language: "en",
           }}
           styles={{
-            // container: {
-            //   backgroundColor: 'E6E6E6',
-            // },
-            // textInputContainer: {
-            //   backgroundColor: 'E6E6E6',
-            // },
             textInput: {
               color: "black",
               fontSize: 15,
               backgroundColor: "#E6E6E6",
-              // backgroundColor: "white",
-              padding: 50,
+              padding: 15,
               marginTop: 5,
               borderRadius: 10,
             },
-            // predefinedPlacesDescription: {
-            //   color: '#1faadb',
-            // }
           }}
         />
       ),
