@@ -41,6 +41,7 @@ import {
   GestureHandlerRootView,
   RectButton,
 } from "react-native-gesture-handler";
+const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
 const Itinerary = () => {
   const { id } = useGlobalSearchParams();
@@ -268,7 +269,7 @@ const Itinerary = () => {
   useEffect(() => {
     const getActivities = async ({ id }: { id: string }) => {
       try {
-        const response = await fetch(`http://localhost:3000/trips/${id}/`, {
+        const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -313,7 +314,7 @@ const Itinerary = () => {
         isOnCalendar: calendarStatus,
       };
       const response = await fetch(
-        `http://localhost:3000/trips/${id}/activities/${activityid}/toggle`,
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/activities/${activityid}/toggle`,
         {
           method: "PUT",
           headers: {
