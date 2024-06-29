@@ -77,6 +77,7 @@ router.post("/", async (req, res) => {
     if (existingUser) {
       return res.status(StatusCodes.CONFLICT).json({ error: "Username or email is already in use" });
     }
+    console.log("all good up to here!");
 
     const hashedPassword = await bcrypt.hash(password, saltRounds); // Hash the password
     const user = await prisma.user.create({

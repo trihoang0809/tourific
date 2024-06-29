@@ -80,6 +80,7 @@ const RegisterScreen = () => {
           firebaseUserId,
         }),
       });
+      console.log("created!");
       setLoading(false); // Hide loading spinner
 
       if (response.status === 409) {

@@ -18,6 +18,7 @@ model Trip {
   endDate DateTime
   activities Activity[]
   participants TripMember[]
+  participantsID String[]
   image Photo?
 }
 

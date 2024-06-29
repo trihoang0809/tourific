@@ -14,7 +14,6 @@ app.use(cors());
 // Get all trips
 app.use("/trips", TripRouter);
 
-
 // User Profile
 app.use("/user", UserProfile);
 
