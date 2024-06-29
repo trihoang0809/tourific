@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StatusBar, StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   card: {
@@ -35,4 +35,9 @@ export default StyleSheet.create({
   tripCardSecondaryText: {
     fontSize: 13, color: '#696e6e'
   },
+  AndroidSafeArea: {
+    flex: 1,
+    backgroundColor: "white",
+    // paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
+  }
 });

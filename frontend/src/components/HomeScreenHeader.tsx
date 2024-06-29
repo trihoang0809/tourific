@@ -30,15 +30,14 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-  },
   content: {
-    flex: 1,
+    width: "100%",
+    backgroundColor: "white",
     flexDirection: "row",
     justifyContent: 'space-around',
     alignItems: 'center',
     padding: 10,
-    marginHorizontal: 15,
+    paddingHorizontal: 20
   },
   notificationIcon: {
     position: "absolute",
