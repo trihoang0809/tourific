@@ -13,12 +13,11 @@ datasource db {
 model Trip {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String
-  location Location?
-  startDate DateTime? @default(now())
-  endDate DateTime?
-  participants TripMember[]
+  location Location
+  startDate DateTime @default(now())
+  endDate DateTime
   activities Activity[]
-  participantsID String[]
+  participants TripMember[]
   image Photo?
 }
 
@@ -28,28 +27,11 @@ model TripMember {
   inviteeId   String @db.ObjectId
   inviterId String @db.ObjectId
   status   Status @default(PENDING)
-  
   trip     Trip @relation(fields: [tripId], references: [id])
   invitee  User? @relation("InviteeToTripInvitations", fields: [inviteeId], references: [id])
   inviter  User? @relation("InviterToTripInvitations", fields: [inviterId], references: [id])
   @@unique([tripId, inviteeId])
 }
-
-model Friendship {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  receiver    User     @relation("friendRequestReceived", fields: [receiverID], references: [id])
-  receiverID  String   @db.ObjectId
-  senderID  String   @db.ObjectId
-  friendStatus    Status @default(PENDING)
-  @@unique([receiverID, senderID])
-}
-
-enum Status {
-  ACCEPTED
-  PENDING
-  REJECTED
-}
-
 
 type Location {
   address String?
@@ -69,13 +51,21 @@ model User {
   lastName String
   dateOfBirth DateTime
   avatar Photo
-
   inviteeTripInvitations TripMember[] @relation("InviteeToTripInvitations")
   inviterTripInvitations TripMember[] @relation("InviterToTripInvitations")  
   friendRequestReceived   Friendship[]   @relation("friendRequestReceived")
 }
 
-enum FriendStatus {
+model Friendship {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  receiver    User     @relation("friendRequestReceived", fields: [receiverID], references: [id])
+  receiverID  String   @db.ObjectId
+  senderID  String   @db.ObjectId
+  friendStatus    Status @default(PENDING)
+  @@unique([receiverID, senderID])
+}
+
+enum Status {
   ACCEPTED
   PENDING
   REJECTED

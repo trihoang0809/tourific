@@ -14,6 +14,7 @@ router.get("/", async (req, res) => {
     const users = await prisma.user.findMany();
     res.json(users);
   } catch (error) {
+    console.log(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while fetching users." });
   }
 });
@@ -148,6 +149,136 @@ router.delete("/:id", async (req, res) => {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ error: `An error occurred while deleting the user profile with id: ${id}` });
+  }
+});
+
+// Add a friend
+router.post("/friend/:userId", async (req, res) => {
+  const { friendId } = req.body;
+  const userId = req.params.userId;
+  try {
+    const friend = await prisma.friendship.create({
+      data: {
+        senderID: userId,
+        receiverID: friendId,
+      },
+    });
+    res.status(StatusCodes.CREATED).json(friend);
+  } catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while adding a friend." });
+  }
+});
+
+// get all friends
+router.get("/friend/:userId", async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const friends = await prisma.friendship.findMany({
+      where: {
+        // get all friends that have accepted the friend request
+        OR: [
+          {
+            senderID: userId,
+            friendStatus: "ACCEPTED",
+            receiverID: {
+              not: userId,
+            },
+          },
+          {
+            receiverID: userId,
+            friendStatus: "ACCEPTED",
+            senderID: {
+              not: userId,
+            },
+          },
+        ],
+      },
+    });
+    res.status(StatusCodes.OK).json(friends);
+  } catch (error) {
+    console.log(error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while getting sent friend requests." });
+  }
+});
+
+// accept or decline a friend request
+// to accept: /friend?accept=true
+// to reject: /friend?accept=false
+router.patch("/friend/:userId", async (req, res) => {
+  const { friendId } = req.body;
+  const { accept } = req.query;
+  const userId = req.params.userId;
+  try {
+    if (accept === "true") {
+      const friend = await prisma.friendship.update({
+        where: {
+          receiverID_senderID: {
+            senderID: friendId,
+            receiverID: userId,
+          },
+        },
+        data: {
+          friendStatus: "ACCEPTED",
+        },
+      });
+      res.status(StatusCodes.OK).json(friend);
+    } else {
+      const rejectFriend = await prisma.friendship.delete({
+        where: {
+          receiverID_senderID: {
+            senderID: friendId,
+            receiverID: userId,
+          },
+        },
+      });
+      res.status(StatusCodes.OK).json(rejectFriend);
+    }
+  } catch (error) {
+    console.log(error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while accepting/declining a friend." });
+  }
+});
+
+// get all sent requests
+router.get("/friend/:userId/sent-requests", async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const sentRequests = await prisma.friendship.findMany({
+      where: {
+        senderID: userId,
+        friendStatus: "PENDING",
+      },
+    });
+    res.status(StatusCodes.OK).json(sentRequests);
+  } catch (error) {
+    console.log(error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while getting sent friend requests." });
+  }
+});
+
+// get all pending requests
+router.get("/friend/:userId/pending-requests", async (req, res) => {
+  const userId = req.params.userId;
+  try {
+    const pendingRequests = await prisma.friendship.findMany({
+      where: {
+        receiverID: userId,
+        friendStatus: "PENDING",
+      },
+    });
+    res.status(StatusCodes.OK).json(pendingRequests);
+  } catch (error) {
+    console.log(error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while getting pending friend requests." });
   }
 });
 

@@ -1,14 +1,7 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import React, { useState, useEffect } from "react";
-import { Link, Stack, router, useGlobalSearchParams } from "expo-router";
-import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useGlobalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from "luxon";
 
@@ -80,37 +73,6 @@ const TripDetailsScreen = () => {
 
   return (
     <View>
-      <Stack.Screen
-        options={{
-          title: "Home",
-          headerShown: true,
-          headerStyle: {
-            backgroundColor: "white",
-          },
-          headerTransparent: false,
-          headerRight: () => (
-            <Link href={`/trips/create?id=${id}`}>
-              <Feather
-                onPressIn={showMoreSetting}
-                onPressOut={notShowMoreSetting}
-                name="edit-2"
-                size={20}
-                color="black"
-                style={{ marginRight: 10 }}
-              />
-            </Link>
-          ),
-          headerLeft: () => (
-            <MaterialIcons
-              name="arrow-back"
-              size={24}
-              color="black"
-              style={{ marginLeft: 10 }}
-              onPress={() => router.navigate("/home")}
-            />
-          ),
-        }}
-      />
       <ScrollView style={{ width: width, height: height }}>
         <View>
           <Image

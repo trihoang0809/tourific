@@ -10,9 +10,8 @@ import {
   Alert,
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
-import { useForm, Controller, useFormState } from "react-hook-form";
-import favicon from "@/assets/favicon.png";
-import { Link, Stack, router, useLocalSearchParams } from "expo-router";
+import { useForm, Controller } from "react-hook-form";
+import { Stack, router, useLocalSearchParams } from "expo-router";
 import { MapData, TripData } from "@/types";
 import GooglePlacesInput from "@/components/GoogleMaps/GooglePlacesInput";
 import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
@@ -23,6 +22,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import PhotoAPI from "@/components/PhotoAPI";
 import { getUserIdFromToken, getToken } from "@/utils";
+import { MaterialIcons } from "@expo/vector-icons";
 
 // CREATING: /trips/create
 // UPDATING: /trips/create?id=${id}
@@ -184,11 +184,11 @@ export default function CreateTripScreen() {
           throw new Error("Failed to update trip");
         }
 
-        Alert.alert("", "Successful update trip", [
+        Alert.alert("Trip updated", "Ready to hit the road?", [
           {
-            text: "Go back home",
+            text: "Ok!",
             onPress: () => {
-              router.push("/");
+              router.back();
             },
           },
         ]);
@@ -206,6 +206,7 @@ export default function CreateTripScreen() {
               "Content-Type": "application/json",
               Authorization: `Bearer ${await getToken()}`,
             },
+            body: JSON.stringify(req),
           },
         );
         if (!response.ok) {
@@ -215,10 +216,10 @@ export default function CreateTripScreen() {
         }
         // Optionally, you can handle the response here
         const data = await response.json();
-        Alert.alert("Alert Title", "Create Trip Successfully", [
+        Alert.alert("Trip created", "Let's start planning!", [
           {
-            text: "Go back home page",
-            onPress: () => <Link href={"/trips"} />,
+            text: "Awesome!",
+            onPress: () => router.back(),
           },
         ]);
       } catch (error: any) {
@@ -314,12 +315,24 @@ export default function CreateTripScreen() {
 
   return (
     <View>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          title: " ",
-        }}
-      />
+      {isUpdating ? (
+        ""
+      ) : (
+        <Stack.Screen
+          options={{
+            title: "",
+            headerShown: true,
+            headerLeft: () => (
+              <MaterialIcons
+                name="arrow-back"
+                size={24}
+                color="black"
+                onPress={() => router.navigate("/")}
+              />
+            ),
+          }}
+        />
+      )}
       <ScrollView nestedScrollEnabled={true}>
         {/* trips banner */}
         <View style={{ position: "relative" }}>
