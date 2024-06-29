@@ -76,29 +76,10 @@ router.get("/", async (req, res) => {
     }
 
     const trips = await prisma.trip.findMany(queryConditions);
-    res.json(trips);
+    res.status(StatusCodes.OK).json(trips);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "An error occurred while fetching trips." });
-  }
-});
-
-router.post("/", async (req, res) => {
-  const { name, startDate, endDate, location, image } = req.body;
-  try {
-    const trip = await prisma.trip.create({
-      data: {
-        name,
-        startDate,
-        endDate,
-        location,
-        image,
-      },
-    });
-    res.status(201).json(trip);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "An error occurred while creating the trip." });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while fetching a trip." });
   }
 });
 
@@ -159,7 +140,7 @@ router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
   });
 
   if (!isValidID) {
-    return res.status(404).json({ error: "Trip does not exist" });
+    res.status(StatusCodes.NOT_FOUND).json({ error: "Trip does not exist" });
   }
 
   try {

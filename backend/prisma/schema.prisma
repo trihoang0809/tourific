@@ -50,11 +50,11 @@ model Friendship {
   receiver    User     @relation("friendRequestReceived", fields: [receiverID], references: [id])
   receiverID  String   @db.ObjectId
   senderID  String   @db.ObjectId
-  friendStatus    FriendStatus @default(PENDING)
+  friendStatus    Status @default(PENDING)
   @@unique([receiverID, senderID])
 }
 
-enum FriendStatus {
+enum Status {
   ACCEPTED
   PENDING
   REJECTED
@@ -73,6 +73,7 @@ model Activity {
   category String[]
   tripId String @db.ObjectId
   trip Trip @relation(fields: [tripId], references: [id])
+  image Photo?
 }
 
 type Photo {

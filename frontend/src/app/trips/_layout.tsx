@@ -1,16 +1,52 @@
-import React from "react"; // This import is often required for JSX transformation.
-import { Stack } from "expo-router";
+import React from "react";
+import { Stack, router } from "expo-router";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const Layout = () => {
   return (
     <Stack>
       <Stack.Screen
         name="[id]"
-        options={{ title: "Testing", headerShown: false }}
+        options={{ title: "Trip", headerShown: false }}
       />
       <Stack.Screen
         name="upcoming"
-        options={{ title: "Upcoming", headerShown: false }}
+        options={{
+          title: "Upcoming trips",
+          headerShown: true,
+          headerTitleAlign: 'center',
+          headerLeft: () => (
+            <MaterialIcons
+              name="arrow-back"
+              size={24}
+              color="black"
+              onPress={() => router.navigate("/")}
+            />
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="ongoing"
+        options={{
+          title: "Ongoing trips",
+          headerShown: true,
+          headerTitleAlign: 'center',
+          headerLeft: () => (
+            <MaterialIcons
+              name="arrow-back"
+              size={24}
+              color="black"
+              onPress={() => router.navigate("/")}
+            />
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="create"
+        options={{
+          title: "",
+          headerShown: true,
+        }}
       />
     </Stack>
   );
