@@ -49,11 +49,12 @@ router.get("/", async (req, res) => {
         },
       };
     } else if (req.query.upcoming === "true") {
-      // Fetch trips that start on a specific date
-      if (typeof req.query.startDate === 'string') {
-        const startDate = new Date(req.query.startDate);
-        const startOfDay = new Date(startDate.setHours(0, 0, 0, 0));
-        const endOfDay = new Date(startDate.setHours(23, 59, 59, 999));
+      // Fetch trips that start and end on a specific date
+      if (typeof req.query.startTimeLocal === 'string' && typeof req.query.endTimeLocal === 'string') {
+        const startOfDay = new Date(req.query.startTimeLocal);
+        const endOfDay = new Date(req.query.endTimeLocal);
+        console.log("Start of Day:", startOfDay);
+        console.log("End of Day:", endOfDay);
         queryConditions = {
           where: {
             startDate: {
