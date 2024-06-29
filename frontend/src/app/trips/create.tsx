@@ -210,8 +210,6 @@ export default function CreateTripScreen() {
               location.longitude,
               location.radius,
             );
-            console.log("fetched activities here: ", fetchedActivities);
-
             // Save fetched activities to backend
             await saveActivitiesToBackend(trip.id, fetchedActivities);
           }
