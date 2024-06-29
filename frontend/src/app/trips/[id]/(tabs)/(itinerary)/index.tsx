@@ -269,12 +269,15 @@ const Itinerary = () => {
   useEffect(() => {
     const getActivities = async ({ id }: { id: string }) => {
       try {
-        const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
+        const response = await fetch(
+          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
           },
-        });
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch activities");
         }
@@ -1056,7 +1059,22 @@ const Itinerary = () => {
                                             </Text>
                                           </TouchableOpacity>
                                           <TouchableOpacity
-                                            style={styles.saveButton}
+                                            style={[
+                                              styles.saveButton,
+                                              {
+                                                backgroundColor:
+                                                  formData.startTime.hours !==
+                                                    undefined &&
+                                                  formData.startTime.minutes !==
+                                                    undefined &&
+                                                  formData.endTime.hours !==
+                                                    undefined &&
+                                                  formData.endTime.minutes !==
+                                                    undefined
+                                                    ? "#007BFF" // Active color when times are set
+                                                    : "gray", // Inactive color when times are not set
+                                              },
+                                            ]}
                                             onPress={() => {
                                               if (
                                                 formData.startTime.hours !==
@@ -1074,6 +1092,12 @@ const Itinerary = () => {
                                                 !timeModalVisible,
                                               );
                                             }}
+                                            disabled={
+                                              !(formData.startTime.hours !== undefined &&
+                                                formData.startTime.minutes !== undefined &&
+                                                formData.endTime.hours !== undefined &&
+                                                formData.endTime.minutes !== undefined)
+                                            }
                                           >
                                             <Text
                                               style={{
