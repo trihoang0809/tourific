@@ -196,7 +196,13 @@ export const GGMapActivityDetail: React.FC<Actprops> = (id: Actprops) => {
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <EvilIcons name="location" size={24} color="blue" />
-              <Text numberOfLines={1} style={{ fontSize: 16, padding: 4 }}>
+              <Text
+                numberOfLines={1}
+                style={{
+                  fontSize: 16,
+                  paddingHorizontal: 0,
+                }}
+              >
                 {activityData.location !== undefined
                   ? activityData.location.address
                   : ""}
@@ -204,55 +210,17 @@ export const GGMapActivityDetail: React.FC<Actprops> = (id: Actprops) => {
             </View>
           </TouchableWithoutFeedback>
 
-          <Text style={{ fontSize: 20, color: "green" }}>
+          <Text
+            style={[
+              { fontSize: 20 },
+              activityData.openNow === "Open"
+                ? { color: "green" }
+                : { color: "red" },
+            ]}
+          >
             {activityData.openNow !== undefined && activityData.openNow + ""}
           </Text>
         </View>
-
-        {/* Date */}
-        {"" + activityStartDate.getTime() !== "NaN" && (
-          <View style={[styles.informationBlock, { flexDirection: "row" }]}>
-            <View style={{ flex: 1, flexDirection: "row", columnGap: 15 }}>
-              <View style={{}}>
-                <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                  {activityStartDate.getTime()}
-                </Text>
-                <Text style={{ fontSize: 20, color: "grey" }}>
-                  {activityStartDate.toLocaleString("default", {
-                    month: "long",
-                  })}
-                </Text>
-              </View>
-              <View>
-                <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                  {weekday[activityStartDate.getDay()]}
-                </Text>
-                <Text style={{ fontSize: 20, color: "grey" }}>
-                  {activityStartDate.toLocaleTimeString("default", {
-                    timeStyle: "short",
-                  })}
-                </Text>
-              </View>
-            </View>
-            <TouchableWithoutFeedback onPress={showStartDatePicker}>
-              <View
-                style={{
-                  borderWidth: 1,
-                  width: 50,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderRadius: 30,
-                }}
-              >
-                <MaterialCommunityIcons
-                  name="timetable"
-                  size={35}
-                  color="black"
-                />
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        )}
 
         {/* Description */}
         {activityData.description !== "" && (
@@ -281,73 +249,6 @@ export const GGMapActivityDetail: React.FC<Actprops> = (id: Actprops) => {
               )}
           </View>
         )}
-
-        {/* Note */}
-        <View style={[styles.informationBlock]}>
-          <Pressable
-            style={[styles.messageBox]}
-            onPress={() => {
-              setNoteEdit(true);
-              setNote(activityData.notes);
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                marginBottom: 10,
-                borderBottomWidth: 0.5,
-                justifyContent: "space-between",
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 28,
-                  verticalAlign: "middle",
-                }}
-              >
-                Note
-              </Text>
-              {noteEdit && (
-                <View style={{ flexDirection: "row", columnGap: 10 }}>
-                  <TouchableWithoutFeedback onPress={() => setNoteEdit(false)}>
-                    <MaterialIcons
-                      name="cancel"
-                      size={27}
-                      color="red"
-                      style={{ alignSelf: "center" }}
-                    />
-                  </TouchableWithoutFeedback>
-                  <TouchableWithoutFeedback
-                    onPress={() => {
-                      let activity = activityData;
-                      activity.notes = note;
-                      setActivityData(activity);
-                      console.log(activityData);
-                      setNoteEdit(false);
-                    }}
-                  >
-                    <FontAwesome6
-                      name="check"
-                      size={24}
-                      color="green"
-                      style={{ alignSelf: "center" }}
-                    />
-                  </TouchableWithoutFeedback>
-                </View>
-              )}
-            </View>
-            {!noteEdit ? (
-              <Text style={{ fontSize: 20 }}>{activityData.notes}</Text>
-            ) : (
-              <TextInput
-                style={{ fontSize: 20 }}
-                onChangeText={setNote}
-                value={note}
-                multiline={true}
-              ></TextInput>
-            )}
-          </Pressable>
-        </View>
 
         {/* Categories */}
         <View
