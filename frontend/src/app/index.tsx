@@ -1,12 +1,13 @@
 import React from 'react';
-import { View } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import { HomeScreen } from "../screens/HomeScreen";
 import { sampleUser } from "@/mock-data/user";
+import Style from 'Style';
 
 export default function App() {
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView style={Style.AndroidSafeArea}>
       <HomeScreen user={sampleUser} />
-    </View>
+    </SafeAreaView>
   );
 }

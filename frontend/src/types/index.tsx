@@ -158,3 +158,9 @@ export interface Event {
   children: JSX.Element | null;
   activityid: string;
 }
+
+export interface TripCardRectProps {
+  trip: Trip;
+  width?: number;
+  height?: number;
+}
