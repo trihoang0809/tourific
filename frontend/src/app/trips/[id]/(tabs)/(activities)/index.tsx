@@ -7,16 +7,14 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useState, useEffect } from "react";
-import { useGlobalSearchParams } from "expo-router";
+import { useGlobalSearchParams, Link } from "expo-router";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { Dimensions, StyleSheet } from "react-native";
 import ActivityThumbnail from "@/components/ActivityThumbnail";
 import { ActivityProps } from "@/types";
-import { fetchActivities } from "@/utils/fetchActivities";
 import { categories } from "@/utils";
 import { categoriesMap } from "@/types";
-
-const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
+import { fetchActivities } from "@/utils/fetchAndSaveActivities";
 
 const ActivitiesScreen = () => {
   const { id } = useGlobalSearchParams();
@@ -28,73 +26,18 @@ const ActivitiesScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
 
   useEffect(() => {
-    const getTripAndActivities = async () => {
+    const getActivities = async () => {
       try {
-        const response = await fetch(
-          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch trip");
-        }
-        const data = await response.json();
-        if (
-          data.location.latitude &&
-          data.location.longitude &&
-          data.location.radius
-        ) {
-          const fetchedActivities = await fetchActivities(
-            data.location.latitude,
-            data.location.longitude,
-            data.location.radius,
-          );
-          setActivities(fetchedActivities);
-          setFilteredActivities(fetchedActivities);
-          await saveActivitiesToBackend(fetchedActivities);
-        }
+        const data = await fetchActivities(id);
+        const sortedData = data.sort((a, b) => b.netUpvotes - a.netUpvotes);
+        setActivities(sortedData);
+        setFilteredActivities(sortedData);
       } catch (error: any) {
-        console.error("Error fetching trip:", error.toString());
+        console.error("Error fetching activities:", error.toString());
       }
     };
-    getTripAndActivities();
+    getActivities();
   }, [id]);
-
-  const saveActivitiesToBackend = async (activities: ActivityProps[]) => {
-    const promises = activities.map(async (activity) => {
-      const response = await fetch(
-        `http://localhost:3000/trips/${id}/activities`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: activity.name,
-            description: activity.description,
-            startTime: new Date(),
-            endTime: new Date(),
-            location: {
-              citystate: activity.location.citystate,
-              latitude: activity.location.latitude,
-              longitude: activity.location.longitude,
-            },
-            notes: activity.notes,
-            netUpvotes: activity.netUpvotes,
-            isOnCalendar: activity.isOnCalendar,
-            category: activity.category,
-            rating: activity.rating,
-            googlePlacesId: activity.googlePlacesId,
-          }),
-        },
-      );
-      return response.json();
-    });
-  };
 
   const handleSelectCategory = (category: string) => {
     setSelectedCategory(category);
@@ -187,17 +130,13 @@ const ActivitiesScreen = () => {
             <Text style={styles.noActivitiesText}>
               No activities found for this category.
             </Text>
-            <TouchableOpacity
-              style={styles.updateButton}
-              onPress={() => {
-                /* Replace with the route to the update trip page */
-                console.log("Navigate to update trip page");
-              }}
-            >
-              <Text style={styles.updateButtonText}>
-                Update trip's radius or location
-              </Text>
-            </TouchableOpacity>
+            <Link href={`/trips/create?id=${id}`}>
+              <TouchableOpacity style={styles.updateButton}>
+                <Text style={styles.updateButtonText}>
+                  Update trip's radius or location
+                </Text>
+              </TouchableOpacity>
+            </Link>
           </View>
         )}
       </ScrollView>

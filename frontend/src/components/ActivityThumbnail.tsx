@@ -1,51 +1,78 @@
-import { ActivityProps } from "@/types";
+import { Activity, ActivityProps, ActivityThumbnailProps } from "@/types";
 import { Text, View, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useState } from "react";
-import { Dimensions } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Rating } from "react-native-ratings";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchActivities } from "@/utils/fetchAndSaveActivities";
+
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
-const screenWidth = Dimensions.get("window").width;
-
-interface ActivityThumbnailProps {
-  activity: ActivityProps;
-  tripId: string | string[] | undefined;
-}
-
 const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
+  const queryClient = useQueryClient();
   const [liked, setLiked] = useState(false);
   const [upvotes, setUpvotes] = useState(activity.netUpvotes);
 
-  const toggleLike = async () => {
-    try {
-      const newLikedState = !liked;
-      const newUpvotes = newLikedState ? upvotes + 1 : upvotes - 1;
-      const url = `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${tripId}/activities/updateUpvotes/${activity.googlePlacesId}`;
-      // Send PUT request to backend
-      const response = await fetch(url, {
+  const { data, error, isLoading } = useQuery({
+    queryKey: ["activities", tripId],
+    queryFn: () => fetchActivities(tripId),
+    refetchInterval: 300000, // Refetch every 5 minutes
+  });
+
+  const updateActivity = async ({
+    googlePlacesId,
+    tripId,
+    netUpvotes,
+  }: {
+    googlePlacesId: string;
+    tripId: string;
+    netUpvotes: number;
+  }): Promise<ActivityProps> => {
+    const response = await fetch(
+      `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${tripId}/activities/updateUpvotes/${googlePlacesId}`,
+      {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...activity,
-          netUpvotes: newUpvotes, // Update the netUpvotes in the request
-        }),
+        body: JSON.stringify({ netUpvotes }),
+      },
+    );
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    return response.json();
+  };
+
+  const mutation = useMutation({
+    mutationFn: updateActivity,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["activities", tripId],
+        refetchType: "active",
       });
+    },
+  });
 
-      const data = await response.json();
-      console.log("data: ", data);
+  const toggleLike = async () => {
+    if (typeof tripId === "string") {
+      try {
+        const newLikedState = !liked;
+        const newUpvotes = newLikedState ? upvotes + 1 : upvotes - 1;
 
-      if (response.ok) {
+        mutation.mutate({
+          googlePlacesId: activity.googlePlacesId,
+          tripId,
+          netUpvotes: newUpvotes,
+        });
+
         setLiked(newLikedState);
-        setUpvotes(data.netUpvotes); // Update the state based on the response
-        console.log("new net upvotes: ", upvotes);
-      } else {
-        throw new Error(data.error || "Failed to update the activity");
+        setUpvotes(newUpvotes);
+      } catch (error) {
+        console.error("Error updating activity:", error);
       }
-    } catch (error) {
-      console.error("Error updating activity:", error);
+    } else {
+      console.error("Invalid tripId:", tripId);
     }
   };
 
