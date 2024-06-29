@@ -1,26 +1,24 @@
 import { View, Text, ScrollView, Image, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
 import favicon from "@/assets/favicon.png";
-import { Link, Stack, useGlobalSearchParams } from "expo-router";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { useGlobalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from "luxon";
 import { StyleSheet } from "react-native";
 import { Rating } from "react-native-ratings";
+const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
 const ViewActivity = () => {
   const { id } = useGlobalSearchParams();
   console.log("id (view activity):", id);
-
-  const { activityid } = useGlobalSearchParams();
-  console.log("activity-id (view activity):", activityid);
-
+  const { itineraryid } = useGlobalSearchParams();
+  console.log("itinerary-id (view activity):", itineraryid);
   const [isOnCalendar, setIsOnCalendar] = useState(false);
   const [liked, setLiked] = React.useState(false);
   const toggleLike = () => {
     setLiked(!liked);
   };
-
   const [activity, setActivity] = useState({
     name: "",
     description: "",
@@ -30,28 +28,33 @@ const ViewActivity = () => {
     notes: "",
     netUpvotes: 0,
     isOnCalendar: false,
+    image: {
+      url: "",
+    },
   });
 
   const getActivity = async ({
     id,
-    activityid,
+    itineraryid,
   }: {
     id: string;
-    activityid: string;
+    itineraryid: string;
   }) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/trips/${id}/activities/${activityid}`,
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/activities/${itineraryid}`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
+          // body: JSON.stringify(req),
         },
       );
       if (!response.ok) {
         throw new Error("Failed to fetch activity");
       }
+      // Optionally, you can handle the response here
       const data = await response.json();
       setActivity(data);
       console.log("Activity fetch:", data);
@@ -61,15 +64,24 @@ const ViewActivity = () => {
   };
 
   useEffect(() => {
-    getActivity({ id, activityid });
+    if (typeof id === "string" && typeof itineraryid === "string") {
+      getActivity({ id, itineraryid });
+    }
     setIsOnCalendar(activity.isOnCalendar);
   }, []);
 
   return (
-    <View style={{ height: Dimensions.get("window").height }}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+    <View style={{ height: Dimensions.get("window").height, flex: 1 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.imageContainer}>
-          <Image style={styles.image} source={favicon} />
+          <Image
+            style={styles.image}
+            source={{
+              uri: activity.image?.url
+                ? activity.image?.url
+                : "https://images.unsplash.com/photo-1600456899121-68eda5705257?q=80&w=2757&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            }}
+          />
           <View style={styles.likeContainer}>
             <Text style={styles.h4}>{activity.netUpvotes}</Text>
             <TouchableOpacity style={styles.heartIcon} onPress={toggleLike}>
@@ -92,6 +104,7 @@ const ViewActivity = () => {
             <Text style={[styles.h1, { marginTop: 18 }]}>{activity.name}</Text>
             <View style={styles.row}>
               <Text style={[styles.h3, { marginRight: 5 }]}>3</Text>
+              {/* <Ionicons name="star" size={24} color="#FFC501" /> */}
               <Rating
                 type="star"
                 ratingCount={5}
@@ -103,16 +116,9 @@ const ViewActivity = () => {
             <View style={styles.row}>
               <Ionicons name="location" size={25} color="#006ee6" />
               <View>
-                {activity.location.address ? (
-                  <Text style={[styles.h3, { marginLeft: 10 }]}>
-                    {activity.location.address}
-                  </Text>
-                ) : null}
-                {activity.location.citystate ? (
-                  <Text style={[styles.h3, { marginLeft: 10 }]}>
-                    {activity.location.citystate}
-                  </Text>
-                ) : null}
+                <Text style={[styles.h3, { marginLeft: 10 }]}>
+                  {activity.location.address} {activity.location.citystate}
+                </Text>
               </View>
             </View>
             <View style={styles.row}>
@@ -129,6 +135,7 @@ const ViewActivity = () => {
                   {DateTime.fromISO(activity.startTime.toString())
                     .setZone("system")
                     .toLocaleString(DateTime.TIME_SIMPLE)}
+                  {/* {trip.startDate.getHours() % 12 || 12}:{trip.startDate.getMinutes().toString().padStart(2, '0')} {trip.startDate.getHours() >= 12 ? 'PM' : 'AM'} */}
                 </Text>
               </View>
               <Ionicons
@@ -148,6 +155,7 @@ const ViewActivity = () => {
                   {DateTime.fromISO(activity.endTime.toString())
                     .setZone("system")
                     .toLocaleString(DateTime.TIME_SIMPLE)}
+                  {/* {trip.endDate.getHours() % 12 || 12}:{trip.endDate.getMinutes().toString().padStart(2, '0')} {trip.endDate.getHours() >= 12 ? 'PM' : 'AM'} */}
                 </Text>
               </View>
             </View>
@@ -155,7 +163,7 @@ const ViewActivity = () => {
               {DateTime.local().zoneName}
             </Text>
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => setIsOnCalendar(!isOnCalendar)}
               style={{
                 width: "100%",
@@ -177,14 +185,22 @@ const ViewActivity = () => {
                   Add to Calendar
                 </Text>
               )}
-            </TouchableOpacity>
-            <View>
-              <Text style={styles.h2}>Description</Text>
-              <Text style={styles.h4}>{activity.description}</Text>
-            </View>
+            </TouchableOpacity> */}
+            {activity.description && (
+              <View>
+                <Text style={styles.h2}>Description</Text>
+                <Text style={styles.h4}>{activity.description}</Text>
+              </View>
+            )}
             <View>
               <Text style={styles.h2}>Notes</Text>
-              <Text style={styles.h4}>{activity.notes}</Text>
+              <TouchableOpacity style={{ paddingBottom: 20 }}>
+                {activity.notes ? (
+                  <Text style={styles.h4}>{activity.notes}</Text>
+                ) : (
+                  <Text style={styles.h4}>Add notes</Text>
+                )}
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -194,6 +210,15 @@ const ViewActivity = () => {
 };
 
 const styles = StyleSheet.create({
+  // scrollContainer: {
+  //   display: 'flex',
+  //   flex-direction: 'column',
+  // },
+  container: {
+    // flex: 1,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+  },
   imageContainer: {
     position: "relative",
   },
