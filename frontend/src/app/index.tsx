@@ -6,7 +6,6 @@ import { Text, View, Button, Platform, StyleSheet } from "react-native";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
-import { initializeSocket } from "../services/socket";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -20,10 +19,6 @@ export default function App() {
   const [expoPushToken, setExpoPushToken] = useState("");
   const notificationListener = useRef<Notifications.Subscription>();
   const responseListener = useRef<Notifications.Subscription>();
-
-  useEffect(() => {
-    initializeSocket();
-  }, []);
 
   useEffect(() => {
     registerForPushNotificationsAsync().then(
@@ -115,13 +110,3 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
-
-// Second, call the method
-
-// Notifications.scheduleNotificationAsync({
-//   content: {
-//     title: "Let's plan your next trip!",
-//     body: "Where should we go?",
-//   },
-//   trigger: null,
-// });
