@@ -163,8 +163,19 @@ const TripDetailsScreen = () => {
               <Text style={styles.h2}>Participants</Text>
               <Pressable
                 onPress={async () => {
-                  let result = await scheduleTrip(String(id));
-                  setSchedule(result);
+                  const url = `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/schedule`;
+                  try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                      throw new Error("Failed to fetch trip");
+                    }
+                    // Optionally, you can handle the response here
+                    const data = await response.json();
+                    setSchedule(data);
+                    console.log("Trip fetch:", data);
+                  } catch (error: any) {
+                    console.error("Error fetching trip:", error.toString());
+                  }
                 }}
               >
                 <Text>Click</Text>

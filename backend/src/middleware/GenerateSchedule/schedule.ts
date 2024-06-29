@@ -1,4 +1,5 @@
 import path from "path";
+import { activityData } from "./schedule/prepareData";
 
 let schedule = '{ "route": [], "cost": 0 }';
 
@@ -7,7 +8,7 @@ async function getSchedule(activity: any): Promise<any> {
     const { spawn } = require("child_process");
 
     // Example path to your algorithm file
-    let algorithmFilePath = path.join(__dirname, "../../algorithm/generateSchedule.py");
+    let algorithmFilePath = path.join(__dirname, "../../../algorithm/generateSchedule.py");
     algorithmFilePath = algorithmFilePath.replaceAll("\\", "/");
     let result = "";
     const pythonProcess = spawn("python", [String(algorithmFilePath)]);
@@ -42,7 +43,9 @@ async function getSchedule(activity: any): Promise<any> {
 }
 
 export const generateSchedule = async (activity: any) => {
-  await getSchedule(activity)
+  let activityDistance = await activityData(JSON.parse(activity));
+
+  await getSchedule(activityDistance)
     .then((result) => {
       schedule = result;
     })
