@@ -52,7 +52,7 @@ export const TripCard: React.FC<tripProps> = ({
   return (
     <TouchableHighlight
       style={[Style.card, { height: height, width: width, marginHorizontal: 20, marginBottom: 5 }]} // Apply dynamic height and width
-      underlayColor="#fffcab"
+      underlayColor="#696e6e"
       onPress={onPressTripCard}
     >
       <View style={{ flexDirection: 'column', justifyContent: 'space-between' }}>
