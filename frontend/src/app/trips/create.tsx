@@ -186,14 +186,6 @@ export default function CreateTripScreen() {
     } else {
       // CREATING
       try {
-        let activities = [];
-        if (location.latitude && location.longitude && location.radius) {
-          activities = await fetchGoogleActivities(
-            location.latitude,
-            location.longitude,
-            location.radius,
-          );
-        }
         const response = await fetch(
           `http://${EXPO_PUBLIC_HOST_URL}:3000/trips`,
           {
@@ -210,16 +202,21 @@ export default function CreateTripScreen() {
           );
         }
         const trip = await response.json();
-        // Fetch activities based on the trip location
-        if (location.latitude && location.longitude && location.radius) {
-          const fetchedActivities = await fetchGoogleActivities(
-            location.latitude,
-            location.longitude,
-            location.radius,
-          );
+        try {
+          // Fetch activities based on the trip location
+          if (location.latitude && location.longitude && location.radius) {
+            const fetchedActivities = await fetchGoogleActivities(
+              location.latitude,
+              location.longitude,
+              location.radius,
+            );
+            console.log("fetched activities here: ", fetchedActivities);
 
-          // Save fetched activities to backend
-          await saveActivitiesToBackend(trip.id, fetchedActivities);
+            // Save fetched activities to backend
+            await saveActivitiesToBackend(trip.id, fetchedActivities);
+          }
+        } catch (error) {
+          console.log("Can't save activities,: ", error);
         }
 
         Alert.alert("Trip created", "Let's start planning!", [

@@ -68,7 +68,7 @@ export const saveActivitiesToBackend = async (
 ) => {
   const promises = activities.map(async (activity) => {
     const response = await fetch(
-      `http://localhost:3000/trips/${tripId}/activities`,
+      `http://${process.env.EXPO_PUBLIC_HOST_URL}:3000/trips/${tripId}/activities`,
       {
         method: "POST",
         headers: {
@@ -77,6 +77,7 @@ export const saveActivitiesToBackend = async (
         body: JSON.stringify({
           name: activity.name,
           description: activity.description,
+          imageUrl: activity.imageUrl,
           startTime: new Date(),
           endTime: new Date(),
           location: {

@@ -64,6 +64,7 @@ model Activity {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String
   description String
+  imageUrl String
   startTime DateTime
   endTime DateTime
   location Location

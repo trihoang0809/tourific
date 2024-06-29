@@ -27,6 +27,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
   useEffect(() => {
     const fetchTrips = async () => {
+      console.log(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`);
       try {
         const ongoing = await fetch(
           `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`,
