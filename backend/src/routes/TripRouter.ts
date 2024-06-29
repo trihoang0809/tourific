@@ -40,11 +40,11 @@ router.get("/:id/schedule", async (req, res) => {
     const activities = await getActivities();
 
     const schedule = await generateSchedule(activities);
-    const data = JSON.parse(schedule);
+    // const data = JSON.parse(schedule);
 
-    // console.log(data);
+    console.log(schedule);
 
-    res.json(data);
+    res.json(schedule);
   } catch (error) {
     console.log("An error occur while creating schedule: " + error);
   }

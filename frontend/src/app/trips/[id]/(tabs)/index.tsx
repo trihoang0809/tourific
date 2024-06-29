@@ -11,7 +11,7 @@ import { useGlobalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from "luxon";
-import { scheduleTrip } from "@/utils/schedule/schedule";
+import { any } from "zod";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 const width = Dimensions.get("window").width; //full width
@@ -35,7 +35,7 @@ const TripDetailsScreen = () => {
 
   // more setting icon
   const [modalEditVisible, setModalEditVisible] = useState(false);
-  const [schedule, setSchedule] = useState({ route: [], cost: -1 });
+  const [schedule, setSchedule] = useState({ route: [any], cost: -1 });
   const getTrip = async ({ id: text }: { id: string }) => {
     try {
       console.log(EXPO_PUBLIC_HOST_URL);
@@ -169,17 +169,18 @@ const TripDetailsScreen = () => {
                     if (!response.ok) {
                       throw new Error("Failed to fetch trip");
                     }
-                    // Optionally, you can handle the response here
+
                     const data = await response.json();
                     setSchedule(data);
-                    console.log("Trip fetch:", data);
                   } catch (error: any) {
                     console.error("Error fetching trip:", error.toString());
                   }
                 }}
               >
                 <Text>Click</Text>
-                <Text>{schedule.route}</Text>
+                {schedule.route.map((activity: any, id: number) => (
+                  <Text key={id}>{id + " " + activity.name}</Text>
+                ))}
                 <Text>{schedule.cost}</Text>
               </Pressable>
             </View>

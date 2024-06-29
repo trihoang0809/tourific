@@ -1,7 +1,7 @@
 import path from "path";
 import { activityData } from "./schedule/prepareData";
 
-let schedule = '{ "route": [], "cost": 0 }';
+let schedule = '{ "route": [0], "cost": 0 }';
 
 async function getSchedule(activity: any): Promise<any> {
   return new Promise((resolve, reject) => {
@@ -43,13 +43,18 @@ async function getSchedule(activity: any): Promise<any> {
 }
 
 export const generateSchedule = async (activity: any) => {
-  let activityDistance = await activityData(JSON.parse(activity));
-
+  let activityJSON = JSON.parse(activity);
+  let activityDistance = await activityData(activityJSON);
   await getSchedule(activityDistance)
     .then((result) => {
       schedule = result;
     })
     .catch((error) => console.error("Error creating schedule:", error));
+  let itinerary = [];
+  let data = JSON.parse(schedule);
+  // console.log(data.route);
+  for (let i = 0; i < data.route.length; ++i) itinerary.push(activityJSON[data.route[i]]);
 
-  return schedule;
+  return { route: itinerary, cost: data.cost };
+  // return schedule;
 };
