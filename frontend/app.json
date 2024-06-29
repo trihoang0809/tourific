@@ -13,13 +13,18 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tourific",
+      "infoPlist": {
+        "UIBackgroundModes": ["fetch", "remote-notification"]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.tourific"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -38,8 +43,11 @@
       ]
     ],
     "extra": {
+      "router": {
+        "origin": false
+      },
       "eas": {
-        "projectId": "a40b1425-5ac9-49a9-8972-8332210f4436"
+        "projectId": "705c2be4-e3d0-4e6f-82e1-bd7b4d842c0d"
       }
     }
   }
