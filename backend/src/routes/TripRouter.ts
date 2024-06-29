@@ -49,14 +49,29 @@ router.get("/", async (req, res) => {
         },
       };
     } else if (req.query.upcoming === "true") {
-      queryConditions = {
-        where: {
-          startDate: {
-            gt: now,
+      // Fetch trips that start on a specific date
+      if (typeof req.query.startDate === 'string') {
+        const startDate = new Date(req.query.startDate);
+        const startOfDay = new Date(startDate.setHours(0, 0, 0, 0));
+        const endOfDay = new Date(startDate.setHours(23, 59, 59, 999));
+        queryConditions = {
+          where: {
+            startDate: {
+              gte: startOfDay,
+              lte: endOfDay
+            },
           },
-        },
-      };
-      // console.log(now);
+        };
+      } else {
+        queryConditions = {
+          where: {
+            startDate: {
+              gt: now,
+            },
+          },
+        };
+        // console.log(now);
+      }
     }
 
     const trips = await prisma.trip.findMany(queryConditions);
