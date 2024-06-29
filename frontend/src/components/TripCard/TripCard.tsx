@@ -39,7 +39,7 @@ export const TripCard: React.FC<tripProps> = ({
   };
 
   // Calculate image height as 2/3 of the card's height
-  const imageHeight = (height * 1.7) / 3;
+  const imageHeight = (height * 1.6) / 3;
   const tripState = tripLocation.citystate.split(", ");
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export const TripCard: React.FC<tripProps> = ({
   return (
     <TouchableHighlight
       style={[Style.card, { height: height, width: width, marginHorizontal: 20, marginBottom: 5 }]} // Apply dynamic height and width
-      underlayColor="#696e6e"
+      underlayColor="#e3e3e3"
       onPress={onPressTripCard}
     >
       <View style={{ flexDirection: 'column', justifyContent: 'space-between' }}>
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
 
   descriptionContainer: {
     paddingLeft: 10,
-    // paddingVertical: 10,
+    marginRight: 10,
     textAlign: 'center',
     justifyContent: "space-between",
   },
