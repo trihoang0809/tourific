@@ -2,7 +2,7 @@ import { Expo } from "expo-server-sdk";
 const fetch = require("fix-esm").require("node-fetch");
 
 // Modify this to your device's push token to receive testing's notification
-const TESTING_PUSH_TOKEN = "ExponentPushToken[fZTv_qIqpMWU_NZ7DJl0QZ]";
+const TESTING_PUSH_TOKEN = "ExponentPushToken[your_token_here]";
 
 export type Trip = {
   id: string;
