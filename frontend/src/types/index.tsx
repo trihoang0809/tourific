@@ -59,7 +59,14 @@ export interface ActivityProps {
   isOnCalendar: boolean;
   category: string[];
   rating?: number;
+  googlePlacesId: string;
 }
+
+export interface ActivityThumbnailProps {
+  activity: ActivityProps;
+  tripId: string | string[] | undefined;
+}
+
 export type Trip = {
   id: string;
   name: string;

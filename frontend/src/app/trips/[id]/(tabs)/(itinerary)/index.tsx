@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, Text, TouchableOpacity, Modal, Pressable, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  Pressable,
+  SafeAreaView,
+} from "react-native";
 import { useGlobalSearchParams, router } from "expo-router";
 import { Calendar, DateRangeHandler } from "react-native-big-calendar";
 import { Mode } from "react-native-big-calendar/build/interfaces";
@@ -16,12 +23,15 @@ const Itinerary = () => {
 
   const getActivities = async ({ id }: { id: string }) => {
     try {
-      const response = await fetch(`http://localhost:3000/trips/${id}/`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `http://${process.env.EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch activities");
       }

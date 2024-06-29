@@ -76,6 +76,7 @@ model Activity {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String
   description String
+  imageUrl String
   startTime DateTime
   endTime DateTime
   location Location
@@ -85,6 +86,7 @@ model Activity {
   category String[]
   tripId String @db.ObjectId
   trip Trip @relation(fields: [tripId], references: [id])
+  googlePlacesId String?
 }
 
 type Photo {

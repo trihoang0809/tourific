@@ -12,6 +12,8 @@ import {
 import React, { useCallback, useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Stack, router, useLocalSearchParams } from "expo-router";
+import { useForm, Controller } from "react-hook-form";
+import { Stack, router, useLocalSearchParams } from "expo-router";
 import { MapData, TripData } from "@/types";
 import GooglePlacesInput from "@/components/GoogleMaps/GooglePlacesInput";
 import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
@@ -21,6 +23,10 @@ import { TripSchema } from "@/validation/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import PhotoAPI from "@/components/PhotoAPI";
+import {
+  fetchGoogleActivities,
+  saveActivitiesToBackend,
+} from "@/utils/fetchAndSaveActivities";
 import { getUserIdFromToken, getToken } from "@/utils";
 import { MaterialIcons } from "@expo/vector-icons";
 
@@ -214,8 +220,22 @@ export default function CreateTripScreen() {
             `Failed to create trip: ${response.status} ${response.statusText}`,
           );
         }
-        // Optionally, you can handle the response here
-        const data = await response.json();
+        const trip = await response.json();
+        try {
+          // Fetch activities based on the trip location
+          if (location.latitude && location.longitude && location.radius) {
+            const fetchedActivities = await fetchGoogleActivities(
+              location.latitude,
+              location.longitude,
+              location.radius,
+            );
+            // Save fetched activities to backend
+            await saveActivitiesToBackend(trip.id, fetchedActivities);
+          }
+        } catch (error) {
+          console.log("Can't save activities,: ", error);
+        }
+
         Alert.alert("Trip created", "Let's start planning!", [
           {
             text: "Awesome!",
