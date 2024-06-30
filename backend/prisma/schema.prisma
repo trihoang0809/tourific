@@ -13,22 +13,35 @@ datasource db {
 model Trip {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String
-  location Location?
-  startDate DateTime? @default(now())
-  endDate DateTime?
-  pendingInvitations String[]
-  participants User[] @relation(fields: [participantsID], references: [id])
-  activities Activity[]
-  participantsID String[] @db.ObjectId
+  location Location
+  startDate DateTime @default(now())
+  endDate DateTime
   image Photo?
+  activities Activity[]
+  participants TripMember[]
 }
 
+model TripMember {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  tripId   String @db.ObjectId
+  inviteeId   String @db.ObjectId
+  inviterId String @db.ObjectId
+  status   Status @default(PENDING)
+  
+  trip     Trip @relation(fields: [tripId], references: [id])
+  invitee  User? @relation("InviteeToTripInvitations", fields: [inviteeId], references: [id])
+  inviter  User? @relation("InviterToTripInvitations", fields: [inviterId], references: [id])
+
+  @@unique([tripId, inviteeId])
+}
+
+
 type Location {
-  address String?
+  address String
   citystate String @default("")
   latitude Float
   longitude Float
-  radius Float?
+  radius Float
 }
 
 model User {
@@ -36,13 +49,14 @@ model User {
   userName String @unique
   email String @unique
   password String
-  friendRequestReceived   Friendship[]   @relation("friendRequestReceived")
-  tripID String[] @db.ObjectId
-  trips Trip[] @relation(fields: [tripID], references: [id])
   firstName String
   lastName String
   dateOfBirth DateTime
   avatar Photo
+
+  inviteeTripInvitations TripMember[] @relation("InviteeToTripInvitations")
+  inviterTripInvitations TripMember[] @relation("InviterToTripInvitations")  
+  friendRequestReceived   Friendship[]   @relation("friendRequestReceived")
 }
 
 model Friendship {
@@ -50,11 +64,11 @@ model Friendship {
   receiver    User     @relation("friendRequestReceived", fields: [receiverID], references: [id])
   receiverID  String   @db.ObjectId
   senderID  String   @db.ObjectId
-  friendStatus    FriendStatus @default(PENDING)
+  friendStatus    Status @default(PENDING)
   @@unique([receiverID, senderID])
 }
 
-enum FriendStatus {
+enum Status {
   ACCEPTED
   PENDING
   REJECTED
@@ -67,12 +81,13 @@ model Activity {
   startTime DateTime
   endTime DateTime
   location Location
-  notes String
+  notes String[]
   netUpvotes Int @default(0)
   isOnCalendar Boolean @default(false)
   category String[]
   tripId String @db.ObjectId
   trip Trip @relation(fields: [tripId], references: [id])
+  image Photo?
 }
 
 type Photo {

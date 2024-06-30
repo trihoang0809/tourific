@@ -13,7 +13,7 @@ import { router } from "expo-router";
 import { defaultAvatar } from "@/utils";
 export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
-    <SafeAreaView style={styles.content}>
+    <View style={styles.content}>
       <View>
         <Text style={styles.appName}>tourific</Text>
       </View>
@@ -36,19 +36,19 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
           <Image style={styles.avatar} source={{ uri: defaultAvatar }} />
         </Pressable>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {},
   content: {
-    flex: 1,
+    width: "100%",
+    backgroundColor: "white",
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
     padding: 10,
-    marginHorizontal: 15,
+    paddingHorizontal: 20,
   },
   notificationIcon: {
     position: "absolute",
