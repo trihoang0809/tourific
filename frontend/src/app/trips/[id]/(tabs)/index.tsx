@@ -179,11 +179,11 @@ const TripDetailsScreen = () => {
                   }
                 }}
               >
-                <Text>Click</Text>
+                {/* <Text>Click</Text>
                 {schedule.route.map((activity: any, id: number) => (
                   <Text key={id}>{id + " " + activity.name}</Text>
                 ))}
-                <Text>{"total distance: " + schedule.cost}</Text>
+                <Text>{"total distance: " + schedule.cost}</Text> */}
               </Pressable>
             </View>
           </View>
