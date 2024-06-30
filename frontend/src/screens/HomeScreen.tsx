@@ -65,7 +65,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             <Text style={styles.title}>Ongoing Trips</Text>
             <Text
               onPress={() => {
-                router.replace("/trips/ongoing");
+                router.navigate("/trips/ongoing");
               }}
             >
               See all
@@ -90,7 +90,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             <Text style={styles.title}>Upcoming Trips</Text>
             <Text
               onPress={() => {
-                router.replace("/trips/upcoming");
+                router.navigate("/trips/upcoming");
               }}
             >
               See all

@@ -61,7 +61,6 @@ router.get("/", async (req: Request<TripParams>, res) => {
           gt: now,
         },
       };
-      // console.log(now);
     }
 
     const trips = await prisma.tripMember.findMany({
@@ -124,6 +123,9 @@ router.get("/:id", async (req, res) => {
       where: {
         id,
       },
+      include: {
+        activities: true, // Include activities associated with the trip
+      },
     });
     res.status(StatusCodes.OK).json(trip);
   } catch (error) {
@@ -143,7 +145,7 @@ router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
     });
 
     if (!isValidID) {
-      res.status(StatusCodes.NOT_FOUND);
+      res.status(StatusCodes.NOT_FOUND).json({ error: "Trip does not exist" });
     }
 
     const trip = await prisma.trip.update({

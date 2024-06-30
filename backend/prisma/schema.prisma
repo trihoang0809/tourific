@@ -87,6 +87,7 @@ model Activity {
   category String[]
   tripId String @db.ObjectId
   trip Trip @relation(fields: [tripId], references: [id])
+  image Photo?
 }
 
 type Photo {

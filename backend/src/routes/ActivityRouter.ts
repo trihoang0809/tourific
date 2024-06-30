@@ -1,6 +1,7 @@
 import express, { Request } from "express";
 import { PrismaClient } from "@prisma/client";
 import { TripParams } from "./TripRouter";
+import { StatusCodes } from "http-status-codes";
 
 const router = express.Router({ mergeParams: true });
 const prisma = new PrismaClient();
@@ -21,9 +22,11 @@ router.get("/", async (req: Request<TripParams>, res) => {
         tripId,
       },
     });
-    res.json(activities);
+    res.status(StatusCodes.OK).json(activities);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while fetching activities.", tripId });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: `An error occurred while fetching activity Id: ${tripId}` });
   }
 });
 
@@ -38,11 +41,13 @@ router.get("/:activityId", async (req: Request<ActivityParams>, res) => {
       },
     });
     if (!activity) {
-      res.status(404).json({ error: `There is no activity with Id: ${activityId}` });
+      res.status(StatusCodes.NOT_FOUND).json({ error: `There is no activity with Id: ${activityId}` });
     }
     res.json(activity);
   } catch (error) {
-    res.status(500).json({ error: `An error occurred while fetching activity with Id: ${activityId}` });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: `An error occurred while fetching activity Id: ${activityId}` });
   }
 });
 
@@ -52,7 +57,7 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
   const { name, description, startTime, endTime, location, notes } = req.body;
 
   if (!tripId) {
-    res.status(404).json({ error: "ID does not exist" });
+    res.status(StatusCodes.NOT_FOUND).json({ error: "Trip ID does not exist" });
   }
   try {
     const activity = await prisma.trip.update({
@@ -72,10 +77,10 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
         },
       },
     });
-    res.status(201).json(activity);
+    res.status(StatusCodes.CREATED).json(activity);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "An error occurred while creating the activity." });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while creating the activity." });
   }
 });
 
@@ -92,7 +97,7 @@ router.put("/:activityId", async (req: Request<ActivityParams>, res) => {
   });
 
   if (!isValidID) {
-    res.status(404).json({ error: "Activity does not exist" });
+    res.status(StatusCodes.NOT_FOUND).json({ error: "Activty does not exist" });
   }
 
   try {
@@ -110,9 +115,42 @@ router.put("/:activityId", async (req: Request<ActivityParams>, res) => {
         // image,
       },
     });
-    res.status(200).json(activity);
+    res.status(StatusCodes.OK).json(activity);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while updating the activity." });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while updating the activity." });
+  }
+});
+
+// Update calendar status of an activity
+router.put("/:activityId/toggle", async (req: Request<ActivityParams>, res) => {
+  const { activityId: activityId, tripId } = req.params;
+  const { isOnCalendar, startTime, endTime } = req.body;
+
+  const isValidID = await prisma.activity.findUnique({
+    where: {
+      id: activityId,
+      tripId: tripId,
+    },
+  });
+
+  if (!isValidID) {
+    res.status(StatusCodes.NOT_FOUND).json({ error: "Activity does not exist" });
+  }
+
+  try {
+    const activity = await prisma.activity.update({
+      where: {
+        id: activityId,
+      },
+      data: {
+        isOnCalendar,
+        startTime,
+        endTime,
+      },
+    });
+    res.status(StatusCodes.OK).json(activity);
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while updating the activity." });
   }
 });
 
@@ -126,9 +164,9 @@ router.delete("/:activityId", async (req: Request<ActivityParams>, res) => {
         tripId: tripId,
       },
     });
-    res.status(200).json(deletedActivity);
+    res.status(StatusCodes.OK).json(deletedActivity);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while deleting the activity." });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while deleting the activity." });
   }
 });
 
