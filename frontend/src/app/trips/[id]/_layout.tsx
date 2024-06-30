@@ -24,7 +24,6 @@ export default function TripLayout({}) {
       }
       const data = await response.json();
       setTripName(data.name);
-      console.log("Trip fetch:", data);
     } catch (error: any) {
       console.error("Error fetching trip:", error.toString());
     }
@@ -42,13 +41,13 @@ export default function TripLayout({}) {
         options={{
           headerShown: true,
           headerTitle: tripName,
-          headerTitleAlign: 'center',
+          headerTitleAlign: "center",
           headerLeft: () => (
             <MaterialIcons
               name="arrow-back"
               size={24}
               color="black"
-              onPress={() => router.navigate("/")}
+              onPress={() => router.navigate("/home")}
             />
           ),
           headerRight: () => (

@@ -12,8 +12,6 @@ import {
 import React, { useCallback, useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { useForm, Controller } from "react-hook-form";
-import { Stack, router, useLocalSearchParams } from "expo-router";
 import { MapData, TripData } from "@/types";
 import GooglePlacesInput from "@/components/GoogleMaps/GooglePlacesInput";
 import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
@@ -21,7 +19,7 @@ import { extractDateTime, formatDateTime } from "@/utils";
 import { DateTime } from "luxon";
 import { TripSchema } from "@/validation/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import PhotoAPI from "@/components/PhotoAPI";
 import {
   fetchGoogleActivities,
@@ -168,7 +166,7 @@ export default function CreateTripScreen() {
       endDate: isoEndDate,
       location,
       image: { url: savedPhoto },
-      participantsID: [userId],
+      firebaseUserId: userId,
     };
 
     if (isUpdating) {
@@ -334,7 +332,7 @@ export default function CreateTripScreen() {
   );
 
   return (
-    <View>
+    <SafeAreaView>
       {isUpdating ? (
         ""
       ) : (
@@ -661,6 +659,6 @@ export default function CreateTripScreen() {
           </View>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
