@@ -171,6 +171,33 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// Create a new trip
+router.post("/", validateData(tripCreateSchema), async (req, res) => {
+  const { name, startDate, endDate, location, image, firebaseUserId } = req.body;
+  try {
+    const trip = await prisma.trip.create({
+      data: {
+        name: name,
+        startDate,
+        endDate,
+        location,
+        image,
+        participantsID: [firebaseUserId],
+      },
+    });
+    res.status(StatusCodes.CREATED).json(trip);
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        res.status(StatusCodes.CONFLICT).json({ error: "A trip with the same details already exists." });
+      }
+    } else {
+      console.log(error);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while creating the trip." });
+    }
+  }
+});
+
 // Update an existing trip
 router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
   try {

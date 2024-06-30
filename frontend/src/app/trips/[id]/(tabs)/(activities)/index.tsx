@@ -5,7 +5,6 @@ import {
   TextInput,
   Text,
   SafeAreaView,
-  RefreshControl,
 } from "react-native";
 import { useState, useEffect, useCallback } from "react";
 import { router, useGlobalSearchParams, usePathname, Link } from "expo-router";
@@ -22,13 +21,12 @@ const ActivitiesScreen = () => {
   const { id } = useGlobalSearchParams();
   const {
     data: activities,
-    refetch,
-    isFetching,
     error,
+    isLoading,
   } = useQuery({
     queryKey: ["activities", id],
     queryFn: () => fetchActivities(id),
-    // refetchInterval: 100000, // Refetch every 100 seconds
+    refetchInterval: 100000, // Refetch every 100 seconds
   });
   const [filteredActivities, setFilteredActivities] = useState<ActivityProps[]>(
     [],
@@ -41,10 +39,6 @@ const ActivitiesScreen = () => {
       setFilteredActivities(activities);
     }
   }, [activities]);
-
-  const onRefresh = useCallback(() => {
-    refetch();
-  }, [refetch]);
 
   // useEffect(() => {
   //   const getTripAndActivities = async () => {
@@ -201,9 +195,6 @@ const ActivitiesScreen = () => {
           flexWrap: "wrap",
           padding: 5,
         }}
-        refreshControl={
-          <RefreshControl refreshing={isFetching} onRefresh={onRefresh} />
-        }
       >
         {filteredActivities.length > 0 ? (
           <ScrollView
