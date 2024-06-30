@@ -54,9 +54,15 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
         );
         const ongoingData = await ongoing.json();
         const upcomingData = await upcoming.json();
-
-        setOngoingTrips(ongoingData);
-        setUpcomingTrips(getRecentTrips(upcomingData));
+        let ongoingTrips = ongoingData.map(
+          (trip: any, id: number) => trip.trip,
+        );
+        let upcomingTrips = upcomingData.map(
+          (trip: any, id: number) => trip.trip,
+        );
+        console.log(upcomingTrips);
+        setOngoingTrips(ongoingTrips);
+        setUpcomingTrips(getRecentTrips(upcomingTrips));
       } catch (error) {
         console.error("Failed to fetch trips:", error);
       }

@@ -88,7 +88,8 @@ const ActivitiesScreen = () => {
           imageUrl:
             "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlCeVhPcF0B061dWx6Y2p6ZshztnAoVQI59g&s",
         }));
-
+        console.log("user activitiies");
+        console.log(data);
         return data;
       } catch (error: any) {
         console.error("Error fetching trip:", error.toString());
