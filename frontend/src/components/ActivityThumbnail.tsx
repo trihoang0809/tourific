@@ -77,7 +77,7 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
       <View style={styles.imageContainer}>
         <Image source={{ uri: activity.imageUrl }} style={styles.image} />
         <View style={styles.likeContainer}>
-          <Text>{upvotes}</Text>
+          <Text>{activity.netUpvotes}</Text>
           <TouchableOpacity style={styles.heartIcon} onPress={toggleLike}>
             <Ionicons
               name={liked ? "heart" : "heart-outline"}
