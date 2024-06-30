@@ -5,6 +5,7 @@ import { validateData } from "../middleware/validationMiddleware";
 import { tripCreateSchema } from "../schemas/tripSchema";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { StatusCodes } from "http-status-codes";
+import { generateSchedule } from "../middleware/GenerateSchedule/schedule";
 import InvitationRouter from "./InvitationRouter";
 
 // const express = require('express')
@@ -23,6 +24,38 @@ const userID = "6661308f193a6cd9e0ea4d36";
 
 // Activites of a trip
 router.use("/:tripId/activities", ActivityRouter);
+
+//Create Schedule
+router.get("/:id/schedule", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const getActivities = async () => {
+      try {
+        const activities = await prisma.activity.findMany({
+          where: {
+            tripId: id,
+          },
+        });
+
+        return JSON.stringify(activities);
+      } catch (error) {
+        console.log(error);
+        return [];
+      }
+    };
+    const activities = await getActivities();
+
+    const schedule = await generateSchedule(activities);
+    // const data = JSON.parse(schedule);
+
+    console.log(schedule);
+
+    res.json(schedule);
+  } catch (error) {
+    console.log("An error occur while creating schedule: " + error);
+  }
+});
 
 // Invitation route
 router.use("/invite", InvitationRouter);
