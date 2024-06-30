@@ -347,7 +347,7 @@ export default function CreateTripScreen() {
                 name="arrow-back"
                 size={24}
                 color="black"
-                onPress={() => router.navigate("/")}
+                onPress={() => router.back()}
               />
             ),
           }}
