@@ -131,13 +131,13 @@ router.post("/find", async (req, res) => {
         OR: [
           {
             userName: {
-              contains: text,
+              startsWith: text,
               mode: 'insensitive',
             },
           },
           {
             email: {
-              contains: text,
+              startsWith: text,
               mode: 'insensitive',
             },
           },

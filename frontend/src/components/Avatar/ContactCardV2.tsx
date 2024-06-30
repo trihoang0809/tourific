@@ -2,6 +2,7 @@ import { Status, User } from '@/types';
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 interface ContactCardV2Props {
   user: User;
@@ -31,8 +32,13 @@ const ContactCardV2 = ({ user, addFriend, cancelFriendRequest }: ContactCardV2Pr
         <Ionicons name="person-add" size={24} color="black" />
       </TouchableOpacity>;
   }
+
+  const onPress = () => {
+    router.push(`/userProfile/${user.userName}`);
+  };
+
   return (
-    <TouchableOpacity style={styles.contactItem}>
+    <TouchableOpacity style={styles.contactItem} onPress={onPress}>
       <Image source={{ uri: user.avatar?.url }} style={styles.profilePic} />
       <View style={{ flex: 1, justifyContent: 'center', gap: 5 }}>
         <Text style={styles.name}>{user.firstName}</Text>
