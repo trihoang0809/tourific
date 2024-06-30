@@ -11,7 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
-    <SafeAreaView style={styles.content}>
+    <View style={styles.content}>
       <View>
         <Text style={styles.appName}>tourific</Text>
       </View>
@@ -25,7 +25,7 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
         </TouchableOpacity>
         <Image style={styles.avatar} source={{ uri: user.avatar.url }} />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
