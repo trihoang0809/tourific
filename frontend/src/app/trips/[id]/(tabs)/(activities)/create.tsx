@@ -1,4 +1,4 @@
-import { ProposedActivities } from "@/screens/ProposedActivities";
+import { ProposedActivities } from "@/screens/ActivityScreen/ProposedActivities";
 import { useGlobalSearchParams } from "expo-router";
 
 const createActivity = () => {

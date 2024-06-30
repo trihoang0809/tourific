@@ -42,7 +42,7 @@ export default function TripLayout({}) {
         options={{
           headerShown: true,
           headerTitle: tripName,
-          headerTitleAlign: 'center',
+          headerTitleAlign: "center",
           headerLeft: () => (
             <MaterialIcons
               name="arrow-back"

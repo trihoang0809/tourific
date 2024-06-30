@@ -17,7 +17,7 @@ import { getRecentTrips } from "@/utils";
 
 const onPressCategory = () => {
   console.log("You pressed on this category");
-  router.push("/");
+  router.replace("/");
 };
 
 const Header = ({ isUpcoming }: listprops) => (
