@@ -1,5 +1,3 @@
-import { PrismaClient, Prisma } from "@prisma/client";
-import e from "express";
 import { z } from "zod";
 
 export const tripCreateSchema = z.object({

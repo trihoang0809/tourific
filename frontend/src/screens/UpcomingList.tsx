@@ -11,7 +11,7 @@ import {
 import { useState, useEffect } from "react";
 import { TripCard } from "@/components/TripCard/TripCard";
 import { Trip } from "../types";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { getRecentTrips } from "@/utils";
 

@@ -2,7 +2,7 @@ import { User } from "@/types";
 
 export const sampleUser: User = {
   id: "u1",
-  username: "NickDoan123",
+  userName: "NickDoan123",
   password: "verysecurepassword",
   friendRequestReceived: [], // Assuming no friend requests for the sample
   tripID: ["t1", "t2"], // IDs of trips; ensure these correspond to actual trips if needed
@@ -53,3 +53,38 @@ export const sampleUser: User = {
     url: "https://plus.unsplash.com/premium_photo-1677545182425-4fb12bdb9faf?q=80&w=2944&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   },
 };
+
+export const mockUsers: User[] = [
+  {
+    id: 'user-001',
+    userName: 'john.doe',
+    password: 'securepassword123',
+    friendRequestReceived: [],
+    tripID: ['trip-001'],
+    trips: [],
+    firstName: 'John',
+    lastName: 'Doe',
+    dateOfBirth: new Date(1990, 6, 15),
+    avatar: {
+      height: 150,
+      width: 150,
+      url: 'https://example.com/avatar/user-001.jpg'
+    }
+  },
+  {
+    id: 'user-002',
+    userName: 'jane.smith',
+    password: 'anothersecurepassword123',
+    friendRequestReceived: [],
+    tripID: ['trip-002'],
+    trips: [],
+    firstName: 'Jane',
+    lastName: 'Smith',
+    dateOfBirth: new Date(1988, 2, 25),
+    avatar: {
+      height: 150,
+      width: 150,
+      url: 'https://example.com/avatar/user-002.jpg'
+    }
+  }
+];

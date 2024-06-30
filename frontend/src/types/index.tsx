@@ -1,4 +1,5 @@
 import { Ionicons, Feather } from "@expo/vector-icons";
+import { DimensionValue } from "react-native";
 
 export interface TripData {
   name: string;
@@ -222,4 +223,50 @@ export interface timeRange {
 export interface dateRange {
   startDate: Date | undefined;
   endDate: Date | undefined;
+}
+
+export interface AvatarCardProps extends UserProps {
+  size?: DimensionValue;
+}
+
+export interface AvatarGroupProps {
+  users: Invitation[];
+  size?: DimensionValue;
+}
+
+export interface Invitation {
+  id: string;
+  inviter: User;
+  invitee: User;
+  trip: TripData;
+}
+
+export interface InvitationCardProps {
+  invitation: Invitation;
+  onAccept: (id: string) => void;
+  onDecline: (id: string) => void;
+}
+
+export interface BottomSliderProps {
+  handlePresentModalPress: () => void;
+  handleSheetChanges: (index: number) => void;
+}
+
+export enum Status {
+  'ACCEPTED',
+  'REJECTED',
+  'PENDING',
+}
+
+export interface FriendRequest {
+  friendStatus: Status;
+  receiver: User,
+  senderId?: string;
+}
+
+export interface ContactCardProps {
+  user: User;
+  isChecked: boolean;
+  setChecked: (e: any, userId: string) => void;
+  status: Status;
 }

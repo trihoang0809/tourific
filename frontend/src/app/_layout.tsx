@@ -13,11 +13,14 @@ const RootNavigation = () => {
           headerShown: false
         }}
       />
-      <Stack.Screen name="index"
-        options={{
-          title: 'Home',
-          headerShown: false,
-        }} />
+      <Stack.Screen
+        name="index"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="friends"
+        options={{ headerShown: false }}
+      />
     </Stack>
   );
 };
