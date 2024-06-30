@@ -56,10 +56,10 @@ const Home = () => {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <>
       <HomeScreen user={user} />
       <StatusBar style="auto" />
-    </SafeAreaView>
+    </>
   );
 };
 

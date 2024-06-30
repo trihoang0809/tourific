@@ -30,6 +30,7 @@ const RootNavigation = () => {
           options={{ title: "Trip", headerShown: false }}
         />
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="home" options={{ headerShown: false }} />
       </Stack>
     </QueryClientProvider>
   );
