@@ -5,8 +5,9 @@ import {
   TextInput,
   Text,
   SafeAreaView,
+  RefreshControl,
 } from "react-native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { router, useGlobalSearchParams, usePathname, Link } from "expo-router";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { Dimensions, StyleSheet } from "react-native";
@@ -21,12 +22,13 @@ const ActivitiesScreen = () => {
   const { id } = useGlobalSearchParams();
   const {
     data: activities,
+    refetch,
+    isFetching,
     error,
-    isLoading,
   } = useQuery({
     queryKey: ["activities", id],
     queryFn: () => fetchActivities(id),
-    refetchInterval: 100000, // Refetch every 100 seconds
+    // refetchInterval: 100000, // Refetch every 100 seconds
   });
   const [filteredActivities, setFilteredActivities] = useState<ActivityProps[]>(
     [],
@@ -39,6 +41,10 @@ const ActivitiesScreen = () => {
       setFilteredActivities(activities);
     }
   }, [activities]);
+
+  const onRefresh = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
   // useEffect(() => {
   //   const getTripAndActivities = async () => {
@@ -127,7 +133,6 @@ const ActivitiesScreen = () => {
   //   fetchData();
   // }, [id]);
 
-
   const handleSelectCategory = (category: string) => {
     setSelectedCategory(category);
     if (category === "All") {
@@ -196,6 +201,9 @@ const ActivitiesScreen = () => {
           flexWrap: "wrap",
           padding: 5,
         }}
+        refreshControl={
+          <RefreshControl refreshing={isFetching} onRefresh={onRefresh} />
+        }
       >
         {filteredActivities.length > 0 ? (
           <ScrollView
@@ -218,9 +226,7 @@ const ActivitiesScreen = () => {
               No activities found for this category.
             </Text>
             <Link href={`/trips/create?id=${id}`}>
-              <TouchableOpacity
-                style={styles.updateButton}
-              >
+              <TouchableOpacity style={styles.updateButton}>
                 <Text style={styles.updateButtonText}>
                   Update trip's radius or location
                 </Text>
@@ -309,4 +315,3 @@ const styles = StyleSheet.create({
 });
 
 export default ActivitiesScreen;
-

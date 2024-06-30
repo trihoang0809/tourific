@@ -23,31 +23,21 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
           justifyContent: "flex-end",
         }}
       >
-        <TouchableOpacity
-          onPress={() => {
-            /* navigate to notifications */
-          }}
-        >
-          <Ionicons name="notifications-outline" size={24} color="black" />
-        </TouchableOpacity>
-        <Pressable
-          onPress={() => router.push(`userProfile/${user.id}`)}
-        >
-          <Image style={styles.avatar} source={{ uri: user.avatar.url }} />
-        </Pressable>
+        <Image style={styles.avatar} source={{ uri: user.avatar.url }} />
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {},
   content: {
+    width: "100%",
+    backgroundColor: "white",
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
     padding: 10,
-    marginHorizontal: 15,
+    paddingHorizontal: 20,
   },
   notificationIcon: {
     position: "absolute",

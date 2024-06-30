@@ -1,18 +1,11 @@
-import { ActivityProps, ActivityThumbnailProps } from "@/types";
-import {
-  Text,
-  View,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  Pressable,
-} from "react-native";
+import { Activity, ActivityProps, ActivityThumbnailProps } from "@/types";
+import { Text, View, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useState, useEffect } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Rating } from "react-native-ratings";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchActivities } from "@/utils/fetchAndSaveActivities";
 
-import { router } from "expo-router";
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
 const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
@@ -80,57 +73,48 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
   };
 
   return (
-    <Pressable
-      onPress={() => {
-        router.push({
-          pathname: `../(activities)/${activity.id}`,
-          params: { ggMapId: activity.id },
-        });
-      }}
-    >
-      <View style={styles.card}>
-        <View style={styles.imageContainer}>
-          <Image source={{ uri: activity.imageUrl }} style={styles.image} />
-          <View style={styles.likeContainer}>
-            <Text>{upvotes}</Text>
-            <TouchableOpacity style={styles.heartIcon} onPress={toggleLike}>
-              <Ionicons
-                name={liked ? "heart" : "heart-outline"}
-                color="red"
-                size={25}
-              />
-            </TouchableOpacity>
-          </View>
+    <View style={styles.card}>
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: activity.imageUrl }} style={styles.image} />
+        <View style={styles.likeContainer}>
+          <Text>{upvotes}</Text>
+          <TouchableOpacity style={styles.heartIcon} onPress={toggleLike}>
+            <Ionicons
+              name={liked ? "heart" : "heart-outline"}
+              color="red"
+              size={25}
+            />
+          </TouchableOpacity>
         </View>
-        <View style={styles.textContainer}>
-          <Text numberOfLines={2} style={styles.title}>
-            {activity.name}
-          </Text>
-          {/* <Text style={styles.time}>
+      </View>
+      <View style={styles.textContainer}>
+        <Text numberOfLines={2} style={styles.title}>
+          {activity.name}
+        </Text>
+        {/* <Text style={styles.time}>
           {DateTime.fromISO(activity.startTime.toISOString()).setZone("system").toLocaleString(DateTime.TIME_SIMPLE)}
           - {DateTime.fromISO(activity.endTime.toISOString()).setZone("system").toLocaleString(DateTime.TIME_SIMPLE)}
         </Text> */}
-          <View style={styles.lineContainer}>
-            <Text style={{ marginRight: 5 }}>{activity.rating}</Text>
-            {/* <Ionicons name="star" size={24} color="#FFC501" /> */}
-            <Rating
-              type="star"
-              ratingCount={5}
-              imageSize={15}
-              onFinishRating={this.ratingCompleted}
-              readonly
-              startingValue={activity.rating}
-            />
-          </View>
-          <View style={styles.lineContainer}>
-            {/* <Ionicons name="location-outline" size={24} color="#006ee6" style={{marginRight: 10}}/> */}
-            <Text numberOfLines={2} style={{ flex: 1, overflow: "hidden" }}>
-              {activity.location.address}
-            </Text>
-          </View>
+        <View style={styles.lineContainer}>
+          <Text style={{ marginRight: 5 }}>{activity.rating}</Text>
+          {/* <Ionicons name="star" size={24} color="#FFC501" /> */}
+          <Rating
+            type="star"
+            ratingCount={5}
+            imageSize={15}
+            onFinishRating={this.ratingCompleted}
+            readonly
+            startingValue={activity.rating}
+          />
+        </View>
+        <View style={styles.lineContainer}>
+          {/* <Ionicons name="location-outline" size={24} color="#006ee6" style={{marginRight: 10}}/> */}
+          <Text numberOfLines={2} style={{ flex: 1, overflow: "hidden" }}>
+            {activity.location.address}
+          </Text>
         </View>
       </View>
-    </Pressable>
+    </View>
   );
 };
 
