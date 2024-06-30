@@ -1,4 +1,5 @@
 import { Ionicons, Feather } from "@expo/vector-icons";
+import React from "react";
 
 export interface TripData {
   name: string;
@@ -44,6 +45,12 @@ export interface DateRangePickerProps {
 export interface GooglePlacesInputProps {
   onLocationSelect: (location: MapData) => void;
   value: string;
+}
+
+export interface GoogleMapInputProps {
+  onLocationSelect: (location: MapData) => void;
+  value: string;
+  location: MapData;
 }
 
 export interface ActivityProps {

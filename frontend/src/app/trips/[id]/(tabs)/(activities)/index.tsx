@@ -7,7 +7,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import { useState, useEffect } from "react";
-import { useGlobalSearchParams, Link } from "expo-router";
+import { router, useGlobalSearchParams, usePathname, Link } from "expo-router";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { Dimensions, StyleSheet } from "react-native";
 import ActivityThumbnail from "@/components/ActivityThumbnail";
@@ -41,17 +41,92 @@ const ActivitiesScreen = () => {
   }, [activities]);
 
   // useEffect(() => {
-  //   const getActivities = async () => {
+  //   const getTripAndActivities = async () => {
   //     try {
-  //       const data = await fetchActivities(id);
-  //       const sortedData = data.sort((a, b) => b.netUpvotes - a.netUpvotes);
-  //       setFilteredActivities(sortedData);
+  //       const response = await fetch(
+  //         `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}`,
+  //         {
+  //           method: "GET",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //         },
+  //       );
+  //       if (!response.ok) {
+  //         throw new Error("Failed to fetch trip");
+  //       }
+  //       const data = await response.json();
+  //       if (
+  //         data.location.latitude &&
+  //         data.location.longitude &&
+  //         data.location.radius
+  //       ) {
+  //         const fetchedActivities = await fetchActivities(
+  //           data.location.latitude,
+  //           data.location.longitude,
+  //           data.location.radius,
+  //         );
+
+  //         return fetchedActivities;
+  //         //await saveActivitiesToBackend(fetchedActivities);
+  //         // console.log(userActivity);
+  //         // setFilteredActivities(temp);
+  //       }
   //     } catch (error: any) {
-  //       console.error("Error fetching activities:", error.toString());
+  //       console.error("Error fetching trip:", error.toString());
+  //       return [];
   //     }
   //   };
-  //   getActivities();
+
+  //   // Fetch user data (proposed activities)
+  //   const getActivities = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/activities`,
+  //         {
+  //           method: "GET",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //         },
+  //       );
+  //       if (!response.ok) {
+  //         throw new Error("Failed to fetch trip");
+  //       }
+
+  //       let data = await response.json();
+
+  //       data = data.map((item: any) => ({
+  //         ...item,
+  //         imageUrl:
+  //           "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlCeVhPcF0B061dWx6Y2p6ZshztnAoVQI59g&s",
+  //       }));
+  //       console.log("user activitiies");
+  //       console.log(data);
+  //       return data;
+  //     } catch (error: any) {
+  //       console.error("Error fetching trip:", error.toString());
+  //       return [];
+  //     }
+  //   };
+
+  //   // Combine two data
+  //   const fetchData = async () => {
+  //     try {
+  //       const ggData = await getTripAndActivities();
+  //       const userData = await getActivities();
+
+  //       const combinedData = userData.concat(ggData);
+  //       setActivities(combinedData);
+  //       setFilteredActivities(combinedData);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+
+  //   fetchData();
   // }, [id]);
+
 
   const handleSelectCategory = (category: string) => {
     setSelectedCategory(category);
@@ -143,7 +218,14 @@ const ActivitiesScreen = () => {
               No activities found for this category.
             </Text>
             <Link href={`/trips/create?id=${id}`}>
-              <TouchableOpacity style={styles.updateButton}>
+              <TouchableOpacity
+                style={styles.updateButton}
+                onPress={() => {
+                  /* Replace with the route to the update trip page */
+                  console.log("Navigate to update trip page");
+                }}
+              >
+                {" "}
                 <Text style={styles.updateButtonText}>
                   Update trip's radius or location
                 </Text>
@@ -169,7 +251,7 @@ const ActivitiesScreen = () => {
           shadowRadius: 2,
         }}
         onPress={() => {
-          /* Handle the button press */
+          router.push("../create");
         }}
       >
         <Ionicons name="add" size={25} color="white" />
@@ -232,3 +314,4 @@ const styles = StyleSheet.create({
 });
 
 export default ActivitiesScreen;
+

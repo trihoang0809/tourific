@@ -65,7 +65,8 @@ export const ListFilteredCards = ({ isUpcoming, userId }: listprops) => {
           : `http://${serverUrl}:3000/trips?ongoing=true&firebaseUserId=${userId}`;
         const upcoming = await fetch(link);
         let data = await upcoming.json();
-        setUpcoming(getRecentTrips(data));
+        let upcomingTrips = data.map((trip: any, id: number) => trip.trip);
+        setUpcoming(getRecentTrips(upcomingTrips));
       } catch (error) {
         console.log(error);
       }

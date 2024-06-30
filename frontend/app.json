@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.frontend"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -27,13 +28,20 @@
     },
     "scheme": "tourific",
     "plugins": [
-      "expo-router",
       [
         "expo-build-properties",
         {
           "android": {
             "usesCleartextTraffic": true
           }
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Tourific to access your photos",
+          "cameraPermission": "Allow Tourific to access your photos",
+          "microphonePermission": "Allow Tourific to access your photos"
         }
       ]
     ]

@@ -1,8 +1,9 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import TripRouter from "./routes/TripRouter";
-import { connect } from "./db";
 import UserProfile from "./routes/UserProfile";
+import { connect } from "./db";
+
 const app = express();
 const cors = require("cors");
 const port = process.env.PORT || 3000;

@@ -1,9 +1,17 @@
-import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  Image,
+  StyleSheet,
+  Pressable,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import { useGlobalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from "luxon";
+import { any } from "zod";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 const width = Dimensions.get("window").width; //full width
@@ -22,12 +30,11 @@ const TripDetailsScreen = () => {
     startMinute: 0,
     image: { url: "" },
   });
-  const serverUrl = EXPO_PUBLIC_HOST_URL;
   const defaultUri =
     "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400";
   // more setting icon
   const [modalEditVisible, setModalEditVisible] = useState(false);
-
+  const [schedule, setSchedule] = useState({ route: [any], cost: -1 });
   const getTrip = async ({
     id: text,
   }: {
@@ -156,6 +163,28 @@ const TripDetailsScreen = () => {
                 {DateTime.local().zoneName}
               </Text>
               <Text style={styles.h2}>Participants</Text>
+              <Pressable
+                onPress={async () => {
+                  const url = `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/schedule`;
+                  try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                      throw new Error("Failed to fetch trip");
+                    }
+
+                    const data = await response.json();
+                    setSchedule(data);
+                  } catch (error: any) {
+                    console.error("Error fetching trip:", error.toString());
+                  }
+                }}
+              >
+                <Text>Click</Text>
+                {schedule.route.map((activity: any, id: number) => (
+                  <Text key={id}>{id + " " + activity.name}</Text>
+                ))}
+                <Text>{"total distance: " + schedule.cost}</Text>
+              </Pressable>
             </View>
           </View>
         </View>
