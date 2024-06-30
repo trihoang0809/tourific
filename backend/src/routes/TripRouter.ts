@@ -145,9 +145,9 @@ router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
       },
     });
 
-  if (!isValidID) {
-    res.status(StatusCodes.NOT_FOUND).json({ error: "Trip does not exist" });
-  }
+    if (!isValidID) {
+      res.status(StatusCodes.NOT_FOUND).json({ error: "Trip does not exist" });
+    }
 
     const trip = await prisma.trip.update({
       where: {
@@ -193,8 +193,9 @@ router.delete("/:id", async (req, res) => {
 });
 
 // GET all participant in a trip
-router.get("/:id/participants", async (req: Request<TripParams>, res) => {
+router.get("/:tripId/participants", async (req: Request<TripParams>, res) => {
   const { tripId } = req.params;
+  console.log("tripId", tripId);
   try {
     const participants = await prisma.tripMember.findMany({
       where: {
@@ -205,7 +206,7 @@ router.get("/:id/participants", async (req: Request<TripParams>, res) => {
         invitee: true
       }
     });
-    res.json(participants);
+    res.status(StatusCodes.OK).json(participants);
   } catch (error) {
     console.error("Error retrieving trip participants:", error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while retrieving participants." });  // Send an error response
@@ -227,6 +228,7 @@ router.get("/:id/non-participants", async (req, res) => {
       },
       include: {
         receiver: true,
+        sender: true,
       }
     });
     console.log("friends", friends);
@@ -242,6 +244,7 @@ router.get("/:id/non-participants", async (req, res) => {
       },
       select: {
         inviteeId: true,
+        inviterId: true,
         status: true,
       }
     });
@@ -250,24 +253,32 @@ router.get("/:id/non-participants", async (req, res) => {
       return res.status(StatusCodes.NOT_FOUND).json({ error: "Trip not found" });
     }
 
+    console.log("participants", participants);
     // Map participants to their status
     const participantIdsToStatus = new Map(participants.map(p => [p.inviteeId, p.status]));
+    console.log("participantIdsToStatus", participantIdsToStatus);
 
     // Filter and prepare data for friends not fully accepted into the trip
     const contactsNotInTrip = friends.reduce((acc: any, friend) => {
       const friendId = friend.receiverID === userId ? friend.senderID : friend.receiverID;
+      console.log("friendId", friendId);
       const status = participantIdsToStatus.get(friendId);
+      console.log("status", status);
 
-      if (!status || status !== 'ACCEPTED') {  // check if not part of the trip or not accepted
+      if (!status || (status !== 'ACCEPTED' && status !== 'PENDING')) {  // check if not part of the trip or not accepted
         acc.push({
-          receiver: friend.receiver,
+          receiver: friend.receiverID === userId ? friend.sender : friend.receiver,
           status: status || 'NOT_INVITED'  // return status or 'NOT_INVITED' if no status found (user has not been invited)
         });
       }
+
+      // filter out the user from the list of friends
+      acc = acc.filter((contact: any) => contact.receiver.id !== userId);
+
       return acc;
     }, []);
 
-    res.json(contactsNotInTrip);
+    res.status(StatusCodes.OK).json(contactsNotInTrip);
   } catch (error) {
     console.error("Failed to fetch contacts not in trip: ", error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Server error");

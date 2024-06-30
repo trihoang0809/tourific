@@ -137,7 +137,7 @@ router.post("/friend", async (req, res) => {
 });
 
 // get all friends
-router.get("/friend", async (req, res) => {
+router.get("/:id/friends", async (req, res) => {
   const userId = userID;
   try {
     const friends = await prisma.friendship.findMany({

@@ -1,9 +1,9 @@
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, Dimensions } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { Feather, MaterialIcons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import ContactCard from '../Avatar/ContactCard';
 import { EXPO_PUBLIC_HOST_URL } from '@/utils';
-import { Stack, router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { FriendRequest, User } from '@/types';
 import NoFriendDisplay from '../AddFriend/NoFriendDisplay';
 import { SafeAreaView } from 'react-native';
@@ -17,11 +17,15 @@ const InvitePage = () => {
   const [friendList, setFriendList] = useState<User[]>([]);
   const [friendsToInvite, setFriendsToInvite] = useState<FriendRequest[]>([]);
   const [invitations, setInvitations] = useState<string[]>([]);
+  const [isSending, setIsSending] = useState(false);
+  // const [searchResults, setSearchResults] = useState<User[]>([]);
 
-  const handleSearch = (text: string) => {
-    setSearchTerm(text);
-    // Add functionality here if needed to filter friends based on search term
-  };
+  // const handleSearch = (text: string) => {
+  //   setSearchTerm(text);
+  //   if (text) {
+  //     setSearchResults(prev => prev.filter(user => user.receiver.userName?.includes(text.toLowerCase())));
+  //   }
+  // };
 
   const getAllFriends = async () => {
     try {
@@ -37,16 +41,14 @@ const InvitePage = () => {
       }
 
       const result = await usersToInvite.json();
-      console.log(result);
       setFriendList(result);
     } catch (error) {
-      console.error("Failed to fetch trip participants", error);
+      console.error("Failed to fetch friends", error);
     }
   };
 
   const getFriendsToInvite = async () => {
     try {
-      console.log("tripid", id);
       const usersToInvite = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/non-participants`, {
         method: "GET",
         headers: {
@@ -54,19 +56,13 @@ const InvitePage = () => {
         },
       });
 
-      if (!usersToInvite.ok) {
-        throw new Error("Failed to fetch trip participants");
-      }
-
       const result = await usersToInvite.json();
       setFriendsToInvite(result);
     } catch (error) {
-      console.error("Failed to fetch trip participants", error);
+      console.error("Failed to fetch trip participants", id, error);
     }
   };
 
-  console.log("invitations", invitations);
-  console.log("friendsToInvite", friendsToInvite);
   useEffect(() => {
     getAllFriends();
     getFriendsToInvite();
@@ -88,8 +84,8 @@ const InvitePage = () => {
 
   const sendInvitations = async () => {
     try {
+      setIsSending(true);
       const inviteeIds = invitations;
-      console.log("inviteeIds", inviteeIds);
       const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/${id}`, {
         method: "POST",
         headers: {
@@ -99,13 +95,16 @@ const InvitePage = () => {
       });
 
       if (response.ok) {
-        setFriendsToInvite(prev => prev.filter(user => !invitations.includes(user.nonParticipant.id)));
+        setFriendsToInvite(prev => prev.filter(user => !invitations.includes(user.receiver.id)));
         alert('Invitations sent successfully!');
+        setInvitations([]); // Clear invitations after sending
       } else {
         throw new Error("Failed to send invitations");
       }
     } catch (error) {
       console.error("Failed to send invitations", error);
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -113,21 +112,17 @@ const InvitePage = () => {
     router.push(`/trips/${id}`);
   };
 
-  console.log("friendsToInvite", friendsToInvite);
-
   return (
-    <SafeAreaView
-      style={{ height: screenHeight, flexDirection: 'column', backgroundColor: 'white' }}
-    >
-      {friendsToInvite?.length > 0 ?
+    <SafeAreaView style={{ height: screenHeight, flexDirection: 'column', backgroundColor: 'white' }}>
+      {friendsToInvite?.length > 0 ? (
         <>
           <Text style={{ fontSize: 25, fontWeight: 'bold', textAlign: 'center', marginVertical: 10 }}>
             Invite friends to the trip
           </Text>
           <Text style={{ fontSize: 15, color: 'gray', textAlign: 'left', marginHorizontal: 20, marginTop: 10 }}>
-            Your friends will receive a notification of your invitations
+            Your friends will receive a notification of your invitations. You can skip this step and invite friends later.
           </Text>
-          <View style={styles.searchContainer}>
+          {/* <View style={styles.searchContainer}>
             <Feather name="search" size={20} color="black" />
             <TextInput
               placeholder="Search for friends..."
@@ -135,25 +130,26 @@ const InvitePage = () => {
               onChangeText={handleSearch}
               style={styles.searchInput}
             />
-          </View>
-          <View style={{ flex: 1 }}>
+          </View> */}
+          <View style={{ flex: 1, marginTop: 20 }}>
             {friendsToInvite.map((user, index) => (
               <ContactCard
-                user={user.nonParticipant}
+                user={user.receiver}
                 status={user.status}
                 key={index}
-                isChecked={isChecked(user.nonParticipant.id)}
-                setChecked={(e) => setChecked(e, user.nonParticipant.id)} />
-            ))
-            }
+                isChecked={isChecked(user.receiver.id)}
+                setChecked={(e) => setChecked(e, user.receiver.id)}
+              />
+            ))}
           </View>
           <View style={styles.buttonGroup}>
-            <TouchableOpacity onPress={sendInvitations} style={styles.sendButton}>
-              <Text style={{
-                textAlign: 'center',
-                color: 'white'
-              }}>
-                Send Invitations
+            <TouchableOpacity
+              onPress={sendInvitations}
+              style={[styles.sendButton, isSending && { backgroundColor: 'gray' }]}
+              disabled={isSending}
+            >
+              <Text style={{ textAlign: 'center', color: 'white' }}>
+                {isSending ? 'Sending...' : 'Send Invitations'}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleSkip}>
@@ -161,9 +157,9 @@ const InvitePage = () => {
             </TouchableOpacity>
           </View>
         </>
-        :
+      ) : (
         <NoFriendDisplay />
-      }
+      )}
     </SafeAreaView>
   );
 };
@@ -202,8 +198,8 @@ const styles = StyleSheet.create({
     padding: 15,
     width: '90%',
     backgroundColor: 'blue',
-    marginBottom: 15
-  }
+    marginBottom: 15,
+  },
 });
 
 export default InvitePage;
