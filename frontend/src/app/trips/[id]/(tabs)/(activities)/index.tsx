@@ -220,12 +220,7 @@ const ActivitiesScreen = () => {
             <Link href={`/trips/create?id=${id}`}>
               <TouchableOpacity
                 style={styles.updateButton}
-                onPress={() => {
-                  /* Replace with the route to the update trip page */
-                  console.log("Navigate to update trip page");
-                }}
               >
-                {" "}
                 <Text style={styles.updateButtonText}>
                   Update trip's radius or location
                 </Text>
