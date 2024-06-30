@@ -33,7 +33,7 @@ async function queryTripsStartingTomorrow(): Promise<Trip[]> {
   const endOfTomorrowLocal = new Date(tomorrow.setHours(23, 59, 59, 999)).toISOString();
 
   const response = await fetch(
-    `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?upcoming=true&startTimeLocal=${startOfTomorrowLocal}&endTimeLocal=${endOfTomorrowLocal}`,
+    `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/all?upcoming=true&startTimeLocal=${startOfTomorrowLocal}&endTimeLocal=${endOfTomorrowLocal}`,
     {
       method: "GET",
       headers: {
@@ -53,8 +53,8 @@ async function sendPushNotification(expoPushToken: String, trip: Trip) {
   const message = {
     to: expoPushToken,
     sound: "default",
-    title: `${trip.name}`,
-    body: `Your trip to ${trip.location.citystate} starts tomorrow!`,
+    title: `Ready for the coming trip?`,
+    body: `Let's review the plan for ${trip.name}!`,
     data: { tripId: trip.id }
   };
 
