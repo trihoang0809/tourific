@@ -32,7 +32,9 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
         >
           <Ionicons name="notifications-outline" size={24} color="black" />
         </TouchableOpacity>
-        <Pressable onPress={() => router.push("userProfile/userProfileUI")}>
+        <Pressable
+          onPress={() => router.push("userProfile/665d2e50daefbf432fff98dc")}
+        >
           <Image style={styles.avatar} source={{ uri: defaultAvatar }} />
         </Pressable>
       </View>
