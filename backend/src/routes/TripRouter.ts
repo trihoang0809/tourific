@@ -124,6 +124,9 @@ router.get("/:id", async (req, res) => {
       where: {
         id,
       },
+      include: {
+        activities: true, // Include activities associated with the trip
+      },
     });
     res.status(StatusCodes.OK).json(trip);
   } catch (error) {
@@ -142,9 +145,9 @@ router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
       },
     });
 
-    if (!isValidID) {
-      res.status(StatusCodes.NOT_FOUND);
-    }
+  if (!isValidID) {
+    res.status(StatusCodes.NOT_FOUND).json({ error: "Trip does not exist" });
+  }
 
     const trip = await prisma.trip.update({
       where: {

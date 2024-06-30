@@ -7,11 +7,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function App() {
   return (
     <View>
-      <Stack.Screen
-        options={{
-          headerShown: false,
-        }}
-      />
       <SafeAreaView>
         <ListFilteredCards isUpcoming={true} />
       </SafeAreaView>

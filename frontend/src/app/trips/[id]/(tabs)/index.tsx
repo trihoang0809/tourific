@@ -3,13 +3,13 @@ import {
   Text,
   ScrollView,
   Image,
-  TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  TouchableOpacity,
 } from "react-native";
 import React, { useState, useEffect } from "react";
-import { Link, Stack, router, useGlobalSearchParams } from "expo-router";
-import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useGlobalSearchParams, Stack, router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from 'luxon';
 import SplashScreen from "@/components/Loading/SplashScreen";

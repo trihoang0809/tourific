@@ -21,6 +21,7 @@ import { TripSchema } from "@/validation/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import PhotoAPI from "@/components/PhotoAPI";
+import { MaterialIcons } from "@expo/vector-icons";
 
 // CREATING: /trips/create
 // UPDATING: /trips/create?id=${id}
@@ -167,11 +168,11 @@ export default function CreateTripScreen() {
           throw new Error("Failed to update trip");
         }
 
-        Alert.alert("", "Successful update trip", [
+        Alert.alert("Trip updated", "Ready to hit the road?", [
           {
-            text: "Go back home",
+            text: "Ok!",
             onPress: () => {
-              router.push("/");
+              router.back()
             },
           },
         ]);
@@ -198,10 +199,10 @@ export default function CreateTripScreen() {
         }
         // Optionally, you can handle the response here
         const data = await response.json();
-        Alert.alert("Alert Title", "Create Trip Successfully", [
+        Alert.alert("Trip created", "Let's start planning!", [
           {
-            text: "Go back home page",
-            onPress: () => <Link href={"/trips"} />,
+            text: "Awesome!",
+            onPress: () => router.back()
           },
         ]);
       } catch (error: any) {
@@ -297,12 +298,24 @@ export default function CreateTripScreen() {
 
   return (
     <View>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          title: " ",
-        }}
-      />
+      {isUpdating ? (
+        ""
+      ) : (
+        <Stack.Screen
+          options={{
+            title: "",
+            headerShown: true,
+            headerLeft: () => (
+              <MaterialIcons
+                name="arrow-back"
+                size={24}
+                color="black"
+                onPress={() => router.navigate("/")}
+              />
+            ),
+          }}
+        />
+      )}
       <ScrollView nestedScrollEnabled={true}>
         {/* trips banner */}
         <View style={{ position: "relative" }}>
