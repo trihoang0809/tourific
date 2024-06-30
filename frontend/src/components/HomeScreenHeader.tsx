@@ -11,11 +11,18 @@ import { Ionicons } from "@expo/vector-icons";
 
 export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
-    <View style={styles.content}>
+    <SafeAreaView style={styles.content}>
       <View>
         <Text style={styles.appName}>tourific</Text>
       </View>
-      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-end",
+        }}
+      >
         <TouchableOpacity
           onPress={() => {
             /* navigate to notifications */
@@ -25,19 +32,19 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
         </TouchableOpacity>
         <Image style={styles.avatar} source={{ uri: user.avatar.url }} />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {},
   content: {
-    width: "100%",
-    backgroundColor: "white",
+    flex: 1,
     flexDirection: "row",
-    justifyContent: 'space-around',
-    alignItems: 'center',
+    justifyContent: "space-around",
+    alignItems: "center",
     padding: 10,
-    paddingHorizontal: 20
+    marginHorizontal: 15,
   },
   notificationIcon: {
     position: "absolute",

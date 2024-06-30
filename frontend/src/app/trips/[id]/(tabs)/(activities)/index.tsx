@@ -26,7 +26,7 @@ const ActivitiesScreen = () => {
   } = useQuery({
     queryKey: ["activities", id],
     queryFn: () => fetchActivities(id),
-    refetchInterval: 10000, // Refetch every 100 seconds
+    refetchInterval: 100000, // Refetch every 100 seconds
   });
   const [filteredActivities, setFilteredActivities] = useState<ActivityProps[]>(
     [],

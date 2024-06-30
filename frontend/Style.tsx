@@ -1,4 +1,4 @@
-import { Platform, StatusBar, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   card: {
@@ -33,6 +33,7 @@ export default StyleSheet.create({
     borderTopRightRadius: 15,
   },
   tripCardSecondaryText: {
-    fontSize: 13, color: '#696e6e'
+    fontSize: 13,
+    color: "#696e6e",
   },
 });

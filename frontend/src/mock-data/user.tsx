@@ -51,6 +51,6 @@ export const sampleUser: User = {
   avatar: {
     height: 100,
     width: 100,
-    url: "https://plus.unsplash.com/premium_photo-1677545182425-4fb12bdb9faf?q=80&w=2944&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    url: "https://scontent-hou1-1.xx.fbcdn.net/v/t1.6435-9/67549543_1677313342402190_2404123813840158720_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=5f2048&_nc_ohc=pDHdI8PBFUwAb5JLH3r&_nc_ht=scontent-hou1-1.xx&oh=00_AfD5qhcs4aJFMg8m7IrWQWCU-WdOUiJD_vOruMURm0JLMA&oe=664D6F85",
   },
 };

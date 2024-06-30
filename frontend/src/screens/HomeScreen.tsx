@@ -77,18 +77,18 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-      <HomeScreenHeader user={sampleUser} />
+      <HomeScreenHeader user={user} />
       <ScrollView style={styles.container}>
         <View style={{ height: 180 }}>
           <Image
             source={{
               uri: randomizeCover(headerImage),
             }}
-            style={{ height: 100, position: "absolute", width: "100%", top: 0 }}
+            style={{ height: 180, position: "absolute", width: "100%", top: 0 }}
             resizeMode="cover"
           />
         </View>
-        <View style={{ marginTop: -80 }}>
+        <View style={{ marginTop: -5 }}>
           <View style={styles.inline}>
             <Text style={styles.title}>Ongoing Trips</Text>
             <Text

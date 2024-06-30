@@ -66,6 +66,7 @@ export const saveActivitiesToBackend = async (
   tripId: string,
   activities: ActivityProps[],
 ) => {
+  console.log("trip ID!: ", tripId);
   const promises = activities.map(async (activity) => {
     const response = await fetch(
       `http://${process.env.EXPO_PUBLIC_HOST_URL}:3000/trips/${tripId}/activities`,

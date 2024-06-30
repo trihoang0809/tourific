@@ -7,9 +7,9 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Trip } from "../../types";
-import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
-import { router } from "expo-router";
-import { noImage } from "@/utils/constants";
+import { Octicons, MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import { Link, router, Stack } from "expo-router";
+import { noImage, defaultAvatar } from "@/utils/constants";
 import { tripDate } from "@/utils";
 import Style from "Style";
 
@@ -39,27 +39,37 @@ export const TripCard: React.FC<tripProps> = ({
   };
 
   // Calculate image height as 2/3 of the card's height
-  const imageHeight = (height * 1.7) / 3;
+  const imageHeight = (height * 2) / 3;
   const tripState = tripLocation.citystate.split(", ");
 
   useEffect(() => {
     if (tripLocation.citystate.length * fontTripDetail * 0.75 >= width)
       if (tripState.length >= 2)
-        setLocation(tripState[tripState.length - 2] + ", " + tripState[tripState.length - 1]);
-
+        setLocation(
+          tripState[tripState.length - 2] +
+            ", " +
+            tripState[tripState.length - 1],
+        );
   }, []);
 
   return (
     <TouchableHighlight
-      style={[Style.card, { height: height, width: width, marginHorizontal: 20, marginBottom: 5 }]} // Apply dynamic height and width
-      underlayColor="#e3e3e3"
+      style={[
+        Style.card,
+        { height: height, width: width, marginHorizontal: 20, marginBottom: 5 },
+      ]} // Apply dynamic height and width
+      underlayColor="#fffcab"
       onPress={onPressTripCard}
     >
-      <View style={{ flexDirection: 'column', justifyContent: 'space-between' }}>
-        <View style={{
-          padding: 8,
-          marginTop: 10
-        }}>
+      <View
+        style={{ flexDirection: "column", justifyContent: "space-between" }}
+      >
+        <View
+          style={{
+            padding: 8,
+            marginTop: 10,
+          }}
+        >
           <Image
             source={
               tripImage?.url === undefined
@@ -78,20 +88,30 @@ export const TripCard: React.FC<tripProps> = ({
         </View>
         <View style={styles.descriptionContainer}>
           <View>
-            <Text numberOfLines={1} style={{ fontSize: fontTripName, fontWeight: "bold" }}>
+            <Text
+              numberOfLines={1}
+              style={{ fontSize: fontTripName, fontWeight: "bold" }}
+            >
               {tripName}
             </Text>
           </View>
 
-          <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 5 }}>
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             <View style={styles.detail}>
               <Ionicons name="location-outline" size={18} color="#696e6e" />
-              <Text numberOfLines={1} style={[Style.tripCardSecondaryText, { marginLeft: 4 }]}>
+              <Text
+                numberOfLines={1}
+                style={[Style.tripCardSecondaryText, { marginLeft: 4 }]}
+              >
                 {location}
               </Text>
             </View>
             <View style={styles.detail}>
-              <MaterialCommunityIcons name="timetable" size={17} color="#696e6e" />
+              <MaterialCommunityIcons
+                name="timetable"
+                size={17}
+                color="#696e6e"
+              />
               <Text style={[Style.tripCardSecondaryText, { marginLeft: 4 }]}>
                 {tripDate(new Date(tripStartDate))}
               </Text>
@@ -117,13 +137,13 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    borderRadius: 14
+    borderRadius: 14,
   },
 
   descriptionContainer: {
     paddingLeft: 10,
     // paddingVertical: 10,
-    textAlign: 'center',
+    textAlign: "center",
     justifyContent: "space-between",
   },
 
