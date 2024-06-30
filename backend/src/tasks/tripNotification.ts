@@ -17,8 +17,8 @@ function scheduleTripNotifications() {
     }
   });
 
-  cron.schedule("*/20 * * * * *", async () => {
-    // For testing, run every 20 seconds
+  cron.schedule("*/30 * * * * *", async () => {
+    // For testing, run every 30 seconds
     // cron.schedule("0 0 * * 0", async () => { // For production: Run at midnight (0 hours and 0 minutes) on Sunday
     try {
       await sendUpvoteMoreActivitiesNotification();

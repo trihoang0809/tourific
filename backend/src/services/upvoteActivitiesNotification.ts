@@ -53,7 +53,7 @@ const expo = new Expo();
 
 async function queryUsersUpcomingTrips(): Promise<User[]> {
   const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL || "localhost";
-  const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/user/`, {
+  const response = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/user?upcoming=true`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -72,7 +72,7 @@ async function sendPushNotification(expoPushToken: String, trip: Trip) {
     to: expoPushToken,
     sound: "default",
     title: `${trip.name}`,
-    body: `"Help us plan this trip by upvoting activities you like!"`,
+    body: "Help us plan this trip by upvoting some more activities!",
     data: { tripId: trip.id },
   };
 
@@ -93,14 +93,14 @@ async function sendUpvoteMoreActivitiesNotification() {
     const users = await queryUsersUpcomingTrips();
     // Send notification to first upcoming trip that doesn't have enough activity
     for (const user of users) {
-      const upcomingTrips = user.inviteeTripInvitations.filter((tripMember) => {
-        const trip = tripMember.trip;
-        const tripDuration = (trip.endDate.getTime() - trip.startDate.getTime()) / (1000 * 3600 * 24);
+      const membership = user.inviteeTripInvitations.filter((memberOf) => {
+        const trip = memberOf.trip;
+        const tripDuration = (new Date(trip.endDate).getTime() - new Date(trip.startDate).getTime()) / (1000 * 3600 * 24);
         return trip.activities.length < tripDuration;
       });
 
-      if (upcomingTrips.length > 0) {
-        const tripToNotify = upcomingTrips[0]; // Notify about the first trip
+      if (membership.length > 0) {
+        const tripToNotify = membership[0]; // Notify about the first trip
         await sendPushNotification(TESTING_PUSH_TOKEN, tripToNotify.trip);
         console.log("Successfully sent notifications to remind users to upvote more activities");
       }
