@@ -48,7 +48,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <HomeScreenHeader user={sampleUser} />
       <ScrollView style={styles.container}>
         <View style={{ height: 180 }}>
