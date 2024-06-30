@@ -10,8 +10,39 @@ const userID = "6661308f193a6cd9e0ea4d36";
 
 // Get all user profiles
 router.get("/", async (req, res) => {
+  // Get all users with their 3 most recent upcoming trips
   try {
-    const users = await prisma.user.findMany();
+    let queryConditions = {};
+    if (req.query.threeUpcoming === "true") {
+      queryConditions = {
+        include: {
+          inviteeTripInvitations: {
+            include: {
+              trip: {
+                include: {
+                  activities: true, // Is this necessary
+                },
+              },
+            },
+            where: {
+              status: "ACCEPTED",
+              trip: {
+                endDate: {
+                  gt: new Date(), // Filter for upcoming trips
+                },
+              },
+            },
+            orderBy: {
+              trip: {
+                startDate: "asc", // Order trips by start date ascending
+              },
+            },
+            take: 3, // Get only 3 the earliest trips of that user
+          },
+        },
+      };
+    }
+    const users = await prisma.user.findMany(queryConditions);
     res.json(users);
   } catch (error) {
     console.log(error);
@@ -129,8 +160,7 @@ router.post("/friend", async (req, res) => {
       },
     });
     res.status(StatusCodes.CREATED).json(friend);
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while adding a friend." });
   }
@@ -148,29 +178,30 @@ router.get("/friend", async (req, res) => {
             senderID: userId,
             friendStatus: "ACCEPTED",
             receiverID: {
-              not: userId
-            }
+              not: userId,
+            },
           },
           {
             receiverID: userId,
             friendStatus: "ACCEPTED",
             senderID: {
-              not: userId
-            }
+              not: userId,
+            },
           },
         ],
       },
     });
     res.status(StatusCodes.OK).json(friends);
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting sent friend requests." });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while getting sent friend requests." });
   }
 });
 
 // accept or decline a friend request
-// to accept: /friend?accept=true 
+// to accept: /friend?accept=true
 // to reject: /friend?accept=false
 router.patch("/friend", async (req, res) => {
   const { friendId } = req.body;
@@ -186,7 +217,7 @@ router.patch("/friend", async (req, res) => {
           },
         },
         data: {
-          friendStatus: "ACCEPTED"
+          friendStatus: "ACCEPTED",
         },
       });
       res.status(StatusCodes.OK).json(friend);
@@ -201,10 +232,11 @@ router.patch("/friend", async (req, res) => {
       });
       res.status(StatusCodes.OK).json(rejectFriend);
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while accepting/declining a friend." });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while accepting/declining a friend." });
   }
 });
 
@@ -215,13 +247,15 @@ router.get("/friend/sent-requests", async (req, res) => {
     const sentRequests = await prisma.friendship.findMany({
       where: {
         senderID: userId,
-        friendStatus: 'PENDING',
+        friendStatus: "PENDING",
       },
     });
     res.status(StatusCodes.OK).json(sentRequests);
   } catch (error) {
     console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting sent friend requests." });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while getting sent friend requests." });
   }
 });
 
@@ -232,13 +266,15 @@ router.get("/friend/pending-requests", async (req, res) => {
     const pendingRequests = await prisma.friendship.findMany({
       where: {
         receiverID: userId,
-        friendStatus: 'PENDING',
+        friendStatus: "PENDING",
       },
     });
     res.status(StatusCodes.OK).json(pendingRequests);
   } catch (error) {
     console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting pending friend requests." });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while getting pending friend requests." });
   }
 });
 
