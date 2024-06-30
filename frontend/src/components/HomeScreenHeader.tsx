@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { UserProps } from "../types";
 import { Ionicons } from "@expo/vector-icons";
+import { Link, router } from "expo-router";
 
 export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
@@ -17,6 +18,12 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
       </View>
       <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
         <TouchableOpacity
+          onPress={() => router.push("/friends/search")}
+          style={{ marginRight: 20 }}
+        >
+          <Ionicons name="person-add-outline" size={22} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity
           onPress={() => {
             /* navigate to notifications */
           }}
@@ -24,8 +31,8 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
           <Ionicons name="notifications-outline" size={24} color="black" />
         </TouchableOpacity>
         <Image style={styles.avatar} source={{ uri: user.avatar.url }} />
-      </View>
-    </SafeAreaView>
+      </View >
+    </SafeAreaView >
   );
 };
 
