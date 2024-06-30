@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  RefreshControl,
 } from "react-native";
 import { TripCard } from "../components/TripCard/TripCard";
 import { HomeScreenHeader } from "../components/HomeScreenHeader";
@@ -36,49 +37,59 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
     fetchUserId();
   }, []);
 
+  const fetchTrips = async () => {
+    console.log(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`);
+    if (!userId) {
+      console.error("User ID is null");
+      return;
+    }
+    try {
+      // const headers = {
+      //   "Content-Type": "application/json",
+      //   Authorization: `Bearer ${await getToken()}`,
+      // };
+      // console.log("Headers:  ", headers);
+
+      const ongoing = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true&firebaseUserId=${userId}`,
+        // { headers },
+      );
+
+      const upcoming = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?upcoming=true&firebaseUserId=${userId}`,
+        // { headers },
+      );
+
+      const ongoingData = await ongoing.json();
+      const upcomingData = await upcoming.json();
+
+      setOngoingTrips(ongoingData);
+      setUpcomingTrips(getRecentTrips(upcomingData));
+    } catch (error) {
+      console.error("Failed to fetch trips:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchTrips = async () => {
-      console.log(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`);
-      if (!userId) {
-        console.error("User ID is null");
-        return;
-      }
-      try {
-        // const headers = {
-        //   "Content-Type": "application/json",
-        //   Authorization: `Bearer ${await getToken()}`,
-        // };
-        // console.log("Headers:  ", headers);
-
-        const ongoing = await fetch(
-          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true&firebaseUserId=${userId}`,
-          // { headers },
-        );
-
-        const upcoming = await fetch(
-          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?upcoming=true&firebaseUserId=${userId}`,
-          // { headers },
-        );
-
-        const ongoingData = await ongoing.json();
-        const upcomingData = await upcoming.json();
-
-        setOngoingTrips(ongoingData);
-        setUpcomingTrips(getRecentTrips(upcomingData));
-      } catch (error) {
-        console.error("Failed to fetch trips:", error);
-      }
-    };
     if (userId) {
       console.log("got user id: ", userId);
       fetchTrips();
     }
   }, [userId]);
 
+  const onRefresh = useCallback(() => {
+    fetchTrips();
+  }, [userId]);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <HomeScreenHeader user={user} />
-      <ScrollView style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={false} onRefresh={onRefresh} />
+        }
+      >
         <View style={{ height: 180 }}>
           <Image
             source={{
