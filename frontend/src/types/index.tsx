@@ -262,7 +262,9 @@ export enum Status {
 export interface FriendRequest {
   friendStatus: Status;
   receiver: User,
-  senderId?: string;
+  receiverID: string;
+  sender: User,
+  senderID: string;
 }
 
 export interface ContactCardProps {
@@ -270,4 +272,8 @@ export interface ContactCardProps {
   isChecked: boolean;
   setChecked: (e: any, userId: string) => void;
   status: Status;
+}
+
+export interface FriendSearch extends User {
+  friendStatus: Status;
 }
