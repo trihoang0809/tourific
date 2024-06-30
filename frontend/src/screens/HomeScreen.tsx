@@ -72,7 +72,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const onAccept = async (id: string) => {
     try {
       console.log("accepting", id);
-      const sendAccept = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/${id}/accept`, {
+      const sendAccept = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/${id}?status=ACCEPTED`, {
         method: "PATCH",
       });
 
@@ -94,7 +94,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
 
   const onDecline = async (id: string) => {
     try {
-      const sendDecline = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/${id}/decline`, {
+      const sendDecline = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/${id}?status=REJECTED`, {
         method: "PATCH",
       });
 
