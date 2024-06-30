@@ -7,5 +7,5 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["**/*.ts", "**/*.tsx"]
+  "include": ["**/*.ts", "**/*.tsx", "src/middleware/GenerateSchedule/schedule/prepareData.ts"]
 }

@@ -4,10 +4,10 @@ import {
   TouchableOpacity,
   TextInput,
   Text,
-  SafeAreaView
+  SafeAreaView,
 } from "react-native";
 import { useState, useEffect } from "react";
-import { useGlobalSearchParams } from "expo-router";
+import { router, useGlobalSearchParams, usePathname } from "expo-router";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { Dimensions, StyleSheet } from "react-native";
 import ActivityThumbnail from "@/components/ActivityThumbnail";
@@ -53,15 +53,65 @@ const ActivitiesScreen = () => {
             data.location.longitude,
             data.location.radius,
           );
-          setActivities(fetchedActivities);
-          setFilteredActivities(fetchedActivities);
+
+          return fetchedActivities;
           //await saveActivitiesToBackend(fetchedActivities);
+          // console.log(userActivity);
+          // setFilteredActivities(temp);
         }
       } catch (error: any) {
         console.error("Error fetching trip:", error.toString());
+        return [];
       }
     };
-    getTripAndActivities();
+
+    // Fetch user data (proposed activities)
+    const getActivities = async () => {
+      try {
+        const response = await fetch(
+          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/activities`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          },
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch trip");
+        }
+
+        let data = await response.json();
+
+        data = data.map((item: any) => ({
+          ...item,
+          imageUrl:
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlCeVhPcF0B061dWx6Y2p6ZshztnAoVQI59g&s",
+        }));
+        console.log("user activitiies");
+        console.log(data);
+        return data;
+      } catch (error: any) {
+        console.error("Error fetching trip:", error.toString());
+        return [];
+      }
+    };
+
+    // Combine two data
+    const fetchData = async () => {
+      try {
+        const ggData = await getTripAndActivities();
+        const userData = await getActivities();
+
+        const combinedData = userData.concat(ggData);
+        setActivities(combinedData);
+        setFilteredActivities(combinedData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
   }, [id]);
 
   // const saveActivitiesToBackend = async (activities: ActivityProps[]) => {
@@ -223,7 +273,7 @@ const ActivitiesScreen = () => {
           shadowRadius: 2,
         }}
         onPress={() => {
-          /* Handle the button press */
+          router.push("../create");
         }}
       >
         <Ionicons name="add" size={25} color="white" />

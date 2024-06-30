@@ -51,6 +51,16 @@ export const tripDate = (date: Date) => {
   return `${date.getDate()} ${month}, ${date.getFullYear()}`;
 };
 
+//weekday
+export const weekday = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 // function to get the most 3 recent upcoming trips
 // @params: trips array
 // return an array of 3 most recent upcoming trips

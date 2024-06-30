@@ -7,17 +7,19 @@ const RootNavigation = () => {
   return (
     <Stack>
       <Stack.Screen
-        name='trips'
+        name="trips"
         options={{
-          title: 'Trip',
-          headerShown: false
+          title: "Trip",
+          headerShown: false,
         }}
       />
-      <Stack.Screen name="index"
+      <Stack.Screen
+        name="index"
         options={{
-          title: 'Home',
+          title: "Home",
           headerShown: false,
-        }} />
+        }}
+      />
     </Stack>
   );
 };

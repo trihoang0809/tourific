@@ -5,6 +5,7 @@ import { validateData } from "../middleware/validationMiddleware";
 import { tripCreateSchema } from "../schemas/tripSchema";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { StatusCodes } from "http-status-codes";
+import { generateSchedule } from "../middleware/GenerateSchedule/schedule";
 import InvitationRouter from "./InvitationRouter";
 
 // const express = require('express')
@@ -12,7 +13,6 @@ const router = express.Router();
 const prisma = new PrismaClient();
 const LOCAL_HOST_URL = process.env.LOCAL_HOST_URL;
 const PORT = process.env.PORT || 3000;
-
 
 export interface TripParams {
   tripId: string;
@@ -24,6 +24,38 @@ const userID = "6661308f193a6cd9e0ea4d36";
 
 // Activites of a trip
 router.use("/:tripId/activities", ActivityRouter);
+
+//Create Schedule
+router.get("/:id/schedule", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const getActivities = async () => {
+      try {
+        const activities = await prisma.activity.findMany({
+          where: {
+            tripId: id,
+          },
+        });
+
+        return JSON.stringify(activities);
+      } catch (error) {
+        console.log(error);
+        return [];
+      }
+    };
+    const activities = await getActivities();
+
+    const schedule = await generateSchedule(activities);
+    // const data = JSON.parse(schedule);
+
+    console.log(schedule);
+
+    res.json(schedule);
+  } catch (error) {
+    console.log("An error occur while creating schedule: " + error);
+  }
+});
 
 // Invitation route
 router.use("/invite", InvitationRouter);
@@ -66,15 +98,16 @@ router.get("/", async (req: Request<TripParams>, res) => {
     const trips = await prisma.tripMember.findMany({
       where: {
         inviteeId: userID,
-        status: 'ACCEPTED',
+        status: "ACCEPTED",
         trip: {
-          AND: queryConditions
-        }
+          AND: queryConditions,
+        },
       },
       include: {
-        trip: true
-      }
+        trip: true,
+      },
     });
+
     res.status(StatusCodes.OK).json(trips);
   } catch (err) {
     console.log(err);
@@ -97,9 +130,9 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
           create: {
             inviteeId: userID,
             inviterId: userID,
-            status: 'ACCEPTED'
-          }
-        }
+            status: "ACCEPTED",
+          },
+        },
       },
     });
     res.status(StatusCodes.CREATED).json(trip);
@@ -157,7 +190,7 @@ router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
         startDate,
         endDate,
         location,
-        image
+        image,
       },
     });
     res.status(StatusCodes.OK).json(trip);
@@ -198,16 +231,16 @@ router.get("/:id/participants", async (req: Request<TripParams>, res) => {
     const participants = await prisma.tripMember.findMany({
       where: {
         tripId: tripId,
-        status: 'ACCEPTED'
+        status: "ACCEPTED",
       },
       include: {
-        invitee: true
-      }
+        invitee: true,
+      },
     });
     res.json(participants);
   } catch (error) {
     console.error("Error retrieving trip participants:", error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while retrieving participants." });  // Send an error response
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while retrieving participants." }); // Send an error response
   }
 });
 
@@ -220,13 +253,13 @@ router.get("/:id/non-participants", async (req, res) => {
     const friends = await prisma.friendship.findMany({
       where: {
         OR: [
-          { receiverID: userId, friendStatus: 'ACCEPTED' },
-          { senderID: userId, friendStatus: 'ACCEPTED' }
-        ]
+          { receiverID: userId, friendStatus: "ACCEPTED" },
+          { senderID: userId, friendStatus: "ACCEPTED" },
+        ],
       },
       include: {
         receiver: true,
-      }
+      },
     });
     console.log("friends", friends);
 
@@ -242,7 +275,7 @@ router.get("/:id/non-participants", async (req, res) => {
       select: {
         inviteeId: true,
         status: true,
-      }
+      },
     });
 
     if (!participants) {
@@ -250,17 +283,18 @@ router.get("/:id/non-participants", async (req, res) => {
     }
 
     // Map participants to their status
-    const participantIdsToStatus = new Map(participants.map(p => [p.inviteeId, p.status]));
+    const participantIdsToStatus = new Map(participants.map((p) => [p.inviteeId, p.status]));
 
     // Filter and prepare data for friends not fully accepted into the trip
     const contactsNotInTrip = friends.reduce((acc: any, friend) => {
       const friendId = friend.receiverID === userId ? friend.senderID : friend.receiverID;
       const status = participantIdsToStatus.get(friendId);
 
-      if (!status || status !== 'ACCEPTED') {  // check if not part of the trip or not accepted
+      if (!status || status !== "ACCEPTED") {
+        // check if not part of the trip or not accepted
         acc.push({
           receiver: friend.receiver,
-          status: status || 'NOT_INVITED'  // return status or 'NOT_INVITED' if no status found (user has not been invited)
+          status: status || "NOT_INVITED", // return status or 'NOT_INVITED' if no status found (user has not been invited)
         });
       }
       return acc;
@@ -273,8 +307,6 @@ router.get("/:id/non-participants", async (req, res) => {
   }
 });
 
-
 // DELETE PARTICIPANT OUT OF TRIPS
-
 
 export default router;

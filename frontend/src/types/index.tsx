@@ -47,6 +47,12 @@ export interface GooglePlacesInputProps {
   value: string;
 }
 
+export interface GoogleMapInputProps {
+  onLocationSelect: (location: MapData) => void;
+  value: string;
+  location: MapData;
+}
+
 export interface ActivityProps {
   id: string;
   name: string;
@@ -171,13 +177,7 @@ export interface TripDate {
   range: Number;
 }
 
-export type Mode =
-  | "3days"
-  | "week"
-  | "day"
-  | "custom"
-  | "month"
-  | "itinerary";
+export type Mode = "3days" | "week" | "day" | "custom" | "month" | "itinerary";
 
 export interface AddActivityProps {
   currentDateUpdate: Date;

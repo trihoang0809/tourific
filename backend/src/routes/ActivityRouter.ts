@@ -19,9 +19,10 @@ router.get("/", async (req: Request<TripParams>, res) => {
   try {
     const activities = await prisma.activity.findMany({
       where: {
-        tripId,
+        tripId: tripId,
       },
     });
+
     res.status(StatusCodes.OK).json(activities);
   } catch (error) {
     res
@@ -55,7 +56,7 @@ router.get("/:activityId", async (req: Request<ActivityParams>, res) => {
 router.post("/", async (req: Request<ActivityParams>, res) => {
   const { tripId } = req.params;
   const { name, description, startTime, endTime, location, notes } = req.body;
-
+  const note = [notes];
   if (!tripId) {
     res.status(StatusCodes.NOT_FOUND).json({ error: "Trip ID does not exist" });
   }
@@ -77,6 +78,7 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
         },
       },
     });
+
     res.status(StatusCodes.CREATED).json(activity);
   } catch (error) {
     console.log(error);
