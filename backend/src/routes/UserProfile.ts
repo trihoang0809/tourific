@@ -13,22 +13,26 @@ router.get("/", async (req, res) => {
   // Get all users with their 3 most recent upcoming trips
   try {
     let queryConditions = {};
-    if (req.query.threeUpcoming === "true") {
+    if (req.query.upcoming === "true") {
       queryConditions = {
+        where: {
+          inviteeTripInvitations: {
+            some: {
+              status: "ACCEPTED",
+              trip: {
+                endDate: {
+                  gt: new Date(), // Filter for upcoming trips
+                },
+              },
+            },
+          },
+        },
         include: {
           inviteeTripInvitations: {
             include: {
               trip: {
                 include: {
-                  activities: true, // Is this necessary
-                },
-              },
-            },
-            where: {
-              status: "ACCEPTED",
-              trip: {
-                endDate: {
-                  gt: new Date(), // Filter for upcoming trips
+                  activities: true,
                 },
               },
             },
@@ -37,7 +41,7 @@ router.get("/", async (req, res) => {
                 startDate: "asc", // Order trips by start date ascending
               },
             },
-            take: 3, // Get only 3 the earliest trips of that user
+            take: 3, // Get only 3 the earliest upcoming trips
           },
         },
       };
