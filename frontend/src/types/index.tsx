@@ -1,4 +1,5 @@
 import { Ionicons, Feather } from "@expo/vector-icons";
+import React from "react";
 
 export interface TripData {
   name: string;

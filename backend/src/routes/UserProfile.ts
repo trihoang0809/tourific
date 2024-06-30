@@ -38,6 +38,7 @@ router.get("/:userId", async (req, res) => {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ error: `An error occurred while fetching user profile with Id: ${userId}` });
+    console.log(error);
   }
 });
 
