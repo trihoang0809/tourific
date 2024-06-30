@@ -8,8 +8,11 @@ const RootNavigation = () => {
     <Tabs>
       <Tabs.Screen name="index" options={{ title: "Home", headerShown: false }} />
       <Tabs.Screen
-        name="create/index"
+        name="trips"
         options={{
+          title: "",
+          headerShown: false,
+          href: "trips/create",
           tabBarIcon: ({ focused }: { focused: boolean; }) => {
             return (
               <View style={{
@@ -18,24 +21,20 @@ const RootNavigation = () => {
                 backgroundColor: focused ? "#673ab7" : "#222",
                 width: Platform.OS == "ios" ? 50 : 60,
                 height: Platform.OS == "ios" ? 50 : 60,
-                top: Platform.OS == "ios" ? -10 : -20,
+                top: -10,
                 borderRadius: 9999,
-                paddingTop: 16,
               }}>
-                {/* <Image
-                  contentFit="contain"
-                  style={{
-                    width: 30,
-                    height: 30,
-                  }}
-                  source={{ uri: "https://static.vecteezy.com/system/resources/previews/000/436/361/original/vector-add-icon.jpg" }}
-                /> */}
                 <Ionicons name="add" size={40} color="white" />
               </View>
             );
           },
         }} />
-      <Tabs.Screen name="userProfile" options={{ title: "User", headerShown: false }} />
+      <Tabs.Screen
+        name="userProfile/userProfileUI"
+        options={{
+          headerShown: false
+        }}
+      />
     </Tabs>
   );
 };
