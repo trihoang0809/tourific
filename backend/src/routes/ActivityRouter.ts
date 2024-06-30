@@ -158,16 +158,19 @@ router.put("/:activityId/toggle", async (req: Request<ActivityParams>, res) => {
 
 // Update an activity by googlePlacesId
 router.put("/updateUpvotes/:googlePlacesId", async (req: Request, res) => {
-  const { googlePlacesId } = req.params;
+  const { googlePlacesId, tripId } = req.params;
   const { netUpvotes } = req.body;
 
   try {
     const activity = await prisma.activity.updateMany({
       where: {
+        tripId: tripId,
         googlePlacesId: googlePlacesId,
       },
       data: {
-        netUpvotes,
+        netUpvotes: {
+          increment: netUpvotes, // Use increment based on the incoming value
+        },
       },
     });
 

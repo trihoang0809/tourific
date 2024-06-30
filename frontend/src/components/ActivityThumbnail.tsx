@@ -1,6 +1,6 @@
 import { Activity, ActivityProps, ActivityThumbnailProps } from "@/types";
 import { Text, View, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Rating } from "react-native-ratings";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -12,12 +12,9 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
   const queryClient = useQueryClient();
   const [liked, setLiked] = useState(false);
   const [upvotes, setUpvotes] = useState(activity.netUpvotes);
-
-  const { data, error, isLoading } = useQuery({
-    queryKey: ["activities", tripId],
-    queryFn: () => fetchActivities(tripId),
-    refetchInterval: 300000, // Refetch every 5 minutes
-  });
+  useEffect(() => {
+    console.log("Rendered Activity Thumbnail with activity:", activity);
+  }, [activity]);
 
   const updateActivity = async ({
     googlePlacesId,
@@ -58,8 +55,7 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
     if (typeof tripId === "string") {
       try {
         const newLikedState = !liked;
-        const newUpvotes = newLikedState ? upvotes + 1 : upvotes - 1;
-
+        const newUpvotes = newLikedState ? 1 : -1;
         mutation.mutate({
           googlePlacesId: activity.googlePlacesId,
           tripId,
@@ -67,7 +63,7 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
         });
 
         setLiked(newLikedState);
-        setUpvotes(newUpvotes);
+        setUpvotes(upvotes + newUpvotes);
       } catch (error) {
         console.error("Error updating activity:", error);
       }

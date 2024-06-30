@@ -15,10 +15,19 @@ import { ActivityProps } from "@/types";
 import { categories } from "@/utils";
 import { categoriesMap } from "@/types";
 import { fetchActivities } from "@/utils/fetchAndSaveActivities";
+import { useQuery } from "@tanstack/react-query";
 
 const ActivitiesScreen = () => {
   const { id } = useGlobalSearchParams();
-  const [activities, setActivities] = useState<ActivityProps[]>([]);
+  const {
+    data: activities,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["activities", id],
+    queryFn: () => fetchActivities(id),
+    refetchInterval: 10000, // Refetch every 100 seconds
+  });
   const [filteredActivities, setFilteredActivities] = useState<ActivityProps[]>(
     [],
   );
@@ -26,40 +35,45 @@ const ActivitiesScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
 
   useEffect(() => {
-    const getActivities = async () => {
-      try {
-        const data = await fetchActivities(id);
-        const sortedData = data.sort((a, b) => b.netUpvotes - a.netUpvotes);
-        setActivities(sortedData);
-        setFilteredActivities(sortedData);
-      } catch (error: any) {
-        console.error("Error fetching activities:", error.toString());
-      }
-    };
-    getActivities();
-  }, [id]);
+    if (activities) {
+      setFilteredActivities(activities);
+    }
+  }, [activities]);
+
+  // useEffect(() => {
+  //   const getActivities = async () => {
+  //     try {
+  //       const data = await fetchActivities(id);
+  //       const sortedData = data.sort((a, b) => b.netUpvotes - a.netUpvotes);
+  //       setFilteredActivities(sortedData);
+  //     } catch (error: any) {
+  //       console.error("Error fetching activities:", error.toString());
+  //     }
+  //   };
+  //   getActivities();
+  // }, [id]);
 
   const handleSelectCategory = (category: string) => {
     setSelectedCategory(category);
     if (category === "All") {
-      setFilteredActivities(activities);
+      setFilteredActivities(activities || []);
     } else {
-      const filtered = activities.filter((activity) =>
+      const filtered = activities?.filter((activity) =>
         activity.category.some((type) => categories[category].includes(type)),
       );
-      setFilteredActivities(filtered);
+      setFilteredActivities(filtered || []);
     }
   };
 
   const handleSearch = (text: string) => {
     setSearchTerm(text);
     if (text) {
-      const searchedActivities = filteredActivities.filter((activity) =>
+      const searchedActivities = activities?.filter((activity) =>
         activity.name.toLowerCase().includes(text.toLowerCase()),
       );
-      setFilteredActivities(searchedActivities);
+      setFilteredActivities(searchedActivities || []);
     } else {
-      setFilteredActivities(activities);
+      setFilteredActivities(activities || []);
     }
   };
 
@@ -117,13 +131,11 @@ const ActivitiesScreen = () => {
               padding: 5,
             }}
           >
-            {filteredActivities.map(
-              (activity: ActivityProps, index: number) => (
-                <View key={index} style={{ width: "100%", padding: 15 }}>
-                  <ActivityThumbnail activity={activity} tripId={id} />
-                </View>
-              ),
-            )}
+            {filteredActivities.map((activity: ActivityProps) => (
+              <View key={activity.id} style={{ width: "100%", padding: 15 }}>
+                <ActivityThumbnail activity={activity} tripId={id} />
+              </View>
+            ))}
           </ScrollView>
         ) : (
           <View style={styles.noActivitiesView}>

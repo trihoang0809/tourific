@@ -42,13 +42,13 @@ export default function TripLayout({}) {
         options={{
           headerShown: true,
           headerTitle: tripName,
-          headerTitleAlign: 'center',
+          headerTitleAlign: "center",
           headerLeft: () => (
             <MaterialIcons
               name="arrow-back"
               size={24}
               color="black"
-              onPress={() => router.navigate("/")}
+              onPress={() => router.navigate("/home")}
             />
           ),
           headerRight: () => (

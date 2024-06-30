@@ -19,13 +19,14 @@ import { extractDateTime, formatDateTime } from "@/utils";
 import { DateTime } from "luxon";
 import { TripSchema } from "@/validation/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import PhotoAPI from "@/components/PhotoAPI";
-import { MaterialIcons } from "@expo/vector-icons";
 import {
   fetchGoogleActivities,
   saveActivitiesToBackend,
 } from "@/utils/fetchAndSaveActivities";
+import { getUserIdFromToken, getToken } from "@/utils";
+import { MaterialIcons } from "@expo/vector-icons";
 
 // CREATING: /trips/create
 // UPDATING: /trips/create?id=${id}
@@ -52,7 +53,7 @@ export default function CreateTripScreen() {
   const isUpdating = !!idString; // id is type of string
 
   //fetch trip if exist
-  async function setTripIfExist(tripId: string) {
+  async function setTripIfExist(tripId: string | string[]) {
     try {
       const response = await fetch(
         `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${tripId}`,
@@ -140,6 +141,16 @@ export default function CreateTripScreen() {
   const [visibleStart, setVisibleStart] = useState(false);
   const [visibleEnd, setVisibleEnd] = useState(false);
 
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const userId = await getUserIdFromToken();
+      setUserId(userId);
+    };
+    fetchUserId();
+  }, []);
+
   const onSubmit = async (data: any) => {
     const { name, location, startTime, endTime, dateRange, image } = data;
     const isoStartDate = DateTime.fromISO(
@@ -148,12 +159,14 @@ export default function CreateTripScreen() {
     const isoEndDate = DateTime.fromISO(
       formatDateTime(dateRange.endDate, endTime.hours, endTime.minutes),
     ).setZone("system");
+
     const req = {
       name: name,
       startDate: isoStartDate,
       endDate: isoEndDate,
       location,
       image: { url: savedPhoto },
+      firebaseUserId: userId,
     };
 
     if (isUpdating) {
@@ -163,7 +176,10 @@ export default function CreateTripScreen() {
           `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${idString}`,
           {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${await getToken()}`,
+            },
             body: JSON.stringify(req),
           },
         );
@@ -192,6 +208,7 @@ export default function CreateTripScreen() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${await getToken()}`,
             },
             body: JSON.stringify(req),
           },
@@ -315,7 +332,7 @@ export default function CreateTripScreen() {
   );
 
   return (
-    <View>
+    <SafeAreaView>
       {isUpdating ? (
         ""
       ) : (
@@ -642,6 +659,6 @@ export default function CreateTripScreen() {
           </View>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }

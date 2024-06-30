@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  Image,
-  StyleSheet,
-} from "react-native";
+import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import React, { useState, useEffect } from "react";
 import { useGlobalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -53,7 +47,6 @@ const TripDetailsScreen = () => {
       // Optionally, you can handle the response here
       const data = await response.json();
       setTrip(data);
-      console.log("Trip fetch:", data);
     } catch (error: any) {
       console.error("Error fetching trip:", error.toString());
     }
