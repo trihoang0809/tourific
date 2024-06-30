@@ -61,7 +61,6 @@ router.get("/", async (req: Request<TripParams>, res) => {
           gt: now,
         },
       };
-      // console.log(now);
     }
 
     const trips = await prisma.tripMember.findMany({

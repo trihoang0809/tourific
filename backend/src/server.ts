@@ -18,7 +18,6 @@ app.use(cors());
 // Trip route
 app.use("/trips", TripRouter);
 
-
 // User Profile
 app.use("/user", UserProfile);
 

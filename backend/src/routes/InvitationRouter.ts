@@ -15,12 +15,19 @@ export interface InvitationParams extends TripParams {
 // temporary for testing until auth done
 const userID = "6669267e34f4cab1d9ddd751";
 
-// get all invitations
-router.get("/", async (req: Request, res) => {
+// get an invitation by status
+// example endpoint: /invite?status=PENDING
+router.get("/", async (req: Request<InvitationParams>, res) => {
+  const { status } = req.query;
   try {
-    const trips = await prisma.tripMember.findMany();
-    console.log("trips", trips);
-    res.status(StatusCodes.OK).json(trips);
+    const invitations = await prisma.tripMember.findMany({
+      where: {
+        inviteeId: userID,
+        status: status as Status
+      },
+    });
+
+    res.status(StatusCodes.OK).json(invitations);
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting invitatiion." });
   }
@@ -29,7 +36,7 @@ router.get("/", async (req: Request, res) => {
 // get all received invitations of a user, including trip details
 router.get("/all-received", async (req: Request, res) => {
   try {
-    const trips = await prisma.tripMember.findMany({
+    const invitations = await prisma.tripMember.findMany({
       where: {
         inviteeId: userID,
         status: 'PENDING'
@@ -40,8 +47,8 @@ router.get("/all-received", async (req: Request, res) => {
       }
     });
 
-    console.log("trips", trips);
-    res.status(StatusCodes.OK).json(trips);
+    console.log("invitations", invitations);
+    res.status(StatusCodes.OK).json(invitations);
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting invitatiion." });
   }
@@ -50,7 +57,7 @@ router.get("/all-received", async (req: Request, res) => {
 // get all sent invitations of a user, including trip details
 router.get("/all-sent", async (req: Request, res) => {
   try {
-    const trips = await prisma.tripMember.findMany({
+    const invitations = await prisma.tripMember.findMany({
       where: {
         inviterId: userID,
       },
@@ -60,34 +67,17 @@ router.get("/all-sent", async (req: Request, res) => {
       }
     });
 
-    if (!trips) {
+    if (!invitations) {
       res.status(StatusCodes.NOT_FOUND).json({ error: "No invitations found." });
     }
 
-    res.status(StatusCodes.OK).json(trips);
+    res.status(StatusCodes.OK).json(invitations);
   } catch (error) {
     console.error("Error retrieving sent invitations:", error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting invitation." });
   }
 });
 
-// get an invitation by status
-// example endpoint: /invite?status=PENDING
-router.get("/", async (req: Request<InvitationParams>, res) => {
-  const { status } = req.query;
-  try {
-    const trips = await prisma.tripMember.findMany({
-      where: {
-        inviteeId: userID,
-        status: status as Status
-      },
-    });
-
-    res.status(StatusCodes.OK).json(trips);
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting invitatiion." });
-  }
-});
 
 // invite users, accept list of users' id
 router.post("/:tripId", async (req: Request<InvitationParams>, res) => {

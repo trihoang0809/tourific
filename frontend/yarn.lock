@@ -4829,21 +4829,7 @@ expo-modules-core@1.12.18:
   dependencies:
     invariant "^2.2.4"
 
-expo-notifications@~0.28.9:
-  version "0.28.9"
-  resolved "https://registry.npmjs.org/expo-notifications/-/expo-notifications-0.28.9.tgz"
-  integrity sha512-lilBS+0n+MC71jU6R9kYr91nev2God/OyxGRtab37XBmr7OWKL+jrahwdIRc2fJXq3hkQoiVWr4i9COGVFF8sA==
-  dependencies:
-    "@expo/image-utils" "^0.5.0"
-    "@ide/backoff" "^1.0.0"
-    abort-controller "^3.0.0"
-    assert "^2.0.0"
-    badgin "^1.1.5"
-    expo-application "~5.9.0"
-    expo-constants "~16.0.0"
-    fs-extra "^9.1.0"
-
-expo-router@~3.5.17:
+expo-router@^3.5.11:
   version "3.5.17"
   resolved "https://registry.npmjs.org/expo-router/-/expo-router-3.5.17.tgz"
   integrity sha512-UGSx5vSZISgnhNYsbhbpFuYivS/tFQVoYqsWsFNdU1Cob+KdR2N1C68nDk9S9T6N66JdeCI7fDiEpvR2H1+Amw==
