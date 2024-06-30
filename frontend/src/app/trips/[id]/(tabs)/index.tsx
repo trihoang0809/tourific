@@ -6,10 +6,10 @@ import {
   StyleSheet,
   Pressable,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useGlobalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { Dimensions } from "react-native";
+import { Dimensions, RefreshControl } from "react-native";
 import { DateTime } from "luxon";
 import { any } from "zod";
 
@@ -67,6 +67,10 @@ const TripDetailsScreen = () => {
     getTrip({ id });
   }, []);
 
+  const onRefresh = useCallback(() => {
+    getTrip({ id });
+  }, [id]);
+
   // showing more setting options
   const showMoreSetting = () => {
     setModalEditVisible(true);
@@ -78,7 +82,12 @@ const TripDetailsScreen = () => {
 
   return (
     <View>
-      <ScrollView style={{ width: width, height: height }}>
+      <ScrollView
+        style={{ width: width, height: height }}
+        refreshControl={
+          <RefreshControl refreshing={false} onRefresh={onRefresh} />
+        }
+      >
         <View>
           <Image
             style={styles.image}
