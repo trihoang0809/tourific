@@ -65,6 +65,11 @@ export interface ActivityProps {
   isOnCalendar: boolean;
   category: string[];
   rating?: number;
+  image?: {
+    height: number;
+    width: number;
+    url: string;
+  };
 }
 export type Trip = {
   id: string;
@@ -163,4 +168,58 @@ export interface Event {
   end: Date;
   children: JSX.Element | null;
   activityid: string;
+  url: string;
+}
+
+export interface TripDate {
+  start: String;
+  range: Number;
+}
+
+export type Mode = "3days" | "week" | "day" | "custom" | "month" | "itinerary";
+
+export interface AddActivityProps {
+  currentDateUpdate: Date;
+  input: ActivityProps[];
+  saveActivityId: (activityId: string) => void;
+  isVisible: boolean;
+  setIsVisible: (isVisible: boolean) => void;
+}
+
+export const calendarViewLabels = [
+  { label: "Itinerary", value: "itinerary" },
+  { label: "Day", value: "day" },
+  { label: "3 days", value: "3days" },
+  { label: "Week", value: "week" },
+  { label: "Month", value: "month" },
+];
+export const monthNames = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+export interface timeRange {
+  startTime: {
+    hours: number | undefined;
+    minutes: number | undefined;
+  };
+  endTime: {
+    hours: number | undefined;
+    minutes: number | undefined;
+  };
+}
+
+export interface dateRange {
+  startDate: Date | undefined;
+  endDate: Date | undefined;
 }

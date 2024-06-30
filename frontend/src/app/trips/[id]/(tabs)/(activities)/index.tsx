@@ -116,7 +116,7 @@ const ActivitiesScreen = () => {
   // const saveActivitiesToBackend = async (activities: ActivityProps[]) => {
   //   const promises = activities.map(async (activity) => {
   //     const response = await fetch(
-  //       `http://localhost:3000/trips/${id}/activities`,
+  //       `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/activities`,
   //       {
   //         method: "POST",
   //         headers: {
