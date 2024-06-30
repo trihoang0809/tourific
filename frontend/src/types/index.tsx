@@ -1,5 +1,6 @@
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { DimensionValue } from "react-native";
+import React from "react";
 
 export interface TripData {
   name: string;
