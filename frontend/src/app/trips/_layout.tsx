@@ -14,13 +14,13 @@ const Layout = () => {
         options={{
           title: "Upcoming trips",
           headerShown: true,
-          headerTitleAlign: 'center',
+          headerTitleAlign: "center",
           headerLeft: () => (
             <MaterialIcons
               name="arrow-back"
               size={24}
               color="black"
-              onPress={() => router.navigate("/")}
+              onPress={() => router.navigate("/home")}
             />
           ),
         }}
@@ -30,13 +30,13 @@ const Layout = () => {
         options={{
           title: "Ongoing trips",
           headerShown: true,
-          headerTitleAlign: 'center',
+          headerTitleAlign: "center",
           headerLeft: () => (
             <MaterialIcons
               name="arrow-back"
               size={24}
               color="black"
-              onPress={() => router.navigate("/")}
+              onPress={() => router.navigate("/home")}
             />
           ),
         }}

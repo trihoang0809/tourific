@@ -22,10 +22,10 @@ export interface TripData {
 
 export type MapData = {
   address: String;
-  citystate: String;
+  citystate?: String;
   latitude: number;
   longitude: number;
-  radius: number;
+  radius?: number;
 };
 
 export type DataItem = {

@@ -82,7 +82,7 @@ export const saveActivitiesToBackend = async (
           startTime: new Date(),
           endTime: new Date(),
           location: {
-            citystate: activity.location.citystate,
+            citystate: activity.location.address,
             latitude: activity.location.latitude,
             longitude: activity.location.longitude,
           },

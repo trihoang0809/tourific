@@ -93,7 +93,10 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             <Text style={styles.title}>Ongoing Trips</Text>
             <Text
               onPress={() => {
-                router.navigate("/trips/ongoing");
+                router.navigate({
+                  pathname: "/trips/ongoing",
+                  params: { userId: userId },
+                });
               }}
             >
               See all
@@ -120,7 +123,10 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             <Text style={styles.title}>Upcoming Trips</Text>
             <Text
               onPress={() => {
-                router.navigate("/trips/upcoming");
+                router.navigate({
+                  pathname: "/trips/upcoming",
+                  params: { key: userId },
+                });
               }}
             >
               See all
