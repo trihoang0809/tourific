@@ -4,27 +4,32 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   Image,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import { TripCard } from "../components/TripCard/TripCard";
 import { HomeScreenHeader } from "../components/HomeScreenHeader";
 import { useState, useEffect } from "react";
-import { UserProps, Trip } from "../types";
+import { UserProps, Trip, Invitation } from "../types";
 import { Link, router } from "expo-router";
 import { EXPO_PUBLIC_HOST_URL, getRecentTrips, randomizeCover } from "@/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
 import TripCardRect from "@/components/TripCard/TripCardRect";
-import { headerImage } from "@/utils/constants";
 import Style from "Style";
+import InvitationCard from "@/components/Invitation/InvitationCard";
+
+// icon and image
+import { Ionicons } from "@expo/vector-icons";
+import { headerImage } from "@/utils/constants";
+import { sampleUser } from "@/mock-data/user";
 
 const screenw = Dimensions.get("window").width;
 const titleWidth = screenw - screenw * 0.96;
 export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [ongoingTrips, setOngoingTrips] = useState<Trip[]>([]);
   const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
+  const [invitation, setInvitation] = useState<Invitation[]>([]);
   useEffect(() => {
     const fetchTrips = async () => {
       try {
@@ -46,21 +51,78 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
     fetchTrips();
   }, []);
 
+  console.log("up", upcomingTrips);
+  console.log("on", ongoingTrips);
+
+  useEffect(() => {
+    const fetchInvitations = async () => {
+      try {
+        const invitations = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/all-received`);
+        const invites = await invitations.json();
+        setInvitation(invites);
+      } catch (error) {
+        console.error("Failed to fetch invitations", error);
+      }
+    };
+
+    fetchInvitations();
+  }, []);
+
+  console.log("inv", invitation);
+  const onAccept = async (id: string) => {
+    try {
+      console.log("accepting", id);
+      const sendAccept = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/${id}?status=ACCEPTED`, {
+        method: "PATCH",
+      });
+
+      if (!sendAccept.ok) {
+        throw new Error("Failed to accept invitation");
+      }
+
+      const newInvitations = invitation.filter((invite) => invite.id !== id);
+      setInvitation(newInvitations);
+
+      const acceptedInvite = await sendAccept.json();
+      if (acceptedInvite.trip) {
+        router.replace(`/trips/${acceptedInvite.trip.id}`);
+      }
+    } catch (error) {
+      console.error("Failed to accept invitation", error);
+    }
+  };
+
+  const onDecline = async (id: string) => {
+    try {
+      const sendDecline = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/${id}?status=REJECTED`, {
+        method: "PATCH",
+      });
+
+      if (!sendDecline.ok) {
+        throw new Error("Failed to decline invitation");
+      }
+
+      const newInvitations = invitation.filter((invite) => invite.id !== id);
+      setInvitation(newInvitations);
+    } catch (error) {
+      console.error("Failed to decline invitation", error);
+    }
+  };
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+      <HomeScreenHeader user={sampleUser} />
       <ScrollView style={styles.container}>
-        <HomeScreenHeader user={user} />
-        <Text style={styles.greeting}>Hey 👋, {user.firstName}!</Text>
         <View style={{ height: 180 }}>
           <Image
             source={{
               uri: randomizeCover(headerImage),
             }}
-            style={{ height: 180, position: "absolute", width: "100%", top: 0 }} // Image is positioned absolutely and aligned to the top
+            style={{ height: 100, position: "absolute", width: "100%", top: 0 }}
             resizeMode="cover"
           />
         </View>
-        <View style={{ marginTop: -5 }}>
+        <View style={{ marginTop: -80 }}>
           <View style={styles.inline}>
             <Text style={styles.title}>Ongoing Trips</Text>
             <Text
@@ -76,9 +138,9 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             showsHorizontalScrollIndicator={false}
             style={styles.tripScroll}
           >
-            {ongoingTrips.length > 0 ? (
+            {ongoingTrips?.length > 0 ? (
               ongoingTrips.map((trip) => (
-                <TripCard key={trip.id} trip={trip} height={250} width={300} />
+                <TripCard key={trip.tripId} trip={trip.trip} height={250} width={300} />
               ))
             ) : (
               <Text style={styles.noTrip}>No ongoing trips</Text>
@@ -99,7 +161,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
           <ScrollView style={{ paddingHorizontal: 10 }}>
             {upcomingTrips.slice(0, 3).map((trip) => (
               <View style={{ padding: 5, alignItems: "center" }}>
-                <TripCardRect key={trip.id} trip={trip} height={100} />
+                <TripCardRect key={trip.id} trip={trip.trip} height={100} />
               </View>
             ))}
           </ScrollView>
@@ -110,6 +172,11 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
           <Ionicons name="add" size={40} color="white" />
         </Link>
       </TouchableOpacity>
+      <View>
+        {invitation.map((invite: Invitation) => (
+          <InvitationCard key={invite.id} invitation={invite} onAccept={onAccept} onDecline={onDecline} />
+        ))}
+      </View>
     </SafeAreaView>
   );
 };
@@ -117,11 +184,6 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  greeting: {
-    marginLeft: 20,
-    fontSize: 15,
-    marginBottom: 10,
   },
   title: {
     fontSize: 18,

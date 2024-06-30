@@ -57,11 +57,13 @@ model User {
   inviteeTripInvitations TripMember[] @relation("InviteeToTripInvitations")
   inviterTripInvitations TripMember[] @relation("InviterToTripInvitations")  
   friendRequestReceived   Friendship[]   @relation("friendRequestReceived")
+  friendRequestSent   Friendship[]   @relation("friendRequestSent")
 }
 
 model Friendship {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   receiver    User     @relation("friendRequestReceived", fields: [receiverID], references: [id])
+  sender    User     @relation("friendRequestSent", fields: [senderID], references: [id])
   receiverID  String   @db.ObjectId
   senderID  String   @db.ObjectId
   friendStatus    Status @default(PENDING)
