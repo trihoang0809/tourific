@@ -13,7 +13,6 @@ const prisma = new PrismaClient();
 const LOCAL_HOST_URL = process.env.LOCAL_HOST_URL;
 const PORT = process.env.PORT || 3000;
 
-
 export interface TripParams {
   tripId: string;
   userId: string;
@@ -27,6 +26,66 @@ router.use("/:tripId/activities", ActivityRouter);
 
 // Invitation route
 router.use("/invite", InvitationRouter);
+
+// Get all trips in database
+router.get("/all", async (req: Request<TripParams>, res) => {
+  try {
+    let queryConditions = {};
+    const now = new Date();
+
+    if (req.query.ongoing === "true") {
+      queryConditions = {
+        AND: [
+          {
+            startDate: {
+              lt: now,
+            },
+          },
+          {
+            endDate: {
+              gt: now,
+            },
+          },
+        ],
+      };
+    } else if (req.query.past === "true") {
+      queryConditions = {
+        endDate: {
+          lt: now,
+        },
+      };
+    } else if (req.query.upcoming === "true") {
+      // Fetch trips that have start date in a specific range
+      if (typeof req.query.startTimeLocal === "string" && typeof req.query.endTimeLocal === "string") {
+        const startOfDay = new Date(req.query.startTimeLocal);
+        const endOfDay = new Date(req.query.endTimeLocal);
+        console.log("Start of Day:", startOfDay);
+        console.log("End of Day:", endOfDay);
+        queryConditions = {
+          startDate: {
+            gte: startOfDay,
+            lte: endOfDay,
+          },
+        };
+      } else {
+        queryConditions = {
+          startDate: {
+            gt: now,
+          },
+        };
+        // console.log(now);
+      }
+    }
+
+    const trips = await prisma.trip.findMany({
+      where: queryConditions,
+    });
+    res.status(StatusCodes.OK).json(trips);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "An error occurred while fetching trips." });
+  }
+});
 
 // Get all trips of a user
 router.get("/", async (req: Request<TripParams>, res) => {
@@ -56,43 +115,27 @@ router.get("/", async (req: Request<TripParams>, res) => {
         },
       };
     } else if (req.query.upcoming === "true") {
-      // Fetch trips that start and end on a specific date
-      if (typeof req.query.startTimeLocal === 'string' && typeof req.query.endTimeLocal === 'string') {
-        const startOfDay = new Date(req.query.startTimeLocal);
-        const endOfDay = new Date(req.query.endTimeLocal);
-        console.log("Start of Day:", startOfDay);
-        console.log("End of Day:", endOfDay);
-        queryConditions = {
-          where: {
-            startDate: {
-              gte: startOfDay,
-              lte: endOfDay
-            },
+      queryConditions = {
+        where: {
+          startDate: {
+            gt: now,
           },
-        };
-      } else {
-        queryConditions = {
-          where: {
-            startDate: {
-              gt: now,
-            },
-          },
-        };
-        // console.log(now);
-      }
+        },
+      };
+      // console.log(now);
     }
 
     const trips = await prisma.tripMember.findMany({
       where: {
         inviteeId: userID,
-        status: 'ACCEPTED',
+        status: "ACCEPTED",
         trip: {
-          AND: queryConditions
-        }
+          AND: queryConditions,
+        },
       },
       include: {
-        trip: true
-      }
+        trip: true,
+      },
     });
     res.status(StatusCodes.OK).json(trips);
   } catch (err) {
@@ -116,9 +159,9 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
           create: {
             inviteeId: userID,
             inviterId: userID,
-            status: 'ACCEPTED'
-          }
-        }
+            status: "ACCEPTED",
+          },
+        },
       },
     });
     res.status(StatusCodes.CREATED).json(trip);
@@ -176,7 +219,7 @@ router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
         startDate,
         endDate,
         location,
-        image
+        image,
       },
     });
     res.status(StatusCodes.OK).json(trip);
@@ -217,16 +260,16 @@ router.get("/:id/participants", async (req: Request<TripParams>, res) => {
     const participants = await prisma.tripMember.findMany({
       where: {
         tripId: tripId,
-        status: 'ACCEPTED'
+        status: "ACCEPTED",
       },
       include: {
-        invitee: true
-      }
+        invitee: true,
+      },
     });
     res.json(participants);
   } catch (error) {
     console.error("Error retrieving trip participants:", error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while retrieving participants." });  // Send an error response
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while retrieving participants." }); // Send an error response
   }
 });
 
@@ -239,13 +282,13 @@ router.get("/:id/non-participants", async (req, res) => {
     const friends = await prisma.friendship.findMany({
       where: {
         OR: [
-          { receiverID: userId, friendStatus: 'ACCEPTED' },
-          { senderID: userId, friendStatus: 'ACCEPTED' }
-        ]
+          { receiverID: userId, friendStatus: "ACCEPTED" },
+          { senderID: userId, friendStatus: "ACCEPTED" },
+        ],
       },
       include: {
         receiver: true,
-      }
+      },
     });
     console.log("friends", friends);
 
@@ -261,7 +304,7 @@ router.get("/:id/non-participants", async (req, res) => {
       select: {
         inviteeId: true,
         status: true,
-      }
+      },
     });
 
     if (!participants) {
@@ -269,17 +312,18 @@ router.get("/:id/non-participants", async (req, res) => {
     }
 
     // Map participants to their status
-    const participantIdsToStatus = new Map(participants.map(p => [p.inviteeId, p.status]));
+    const participantIdsToStatus = new Map(participants.map((p) => [p.inviteeId, p.status]));
 
     // Filter and prepare data for friends not fully accepted into the trip
     const contactsNotInTrip = friends.reduce((acc: any, friend) => {
       const friendId = friend.receiverID === userId ? friend.senderID : friend.receiverID;
       const status = participantIdsToStatus.get(friendId);
 
-      if (!status || status !== 'ACCEPTED') {  // check if not part of the trip or not accepted
+      if (!status || status !== "ACCEPTED") {
+        // check if not part of the trip or not accepted
         acc.push({
           receiver: friend.receiver,
-          status: status || 'NOT_INVITED'  // return status or 'NOT_INVITED' if no status found (user has not been invited)
+          status: status || "NOT_INVITED", // return status or 'NOT_INVITED' if no status found (user has not been invited)
         });
       }
       return acc;
@@ -292,8 +336,6 @@ router.get("/:id/non-participants", async (req, res) => {
   }
 });
 
-
 // DELETE PARTICIPANT OUT OF TRIPS
-
 
 export default router;
