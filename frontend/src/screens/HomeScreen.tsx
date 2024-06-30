@@ -136,7 +136,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
               onPress={() => {
                 router.navigate({
                   pathname: "/trips/upcoming",
-                  params: { key: userId },
+                  params: { userId: userId },
                 });
               }}
             >
