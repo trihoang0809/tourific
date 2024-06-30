@@ -7,6 +7,7 @@ import { Dimensions } from "react-native";
 import { DateTime } from "luxon";
 import { StyleSheet } from "react-native";
 import { Rating } from "react-native-ratings";
+const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
 const ViewActivity = () => {
   const { id } = useGlobalSearchParams();
@@ -41,7 +42,7 @@ const ViewActivity = () => {
   }) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/trips/${id}/activities/${activityid}`,
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/activities/${activityid}`,
         {
           method: "GET",
           headers: {
