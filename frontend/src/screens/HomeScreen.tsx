@@ -4,21 +4,24 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   Image,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import { TripCard } from "../components/TripCard/TripCard";
 import { HomeScreenHeader } from "../components/HomeScreenHeader";
 import { useState, useEffect } from "react";
-import { UserProps, Trip } from "../types";
+import { UserProps, Trip, Invitation } from "../types";
 import { Link, router } from "expo-router";
 import { EXPO_PUBLIC_HOST_URL, getRecentTrips, randomizeCover } from "@/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
 import TripCardRect from "@/components/TripCard/TripCardRect";
-import { headerImage } from "@/utils/constants";
 import Style from "Style";
+import InvitationCard from "@/components/Invitation/InvitationCard";
+
+// icon and image
+import { Ionicons } from "@expo/vector-icons";
+import { headerImage } from "@/utils/constants";
 import { getUserIdFromToken, getToken } from "@/utils";
 
 const screenw = Dimensions.get("window").width;
@@ -36,6 +39,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
     fetchUserId();
   }, []);
 
+  const [invitation, setInvitation] = useState<Invitation[]>([]);
   useEffect(() => {
     const fetchTrips = async () => {
       console.log(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`);
@@ -75,6 +79,65 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
     }
   }, [userId]);
 
+  console.log("up", upcomingTrips);
+  console.log("on", ongoingTrips);
+
+  useEffect(() => {
+    const fetchInvitations = async () => {
+      try {
+        const invitations = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/all-received`);
+        const invites = await invitations.json();
+        setInvitation(invites);
+      } catch (error) {
+        console.error("Failed to fetch invitations", error);
+      }
+    };
+
+    fetchInvitations();
+  }, []);
+
+  console.log("inv", invitation);
+  const onAccept = async (id: string) => {
+    try {
+      console.log("accepting", id);
+      const sendAccept = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/${id}?status=ACCEPTED`, {
+        method: "PATCH",
+      });
+
+      if (!sendAccept.ok) {
+        throw new Error("Failed to accept invitation");
+      }
+
+      const newInvitations = invitation.filter((invite) => invite.id !== id);
+      setInvitation(newInvitations);
+
+      const acceptedInvite = await sendAccept.json();
+      if (acceptedInvite.trip) {
+        router.replace(`/trips/${acceptedInvite.trip.id}`);
+      }
+    } catch (error) {
+      console.error("Failed to accept invitation", error);
+    }
+  };
+
+  const onDecline = async (id: string) => {
+    try {
+      const sendDecline = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/${id}?status=REJECTED`, {
+        method: "PATCH",
+      });
+
+      if (!sendDecline.ok) {
+        throw new Error("Failed to decline invitation");
+      }
+
+      const newInvitations = invitation.filter((invite) => invite.id !== id);
+      setInvitation(newInvitations);
+    } catch (error) {
+      console.error("Failed to decline invitation", error);
+    }
+  };
+
+  // console.log("trip", tri)
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <HomeScreenHeader user={user} />
@@ -107,11 +170,9 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             showsHorizontalScrollIndicator={false}
             style={styles.tripScroll}
           >
-            {ongoingTrips.length > 0 ? (
+            {ongoingTrips?.length > 0 ? (
               ongoingTrips.map((trip) => (
-                <View key={trip.id}>
-                  <TripCard trip={trip} height={250} width={300} />
-                </View>
+                <TripCard trip={trip} height={250} width={300} />
               ))
             ) : (
               <Text style={styles.noTrip}>No ongoing trips</Text>
@@ -134,8 +195,8 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
           </View>
           <ScrollView style={{ paddingHorizontal: 10 }}>
             {upcomingTrips.slice(0, 3).map((trip) => (
-              <View key={trip.id} style={{ padding: 5, alignItems: "center" }}>
-                <TripCardRect trip={trip} height={100} />
+              <View style={{ padding: 5, alignItems: "center" }}>
+                <TripCardRect key={trip.id} trip={trip} height={100} />
               </View>
             ))}
           </ScrollView>
@@ -146,6 +207,11 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
           <Ionicons name="add" size={40} color="white" />
         </Link>
       </TouchableOpacity>
+      <View>
+        {invitation.map((invite: Invitation) => (
+          <InvitationCard key={invite.id} invitation={invite} onAccept={onAccept} onDecline={onDecline} />
+        ))}
+      </View>
     </SafeAreaView>
   );
 };

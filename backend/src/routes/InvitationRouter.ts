@@ -13,7 +13,7 @@ export interface InvitationParams extends TripParams {
 }
 
 // temporary for testing until auth done
-const userID = "6669267e34f4cab1d9ddd751";
+const userID = "6661308f193a6cd9e0ea4d36";
 
 // get an invitation by status
 // example endpoint: /invite?status=PENDING
@@ -158,7 +158,7 @@ router.post("/:tripId", async (req: Request<InvitationParams>, res) => {
 });
 
 // accept or decline invite to join group
-// endpoint: /trips/tripId?status=ACCEPTED or /trips/tripId?status=REJECTED
+// endpoint: /trips/inviteId?status=ACCEPTED or /trips/inviteId?status=REJECTED
 router.patch("/:invitationId", async (req: Request<InvitationParams>, res) => {
   const { invitationId } = req.params;
   const { status } = req.query;
@@ -173,10 +173,17 @@ router.patch("/:invitationId", async (req: Request<InvitationParams>, res) => {
         throw new Error("Invitation cannot be accepted/rejected");
       }
 
-      return await prisma.tripMember.update({
-        where: { id: invitationId },
-        data: { status: status as Status },
-      });
+      if (status === 'REJECTED') {
+        return await prisma.tripMember.delete({
+          where: { id: invitationId }
+        });
+      } else if (status === 'ACCEPTED') {
+        // Update the status of the invitation to ACCEPTED
+        return await prisma.tripMember.update({
+          where: { id: invitationId },
+          data: { status: status as Status },
+        });
+      }
     });
     res.status(StatusCodes.OK).json(result);
   } catch (error) {

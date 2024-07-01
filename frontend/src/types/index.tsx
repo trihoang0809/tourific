@@ -1,4 +1,5 @@
 import { Ionicons, Feather } from "@expo/vector-icons";
+import { DimensionValue } from "react-native";
 import React from "react";
 
 export interface TripData {
@@ -238,3 +239,55 @@ export type Photo = {
   width?: number;
   height?: number;
 };
+
+export interface AvatarCardProps extends UserProps {
+  size?: DimensionValue;
+}
+
+export interface AvatarGroupProps {
+  users: Invitation[];
+  size?: DimensionValue;
+}
+
+export interface Invitation {
+  id: string;
+  inviter: User;
+  invitee: User;
+  trip: TripData;
+}
+
+export interface InvitationCardProps {
+  invitation: Invitation;
+  onAccept: (id: string) => void;
+  onDecline: (id: string) => void;
+}
+
+export interface BottomSliderProps {
+  handlePresentModalPress: () => void;
+  handleSheetChanges: (index: number) => void;
+}
+
+export enum Status {
+  'ACCEPTED',
+  'REJECTED',
+  'PENDING',
+}
+
+export interface FriendRequest {
+  friendStatus: Status;
+  receiver: User,
+  receiverID: string;
+  sender: User,
+  senderID: string;
+}
+
+export interface ContactCardProps {
+  user: User;
+  isChecked: boolean;
+  setChecked: (e: any, userId: string) => void;
+  status: Status;
+}
+
+export interface FriendSearch extends User {
+  friendStatus: Status;
+}

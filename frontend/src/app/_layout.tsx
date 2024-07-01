@@ -26,13 +26,19 @@ const RootNavigation = () => {
     <QueryClientProvider client={queryClient}>
       <Stack>
         <Stack.Screen
-          name="trips"
-          options={{ title: "Trip", headerShown: false }}
+          name='trips'
+          options={{
+            title: 'Trip',
+            headerShown: false
+          }}
         />
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="home" options={{ headerShown: false }} />
+        <Stack.Screen name="index"
+          options={{
+            headerShown: false,
+          }} />
       </Stack>
     </QueryClientProvider>
+
   );
 };
 

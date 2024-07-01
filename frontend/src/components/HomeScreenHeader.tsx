@@ -8,22 +8,25 @@ import {
 } from "react-native";
 import { UserProps } from "../types";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { defaultAvatar } from "@/utils"; 
+import { Link, router } from "expo-router";
+
 export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
     <View style={styles.content}>
       <View>
         <Text style={styles.appName}>tourific</Text>
       </View>
-      <View
-        style={{
-          flex: 1,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "flex-end",
-        }}
-      >
-        <Image style={styles.avatar} source={{ uri: user.avatar.url }} />
+      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
+        <TouchableOpacity
+          onPress={() => router.push("/friends/search")}
+          style={{ marginRight: 20 }}
+        >
+          <Ionicons name="person-add-outline" size={22} color="black" />
+        </TouchableOpacity>
+        <Pressable onPress={() => router.push("userProfile/userProfileUI")}>
+          <Image style={styles.avatar} source={{ uri: defaultAvatar }} />
+        </Pressable>
       </View>
     </View>
   );

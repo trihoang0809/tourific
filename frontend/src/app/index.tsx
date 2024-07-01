@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { useRouter, Stack } from "expo-router";
-import { HomeScreen } from "../screens/HomeScreen";
 import LoginScreen from "./login";
 
 const App = () => {
@@ -17,7 +15,8 @@ const App = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      {/* <HomeScreen user={sampleUser} /> */}
+      {/* (
+    <HomeScreen user={sampleUser} /> */}
       <LoginScreen />
       <StatusBar style="auto" />
     </SafeAreaView>
