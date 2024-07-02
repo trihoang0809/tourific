@@ -1,5 +1,5 @@
 import path from "path";
-import { activityData } from "./scheduleData/prepareData";
+import { activityData } from "../GenerateSchedule/scheduleData/prepareData";
 
 let schedule = '{ "route": [], "cost": 0 }';
 let itinerary = '{ "itinerary": [] }';
@@ -90,6 +90,7 @@ export const generateSchedule = async (activity: any, days: number) => {
   let activityJSON = JSON.parse(activity);
   let activityFunScore = new Array(activityJSON.length).fill(4);
 
+  // Divide activities into multiple
   await clusterFunScore(activityFunScore, days)
     .then((result) => {
       itinerary = result;
