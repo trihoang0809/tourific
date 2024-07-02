@@ -34,7 +34,7 @@ const ContactCardV2 = ({ user, addFriend, cancelFriendRequest }: ContactCardV2Pr
   }
 
   const onPress = () => {
-    router.push(`/userProfile/${user.userName}`);
+    router.push(`/userProfile/${user.id}`);
   };
 
   return (
