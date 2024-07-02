@@ -7,6 +7,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { StatusCodes } from "http-status-codes";
 import { generateSchedule } from "../middleware/GenerateSchedule/schedule";
 import InvitationRouter from "./InvitationRouter";
+import { any } from "zod";
 
 // const express = require('express')
 const router = express.Router();
@@ -30,6 +31,7 @@ router.get("/:id/schedule", async (req, res) => {
   const { id } = req.params;
 
   try {
+    // Get all activities user have created on their own
     const getActivities = async () => {
       try {
         const activities = await prisma.activity.findMany({
@@ -38,20 +40,97 @@ router.get("/:id/schedule", async (req, res) => {
           },
         });
 
-        return JSON.stringify(activities);
+        return activities;
       } catch (error) {
         console.log(error);
         return [];
       }
     };
-    const activities = await getActivities();
 
-    const schedule = await generateSchedule(activities);
-    // const data = JSON.parse(schedule);
+    // Get the trip data
+    const getTripData = async () => {
+      try {
+        const trip = await prisma.trip.findUnique({
+          where: {
+            id,
+          },
+        });
 
-    console.log(schedule);
+        return trip;
+      } catch (error) {
+        console.log("An error happens while fetching trip " + error);
+      }
+    };
 
-    res.json(schedule);
+    // Add the activity to the calendar
+    const addActivityToCalendar = async (activityId: string, isOnCalendar: boolean, startTime: Date, endTime: Date) => {
+      const isValidID = await prisma.activity.findUnique({
+        where: {
+          id: activityId,
+          tripId: id,
+        },
+      });
+
+      if (!isValidID) {
+        res.status(StatusCodes.NOT_FOUND).json({ error: "Activity does not exist" });
+      }
+
+      try {
+        const activity = await prisma.activity.update({
+          where: {
+            id: activityId,
+          },
+          data: {
+            isOnCalendar,
+            startTime,
+            endTime,
+          },
+        });
+      } catch (error) {
+        console.log("An error occurred while updating the activity.");
+      }
+    };
+
+    // get all activities having upvote > 0
+    const getActivitiesUpvote = async () => {
+      try {
+        const activities = await prisma.activity.findMany({
+          where: {
+            tripId: id,
+            netUpvotes: { gt: 0 },
+          },
+        });
+
+        return activities;
+      } catch (error) {
+        console.log(error);
+        return [];
+      }
+    };
+
+    console.log("---------------------------");
+    const userCreatedActivities = await getActivities();
+    const upvoteActivities = await getActivitiesUpvote();
+    const activities = userCreatedActivities.concat(upvoteActivities);
+    const tripData = await getTripData();
+    console.log(upvoteActivities);
+    // Calculate days
+    let startDate = tripData?.startDate.getTime() || 0;
+    let endDate = tripData?.endDate.getTime() || 0;
+    const days = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
+    const schedule = await generateSchedule(JSON.stringify(activities), days);
+
+    for (let i = 0; i < schedule.length; ++i)
+      for (let j = 0; j < schedule[i].route.length; ++j) {
+        addActivityToCalendar(
+          activities[schedule[i].route[j]].id,
+          true,
+          new Date(startDate + i * 24 * 60 * 60 * 1000),
+          new Date(startDate + i * 24 * 60 * 60 * 1000)
+        );
+      }
+
+    res.status(StatusCodes.OK).json(schedule);
   } catch (error) {
     console.log("An error occur while creating schedule: " + error);
   }
