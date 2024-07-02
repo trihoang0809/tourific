@@ -17,10 +17,10 @@ const PORT = process.env.PORT || 3000;
 
 export interface TripParams {
   tripId: string;
-  userId: string;
+  firebaseUserId: string;
 }
 
-const userID = "66806671b368fc776a512ad5";
+// const userID = "66806671b368fc776a512ad5";
 
 // router.use(verifyToken);
 
@@ -30,7 +30,6 @@ router.use("/:tripId/activities", ActivityRouter);
 //Create Schedule
 router.get("/:id/schedule", async (req, res) => {
   const { id } = req.params;
-
   try {
     const getActivities = async () => {
       try {
@@ -101,9 +100,19 @@ router.get("/", async (req: Request<TripParams>, res) => {
       };
     }
     console.log("query conditions: ", queryConditions);
+
+    const MongoUserId = await prisma.user.findUnique({
+      where: {
+        firebaseUserId: firebaseUserId as string,
+      },
+      select: {
+        id: true,
+      },
+    });
+
     const trips = await prisma.tripMember.findMany({
       where: {
-        inviteeId: userID,
+        inviteeId: MongoUserId?.id,
         status: "ACCEPTED",
         trip: queryConditions.where,
       },
@@ -123,6 +132,15 @@ router.get("/", async (req: Request<TripParams>, res) => {
 router.post("/", validateData(tripCreateSchema), async (req, res) => {
   try {
     const { name, startDate, endDate, location, image, firebaseUserId } = req.body;
+    const MongoUserId = await prisma.user.findUnique({
+      where: {
+        firebaseUserId: firebaseUserId as string,
+      },
+      select: {
+        id: true,
+      },
+    });
+
     const trip = await prisma.trip.create({
       data: {
         name,
@@ -132,12 +150,12 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
         image,
         participants: {
           create: {
-            inviteeId: userID,
-            inviterId: userID,
+            inviteeId: MongoUserId?.id as string,
+            inviterId: MongoUserId?.id as string,
             status: "ACCEPTED",
           },
         },
-        participantsID: [firebaseUserId],
+        // participantsID: [firebaseUserId],
       },
     });
     res.status(StatusCodes.CREATED).json(trip);
@@ -259,14 +277,22 @@ router.get("/:tripId/participants", async (req: Request<TripParams>, res) => {
 // GET all contact/friends not in a group
 router.get("/:id/non-participants", async (req, res) => {
   const { id: tripId } = req.params;
-  const userId = userID;
+  const { firebaseUserId } = req.body;
+  const MongoUserId = await prisma.user.findUnique({
+    where: {
+      firebaseUserId: firebaseUserId as string,
+    },
+    select: {
+      id: true,
+    },
+  });
   try {
     // Fetch all friends of the user where the friendship status is ACCEPTED
     const friends = await prisma.friendship.findMany({
       where: {
         OR: [
-          { receiverID: userId, friendStatus: "ACCEPTED" },
-          { senderID: userId, friendStatus: "ACCEPTED" },
+          { receiverID: MongoUserId?.id, friendStatus: "ACCEPTED" },
+          { senderID: MongoUserId?.id, friendStatus: "ACCEPTED" },
         ],
       },
       include: {
@@ -303,20 +329,20 @@ router.get("/:id/non-participants", async (req, res) => {
 
     // Filter and prepare data for friends not fully accepted into the trip
     const contactsNotInTrip = friends.reduce((acc: any, friend) => {
-      const friendId = friend.receiverID === userId ? friend.senderID : friend.receiverID;
+      const friendId = friend.receiverID === MongoUserId?.id ? friend.senderID : friend.receiverID;
       console.log("friendId", friendId);
       const status = participantIdsToStatus.get(friendId);
       console.log("status", status);
 
       if (!status || (status !== 'ACCEPTED' && status !== 'PENDING')) {  // check if not part of the trip or not accepted
         acc.push({
-          receiver: friend.receiverID === userId ? friend.sender : friend.receiver,
+          receiver: friend.receiverID === MongoUserId?.id ? friend.sender : friend.receiver,
           status: status || 'NOT_INVITED'  // return status or 'NOT_INVITED' if no status found (user has not been invited)
         });
       }
 
       // filter out the user from the list of friends
-      acc = acc.filter((contact: any) => contact.receiver.id !== userId);
+      acc = acc.filter((contact: any) => contact.receiver.id !== MongoUserId?.id);
 
       return acc;
     }, []);
