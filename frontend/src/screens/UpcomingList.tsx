@@ -63,7 +63,8 @@ export const ListFilteredCards = ({ isUpcoming }: listprops) => {
           : `http://${serverUrl}:3000/trips?ongoing=true`;
         const upcoming = await fetch(link);
         let data = await upcoming.json();
-        setUpcoming(getRecentTrips(data));
+        let upcomingTrips = data.map((trip: any, id: number) => trip.trip);
+        setUpcoming(getRecentTrips(upcomingTrips));
       } catch (error) {
         console.log(error);
       }

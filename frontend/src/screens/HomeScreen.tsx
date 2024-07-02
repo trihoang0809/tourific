@@ -37,9 +37,15 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
         );
         const ongoingData = await ongoing.json();
         const upcomingData = await upcoming.json();
+        let ongoingTrips = ongoingData.map(
+          (trip: any, id: number) => trip.trip,
+        );
+        let upcomingTrips = upcomingData.map(
+          (trip: any, id: number) => trip.trip,
+        );
 
-        setOngoingTrips(ongoingData);
-        setUpcomingTrips(getRecentTrips(upcomingData));
+        setOngoingTrips(ongoingTrips);
+        setUpcomingTrips(getRecentTrips(upcomingTrips));
       } catch (error) {
         console.error("Failed to fetch trips:", error);
       }
@@ -48,7 +54,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <HomeScreenHeader user={sampleUser} />
       <ScrollView style={styles.container}>
         <View style={{ height: 180 }}>
