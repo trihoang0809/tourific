@@ -81,7 +81,7 @@ model Activity {
   startTime DateTime
   endTime DateTime
   location Location
-  notes String[]
+  notes String
   netUpvotes Int @default(0)
   isOnCalendar Boolean @default(false)
   category String[]
