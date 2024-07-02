@@ -12,9 +12,10 @@ import { router } from "expo-router";
 export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
     <View style={styles.content}>
-      <View>
-        <Text style={styles.appName}>tourific</Text>
-      </View>
+      <Image
+        style={{ width: 180, height: 70 }}
+        source={require("@/assets/Tourific Logo.png")}
+      />
       <View
         style={{
           flex: 1,
