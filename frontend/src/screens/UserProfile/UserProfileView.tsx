@@ -11,7 +11,6 @@ import {
 import { material } from "react-native-typography";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { defaultAvatar } from "@/utils";
 
 interface userIDProps {
   userID: string;
@@ -25,7 +24,7 @@ const UserProfileView = (userID: userIDProps) => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const link = `http://${serverUrl}:3000/user/` + userID.userID;
+        const link = `http://${serverUrl}:3000/user/${userID.userID}`;
         const profile = await fetch(link);
         let data = await profile.json();
         setUserProfile(data);
@@ -52,8 +51,7 @@ const UserProfileView = (userID: userIDProps) => {
 
         <View style={styles.avatarContainer}>
           <Image
-            // source={{ uri: userProfile?.avatar.url }}
-            source={{ uri: defaultAvatar }}
+            source={{ uri: userProfile?.avatar.url || "" }}
             style={styles.avatar}
           />
         </View>

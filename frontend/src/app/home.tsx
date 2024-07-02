@@ -40,7 +40,8 @@ const Home = () => {
 
       try {
         const userInfo = await fetchUserInfo(userId);
-        console.log("got the user right here: ", userInfo);
+        // console.log("got the user right here: ", userInfo);
+        console.log("Home file: ", userId);
         setUser(userInfo);
       } catch (error) {
         console.error("Failed to fetch user info:", error);

@@ -14,14 +14,12 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import * as ImagePicker from "expo-image-picker";
 import { AntDesign, Entypo, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { defaultAvatar } from "@/utils";
 
 interface editProps {
-  method: string;
   id?: string;
 }
 
-export const UserProfileEdit: React.FC<editProps> = ({ method, id = "" }) => {
+export const UserProfileEdit: React.FC<editProps> = ({ id = "" }) => {
   const validColor = "green";
   const invalidColor = "red";
   const noInputColor = "black";
@@ -35,7 +33,7 @@ export const UserProfileEdit: React.FC<editProps> = ({ method, id = "" }) => {
   const [avatar, setAvatar] = useState({
     height: 200,
     width: 200,
-    url: defaultAvatar,
+    url: "",
   });
 
   const [isDOBDatePickerVisible, setDOBDatePickerVisibility] = useState(false);
@@ -49,28 +47,26 @@ export const UserProfileEdit: React.FC<editProps> = ({ method, id = "" }) => {
 
   // Determine method
   useEffect(() => {
-    if (method === "PUT") {
-      const getData = async () => {
-        try {
-          const link = `http://${serverUrl}:3000/user/` + id;
-          const profile = await fetch(link);
-          let data = await profile.json();
+    const getData = async () => {
+      try {
+        const link = `http://${serverUrl}:3000/user/` + id;
+        const profile = await fetch(link);
+        let data = await profile.json();
 
-          setUserName(String(data.userName));
-          setFirstName(String(data.firstName));
-          setLastName(String(data.lastName));
-          setDOB(new Date(String(data.dateOfBirth)));
-          setPassword(String(data.password));
-          setAvatar({ height: 200, width: 200, url: String(data.avatar.url) });
-        } catch (error) {
-          console.log("An error happen while fetching data");
-          console.log(error);
-        }
-      };
+        setUserName(String(data.userName));
+        setFirstName(String(data.firstName));
+        setLastName(String(data.lastName));
+        setDOB(new Date(String(data.dateOfBirth)));
+        setPassword(String(data.password));
+        setAvatar({ height: 200, width: 200, url: String(data.avatar.url) });
+      } catch (error) {
+        console.log("An error happen while fetching data");
+        console.log(error);
+      }
 
       //Fetch Data + Format Data
       getData();
-    }
+    };
   }, []);
 
   //Header render + Return Button + Alert Pop up

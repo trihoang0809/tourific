@@ -1,10 +1,18 @@
 import { Activity, ActivityProps, ActivityThumbnailProps } from "@/types";
-import { Text, View, Image, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  Text,
+  View,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
 import { useState, useEffect } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Rating } from "react-native-ratings";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchActivities } from "@/utils/fetchAndSaveActivities";
+import { router } from "expo-router";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
@@ -73,7 +81,12 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
   };
 
   return (
-    <View style={styles.card}>
+    <Pressable
+      style={styles.card}
+      onPress={() => {
+        router.push(`./${activity.googlePlacesId}`);
+      }}
+    >
       <View style={styles.imageContainer}>
         <Image source={{ uri: activity.imageUrl }} style={styles.image} />
         <View style={styles.likeContainer}>
@@ -114,7 +127,7 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
           </Text>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

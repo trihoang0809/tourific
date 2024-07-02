@@ -20,6 +20,8 @@ const noAvatar: Photo = {
   url: "https://t4.ftcdn.net/jpg/03/59/58/91/360_F_359589186_JDLl8dIWoBNf1iqEkHxhUeeOulx0wOC5.jpg",
 };
 
+const HOST = process.env.EXPO_PUBLIC_HOST_URL;
+
 const RegisterScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -64,7 +66,7 @@ const RegisterScreen = () => {
       const firebaseUserId = user.uid;
 
       // Upload user data to MongoDB
-      const response = await fetch("http://localhost:3000/user", {
+      const response = await fetch(`http://${HOST}:3000/user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

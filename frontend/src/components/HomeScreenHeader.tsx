@@ -13,7 +13,7 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
     <View style={styles.content}>
       <Image
-        style={{ width: 180, height: 70 }}
+        style={{ width: 180, height: 60 }}
         source={require("@/assets/Tourific Logo.png")}
       />
       <View
@@ -24,7 +24,18 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
           justifyContent: "flex-end",
         }}
       >
-        <Image style={styles.avatar} source={{ uri: user.avatar.url }} />
+        <Pressable
+          onPress={() => {
+            router.push(`./userProfile/${user.firebaseUserId}`);
+          }}
+        >
+          <Image
+            style={styles.avatar}
+            source={{
+              uri: user.avatar.url,
+            }}
+          />
+        </Pressable>
       </View>
     </View>
   );
