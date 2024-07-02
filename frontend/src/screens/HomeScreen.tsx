@@ -19,6 +19,7 @@ import { Ionicons } from "@expo/vector-icons";
 import TripCardRect from "@/components/TripCard/TripCardRect";
 import { headerImage } from "@/utils/constants";
 import Style from "Style";
+import { sampleUser } from "@/mock-data/user";
 
 const screenw = Dimensions.get("window").width;
 const titleWidth = screenw - screenw * 0.96;
@@ -71,20 +72,19 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+      <HomeScreenHeader user={sampleUser} />
       <ScrollView style={styles.container}>
-        <HomeScreenHeader user={user} />
-        <Text style={styles.greeting}>Hey 👋, {user.firstName}!</Text>
         <View style={{ height: 180 }}>
           <Image
             source={{
               uri: randomizeCover(headerImage),
             }}
-            style={{ height: 180, position: "absolute", width: "100%", top: 0 }} // Image is positioned absolutely and aligned to the top
+            style={{ height: 100, position: "absolute", width: "100%", top: 0 }}
             resizeMode="cover"
           />
         </View>
-        <View style={{ marginTop: -5 }}>
+        <View style={{ marginTop: -80 }}>
           <View style={styles.inline}>
             <Text style={styles.title}>Ongoing Trips</Text>
             <Text
@@ -141,11 +141,6 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  greeting: {
-    marginLeft: 20,
-    fontSize: 15,
-    marginBottom: 10,
   },
   title: {
     fontSize: 18,
