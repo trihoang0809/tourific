@@ -41,6 +41,7 @@ import {
   GestureHandlerRootView,
   RectButton,
 } from "react-native-gesture-handler";
+import Style from "Style";
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
 const Itinerary = () => {
@@ -596,6 +597,31 @@ const Itinerary = () => {
   );
 
   const [isModalVisible, setModalVisible] = useState(false);
+
+  const generateAlert = () =>
+    Alert.alert(
+      "Autogenerate schedule",
+      "This will overwrite existing events if any",
+      [
+        {
+          text: "Cancel",
+          onPress: () => {},
+          style: "cancel",
+        },
+        {
+          text: "Do it",
+          onPress: async () => {
+            const url = `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/schedule`;
+            try {
+              const response = await fetch(url);
+            } catch (error: any) {
+              console.error("Error fetching trip:", error.toString());
+            }
+          },
+        },
+      ],
+    );
+
   const customTheme = {
     palette: {
       primary: {
@@ -669,7 +695,9 @@ const Itinerary = () => {
           <TouchableOpacity onPress={() => setModalVisible(true)}>
             <View style={styles.monthContainer}>
               {calendarMode === "itinerary" ? (
-                <Text style={styles.h1}>Intinerary</Text>
+                <>
+                  <Text style={styles.h1}>Intinerary</Text>
+                </>
               ) : (
                 <Text style={styles.h1}>
                   {monthNames[currentDate.getMonth()]}
@@ -705,6 +733,7 @@ const Itinerary = () => {
             </TouchableOpacity>
           )}
         </View>
+
         {/* Modal to pick calendar view */}
         <Modal animationType="fade" visible={isModalVisible} transparent={true}>
           <View style={styles.modalOverlay}>
@@ -1189,6 +1218,9 @@ const Itinerary = () => {
             theme={customTheme}
           />
         )}
+        <Pressable style={[Style.addIcon]} onPress={generateAlert}>
+          <Ionicons name="color-wand-sharp" size={40} color="#FFFFFF" />
+        </Pressable>
       </SafeAreaView>
     </GestureHandlerRootView>
   );
