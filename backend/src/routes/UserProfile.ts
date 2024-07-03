@@ -11,8 +11,43 @@ const saltRounds = 10; // The cost factor for bcrypt
 
 // Get all user profiles
 router.get("/", async (req, res) => {
+  // Get all users with their 3 most recent upcoming trips
   try {
-    const users = await prisma.user.findMany();
+    let queryConditions = {};
+    if (req.query.upcoming === "true") {
+      queryConditions = {
+        where: {
+          inviteeTripInvitations: {
+            some: {
+              status: "ACCEPTED",
+              trip: {
+                endDate: {
+                  gt: new Date(), // Filter for upcoming trips
+                },
+              },
+            },
+          },
+        },
+        include: {
+          inviteeTripInvitations: {
+            include: {
+              trip: {
+                include: {
+                  activities: true,
+                },
+              },
+            },
+            orderBy: {
+              trip: {
+                startDate: "asc", // Order trips by start date ascending
+              },
+            },
+            take: 3, // Get only 3 the earliest upcoming trips
+          },
+        },
+      };
+    }
+    const users = await prisma.user.findMany(queryConditions);
     res.json(users);
   } catch (error) {
     console.log(error);
@@ -253,7 +288,7 @@ router.post("/friend", async (req, res) => {
 });
 
 // accept or decline a friend request
-// to accept: /friend?accept=true 
+// to accept: /friend?accept=true
 // to reject: /friend?accept=false
 router.patch("/friend", async (req, res) => {
   const { friendId, userId } = req.body;
@@ -275,7 +310,7 @@ router.patch("/friend", async (req, res) => {
           },
         },
         data: {
-          friendStatus: "ACCEPTED"
+          friendStatus: "ACCEPTED",
         },
       });
       res.status(StatusCodes.OK).json(friend);
@@ -351,7 +386,9 @@ router.get("/friend/sent-requests", async (req, res) => {
     res.status(StatusCodes.OK).json(sentRequests);
   } catch (error) {
     console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting sent friend requests." });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while getting sent friend requests." });
   }
 });
 

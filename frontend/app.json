@@ -18,6 +18,11 @@
       "infoPlist": {
         "UIBackgroundModes": ["fetch", "remote-notification"]
       }
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tourific",
+      "infoPlist": {
+        "UIBackgroundModes": ["fetch", "remote-notification"]
+      }
     },
     "android": {
       "adaptiveIcon": {
