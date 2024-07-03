@@ -31,6 +31,9 @@ const fetchUserInfo = async (userId: string): Promise<User> => {
 
 const Home = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const notificationListener = useRef<Notifications.Subscription>();
+  const responseListener = useRef<Notifications.Subscription>();
   const router = useRouter();
   const auth = getAuth();
 
@@ -63,14 +66,6 @@ const Home = () => {
     initializeUser();
   }, [router]);
 
-  if (!user) {
-    return null; // Or a loading spinner
-  }
-
-  const [expoPushToken, setExpoPushToken] = useState("");
-  const notificationListener = useRef<Notifications.Subscription>();
-  const responseListener = useRef<Notifications.Subscription>();
-
   useEffect(() => {
     registerForPushNotificationsAsync().then(
       (token) => token && setExpoPushToken(token),
@@ -89,6 +84,10 @@ const Home = () => {
         Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
+
+  if (!user) {
+    return null; // Or a loading spinner
+  }
 
   return (
     <>
