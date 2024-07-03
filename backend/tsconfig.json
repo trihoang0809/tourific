@@ -6,7 +6,8 @@
     "module": "commonjs",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "typeRoots": ["./node_modules/@types", "./types"]
   },
   "include": ["**/*.ts", "**/*.tsx", "src/middleware/GenerateSchedule/schedule/prepareData.ts"]
 }

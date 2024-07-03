@@ -15,14 +15,16 @@ const prisma = new PrismaClient();
 const LOCAL_HOST_URL = process.env.LOCAL_HOST_URL;
 const PORT = process.env.PORT || 3000;
 
-export interface TripParams {
+export interface TripParams extends Request {
   tripId: string;
   userId: string;
 }
 
-const userID = "66806671b368fc776a512ad5";
+// const userID = "66806671b368fc776a512ad5";
 
-// router.use(verifyToken);
+router.use(verifyToken);
+
+// console.log(req.user.id);
 
 // Activites of a trip
 router.use("/:tripId/activities", ActivityRouter);
@@ -66,6 +68,8 @@ router.use("/invite", InvitationRouter);
 router.get("/", async (req: Request<TripParams>, res) => {
   console.log("Request body: ", req);
   const { firebaseUserId } = req.query;
+  const { id: userID } = req.user?.id;
+
   console.log("firebase User Id: ", firebaseUserId);
 
   try {
@@ -123,6 +127,7 @@ router.get("/", async (req: Request<TripParams>, res) => {
 router.post("/", validateData(tripCreateSchema), async (req, res) => {
   try {
     const { name, startDate, endDate, location, image, firebaseUserId } = req.body;
+    const { id: userId } = req.user?.id;
     const trip = await prisma.trip.create({
       data: {
         name,
@@ -132,12 +137,12 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
         image,
         participants: {
           create: {
-            inviteeId: userID,
-            inviterId: userID,
+            inviteeId: userId,
+            inviterId: userId,
             status: "ACCEPTED",
           },
         },
-        participantsID: [firebaseUserId],
+        // participantsID: [firebaseUserId],
       },
     });
     res.status(StatusCodes.CREATED).json(trip);
@@ -258,7 +263,7 @@ router.get("/:id/participants", async (req: Request<TripParams>, res) => {
 // GET all contact/friends not in a group
 router.get("/:id/non-participants", async (req, res) => {
   const { id: tripId } = req.params;
-  const userId = userID;
+  const { id: userId } = req.user?.id;
   try {
     // Fetch all friends of the user where the friendship status is ACCEPTED
     const friends = await prisma.friendship.findMany({
