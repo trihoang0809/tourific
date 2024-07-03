@@ -101,6 +101,8 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
                 radius: 0,
               },
               notes: activityNote,
+              imageUrl:
+                "https://assets-global.website-files.com/5ca5fe687e34be0992df1fbe/64d3853418a507bc6b3d03a0_Vol%20en%20parapente%20au%20mont%20blanc.jpg",
             }),
           },
         );
