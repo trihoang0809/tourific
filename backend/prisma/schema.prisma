@@ -16,9 +16,10 @@ model Trip {
   location Location
   startDate DateTime @default(now())
   endDate DateTime
-  image Photo?
   activities Activity[]
   participants TripMember[]
+  participantsID String[]
+  image Photo?
 }
 
 model TripMember {
@@ -27,21 +28,18 @@ model TripMember {
   inviteeId   String @db.ObjectId
   inviterId String @db.ObjectId
   status   Status @default(PENDING)
-  
   trip     Trip @relation(fields: [tripId], references: [id])
   invitee  User? @relation("InviteeToTripInvitations", fields: [inviteeId], references: [id])
   inviter  User? @relation("InviterToTripInvitations", fields: [inviterId], references: [id])
-
   @@unique([tripId, inviteeId])
 }
 
-
 type Location {
-  address String
+  address String?
   citystate String @default("")
   latitude Float
   longitude Float
-  radius Float
+  radius Float?
 }
 
 model User {
@@ -49,11 +47,11 @@ model User {
   userName String @unique
   email String @unique
   password String
+  firebaseUserId    String @unique
   firstName String
   lastName String
   dateOfBirth DateTime
   avatar Photo
-
   inviteeTripInvitations TripMember[] @relation("InviteeToTripInvitations")
   inviterTripInvitations TripMember[] @relation("InviterToTripInvitations")  
   friendRequestReceived   Friendship[]   @relation("friendRequestReceived")
@@ -78,15 +76,17 @@ model Activity {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String
   description String
+  imageUrl String
   startTime DateTime
   endTime DateTime
   location Location
-  notes String[]
+  notes String
   netUpvotes Int @default(0)
   isOnCalendar Boolean @default(false)
   category String[]
   tripId String @db.ObjectId
   trip Trip @relation(fields: [tripId], references: [id])
+  googlePlacesId String?
   image Photo?
 }
 

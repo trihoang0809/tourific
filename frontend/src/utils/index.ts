@@ -1,4 +1,6 @@
 import { Trip, TripData } from "@/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
 
 // format follow UTC
 export function formatDateTime(dateString: Date, hour: number, minute: number) {
@@ -51,6 +53,16 @@ export const tripDate = (date: Date) => {
   return `${date.getDate()} ${month}, ${date.getFullYear()}`;
 };
 
+//weekday
+export const weekday = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 // function to get the most 3 recent upcoming trips
 // @params: trips array
 // return an array of 3 most recent upcoming trips
@@ -159,4 +171,50 @@ export const categories: Record<string, string[]> = {
     "physiotherapist",
     "beauty_salon",
   ],
+};
+
+// Function to store the token
+export const storeToken = async (token: string) => {
+  try {
+    await AsyncStorage.setItem("userToken", token);
+    console.log("Token stored successfully ", token);
+  } catch (error) {
+    console.error("Error storing the token:", error);
+  }
+};
+
+// Function to retrieve the token
+export const getToken = async (): Promise<string | null> => {
+  try {
+    const token = AsyncStorage.getItem("userToken");
+    console.log("Retrieved token: ", token);
+    return await token;
+  } catch (error) {
+    console.error("Error retrieving the token:", error);
+    return null;
+  }
+};
+
+// Function to decode the token
+export const decodeToken = (token: string): any => {
+  try {
+    const decoded = jwtDecode(token);
+    console.log("Decoded token:", decoded);
+    return decoded;
+  } catch (error) {
+    console.error("Error decoding the token:", error);
+    return null;
+  }
+};
+
+// Function to retrieve the userId from the token
+export const getUserIdFromToken = async (): Promise<string | null> => {
+  const token = await getToken();
+  if (token) {
+    const decodedToken = decodeToken(token);
+    const userId = decodedToken.user_id || decodedToken.sub; // Firebase stores user ID in 'sub'
+    console.log("Decoded userId: ", userId);
+    return userId || null;
+  }
+  return null;
 };

@@ -1093,10 +1093,16 @@ const Itinerary = () => {
                                               );
                                             }}
                                             disabled={
-                                              !(formData.startTime.hours !== undefined &&
-                                                formData.startTime.minutes !== undefined &&
-                                                formData.endTime.hours !== undefined &&
-                                                formData.endTime.minutes !== undefined)
+                                              !(
+                                                formData.startTime.hours !==
+                                                  undefined &&
+                                                formData.startTime.minutes !==
+                                                  undefined &&
+                                                formData.endTime.hours !==
+                                                  undefined &&
+                                                formData.endTime.minutes !==
+                                                  undefined
+                                              )
                                             }
                                           >
                                             <Text

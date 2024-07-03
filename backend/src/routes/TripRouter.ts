@@ -5,6 +5,8 @@ import { validateData } from "../middleware/validationMiddleware";
 import { tripCreateSchema } from "../schemas/tripSchema";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { StatusCodes } from "http-status-codes";
+import { verifyToken } from "../middleware/authMiddleware";
+import { generateSchedule } from "../middleware/GenerateSchedule/schedule";
 import InvitationRouter from "./InvitationRouter";
 
 // const express = require('express')
@@ -18,11 +20,44 @@ export interface TripParams {
   userId: string;
 }
 
-// temporary for testing until auth done
-const userID = "6661308f193a6cd9e0ea4d36";
+const userID = "66806671b368fc776a512ad5";
+
+// router.use(verifyToken);
 
 // Activites of a trip
 router.use("/:tripId/activities", ActivityRouter);
+
+//Create Schedule
+router.get("/:id/schedule", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const getActivities = async () => {
+      try {
+        const activities = await prisma.activity.findMany({
+          where: {
+            tripId: id,
+          },
+        });
+
+        return JSON.stringify(activities);
+      } catch (error) {
+        console.log(error);
+        return [];
+      }
+    };
+    const activities = await getActivities();
+
+    const schedule = await generateSchedule(activities);
+    // const data = JSON.parse(schedule);
+
+    console.log(schedule);
+
+    res.json(schedule);
+  } catch (error) {
+    console.log("An error occur while creating schedule: " + error);
+  }
+});
 
 // Invitation route
 router.use("/invite", InvitationRouter);
@@ -87,10 +122,16 @@ router.get("/all", async (req: Request<TripParams>, res) => {
   }
 });
 
-// Get all trips of a user
+// Get all trips in database
 router.get("/", async (req: Request<TripParams>, res) => {
   try {
-    let queryConditions = {};
+    let queryConditions: any = {
+      where: {
+        participantsID: {
+          has: firebaseUserId,
+        },
+      },
+    };
     const now = new Date();
 
     if (req.query.ongoing === "true") {
@@ -115,29 +156,89 @@ router.get("/", async (req: Request<TripParams>, res) => {
         },
       };
     } else if (req.query.upcoming === "true") {
-      queryConditions = {
-        where: {
+      // Fetch trips that have start date in a specific range
+      if (typeof req.query.startTimeLocal === "string" && typeof req.query.endTimeLocal === "string") {
+        const startOfDay = new Date(req.query.startTimeLocal);
+        const endOfDay = new Date(req.query.endTimeLocal);
+        console.log("Start of Day:", startOfDay);
+        console.log("End of Day:", endOfDay);
+        queryConditions = {
+          startDate: {
+            gte: startOfDay,
+            lte: endOfDay,
+          },
+        };
+      } else {
+        queryConditions = {
           startDate: {
             gt: now,
           },
-        },
-      };
-      // console.log(now);
+        };
+        // console.log(now);
+      }
     }
 
+    const trips = await prisma.trip.findMany({
+      where: queryConditions,
+    });
+    res.status(StatusCodes.OK).json(trips);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "An error occurred while fetching trips." });
+  }
+});
+
+// Get all trips of a user
+router.get("/", async (req: Request<TripParams>, res) => {
+  console.log("Request body: ", req);
+  const { firebaseUserId } = req.query;
+  console.log("firebase User Id: ", firebaseUserId);
+
+  try {
+    let queryConditions: any = {
+      where: {
+        participantsID: {
+          has: firebaseUserId,
+        },
+      },
+    };
+    const now = new Date();
+
+    if (req.query.ongoing === "true") {
+      queryConditions.where.AND = [
+        {
+          startDate: {
+            lt: now,
+          },
+        },
+        {
+          endDate: {
+            gt: now,
+          },
+        },
+      ];
+    } else if (req.query.past === "true") {
+      queryConditions.where.endDate = {
+        lt: now,
+      };
+    } else if (req.query.upcoming === "true") {
+      queryConditions.where.startDate = {
+        gt: now,
+      };
+    }
+    console.log("query conditions: ", queryConditions);
     const trips = await prisma.tripMember.findMany({
       where: {
         inviteeId: userID,
         status: "ACCEPTED",
-        trip: {
-          AND: queryConditions,
-        },
+        trip: queryConditions.where,
       },
       include: {
         trip: true,
       },
     });
-    res.status(StatusCodes.OK).json(trips);
+    const tripData = trips.map((tripMember) => tripMember.trip);
+    res.status(StatusCodes.OK).json(tripData);
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "An error occurred while fetching trips." });
@@ -147,7 +248,7 @@ router.get("/", async (req: Request<TripParams>, res) => {
 // create a trip
 router.post("/", validateData(tripCreateSchema), async (req, res) => {
   try {
-    const { name, startDate, endDate, location, image } = req.body;
+    const { name, startDate, endDate, location, image, firebaseUserId } = req.body;
     const trip = await prisma.trip.create({
       data: {
         name,
@@ -162,6 +263,7 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
             status: "ACCEPTED",
           },
         },
+        participantsID: [firebaseUserId],
       },
     });
     res.status(StatusCodes.CREATED).json(trip);
@@ -198,11 +300,13 @@ router.get("/:id", async (req, res) => {
 // Update an existing trip
 router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
   try {
+    console.log("start running");
     const { id } = req.params;
-    const { name, startDate, endDate, location, image } = req.body;
+    const { name, startDate, endDate, location, image, firebaseUserId } = req.body;
+
     const isValidID = await prisma.trip.findUnique({
       where: {
-        id,
+        id: id,
       },
     });
 
@@ -215,15 +319,19 @@ router.put("/:id", validateData(tripCreateSchema), async (req, res) => {
         id,
       },
       data: {
-        name,
-        startDate,
-        endDate,
-        location,
-        image,
+        name: name,
+        startDate: startDate,
+        endDate: endDate,
+        location: location,
+        image: image,
+        participantsID: {
+          push: firebaseUserId, // Add the userId to the participantsID array
+        },
       },
     });
     res.status(StatusCodes.OK).json(trip);
   } catch (error) {
+    console.log(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while updating the trip." });
   }
 });

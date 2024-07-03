@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  RefreshControl,
 } from "react-native";
 import { TripCard } from "../components/TripCard/TripCard";
 import { HomeScreenHeader } from "../components/HomeScreenHeader";
@@ -19,44 +20,82 @@ import { Ionicons } from "@expo/vector-icons";
 import TripCardRect from "@/components/TripCard/TripCardRect";
 import { headerImage } from "@/utils/constants";
 import Style from "Style";
+import { getUserIdFromToken, getToken } from "@/utils";
 
 const screenw = Dimensions.get("window").width;
 const titleWidth = screenw - screenw * 0.96;
 export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [ongoingTrips, setOngoingTrips] = useState<Trip[]>([]);
   const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
   useEffect(() => {
-    const fetchTrips = async () => {
-      try {
-        const ongoing = await fetch(
-          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`,
-        );
-        const upcoming = await fetch(
-          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?upcoming=true`,
-        );
-        const ongoingData = await ongoing.json();
-        const upcomingData = await upcoming.json();
-
-        setOngoingTrips(ongoingData);
-        setUpcomingTrips(getRecentTrips(upcomingData));
-      } catch (error) {
-        console.error("Failed to fetch trips:", error);
-      }
+    const fetchUserId = async () => {
+      const id = await getUserIdFromToken();
+      console.log("user Id logged in: ", id);
+      setUserId(id);
     };
-    fetchTrips();
+    fetchUserId();
   }, []);
 
+  const fetchTrips = async () => {
+    console.log(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`);
+    if (!userId) {
+      console.error("User ID is null");
+      return;
+    }
+    try {
+      // const headers = {
+      //   "Content-Type": "application/json",
+      //   Authorization: `Bearer ${await getToken()}`,
+      // };
+      // console.log("Headers:  ", headers);
+
+      const ongoing = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true&firebaseUserId=${userId}`,
+        // { headers },
+      );
+
+      const upcoming = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?upcoming=true&firebaseUserId=${userId}`,
+        // { headers },
+      );
+
+      const ongoingData = await ongoing.json();
+      const upcomingData = await upcoming.json();
+
+      setOngoingTrips(ongoingData);
+      setUpcomingTrips(getRecentTrips(upcomingData));
+    } catch (error) {
+      console.error("Failed to fetch trips:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (userId) {
+      console.log("got user id: ", userId);
+      fetchTrips();
+    }
+  }, [userId]);
+
+  const onRefresh = useCallback(() => {
+    fetchTrips();
+  }, [userId]);
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView style={styles.container}>
-        <HomeScreenHeader user={user} />
-        <Text style={styles.greeting}>Hey 👋, {user.firstName}!</Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+      <HomeScreenHeader user={user} />
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={false} onRefresh={onRefresh} />
+        }
+      >
         <View style={{ height: 180 }}>
           <Image
             source={{
               uri: randomizeCover(headerImage),
             }}
-            style={{ height: 180, position: "absolute", width: "100%", top: 0 }} // Image is positioned absolutely and aligned to the top
+            style={{ height: 180, position: "absolute", width: "100%", top: 0 }}
             resizeMode="cover"
           />
         </View>
@@ -65,7 +104,10 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             <Text style={styles.title}>Ongoing Trips</Text>
             <Text
               onPress={() => {
-                router.navigate("/trips/ongoing");
+                router.navigate({
+                  pathname: "/trips/ongoing",
+                  params: { userId: userId },
+                });
               }}
             >
               See all
@@ -78,7 +120,9 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
           >
             {ongoingTrips.length > 0 ? (
               ongoingTrips.map((trip) => (
-                <TripCard key={trip.id} trip={trip} height={250} width={300} />
+                <View key={trip.id}>
+                  <TripCard trip={trip} height={250} width={300} />
+                </View>
               ))
             ) : (
               <Text style={styles.noTrip}>No ongoing trips</Text>
@@ -90,7 +134,10 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             <Text style={styles.title}>Upcoming Trips</Text>
             <Text
               onPress={() => {
-                router.navigate("/trips/upcoming");
+                router.navigate({
+                  pathname: "/trips/upcoming",
+                  params: { userId: userId },
+                });
               }}
             >
               See all
@@ -98,8 +145,8 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
           </View>
           <ScrollView style={{ paddingHorizontal: 10 }}>
             {upcomingTrips.slice(0, 3).map((trip) => (
-              <View style={{ padding: 5, alignItems: "center" }}>
-                <TripCardRect key={trip.id} trip={trip} height={100} />
+              <View key={trip.id} style={{ padding: 5, alignItems: "center" }}>
+                <TripCardRect trip={trip} height={100} />
               </View>
             ))}
           </ScrollView>
@@ -117,11 +164,6 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  greeting: {
-    marginLeft: 20,
-    fontSize: 15,
-    marginBottom: 10,
   },
   title: {
     fontSize: 18,

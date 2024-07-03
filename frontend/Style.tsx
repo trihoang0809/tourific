@@ -33,6 +33,7 @@ export default StyleSheet.create({
     borderTopRightRadius: 15,
   },
   tripCardSecondaryText: {
-    fontSize: 13, color: '#696e6e'
+    fontSize: 13,
+    color: "#696e6e",
   },
 });

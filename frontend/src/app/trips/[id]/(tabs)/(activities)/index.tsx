@@ -4,23 +4,32 @@ import {
   TouchableOpacity,
   TextInput,
   Text,
-  SafeAreaView
+  SafeAreaView,
+  RefreshControl,
 } from "react-native";
-import { useState, useEffect } from "react";
-import { useGlobalSearchParams } from "expo-router";
+import { useState, useEffect, useCallback } from "react";
+import { router, useGlobalSearchParams, usePathname, Link } from "expo-router";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { Dimensions, StyleSheet } from "react-native";
 import ActivityThumbnail from "@/components/ActivityThumbnail";
 import { ActivityProps } from "@/types";
-import { fetchActivities } from "@/utils/fetchActivities";
 import { categories } from "@/utils";
 import { categoriesMap } from "@/types";
-
-const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
+import { fetchActivities } from "@/utils/fetchAndSaveActivities";
+import { useQuery } from "@tanstack/react-query";
 
 const ActivitiesScreen = () => {
   const { id } = useGlobalSearchParams();
-  const [activities, setActivities] = useState<ActivityProps[]>([]);
+  const {
+    data: activities,
+    error,
+    refetch,
+    isFetching,
+  } = useQuery({
+    queryKey: ["activities", id],
+    queryFn: () => fetchActivities(id),
+    //refetchInterval: 100000, // Refetch every 100 seconds
+  });
   const [filteredActivities, setFilteredActivities] = useState<ActivityProps[]>(
     [],
   );
@@ -28,100 +37,123 @@ const ActivitiesScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
 
   useEffect(() => {
-    const getTripAndActivities = async () => {
-      try {
-        const response = await fetch(
-          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch trip");
-        }
-        const data = await response.json();
-        if (
-          data.location.latitude &&
-          data.location.longitude &&
-          data.location.radius
-        ) {
-          const fetchedActivities = await fetchActivities(
-            data.location.latitude,
-            data.location.longitude,
-            data.location.radius,
-          );
-          setActivities(fetchedActivities);
-          setFilteredActivities(fetchedActivities);
-          //await saveActivitiesToBackend(fetchedActivities);
-        }
-      } catch (error: any) {
-        console.error("Error fetching trip:", error.toString());
-      }
-    };
-    getTripAndActivities();
-  }, [id]);
+    if (activities) {
+      setFilteredActivities(activities);
+    }
+  }, [activities]);
 
-  // const saveActivitiesToBackend = async (activities: ActivityProps[]) => {
-  //   const promises = activities.map(async (activity) => {
-  //     const response = await fetch(
-  //       `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/activities`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           name: activity.name,
-  //           description: activity.description,
-  //           startTime: new Date(),
-  //           endTime: new Date(),
-  //           location: {
-  //             citystate: activity.location.citystate,
-  //             latitude: activity.location.latitude,
-  //             longitude: activity.location.longitude,
+  const onRefresh = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
+  // useEffect(() => {
+  //   const getTripAndActivities = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}`,
+  //         {
+  //           method: "GET",
+  //           headers: {
+  //             "Content-Type": "application/json",
   //           },
-  //           notes: activity.notes,
-  //           netUpvotes: activity.netUpvotes,
-  //           isOnCalendar: activity.isOnCalendar,
-  //           category: activity.category,
-  //           rating: activity.rating,
-  //         }),
-  //       },
-  //     );
-  //     return response.json();
-  //   });
-  //   try {
-  //     //const newActivities = await Promise.all(promises);
-  //     //setActivities(newActivities); // Update the activities state with new data including IDs
-  //   } catch (error) {
-  //     console.error("Error saving activities:", error);
-  //   }
-  // };
+  //         },
+  //       );
+  //       if (!response.ok) {
+  //         throw new Error("Failed to fetch trip");
+  //       }
+  //       const data = await response.json();
+  //       if (
+  //         data.location.latitude &&
+  //         data.location.longitude &&
+  //         data.location.radius
+  //       ) {
+  //         const fetchedActivities = await fetchActivities(
+  //           data.location.latitude,
+  //           data.location.longitude,
+  //           data.location.radius,
+  //         );
+
+  //         return fetchedActivities;
+  //         //await saveActivitiesToBackend(fetchedActivities);
+  //         // console.log(userActivity);
+  //         // setFilteredActivities(temp);
+  //       }
+  //     } catch (error: any) {
+  //       console.error("Error fetching trip:", error.toString());
+  //       return [];
+  //     }
+  //   };
+
+  //   // Fetch user data (proposed activities)
+  //   const getActivities = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/activities`,
+  //         {
+  //           method: "GET",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //         },
+  //       );
+  //       if (!response.ok) {
+  //         throw new Error("Failed to fetch trip");
+  //       }
+
+  //       let data = await response.json();
+
+  //       data = data.map((item: any) => ({
+  //         ...item,
+  //         imageUrl:
+  //           "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlCeVhPcF0B061dWx6Y2p6ZshztnAoVQI59g&s",
+  //       }));
+  //       console.log("user activitiies");
+  //       console.log(data);
+  //       return data;
+  //     } catch (error: any) {
+  //       console.error("Error fetching trip:", error.toString());
+  //       return [];
+  //     }
+  //   };
+
+  //   // Combine two data
+  //   const fetchData = async () => {
+  //     try {
+  //       const ggData = await getTripAndActivities();
+  //       const userData = await getActivities();
+
+  //       const combinedData = userData.concat(ggData);
+  //       setActivities(combinedData);
+  //       setFilteredActivities(combinedData);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, [id]);
 
   const handleSelectCategory = (category: string) => {
     setSelectedCategory(category);
     if (category === "All") {
-      setFilteredActivities(activities);
+      setFilteredActivities(activities || []);
     } else {
-      const filtered = activities.filter((activity) =>
+      const filtered = activities?.filter((activity) =>
         activity.category.some((type) => categories[category].includes(type)),
       );
-      setFilteredActivities(filtered);
+      setFilteredActivities(filtered || []);
     }
   };
 
   const handleSearch = (text: string) => {
     setSearchTerm(text);
     if (text) {
-      const searchedActivities = filteredActivities.filter((activity) =>
+      const searchedActivities = activities?.filter((activity) =>
         activity.name.toLowerCase().includes(text.toLowerCase()),
       );
-      setFilteredActivities(searchedActivities);
+      setFilteredActivities(searchedActivities || []);
     } else {
-      setFilteredActivities(activities);
+      setFilteredActivities(activities || []);
     }
   };
 
@@ -169,6 +201,9 @@ const ActivitiesScreen = () => {
           flexWrap: "wrap",
           padding: 5,
         }}
+        refreshControl={
+          <RefreshControl refreshing={isFetching} onRefresh={onRefresh} />
+        }
       >
         {filteredActivities.length > 0 ? (
           <ScrollView
@@ -179,30 +214,24 @@ const ActivitiesScreen = () => {
               padding: 5,
             }}
           >
-            {filteredActivities.map(
-              (activity: ActivityProps, index: number) => (
-                <View key={index} style={{ width: "100%", padding: 15 }}>
-                  <ActivityThumbnail activity={activity} tripId={id} />
-                </View>
-              ),
-            )}
+            {filteredActivities.map((activity: ActivityProps) => (
+              <View key={activity.id} style={{ width: "100%", padding: 15 }}>
+                <ActivityThumbnail activity={activity} tripId={id} />
+              </View>
+            ))}
           </ScrollView>
         ) : (
           <View style={styles.noActivitiesView}>
             <Text style={styles.noActivitiesText}>
               No activities found for this category.
             </Text>
-            <TouchableOpacity
-              style={styles.updateButton}
-              onPress={() => {
-                /* Replace with the route to the update trip page */
-                console.log("Navigate to update trip page");
-              }}
-            >
-              <Text style={styles.updateButtonText}>
-                Update trip's radius or location
-              </Text>
-            </TouchableOpacity>
+            <Link href={`/trips/create?id=${id}`}>
+              <TouchableOpacity style={styles.updateButton}>
+                <Text style={styles.updateButtonText}>
+                  Update trip's radius or location
+                </Text>
+              </TouchableOpacity>
+            </Link>
           </View>
         )}
       </ScrollView>
@@ -223,7 +252,7 @@ const ActivitiesScreen = () => {
           shadowRadius: 2,
         }}
         onPress={() => {
-          /* Handle the button press */
+          router.push("../create");
         }}
       >
         <Ionicons name="add" size={25} color="white" />

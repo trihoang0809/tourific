@@ -1,4 +1,5 @@
 import { Ionicons, Feather } from "@expo/vector-icons";
+import React from "react";
 
 export interface TripData {
   name: string;
@@ -22,10 +23,10 @@ export interface TripData {
 
 export type MapData = {
   address: String;
-  citystate: String;
+  citystate?: String;
   latitude: number;
   longitude: number;
-  radius: number;
+  radius?: number;
 };
 
 export type DataItem = {
@@ -46,6 +47,12 @@ export interface GooglePlacesInputProps {
   value: string;
 }
 
+export interface GoogleMapInputProps {
+  onLocationSelect: (location: MapData) => void;
+  value: string;
+  location: MapData;
+}
+
 export interface ActivityProps {
   id: string;
   name: string;
@@ -64,7 +71,14 @@ export interface ActivityProps {
     width: number;
     url: string;
   };
+  googlePlacesId: string;
 }
+
+export interface ActivityThumbnailProps {
+  activity: ActivityProps;
+  tripId: string | string[] | undefined;
+}
+
 export type Trip = {
   id: string;
   name: string;
@@ -88,6 +102,7 @@ export type User = {
   id: string;
   userName: string;
   password: string;
+  firebaseUserId: string;
   friendRequestReceived: any[]; // Specify the type if known
   tripID: string[];
   trips: Trip[];
@@ -170,13 +185,7 @@ export interface TripDate {
   range: Number;
 }
 
-export type Mode =
-  | "3days"
-  | "week"
-  | "day"
-  | "custom"
-  | "month"
-  | "itinerary";
+export type Mode = "3days" | "week" | "day" | "custom" | "month" | "itinerary";
 
 export interface AddActivityProps {
   currentDateUpdate: Date;
@@ -223,3 +232,9 @@ export interface dateRange {
   startDate: Date | undefined;
   endDate: Date | undefined;
 }
+
+export type Photo = {
+  url: string;
+  width?: number;
+  height?: number;
+};

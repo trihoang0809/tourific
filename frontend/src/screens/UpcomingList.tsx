@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import { TripCard } from "@/components/TripCard/TripCard";
-import { Trip } from "../types";
+import { Trip, UserProps } from "../types";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { getRecentTrips } from "@/utils";
@@ -45,9 +45,10 @@ const Header = ({ isUpcoming }: listprops) => (
 
 export interface listprops {
   isUpcoming: boolean;
+  userId: string | string[] | undefined;
 }
 
-export const ListFilteredCards = ({ isUpcoming }: listprops) => {
+export const ListFilteredCards = ({ isUpcoming, userId }: listprops) => {
   const [upcomingTrips, setUpcoming] = useState<Trip[]>([]);
   const serverUrl = process.env.EXPO_PUBLIC_HOST_URL;
   const windowWidth = Dimensions.get("window").width;
@@ -57,10 +58,11 @@ export const ListFilteredCards = ({ isUpcoming }: listprops) => {
   //Fetching data
   useEffect(() => {
     const getData = async () => {
+      console.log("please", userId);
       try {
         const link = isUpcoming
-          ? `http://${serverUrl}:3000/trips?upcoming=true`
-          : `http://${serverUrl}:3000/trips?ongoing=true`;
+          ? `http://${serverUrl}:3000/trips?upcoming=true&firebaseUserId=${userId}`
+          : `http://${serverUrl}:3000/trips?ongoing=true&firebaseUserId=${userId}`;
         const upcoming = await fetch(link);
         let data = await upcoming.json();
         setUpcoming(getRecentTrips(data));
@@ -75,7 +77,7 @@ export const ListFilteredCards = ({ isUpcoming }: listprops) => {
   return (
     <View>
       <View style={styles.container}>
-        <Header isUpcoming={isUpcoming} />
+        <Header isUpcoming={isUpcoming} userId={userId} />
         <View style={{ flex: 1 }}>
           <FlatList
             style={{

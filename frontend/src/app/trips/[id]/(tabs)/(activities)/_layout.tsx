@@ -4,7 +4,8 @@ export default function SuggestionsLayout() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="[activityid]" options={{ headerShown: true }} />
+      <Stack.Screen name="[activityid]" options={{ headerShown: false }} />
+      <Stack.Screen name="create" options={{ headerShown: false }} />
     </Stack>
   );
 }

@@ -19,9 +19,10 @@ router.get("/", async (req: Request<TripParams>, res) => {
   try {
     const activities = await prisma.activity.findMany({
       where: {
-        tripId,
+        tripId: tripId,
       },
     });
+
     res.status(StatusCodes.OK).json(activities);
   } catch (error) {
     res
@@ -54,7 +55,8 @@ router.get("/:activityId", async (req: Request<ActivityParams>, res) => {
 // Create a new activity
 router.post("/", async (req: Request<ActivityParams>, res) => {
   const { tripId } = req.params;
-  const { name, description, startTime, endTime, location, notes } = req.body;
+  console.log("trip id: ", tripId);
+  const { name, description, startTime, endTime, location, notes, imageUrl, googlePlacesId } = req.body;
 
   if (!tripId) {
     res.status(StatusCodes.NOT_FOUND).json({ error: "Trip ID does not exist" });
@@ -73,10 +75,13 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
             endTime,
             location,
             notes,
+            googlePlacesId,
+            imageUrl,
           },
         },
       },
     });
+
     res.status(StatusCodes.CREATED).json(activity);
   } catch (error) {
     console.log(error);
@@ -151,6 +156,62 @@ router.put("/:activityId/toggle", async (req: Request<ActivityParams>, res) => {
     res.status(StatusCodes.OK).json(activity);
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while updating the activity." });
+  }
+});
+
+// Update an activity by googlePlacesId
+router.put("/updateUpvotes/:googlePlacesId", async (req: Request, res) => {
+  const { googlePlacesId, tripId } = req.params;
+  const { netUpvotes } = req.body;
+
+  try {
+    const activity = await prisma.activity.updateMany({
+      where: {
+        tripId: tripId,
+        googlePlacesId: googlePlacesId,
+      },
+      data: {
+        netUpvotes: {
+          increment: netUpvotes, // Use increment based on the incoming value
+        },
+      },
+    });
+
+    if (activity.count === 0) {
+      return res.status(404).json({ error: "Activity does not exist" });
+    }
+
+    res.status(200).json({ netUpvotes });
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while updating the activity." });
+  }
+});
+
+// Update an activity by googlePlacesId
+router.put("/updateUpvotes/:googlePlacesId", async (req: Request, res) => {
+  const { googlePlacesId, tripId } = req.params;
+  const { netUpvotes } = req.body;
+
+  try {
+    const activity = await prisma.activity.updateMany({
+      where: {
+        tripId: tripId,
+        googlePlacesId: googlePlacesId,
+      },
+      data: {
+        netUpvotes: {
+          increment: netUpvotes, // Use increment based on the incoming value
+        },
+      },
+    });
+
+    if (activity.count === 0) {
+      return res.status(404).json({ error: "Activity does not exist" });
+    }
+
+    res.status(200).json({ netUpvotes });
+  } catch (error) {
+    res.status(500).json({ error: "An error occurred while updating the activity." });
   }
 });
 
