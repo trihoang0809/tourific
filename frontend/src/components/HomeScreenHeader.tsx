@@ -4,11 +4,11 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  Pressable,
 } from "react-native";
 import { UserProps } from "../types";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+
 export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
     <View style={styles.content}>
@@ -23,7 +23,14 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
           justifyContent: "flex-end",
         }}
       >
-        <Image style={styles.avatar} source={{ uri: user.avatar.url }} />
+        <TouchableOpacity
+          onPress={() => router.push("/friends/search")}
+          style={{ marginRight: 20 }}
+        >
+          <Ionicons name="person-add-outline" size={22} color="black" />
+        </TouchableOpacity>
+        
+        <Image style={styles.avatar} source={{ uri: user.avatar?.url }} />
       </View>
     </View>
   );

@@ -36,4 +36,20 @@ export default StyleSheet.create({
     fontSize: 13,
     color: "#696e6e",
   },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#E6E6E6",
+    borderRadius: 20,
+    borderWidth: 1,
+    padding: 10,
+    margin: 10,
+  },
+  searchInput: {
+    padding: 5,
+    flex: 1,
+    height: 30,
+    fontSize: 16,
+    color: "black",
+  },
 });

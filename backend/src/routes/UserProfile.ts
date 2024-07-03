@@ -1,7 +1,8 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Status } from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
 import bcrypt from "bcrypt";
+import { findMongoDBUser } from "../utils/index";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -30,8 +31,9 @@ router.get("/:firebaseUserId", async (req, res) => {
     });
 
     if (!userProfile) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: `There is no user with Id: ${firebaseUserId}` });
+      return res.status(StatusCodes.NOT_FOUND).json({ error: `There is no user with Id: ${firebaseUserId}` });
     }
+
     res.status(StatusCodes.OK).json(userProfile);
   } catch (error) {
     console.log("Some errors happen while getting user profile");
@@ -40,6 +42,7 @@ router.get("/:firebaseUserId", async (req, res) => {
       .json({ error: `An error occurred while fetching user profile with Id: ${firebaseUserId}` });
   }
 });
+
 
 // Create a user profile
 router.post("/", async (req, res) => {
@@ -153,76 +156,126 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-// Add a friend
-router.post("/friend/:userId", async (req, res) => {
-  const { friendId } = req.body;
-  const userId = req.params.userId;
+// find a user profile by username and email that matches the text
+// case insensitive
+router.post("/find", async (req, res) => {
+  const { text } = req.body;
   try {
-    const friend = await prisma.friendship.create({
-      data: {
-        senderID: userId,
-        receiverID: friendId,
-      },
-    });
-    res.status(StatusCodes.CREATED).json(friend);
-  } catch (error) {
-    console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while adding a friend." });
-  }
-});
-
-// get all friends
-router.get("/friend/:userId", async (req, res) => {
-  const userId = req.params.userId;
-  try {
-    const friends = await prisma.friendship.findMany({
+    const user = await prisma.user.findMany({
       where: {
-        // get all friends that have accepted the friend request
         OR: [
           {
-            senderID: userId,
-            friendStatus: "ACCEPTED",
-            receiverID: {
-              not: userId,
+            userName: {
+              startsWith: text,
+              mode: 'insensitive',
             },
           },
           {
-            receiverID: userId,
-            friendStatus: "ACCEPTED",
-            senderID: {
-              not: userId,
+            email: {
+              startsWith: text,
+              mode: 'insensitive',
             },
           },
         ],
       },
     });
-    res.status(StatusCodes.OK).json(friends);
-  } catch (error) {
+    res.status(StatusCodes.OK).json(user);
+  }
+  catch (error) {
     console.log(error);
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: "An error occurred while getting sent friend requests." });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while finding a user." });
+  }
+});
+
+// Add a friend or cancel a friend request
+router.post("/friend", async (req, res) => {
+  const { friendId } = req.body;
+  const { userId } = req.body;
+  const { add } = req.query;
+
+  console.log(friendId, ";", userId);
+  if (!friendId || !userId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing userId or friendId" });
+  }
+
+  const MongoUserId = await findMongoDBUser(userId);
+  const MongoFriendId = await findMongoDBUser(friendId);
+
+  try {
+    // cancel a sent request
+    if (add === "false") {
+      const cancelRequest = await prisma.friendship.delete({
+        where: {
+          receiverID_senderID: {
+            senderID: MongoUserId?.id as string,
+            receiverID: MongoFriendId?.id as string,
+          },
+        },
+      });
+      res.status(StatusCodes.OK).json(cancelRequest);
+    } else if (add === "true") {
+      // send a friend request
+
+      // check if the friend request already exists
+      const existingRequest = await prisma.friendship.findFirst({
+        where: {
+          OR: [
+            {
+              senderID: MongoUserId?.id as string,
+              receiverID: MongoFriendId?.id as string,
+            },
+            {
+              senderID: MongoUserId?.id as string,
+              receiverID: MongoFriendId?.id as string,
+            },
+          ],
+        },
+      });
+
+      if (existingRequest) {
+        res.status(StatusCodes.BAD_REQUEST).json({ error: "Friend request already exists." });
+        return;
+      }
+
+      const friend = await prisma.friendship.create({
+        data: {
+          senderID: MongoUserId?.id as string,
+          receiverID: MongoFriendId?.id as string,
+        },
+      });
+      res.status(StatusCodes.CREATED).json(friend);
+    }
+  }
+  catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while adding/cancelling a friend." });
   }
 });
 
 // accept or decline a friend request
-// to accept: /friend?accept=true
+// to accept: /friend?accept=true 
 // to reject: /friend?accept=false
-router.patch("/friend/:userId", async (req, res) => {
-  const { friendId } = req.body;
+router.patch("/friend", async (req, res) => {
+  const { friendId, userId } = req.body;
   const { accept } = req.query;
-  const userId = req.params.userId;
+
+  if (!friendId || !userId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing userId or friendId" });
+  }
+
+  const MongoUserId = await findMongoDBUser(userId);
+  const MongoFriendId = await findMongoDBUser(friendId);
   try {
     if (accept === "true") {
       const friend = await prisma.friendship.update({
         where: {
           receiverID_senderID: {
-            senderID: friendId,
-            receiverID: userId,
+            senderID: MongoFriendId?.id as string,
+            receiverID: MongoUserId?.id as string,
           },
         },
         data: {
-          friendStatus: "ACCEPTED",
+          friendStatus: "ACCEPTED"
         },
       });
       res.status(StatusCodes.OK).json(friend);
@@ -230,63 +283,103 @@ router.patch("/friend/:userId", async (req, res) => {
       const rejectFriend = await prisma.friendship.delete({
         where: {
           receiverID_senderID: {
-            senderID: friendId,
-            receiverID: userId,
+            senderID: MongoFriendId?.id as string,
+            receiverID: MongoUserId?.id as string,
           },
         },
       });
       res.status(StatusCodes.OK).json(rejectFriend);
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.log(error);
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: "An error occurred while accepting/declining a friend." });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while accepting/declining a friend." });
+  }
+});
+
+// get all friendship by status
+router.get("/:userId/friends", async (req, res) => {
+  const { userId } = req.params;
+  const { status } = req.query;
+  try {
+    const MongoUserId = await findMongoDBUser(userId);
+    const friends = await prisma.friendship.findMany({
+      where: {
+        // get all friends that have accepted the friend request
+        OR: [
+          {
+            senderID: MongoUserId?.id as string,
+            friendStatus: status as Status,
+            receiverID: {
+              not: MongoUserId?.id as string
+            }
+          },
+          {
+            receiverID: MongoUserId?.id as string,
+            friendStatus: status as Status,
+            senderID: {
+              not: MongoUserId?.id as string
+            }
+          },
+        ],
+      },
+    });
+    res.status(StatusCodes.OK).json(friends);
+  }
+  catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting friends." });
   }
 });
 
 // get all sent requests
-router.get("/friend/:userId/sent-requests", async (req, res) => {
-  const userId = req.params.userId;
+router.get("/friend/sent-requests", async (req, res) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing userId" });
+  }
+
+  const MongoUserId = await findMongoDBUser(userId);
   try {
     const sentRequests = await prisma.friendship.findMany({
       where: {
-        senderID: userId,
-        friendStatus: "PENDING",
+        senderID: MongoUserId?.id as string,
+        friendStatus: 'PENDING',
       },
     });
     res.status(StatusCodes.OK).json(sentRequests);
   } catch (error) {
     console.log(error);
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: "An error occurred while getting sent friend requests." });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting sent friend requests." });
   }
 });
 
 // get all pending requests
-router.get("/friend/:userId/pending-requests", async (req, res) => {
-  const userId = req.params.userId;
+router.get("/friend/pending-requests", async (req, res) => {
+  const { userId } = req.body;
+  if (!userId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing userId" });
+  }
+
+  const MongoUserId = await findMongoDBUser(userId);
   try {
     const pendingRequests = await prisma.friendship.findMany({
       where: {
-        receiverID: userId,
-        friendStatus: "PENDING",
+        receiverID: MongoUserId?.id as string,
+        friendStatus: 'PENDING',
       },
     });
     res.status(StatusCodes.OK).json(pendingRequests);
   } catch (error) {
     console.log(error);
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: "An error occurred while getting pending friend requests." });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting pending friend requests." });
   }
 });
 
 // Login a user
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const user = await prisma.user.findUnique({
       where: {

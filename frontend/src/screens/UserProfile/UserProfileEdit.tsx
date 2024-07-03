@@ -141,7 +141,7 @@ export const UserProfileEdit: React.FC<editProps> = ({ method, id = "" }) => {
 
         if (updateUserProfile.ok) {
           console.log("success");
-          router.push("/userProfile/userProfileUI");
+          router.push("/userProfile/profile");
         }
       } catch (error) {
         console.log("An error occured while EDIT user Profile " + error);
