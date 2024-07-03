@@ -30,8 +30,9 @@ router.get("/:firebaseUserId", async (req, res) => {
     });
 
     if (!userProfile) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: `There is no user with Id: ${firebaseUserId}` });
+      return res.status(StatusCodes.NOT_FOUND).json({ error: `There is no user with Id: ${firebaseUserId}` });
     }
+
     res.status(StatusCodes.OK).json(userProfile);
   } catch (error) {
     console.log("Some errors happen while getting user profile");

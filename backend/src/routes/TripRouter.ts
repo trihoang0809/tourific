@@ -62,7 +62,65 @@ router.get("/:id/schedule", async (req, res) => {
 // Invitation route
 router.use("/invite", InvitationRouter);
 
-// Get all trips in database
+// Get all trips of a user
+router.get("/", async (req: Request<TripParams>, res) => {
+  console.log("Request body: ", req);
+  const { firebaseUserId } = req.query;
+  console.log("firebase User Id: ", firebaseUserId);
+
+  try {
+    let queryConditions: any = {
+      where: {
+        participantsID: {
+          has: firebaseUserId,
+        },
+      },
+    };
+    const now = new Date();
+
+    if (req.query.ongoing === "true") {
+      queryConditions.where.AND = [
+        {
+          startDate: {
+            lt: now,
+          },
+        },
+        {
+          endDate: {
+            gt: now,
+          },
+        },
+      ];
+    } else if (req.query.past === "true") {
+      queryConditions.where.endDate = {
+        lt: now,
+      };
+    } else if (req.query.upcoming === "true") {
+      queryConditions.where.startDate = {
+        gt: now,
+      };
+    }
+    console.log("query conditions: ", queryConditions);
+    const trips = await prisma.tripMember.findMany({
+      where: {
+        inviteeId: userID,
+        status: "ACCEPTED",
+        trip: queryConditions.where,
+      },
+      include: {
+        trip: true,
+      },
+    });
+    const tripData = trips.map((tripMember) => tripMember.trip);
+    res.status(StatusCodes.OK).json(tripData);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "An error occurred while fetching trips." });
+  }
+});
+
+
+// Get all trips of all users
 router.get("/all", async (req: Request<TripParams>, res) => {
   try {
     let queryConditions = {};
@@ -116,129 +174,6 @@ router.get("/all", async (req: Request<TripParams>, res) => {
       where: queryConditions,
     });
     res.status(StatusCodes.OK).json(trips);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "An error occurred while fetching trips." });
-  }
-});
-
-// Get all trips in database
-router.get("/", async (req: Request<TripParams>, res) => {
-  try {
-    let queryConditions: any = {
-      where: {
-        participantsID: {
-          has: firebaseUserId,
-        },
-      },
-    };
-    const now = new Date();
-
-    if (req.query.ongoing === "true") {
-      queryConditions = {
-        AND: [
-          {
-            startDate: {
-              lt: now,
-            },
-          },
-          {
-            endDate: {
-              gt: now,
-            },
-          },
-        ],
-      };
-    } else if (req.query.past === "true") {
-      queryConditions = {
-        endDate: {
-          lt: now,
-        },
-      };
-    } else if (req.query.upcoming === "true") {
-      // Fetch trips that have start date in a specific range
-      if (typeof req.query.startTimeLocal === "string" && typeof req.query.endTimeLocal === "string") {
-        const startOfDay = new Date(req.query.startTimeLocal);
-        const endOfDay = new Date(req.query.endTimeLocal);
-        console.log("Start of Day:", startOfDay);
-        console.log("End of Day:", endOfDay);
-        queryConditions = {
-          startDate: {
-            gte: startOfDay,
-            lte: endOfDay,
-          },
-        };
-      } else {
-        queryConditions = {
-          startDate: {
-            gt: now,
-          },
-        };
-        // console.log(now);
-      }
-    }
-
-    const trips = await prisma.trip.findMany({
-      where: queryConditions,
-    });
-    res.status(StatusCodes.OK).json(trips);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "An error occurred while fetching trips." });
-  }
-});
-
-// Get all trips of a user
-router.get("/", async (req: Request<TripParams>, res) => {
-  console.log("Request body: ", req);
-  const { firebaseUserId } = req.query;
-  console.log("firebase User Id: ", firebaseUserId);
-
-  try {
-    let queryConditions: any = {
-      where: {
-        participantsID: {
-          has: firebaseUserId,
-        },
-      },
-    };
-    const now = new Date();
-
-    if (req.query.ongoing === "true") {
-      queryConditions.where.AND = [
-        {
-          startDate: {
-            lt: now,
-          },
-        },
-        {
-          endDate: {
-            gt: now,
-          },
-        },
-      ];
-    } else if (req.query.past === "true") {
-      queryConditions.where.endDate = {
-        lt: now,
-      };
-    } else if (req.query.upcoming === "true") {
-      queryConditions.where.startDate = {
-        gt: now,
-      };
-    }
-    console.log("query conditions: ", queryConditions);
-    const trips = await prisma.tripMember.findMany({
-      where: {
-        inviteeId: userID,
-        status: "ACCEPTED",
-        trip: queryConditions.where,
-      },
-      include: {
-        trip: true,
-      },
-    });
-    const tripData = trips.map((tripMember) => tripMember.trip);
-    res.status(StatusCodes.OK).json(tripData);
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "An error occurred while fetching trips." });
