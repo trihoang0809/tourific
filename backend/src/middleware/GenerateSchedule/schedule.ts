@@ -1,5 +1,6 @@
 import path from "path";
 import { activityData } from "../GenerateSchedule/scheduleData/prepareData";
+import { funScore } from "./scheduleData/funScore";
 
 let schedule = '{ "route": [], "cost": 0 }';
 let itinerary = '{ "itinerary": [] }';
@@ -86,10 +87,11 @@ async function clusterFunScore(funScore: any[], days: number): Promise<any> {
   });
 }
 
-export const generateSchedule = async (activity: any, days: number) => {
+export const generateSchedule = async (activity: any, days: number, participant: number) => {
   let activityJSON = JSON.parse(activity);
-  let activityFunScore = new Array(activityJSON.length).fill(4);
-
+  let activityFunScore = await funScore(activityJSON, participant);
+  console.log("fun score");
+  console.log(activityFunScore);
   // Divide activities into multiple
   await clusterFunScore(activityFunScore, days)
     .then((result) => {
@@ -124,6 +126,6 @@ export const generateSchedule = async (activity: any, days: number) => {
     // Push the result to the official itinerary
     officialItinerary.push(data);
   }
-
+  console.log(officialItinerary);
   return officialItinerary;
 };

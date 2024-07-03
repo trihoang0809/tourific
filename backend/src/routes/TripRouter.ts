@@ -39,6 +39,7 @@ router.get("/:id/schedule", async (req, res) => {
         const activities = await prisma.activity.findMany({
           where: {
             tripId: id,
+            googlePlacesId: "",
           },
         });
 
@@ -120,7 +121,7 @@ router.get("/:id/schedule", async (req, res) => {
     let startDate = tripData?.startDate.getTime() || 0;
     let endDate = tripData?.endDate.getTime() || 0;
     const days = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
-    const schedule = await generateSchedule(JSON.stringify(activities), days);
+    const schedule = await generateSchedule(JSON.stringify(activities), days, tripData?.participantsID.length || 1);
 
     for (let i = 0; i < schedule.length; ++i)
       for (let j = 0; j < schedule[i].route.length; ++j) {
