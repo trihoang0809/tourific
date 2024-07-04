@@ -223,3 +223,16 @@ export interface dateRange {
   startDate: Date | undefined;
   endDate: Date | undefined;
 }
+
+export interface FriendRequest {
+  friendStatus: string;
+  sender: {
+    id: string;
+    avatar: {
+      url: string;
+    };
+    lastName: string;
+    firstName: string;
+    userName: string;
+  };
+}

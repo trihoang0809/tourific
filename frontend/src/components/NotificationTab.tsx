@@ -13,21 +13,9 @@
 // "senderID": "66842fd7f7e0a898807a4167"},
 // {"friendStatus": "PENDING", "id": "6686af01221f4ff006d27f1e", "receiverID": "66860537f96086257c3f9792", "sender": {"avatar": [Object], "dateOfBirth": "2004-09-08T00:00:00.000Z", "email": "leomessi@gmail.com", "firstName": "Leo", "id": "6684ef6ca3ea75b07fde4608", "lastName": "Messi", "password": "$2b$10$/HrO3fd1QDas3Q5NwA0JguoOYKilqFuUbwR8W4CdOkW/VUOGeSLVy", "userName": "messi"}, "senderID": "6684ef6ca3ea75b07fde4608"}, {"friendStatus": "PENDING", "id": "6686aeb7221f4ff006d27f1c", "receiverID": "66860537f96086257c3f9792", "sender": {"avatar": [Object], "dateOfBirth": "2017-02-01T00:00:00.000Z", "email": "thanhvan@gmail.com", "firstName": "thanh", "id": "66860537f96086257c3f9792", "lastName": "van", "password": "$2b$10$rGxARuJlGtvBmB4SMmL27OtMkF4QLNmZ.T/RPnUoS/bjNS660EhBm", "userName": "thanhvan123"}, "senderID": "66860537f96086257c3f9792"}]
 
-import {
-  View,
-  Text,
-  SafeAreaView,
-  TextInput,
-  Image,
-  FlatList,
-  Alert,
-  StyleSheet,
-  Button,
-  TouchableOpacity,
-} from "react-native";
-import React, { useEffect, useState, useRef } from "react";
-import Style from "Style";
-import { Feather } from "@expo/vector-icons";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { FriendRequest } from "@/types";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
@@ -128,14 +116,17 @@ const NotificationTab = () => {
 
 export default NotificationTab;
 
-const FriendRequests = ({ requests }) => {
+const FriendRequests: React.FC<{ requests: FriendRequest[] }> = ({
+  requests,
+}) => {
   return (
     <View>
       {requests &&
         requests.map((request, index) => (
           <FriendRequestCard
             key={index}
-            user={request.sender}
+            request={request}
+            // user={request.sender}
             // isPending={request.isPending}
           />
         ))}
@@ -171,26 +162,6 @@ const TripInvitations = () => (
           {mockTrip.name}
         </Text>
         <Text numberOfLines={2} style={{ marginBottom: 10 }}>
-          {mockUser.firstName} {mockUser.lastName} invited you to join this
-          5-day trip with 2 others.
-        </Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.acceptButton}>
-            <Text style={styles.acceptButtonText}>Accept</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.deleteButton}>
-            <Text style={styles.deleteButtonText}>Decline</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
-    <View style={styles.notification}>
-      <Image source={{ uri: mockTrip.image.url }} style={styles.trip} />
-      <View style={styles.textContainer}>
-        <Text numberOfLines={1} style={styles.userName}>
-          {mockTrip.name}
-        </Text>
-        <Text numberOfLines={2} style={{ marginBottom: 10 }}>
           {mockUser.firstName} {mockUser.lastName} has just joined your trip.
         </Text>
       </View>
@@ -199,7 +170,9 @@ const TripInvitations = () => (
   </View>
 );
 // TODO: ReceivedFriendAcceptCard
-const FriendRequestCard = ({ user }) => {
+const FriendRequestCard: React.FC<{ request: FriendRequest }> = ({
+  request,
+}) => {
   const [isAccepted, setIsAccepted] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const handleAccept = () => {
@@ -213,10 +186,13 @@ const FriendRequestCard = ({ user }) => {
 
   return isDeleted ? null : (
     <View style={styles.notification}>
-      <Image source={{ uri: user.avatar.url }} style={styles.avatar} />
+      <Image
+        source={{ uri: request.sender.avatar.url }}
+        style={styles.avatar}
+      />
       <View style={styles.textContainer}>
         <Text style={styles.userName}>
-          {user.firstName} {user.lastName}
+          {request.sender.firstName} {request.sender.lastName}
         </Text>
         {/* {isPending ? ( */}
         {/* // ) : (
@@ -229,9 +205,7 @@ const FriendRequestCard = ({ user }) => {
           <Text style={{ marginBottom: 10 }}>wants to become your friend.</Text>
           <View style={styles.buttonContainer}>
             {isAccepted ? (
-              <TouchableOpacity
-                style={styles.deleteButton}
-              >
+              <TouchableOpacity style={styles.deleteButton}>
                 <Text style={styles.deleteButtonText}>Accepted</Text>
               </TouchableOpacity>
             ) : (
@@ -256,37 +230,70 @@ const FriendRequestCard = ({ user }) => {
     </View>
   );
 };
-
-const TripInvitationCard = ({ trip, user, isPending }) => (
-  <View style={styles.notification}>
-    <Image source={{ uri: trip.image.url }} style={styles.trip} />
-    <View style={styles.textContainer}>
-      <Text numberOfLines={1} style={styles.userName}>
-        {trip.name}
-      </Text>
-      {isPending ? (
+const TripInvitationCard: React.FC<{ request: FriendRequest }> = ({
+  request,
+}) => {
+  const [isAccepted, setIsAccepted] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
+  const handleAccept = () => {
+    setIsAccepted(true);
+    // TODO: update backend
+  };
+  const handleDelete = () => {
+    setIsDeleted(true);
+    // TODO: delete from backend
+  };
+  return (
+    <View style={styles.notification}>
+      <Image source={{ uri: trip.image.url }} style={styles.trip} />
+      <View style={styles.textContainer}>
+        <Text numberOfLines={1} style={styles.userName}>
+          {trip.name}
+        </Text>
         <>
           <Text numberOfLines={2} style={{ marginBottom: 10 }}>
             {user.firstName} {user.lastName} invited you to join this 5-day trip
             with 2 others.
           </Text>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.acceptButton}>
-              <Text style={styles.acceptButtonText}>Accept</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.deleteButton}>
-              <Text style={styles.deleteButtonText}>Decline</Text>
-            </TouchableOpacity>
+            {isAccepted ? (
+              <TouchableOpacity style={styles.deleteButton}>
+                <Text style={styles.deleteButtonText}>Joined</Text>
+              </TouchableOpacity>
+            ) : (
+              <>
+                <TouchableOpacity
+                  style={styles.acceptButton}
+                  onPress={handleAccept}
+                >
+                  <Text style={styles.acceptButtonText}>Join</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={handleDelete}
+                >
+                  <Text style={styles.deleteButtonText}>Decline</Text>
+                </TouchableOpacity>
+              </>
+            )}
+
+            {/* <TouchableOpacity style={styles.acceptButton}>
+            <Text style={styles.acceptButtonText}>Accept</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.deleteButton}>
+            <Text style={styles.deleteButtonText}>Decline</Text>
+          </TouchableOpacity> */}
           </View>
         </>
-      ) : (
+        {/* ) : (
         <Text numberOfLines={2} style={{ marginBottom: 10 }}>
           {user.firstName} {user.lastName} has just joined your trip.
         </Text>
-      )}
+      )} */}
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
