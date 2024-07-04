@@ -84,9 +84,9 @@ const PhotoAPI = ({ savePhoto, isVisible, setIsVisible }: PhotoAPIProps) => {
         <ScrollView>
           <View style={styles.imageContainer}>
             {results &&
-              results.map((result: Result) => {
+              results.map((result: Result, index: number) => {
                 return (
-                  <View>
+                  <View key={index}>
                     <TouchableOpacity
                       onPress={() => {
                         savePhoto(result.urls.small);
