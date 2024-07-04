@@ -7,6 +7,9 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 
+// Use any userId here
+const userId = "6683f5179867bc7464c5c7bd";
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -20,10 +23,30 @@ export default function App() {
   const notificationListener = useRef<Notifications.Subscription>();
   const responseListener = useRef<Notifications.Subscription>();
 
+  const updateNotificationTokenOnBackend = async (
+    notificationToken: string,
+  ) => {
+    try {
+      const response = await fetch(
+        `http://${process.env.EXPO_PUBLIC_HOST_URL}:3000/user/${userId}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            notificationToken: notificationToken,
+          }),
+        },
+      );
+    } catch (error: any) {
+      console.error("Error updating user's push token:", error.toString());
+    }
+  };
+
   useEffect(() => {
-    registerForPushNotificationsAsync().then(
-      (token) => token && setExpoPushToken(token),
-    );
+    registerForPushNotificationsAsync().then((token) => {
+      token && setExpoPushToken(token);
+      updateNotificationTokenOnBackend(expoPushToken);
+    });
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
         console.log(response);
