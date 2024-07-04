@@ -126,9 +126,8 @@ export const GGMapActivityDetail: React.FC<Actprops> = (id: Actprops) => {
         >
           {activityData.imageUrl !== undefined &&
             activityData.imageUrl.map((img: String, id: number) => (
-              <View>
+              <View key={id}>
                 <Image
-                  key={id}
                   style={[
                     styles.backgroundImage,
                     {

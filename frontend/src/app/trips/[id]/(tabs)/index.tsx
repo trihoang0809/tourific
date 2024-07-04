@@ -172,29 +172,6 @@ const TripDetailsScreen = () => {
                 {DateTime.local().zoneName}
               </Text>
               <Text style={styles.h2}>Participants</Text>
-              <Pressable
-                onPress={async () => {
-                  const url = `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/schedule`;
-                  try {
-                    const response = await fetch(url);
-                    if (!response.ok) {
-                      throw new Error("Failed to fetch trip");
-                    }
-
-                    const data = await response.json();
-                    setSchedule(data);
-                  } catch (error: any) {
-                    console.error("Error fetching trip:", error.toString());
-                  }
-                }}
-              >
-                <Text>Click</Text>
-
-                {/* {schedule.route.map((activity: any, id: number) => (
-                  <Text key={id}>{id + " " + activity.name}</Text>
-                ))}
-                <Text>{schedule.cost}</Text> */}
-              </Pressable>
             </View>
           </View>
         </View>

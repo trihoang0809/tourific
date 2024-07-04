@@ -14,7 +14,11 @@ import { useForm, Controller } from "react-hook-form";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { MapData, TripData } from "@/types";
 import GooglePlacesInput from "@/components/GoogleMaps/GooglePlacesInput";
-import { DatePickerModal, TimePickerModal } from "react-native-paper-dates";
+import {
+  DatePickerModal,
+  TimePickerModal,
+  registerTranslation,
+} from "react-native-paper-dates";
 import { extractDateTime, formatDateTime } from "@/utils";
 import { DateTime } from "luxon";
 import { TripSchema } from "@/validation/types";
@@ -28,6 +32,26 @@ import {
 import { getUserIdFromToken, getToken } from "@/utils";
 import { MaterialIcons } from "@expo/vector-icons";
 
+registerTranslation("en", {
+  save: "Save",
+  selectSingle: " ",
+  selectMultiple: " ",
+  selectRange: " ",
+  notAccordingToDateFormat: (inputFormat) =>
+    `Date format must be ${inputFormat}`,
+  mustBeHigherThan: (date) => `Must be later then ${date}`,
+  mustBeLowerThan: (date) => `Must be earlier then ${date}`,
+  mustBeBetween: (startDate, endDate) =>
+    `Must be between ${startDate} - ${endDate}`,
+  dateIsDisabled: "Day is not allowed",
+  previous: "Previous",
+  next: "Next",
+  typeInDate: "Type in date",
+  pickDateFromCalendar: "Pick date from calendar",
+  close: "Close",
+  hour: "",
+  minute: "",
+});
 // CREATING: /trips/create
 // UPDATING: /trips/create?id=${id}
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
