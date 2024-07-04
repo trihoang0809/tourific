@@ -17,7 +17,11 @@ import { useGlobalSearchParams, router } from "expo-router";
 import { Calendar, DateRangeHandler } from "react-native-big-calendar";
 // import { Mode } from "react-native-big-calendar/build/interfaces";
 import { StyleSheet } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import {
+  AntDesign,
+  FontAwesome5,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -84,6 +88,7 @@ const Itinerary = () => {
       minutes: undefined,
     },
   });
+  const [descriptionModal, setDescriptionModal] = useState(false);
   let prevOpenedRow: any;
   const rowRefs = useRef<{ [key: string]: Swipeable }>({});
 
@@ -1218,9 +1223,120 @@ const Itinerary = () => {
             theme={customTheme}
           />
         )}
-        <Pressable style={[Style.addIcon]} onPress={generateAlert}>
-          <Ionicons name="color-wand-sharp" size={40} color="#FFFFFF" />
+
+        {/* Generating Button  */}
+        <Pressable
+          style={[Style.addIcon, { width: 60, height: 60 }]}
+          onPress={() => {
+            setDescriptionModal(true);
+            // generateAlert
+          }}
+        >
+          <Ionicons name="color-wand-sharp" size={30} color="#FFFFFF" />
         </Pressable>
+
+        {/* Description Modal */}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={descriptionModal}
+          onRequestClose={() => {
+            setModalVisible(!descriptionModal);
+          }}
+        >
+          <View
+            style={{
+              flex: 2,
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 22,
+              backgroundColor: "rgba(0,0,0,0.5)",
+            }}
+          >
+            <View
+              style={{
+                margin: 20,
+                backgroundColor: "white",
+                borderRadius: 20,
+                padding: 35,
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                justifyContent: "space-around",
+                rowGap: 30,
+                alignItems: "center",
+              }}
+            >
+              {/* <FontAwesome5 name="robot" size={80} color="#2196F3" /> */}
+              <Image
+                style={{ width: 300, height: 200 }}
+                source={{
+                  uri: "https://img.freepik.com/free-vector/camping-place-cartoon-composition-with-yellow-tent-lamp-pot-with-dinner-fire-night-sky_1284-54945.jpg?size=626&ext=jpg&ga=GA1.1.1887574231.1711929600&semt=ais",
+                }}
+              />
+              <Text
+                style={[
+                  styles.modalText,
+                  { textAlign: "center", fontSize: 23 },
+                ]}
+              >
+                Automatically generate your schedule with just one tap.
+              </Text>
+              <View style={{ alignItems: "center" }}>
+                <Pressable
+                  style={[
+                    {
+                      borderRadius: 20,
+                      padding: 10,
+                      elevation: 2,
+                      backgroundColor: "#2196F3",
+                      width: 200,
+                    },
+                  ]}
+                  onPress={() => {
+                    setDescriptionModal(false);
+                    generateAlert();
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "white",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                      fontSize: 22,
+                    }}
+                  >
+                    Continue
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[
+                    {
+                      paddingTop: 15,
+                      width: "100%",
+                    },
+                  ]}
+                  onPress={() => {
+                    setDescriptionModal(false);
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "grey",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                      fontSize: 17,
+                    }}
+                  >
+                    Close
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </GestureHandlerRootView>
   );
