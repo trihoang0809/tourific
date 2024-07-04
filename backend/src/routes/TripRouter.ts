@@ -119,6 +119,67 @@ router.get("/", async (req: Request<TripParams>, res) => {
   }
 });
 
+
+// Get all trips of all users
+router.get("/all", async (req: Request<TripParams>, res) => {
+  try {
+    let queryConditions = {};
+    const now = new Date();
+
+    if (req.query.ongoing === "true") {
+      queryConditions = {
+        AND: [
+          {
+            startDate: {
+              lt: now,
+            },
+          },
+          {
+            endDate: {
+              gt: now,
+            },
+          },
+        ],
+      };
+    } else if (req.query.past === "true") {
+      queryConditions = {
+        endDate: {
+          lt: now,
+        },
+      };
+    } else if (req.query.upcoming === "true") {
+      // Fetch trips that have start date in a specific range
+      if (typeof req.query.startTimeLocal === "string" && typeof req.query.endTimeLocal === "string") {
+        const startOfDay = new Date(req.query.startTimeLocal);
+        const endOfDay = new Date(req.query.endTimeLocal);
+        console.log("Start of Day:", startOfDay);
+        console.log("End of Day:", endOfDay);
+        queryConditions = {
+          startDate: {
+            gte: startOfDay,
+            lte: endOfDay,
+          },
+        };
+      } else {
+        queryConditions = {
+          startDate: {
+            gt: now,
+          },
+        };
+        // console.log(now);
+      }
+    }
+
+    const trips = await prisma.trip.findMany({
+      where: queryConditions,
+    });
+    res.status(StatusCodes.OK).json(trips);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "An error occurred while fetching trips." });
+  }
+});
+
 // create a trip
 router.post("/", validateData(tripCreateSchema), async (req, res) => {
   try {

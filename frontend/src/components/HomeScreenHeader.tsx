@@ -1,14 +1,8 @@
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  Pressable,
-} from "react-native";
+import { View, Image, StyleSheet, Pressable } from "react-native";
 import { UserProps } from "../types";
-import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import React from "react";
+
 export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
     <View style={styles.content}>
