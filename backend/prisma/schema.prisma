@@ -53,6 +53,7 @@ model User {
   lastName String
   dateOfBirth DateTime
   avatar Photo
+  notificationToken String[]
 
   inviteeTripInvitations TripMember[] @relation("InviteeToTripInvitations")
   inviterTripInvitations TripMember[] @relation("InviterToTripInvitations")  
