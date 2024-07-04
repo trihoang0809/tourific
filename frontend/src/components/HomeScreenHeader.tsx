@@ -12,10 +12,18 @@ import { Ionicons } from "@expo/vector-icons";
 export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
     <View style={styles.content}>
-      <View>
-        <Text style={styles.appName}>tourific</Text>
-      </View>
-      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
+      <Image
+        style={{ width: 180, height: 70 }}
+        source={require("@/assets/Tourific Logo.png")}
+      />
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-end",
+        }}
+      >
         <TouchableOpacity
           onPress={() => {
             /* navigate to notifications */
@@ -34,10 +42,10 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "white",
     flexDirection: "row",
-    justifyContent: 'space-around',
-    alignItems: 'center',
+    justifyContent: "space-around",
+    alignItems: "center",
     padding: 10,
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   notificationIcon: {
     position: "absolute",

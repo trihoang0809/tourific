@@ -37,9 +37,16 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
         );
         const ongoingData = await ongoing.json();
         const upcomingData = await upcoming.json();
+        let ongoingTrips = ongoingData.map(
+          (trip: any, id: number) => trip.trip,
+        );
 
-        setOngoingTrips(ongoingData);
-        setUpcomingTrips(getRecentTrips(upcomingData));
+        let upcomingTrips = upcomingData.map(
+          (trip: any, id: number) => trip.trip,
+        );
+        console.log(upcomingTrips);
+        setOngoingTrips(ongoingTrips);
+        setUpcomingTrips(getRecentTrips(upcomingTrips));
       } catch (error) {
         console.error("Failed to fetch trips:", error);
       }
@@ -48,7 +55,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
       <HomeScreenHeader user={sampleUser} />
       <ScrollView style={styles.container}>
         <View style={{ height: 180 }}>
@@ -98,8 +105,8 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
           </View>
           <ScrollView style={{ paddingHorizontal: 10 }}>
             {upcomingTrips.slice(0, 3).map((trip) => (
-              <View style={{ padding: 5, alignItems: "center" }}>
-                <TripCardRect key={trip.id} trip={trip} height={100} />
+              <View style={{ padding: 5, alignItems: "center" }} key={trip.id}>
+                <TripCardRect trip={trip} height={100} />
               </View>
             ))}
           </ScrollView>
