@@ -170,13 +170,7 @@ export interface TripDate {
   range: Number;
 }
 
-export type Mode =
-  | "3days"
-  | "week"
-  | "day"
-  | "custom"
-  | "month"
-  | "itinerary";
+export type Mode = "3days" | "week" | "day" | "custom" | "month" | "itinerary";
 
 export interface AddActivityProps {
   currentDateUpdate: Date;
@@ -222,4 +216,12 @@ export interface timeRange {
 export interface dateRange {
   startDate: Date | undefined;
   endDate: Date | undefined;
+}
+
+export interface notificationMessage {
+  to: string;
+  sound: string;
+  title: any;
+  body: any;
+  data?: any;
 }
