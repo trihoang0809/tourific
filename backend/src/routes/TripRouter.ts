@@ -40,9 +40,10 @@ router.get("/:id/schedule", async (req, res) => {
           where: {
             tripId: id,
             googlePlacesId: "",
+            name: "okok",
           },
         });
-
+        console.log(activities);
         return activities;
       } catch (error) {
         console.log(error);
@@ -116,11 +117,11 @@ router.get("/:id/schedule", async (req, res) => {
     const upvoteActivities = await getActivitiesUpvote();
     const activities = userCreatedActivities.concat(upvoteActivities);
     const tripData = await getTripData();
-    console.log(upvoteActivities);
+    console.log(userCreatedActivities);
     // Calculate days
     let startDate = tripData?.startDate.getTime() || 0;
     let endDate = tripData?.endDate.getTime() || 0;
-    const days = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24));
+    const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
     const schedule = await generateSchedule(JSON.stringify(activities), days, tripData?.participantsID.length || 1);
 
     for (let i = 0; i < schedule.length; ++i)
@@ -198,7 +199,6 @@ router.get("/", async (req: Request<TripParams>, res) => {
     res.status(500).json({ error: "An error occurred while fetching trips." });
   }
 });
-
 
 // Get all trips of all users
 router.get("/all", async (req: Request<TripParams>, res) => {

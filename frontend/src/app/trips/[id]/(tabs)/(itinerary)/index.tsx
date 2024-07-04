@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useReducer,
+} from "react";
 import {
   View,
   Text,
@@ -619,6 +625,7 @@ const Itinerary = () => {
             const url = `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/schedule`;
             try {
               const response = await fetch(url);
+              setSavedActivityId("");
             } catch (error: any) {
               console.error("Error fetching trip:", error.toString());
             }
@@ -1229,7 +1236,6 @@ const Itinerary = () => {
           style={[Style.addIcon, { width: 60, height: 60 }]}
           onPress={() => {
             setDescriptionModal(true);
-            // generateAlert
           }}
         >
           <Ionicons name="color-wand-sharp" size={30} color="#FFFFFF" />

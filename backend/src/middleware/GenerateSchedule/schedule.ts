@@ -88,10 +88,10 @@ async function clusterFunScore(funScore: any[], days: number): Promise<any> {
 }
 
 export const generateSchedule = async (activity: any, days: number, participant: number) => {
+  officialItinerary = [];
   let activityJSON = JSON.parse(activity);
   let activityFunScore = await funScore(activityJSON, participant);
-  console.log("fun score");
-  console.log(activityFunScore);
+
   // Divide activities into multiple
   await clusterFunScore(activityFunScore, days)
     .then((result) => {
@@ -100,7 +100,7 @@ export const generateSchedule = async (activity: any, days: number, participant:
     .catch((error) => console.error("Error creating schedule:", error));
 
   let initeraryData = JSON.parse(itinerary); // itinerar
-
+  console.log(initeraryData.itinerary.length);
   // Find the route for each day
   for (let i = 0; i < days; ++i) {
     let filteredActivity = []; //filtered activities that only in a day
