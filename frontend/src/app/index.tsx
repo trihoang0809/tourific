@@ -2,10 +2,17 @@ import React from "react";
 import { HomeScreen } from "../screens/HomeScreen";
 import { sampleUser } from "@/mock-data/user";
 import { useState, useEffect, useRef } from "react";
-import { Text, View, Button, Platform, StyleSheet } from "react-native";
+import {
+  Text,
+  View,
+  Button,
+  Platform,
+} from "react-native";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
+import { sendPushNotification } from "@/utils";
+import { user0, user2, user3, mockTrip } from "@/mock-data/forNotification";
 
 // Use any userId here
 const userId = "6683f5179867bc7464c5c7bd";
@@ -67,12 +74,56 @@ export default function App() {
       <HomeScreen user={sampleUser} />
       <View
         style={{
-          flex: 0.2,
+          flex: 0.5,
           alignItems: "center",
           justifyContent: "space-around",
         }}
       >
         <Text>Your expo push token: {expoPushToken}</Text>
+        <Button
+          onPress={() =>
+            sendPushNotification({
+              to: user2.notificationToken,
+              sound: "default",
+              title: `${user0.firstName} wants to be your friend!`,
+              body: `@${user0.userName} just sent you a friend request`,
+            })
+          }
+          title={`Add friend with ${user2.firstName}`}
+        />
+        <Button
+          onPress={() =>
+            sendPushNotification({
+              to: user3.notificationToken,
+              sound: "default",
+              title: `Ready to travel with ${user0.firstName}?`,
+              body: `@${user0.userName} has accepted your friend request`,
+            })
+          }
+          title={`Accept friend request of ${user3.firstName}`}
+        />
+        <Button
+          onPress={() =>
+            sendPushNotification({
+              to: user2.notificationToken,
+              sound: "default",
+              title: `Go to ${mockTrip.location.citystate} with ${user0.firstName}!`,
+              body: `@${user0.userName} has invited you to join the trip ${mockTrip.name}`,
+            })
+          }
+          title={`Invite ${user2.firstName} to trip X`}
+        />
+        <Button
+          onPress={() =>
+            sendPushNotification({
+              to: user3.notificationToken,
+              sound: "default",
+              title: `${user0.firstName} is excited about ${mockTrip.location.citystate} too!`,
+              body: `@${user0.userName} has accepted your travel invitation`,
+            })
+          }
+          title={`Accept trip invitation of ${user3.firstName}`}
+        />
       </View>
     </View>
   );
