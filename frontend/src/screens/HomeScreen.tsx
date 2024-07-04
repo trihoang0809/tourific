@@ -78,7 +78,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
           >
             {ongoingTrips.length > 0 ? (
               ongoingTrips.map((trip) => (
-                <TripCard key={trip.id} trip={trip} height={250} width={300} />
+                <TripCard key={trip.id} trip={trip.trip} height={250} width={300} />
               ))
             ) : (
               <Text style={styles.noTrip}>No ongoing trips</Text>
@@ -99,7 +99,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
           <ScrollView style={{ paddingHorizontal: 10 }}>
             {upcomingTrips.slice(0, 3).map((trip) => (
               <View style={{ padding: 5, alignItems: "center" }}>
-                <TripCardRect key={trip.id} trip={trip} height={100} />
+                <TripCardRect key={trip.id} trip={trip.trip} height={100} />
               </View>
             ))}
           </ScrollView>
