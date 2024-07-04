@@ -2,6 +2,7 @@ import express, { Request } from "express";
 import { PrismaClient, Status } from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
 import { TripParams } from "./TripRouter";
+import { findMongoDBUser } from "src/utils";
 
 const router = express.Router({ mergeParams: true });
 const prisma = new PrismaClient();
@@ -13,16 +14,23 @@ export interface InvitationParams extends TripParams {
 }
 
 // temporary for testing until auth done
-const userID = "6669267e34f4cab1d9ddd751";
+// const userID = "6669267e34f4cab1d9ddd751";
 
 // get an invitation by status
 // example endpoint: /invite?status=PENDING
 router.get("/", async (req: Request<InvitationParams>, res) => {
   const { status } = req.query;
+  const { userId } = req.body;
+
+  if (!userId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "User ID is required." });
+  }
+
+  const MongoUserId = await findMongoDBUser(userId);
   try {
     const invitations = await prisma.tripMember.findMany({
       where: {
-        inviteeId: userID,
+        inviteeId: MongoUserId?.id as string,
         status: status as Status
       },
     });
@@ -35,10 +43,17 @@ router.get("/", async (req: Request<InvitationParams>, res) => {
 
 // get all received invitations of a user, including trip details
 router.get("/all-received", async (req: Request, res) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "User ID is required." });
+  }
+
+  const MongoUserId = await findMongoDBUser(userId);
   try {
     const invitations = await prisma.tripMember.findMany({
       where: {
-        inviteeId: userID,
+        inviteeId: MongoUserId?.id as string,
         status: 'PENDING'
       },
       include: {
@@ -56,10 +71,17 @@ router.get("/all-received", async (req: Request, res) => {
 
 // get all sent invitations of a user, including trip details
 router.get("/all-sent", async (req: Request, res) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "User ID is required." });
+  }
+
+  const MongoUserId = await findMongoDBUser(userId);
   try {
     const invitations = await prisma.tripMember.findMany({
       where: {
-        inviterId: userID,
+        inviterId: MongoUserId?.id as string,
       },
       include: {
         trip: true,
@@ -83,29 +105,32 @@ router.get("/all-sent", async (req: Request, res) => {
 router.post("/:tripId", async (req: Request<InvitationParams>, res) => {
   const { tripId } = req.params;
   const inviteeIds = req.body.inviteeIds;
-  const inviterId = userID;
+  const { inviterId } = req.body;
 
+  
   try {
     console.log("inviteeIds", inviteeIds);
     if (!inviteeIds || inviteeIds.length === 0) {
       res.status(StatusCodes.BAD_REQUEST).json({ error: 'No invitee IDs provided' });
     }
-
+    
     // Validate all provided user IDs exist
     const trans = await prisma.$transaction(async (tx) => {
+      const MongoInviteeIds = inviteeIds.map(async (id: string) => await findMongoDBUser(id));
+
       const validUsers = await tx.user.findMany({
-        where: { id: { in: inviteeIds } },
+        where: { id: { in: MongoInviteeIds } },
         select: { id: true }
       });
 
       if (validUsers.length === 0) {
-        return { newInviteeIds: [], invalidUserIds: inviteeIds, invitations: [] };
+        return { newInviteeIds: [], invalidUserIds: MongoInviteeIds, invitations: [] };
       }
 
       const validUserIds = validUsers.map(user => user.id);
       console.log("validUserIds", validUserIds);
 
-      const invalidUserIds = inviteeIds.filter((id: string) => !validUserIds.includes(id));
+      const invalidUserIds = MongoInviteeIds.filter((id: string) => !validUserIds.includes(id));
 
       console.log("invalid", invalidUserIds);
       // Check for existing invitations
