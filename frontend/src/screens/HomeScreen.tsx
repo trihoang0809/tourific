@@ -21,6 +21,7 @@ import TripCardRect from "@/components/TripCard/TripCardRect";
 import { headerImage } from "@/utils/constants";
 import Style from "Style";
 import { getUserIdFromToken, getToken } from "@/utils";
+import { LinearGradient } from "expo-linear-gradient";
 
 const screenw = Dimensions.get("window").width;
 const titleWidth = screenw - screenw * 0.96;
@@ -82,8 +83,13 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   }, [userId]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+    // <LinearGradient
+    //   colors={["#FFCB62", "#FEC55B", "#FFB937"]} // Gradient from lighter to heavier orange
+    //   style={styles.container}
+    // >
+    <SafeAreaView style={{ flex: 1 }}>
       <HomeScreenHeader user={user} />
+      <View style={{ height: 1.5, backgroundColor: "#D3D3D3" }} />
       <ScrollView
         style={styles.container}
         refreshControl={
@@ -95,13 +101,18 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             source={{
               uri: randomizeCover(headerImage),
             }}
-            style={{ height: 180, position: "absolute", width: "100%", top: 0 }}
+            style={{
+              height: 180,
+              position: "absolute",
+              width: "100%",
+              top: 0,
+            }}
             resizeMode="cover"
           />
         </View>
         <View style={{ marginTop: -5 }}>
           <View style={styles.inline}>
-            <Text style={styles.title}>Ongoing Trips</Text>
+            <Text style={styles.title}>Ongoing trips</Text>
             <Text
               onPress={() => {
                 router.navigate({
@@ -125,13 +136,15 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
                 </View>
               ))
             ) : (
-              <Text style={styles.noTrip}>No ongoing trips</Text>
+              <View style={styles.noTripContainer}>
+                <Text style={styles.noTrip}>No trips yet!</Text>
+              </View>
             )}
           </ScrollView>
         </View>
         <View style={{ marginTop: -5 }}>
           <View style={styles.inline}>
-            <Text style={styles.title}>Upcoming Trips</Text>
+            <Text style={styles.title}>Upcoming trips</Text>
             <Text
               onPress={() => {
                 router.navigate({
@@ -158,6 +171,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
         </Link>
       </TouchableOpacity>
     </SafeAreaView>
+    // </LinearGradient>
   );
 };
 
@@ -173,9 +187,19 @@ const styles = StyleSheet.create({
   tripScroll: {
     marginVertical: 4,
   },
+  noTripContainer: {
+    flex: 1,
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    marginTop: 5,
+    width: "100%",
+    alignContent: "center",
+    // height: "100%",
+  },
   noTrip: {
     fontSize: 16,
-    color: "red",
+    color: "#808080",
     textAlign: "center",
   },
   buttonContainer: {

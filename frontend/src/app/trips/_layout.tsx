@@ -46,14 +46,14 @@ const Layout = () => {
         options={{
           title: "",
           headerShown: true,
-          headerLeft: () => (
-            <MaterialIcons
-              name="arrow-back"
-              size={24}
-              color="black"
-              onPress={() => router.navigate("/home")}
-            />
-          ),
+          // headerLeft: () => (
+          //   <MaterialIcons
+          //     name="arrow-back"
+          //     size={24}
+          //     color="black"
+          //     onPress={() => router.navigate("/home")}
+          //   />
+          // ),
         }}
       />
     </Stack>

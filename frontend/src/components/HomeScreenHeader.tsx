@@ -12,9 +12,10 @@ import { router } from "expo-router";
 export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
     <View style={styles.content}>
-      <View>
-        <Text style={styles.appName}>tourific</Text>
-      </View>
+      <Image
+        style={styles.logo}
+        source={require("@/assets/Tourific Logo.png")}
+      />
       <View
         style={{
           flex: 1,
@@ -34,13 +35,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    padding: 10,
-    marginHorizontal: 15,
+    paddingTop: 10,
+    marginRight: 15,
+    marginLeft: 5,
   },
-  notificationIcon: {
-    position: "absolute",
-    right: 60,
-    padding: 10,
+  // notificationIcon: {
+  //   position: "absolute",
+  //   right: 60,
+  //   padding: 10,
+  // },
+  logo: {
+    width: 150,
+    height: 30,
+    padding: 0,
+    marginBottom: 2,
   },
   appName: {
     fontSize: 18,
@@ -49,8 +57,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   avatar: {
-    width: 30,
-    height: 30,
+    width: 25,
+    height: 25,
     borderRadius: 20,
     marginLeft: 20,
   },

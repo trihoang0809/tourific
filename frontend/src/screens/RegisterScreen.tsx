@@ -15,9 +15,10 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Photo } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import Spinner from "react-native-loading-spinner-overlay";
+import { LinearGradient } from "expo-linear-gradient";
 
 const noAvatar: Photo = {
-  url: "https://t4.ftcdn.net/jpg/03/59/58/91/360_F_359589186_JDLl8dIWoBNf1iqEkHxhUeeOulx0wOC5.jpg",
+  url: "https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg",
 };
 
 const RegisterScreen = () => {
@@ -156,130 +157,132 @@ const RegisterScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Spinner
-        visible={loading}
-        textContent={"Creating account..."}
-        textStyle={styles.spinnerTextStyle}
-      />
-      <Ionicons name="person-add" size={25} color="black" />
-      <Text style={styles.title}>Create a Tourific Account</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-        placeholderTextColor="#aaa"
-        value={userName}
-        onChangeText={setUserName}
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="First Name"
-        placeholderTextColor="#aaa"
-        value={firstName}
-        onChangeText={setFirstName}
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Last Name"
-        placeholderTextColor="#aaa"
-        value={lastName}
-        onChangeText={setLastName}
-        autoCapitalize="none"
-      />
-      <TouchableOpacity onPress={showDatePicker} style={styles.dateButton}>
-        <Text style={styles.dateButtonText}>
-          {dateOfBirth
-            ? `D.O.B: ${dateOfBirth.toISOString().split("T")[0]}`
-            : "Select Date of Birth"}
-        </Text>
-      </TouchableOpacity>
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="date"
-        display="spinner"
-        maximumDate={new Date(2020, 12, 31)}
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#aaa"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#aaa"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-        autoCapitalize="none"
-      />
-      <View style={styles.passwordRequirements}>
-        <Text
-          style={[
-            styles.requirement,
-            { color: passwordErrors.length ? "green" : "red" },
-          ]}
-        >
-          • At least 8 characters
-        </Text>
-        <Text
-          style={[
-            styles.requirement,
-            { color: passwordErrors.uppercase ? "green" : "red" },
-          ]}
-        >
-          • At least one uppercase letter
-        </Text>
-        <Text
-          style={[
-            styles.requirement,
-            { color: passwordErrors.lowercase ? "green" : "red" },
-          ]}
-        >
-          • At least one lowercase letter
-        </Text>
-        <Text
-          style={[
-            styles.requirement,
-            { color: passwordErrors.number ? "green" : "red" },
-          ]}
-        >
-          • At least one number
-        </Text>
-      </View>
-      <TouchableOpacity style={styles.button} onPress={pickImage}>
-        <Ionicons name="image-outline" size={24} color="#fff" />
-        <Text style={styles.buttonText}>Pick an avatar</Text>
-      </TouchableOpacity>
-      <Image source={{ uri: avatar.url }} style={styles.avatar} />
+    <LinearGradient
+      colors={["#e6f7ff", "#ffe6f7", "#ffffff"]}
+      style={styles.container}
+    >
+      <ScrollView contentContainerStyle={styles.form}>
+        <Spinner
+          visible={loading}
+          textContent={"Creating account..."}
+          textStyle={styles.spinnerTextStyle}
+        />
+        <Image
+          style={{ width: 180, height: 70 }}
+          source={require("@/assets/Tourific Logo.png")}
+        />
+        <Text style={styles.title}>SIGN UP</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Username"
+          placeholderTextColor="#aaa"
+          value={userName}
+          onChangeText={setUserName}
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="First Name"
+          placeholderTextColor="#aaa"
+          value={firstName}
+          onChangeText={setFirstName}
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Last Name"
+          placeholderTextColor="#aaa"
+          value={lastName}
+          onChangeText={setLastName}
+          autoCapitalize="none"
+        />
+        <TouchableOpacity onPress={showDatePicker} style={styles.dateButton}>
+          <Text style={styles.dateButtonText}>
+            {dateOfBirth
+              ? `D.O.B: ${dateOfBirth.toISOString().split("T")[0]}`
+              : "Select Date of Birth"}
+          </Text>
+        </TouchableOpacity>
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          display="spinner"
+          maximumDate={new Date(2023, 12, 31)}
+          onConfirm={handleConfirm}
+          onCancel={hideDatePicker}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#aaa"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor="#aaa"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+          autoCapitalize="none"
+        />
+        {Object.values(passwordErrors).some((error) => error) && (
+          <View style={styles.passwordRequirements}>
+            {!passwordErrors.length && (
+              <Text style={[styles.requirement, { color: "red" }]}>
+                Less than 8 characters
+              </Text>
+            )}
+            {!passwordErrors.uppercase && (
+              <Text style={[styles.requirement, { color: "red" }]}>
+                Need at least one uppercase letter
+              </Text>
+            )}
+            {!passwordErrors.lowercase && (
+              <Text style={[styles.requirement, { color: "red" }]}>
+                Need at least one lowercase letter
+              </Text>
+            )}
+            {!passwordErrors.number && (
+              <Text style={[styles.requirement, { color: "red" }]}>
+                Need at least one number
+              </Text>
+            )}
+          </View>
+        )}
+        <TouchableOpacity style={styles.button} onPress={pickImage}>
+          <Ionicons name="image-outline" size={24} color="#fff" />
+          <Text style={styles.buttonText}>Pick an avatar</Text>
+        </TouchableOpacity>
+        <Image source={{ uri: avatar.url }} style={styles.avatar} />
 
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Register</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.linkButton}
-        onPress={() => router.replace("/login")}
-      >
-        <Text style={styles.linkText}>Already have an account? Login</Text>
-      </TouchableOpacity>
-    </ScrollView>
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
+          <Text style={styles.buttonText}>Sign up</Text>
+        </TouchableOpacity>
+        <View>
+          <TouchableOpacity
+            style={styles.signUpButton}
+            onPress={() => router.replace("/login")}
+          >
+            <Text style={styles.signUpText}>
+              Already have an account? Login
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  container: {},
+  form: {
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "white",
     padding: 16,
   },
   logo: {
@@ -291,9 +294,12 @@ const styles = StyleSheet.create({
     color: "#FFF",
   },
   title: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: "bold",
-    marginVertical: 20,
+    color: "#007BFF",
+    marginBottom: 30,
+    textAlign: "center",
+    letterSpacing: 1.5,
   },
   input: {
     width: "100%",
@@ -342,25 +348,40 @@ const styles = StyleSheet.create({
     width: "auto",
     alignItems: "flex-start",
     marginBottom: 12,
-    padding: 10,
-    backgroundColor: "#f0f0f0",
+    // padding: 10,
+    // backgroundColor: "#cceeff", // light blue to match the theme
     borderRadius: 8,
   },
   requirement: {
+    fontSize: 14,
     marginBottom: 4,
   },
   dateButton: {
     width: "100%",
     height: 45,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
+    backgroundColor: "white",
+    borderColor: "#1e90ff",
     justifyContent: "center",
     marginBottom: 12,
     paddingHorizontal: 10,
+    borderWidth: 0.5,
+    paddingVertical: 10,
+    borderRadius: 10,
   },
   dateButtonText: {
-    color: "black",
-    fontSize: 16,
+    color: "#1e90ff",
+    fontSize: 14,
+  },
+  signUpButton: {
+    borderWidth: 1,
+    borderColor: "#1e90ff",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  signUpText: {
+    color: "#1e90ff",
+    fontSize: 14,
   },
 });
 
