@@ -148,29 +148,30 @@ router.get("/friend", async (req, res) => {
             senderID: userId,
             friendStatus: "ACCEPTED",
             receiverID: {
-              not: userId
-            }
+              not: userId,
+            },
           },
           {
             receiverID: userId,
             friendStatus: "ACCEPTED",
             senderID: {
-              not: userId
-            }
+              not: userId,
+            },
           },
         ],
       },
     });
     res.status(StatusCodes.OK).json(friends);
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting sent friend requests." });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while getting sent friend requests." });
   }
 });
 
 // accept or decline a friend request
-// to accept: /friend?accept=true 
+// to accept: /friend?accept=true
 // to reject: /friend?accept=false
 router.patch("/friend", async (req, res) => {
   const { friendId } = req.body;
@@ -186,7 +187,7 @@ router.patch("/friend", async (req, res) => {
           },
         },
         data: {
-          friendStatus: "ACCEPTED"
+          friendStatus: "ACCEPTED",
         },
       });
       res.status(StatusCodes.OK).json(friend);
@@ -201,10 +202,50 @@ router.patch("/friend", async (req, res) => {
       });
       res.status(StatusCodes.OK).json(rejectFriend);
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while accepting/declining a friend." });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while accepting/declining a friend." });
+  }
+});
+
+// Update notification's token
+router.patch("/:userId", async (req, res) => {
+  const { notificationToken } = req.body;
+  const userId = req.params.userId;
+
+  // Regular expression pattern for the desired token format
+  const tokenPattern = /^ExponentPushToken\[\w{22}\]$/;
+  if (!tokenPattern.test(notificationToken)) {
+    return res.status(StatusCodes.BAD_REQUEST).json({ error: "Invalid token format" });
+  }
+
+  try {
+    // Retrieve the current notification tokens
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { notificationToken: true },
+    });
+
+    if (user) {
+      if (!user.notificationToken.includes(notificationToken)) {
+        const updatedTokens = [...user.notificationToken, notificationToken];
+
+        const updatedUser = await prisma.user.update({
+          where: { id: userId },
+          data: {
+            notificationToken: updatedTokens,
+          },
+        });
+        res.status(StatusCodes.OK).json(updatedUser);
+      } else {
+        res.status(StatusCodes.CONFLICT).json({ error: "Token already exists" });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while patching this user." });
   }
 });
 
@@ -215,13 +256,15 @@ router.get("/friend/sent-requests", async (req, res) => {
     const sentRequests = await prisma.friendship.findMany({
       where: {
         senderID: userId,
-        friendStatus: 'PENDING',
+        friendStatus: "PENDING",
       },
     });
     res.status(StatusCodes.OK).json(sentRequests);
   } catch (error) {
     console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting sent friend requests." });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while getting sent friend requests." });
   }
 });
 
@@ -232,13 +275,15 @@ router.get("/friend/pending-requests", async (req, res) => {
     const pendingRequests = await prisma.friendship.findMany({
       where: {
         receiverID: userId,
-        friendStatus: 'PENDING',
+        friendStatus: "PENDING",
       },
     });
     res.status(StatusCodes.OK).json(pendingRequests);
   } catch (error) {
     console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting pending friend requests." });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while getting pending friend requests." });
   }
 });
 
