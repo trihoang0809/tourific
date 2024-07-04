@@ -1,4 +1,4 @@
-import { Trip, TripData } from "@/types";
+import { Trip, TripData, notificationMessage } from "@/types";
 
 // format follow UTC
 export function formatDateTime(dateString: Date, hour: number, minute: number) {
@@ -160,3 +160,22 @@ export const categories: Record<string, string[]> = {
     "beauty_salon",
   ],
 };
+
+export async function sendPushNotification(
+  message: notificationMessage,
+  ...kwargs: any[]
+) {
+  try {
+    await fetch("https://exp.host/--/api/v2/push/send", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Accept-encoding": "gzip, deflate",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(message),
+    });
+  } catch (error: any) {
+    console.error(`Failed to send notification: ${error.toString()}`);
+  }
+}
