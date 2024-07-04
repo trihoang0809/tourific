@@ -84,7 +84,11 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
     <Pressable
       style={styles.card}
       onPress={() => {
-        router.push(`./${activity.googlePlacesId}`);
+        console.log(activity.googlePlacesId);
+        router.push({
+          pathname: `./${activity.id}`,
+          params: { ggMapid: String(activity.googlePlacesId) },
+        });
       }}
     >
       <View style={styles.imageContainer}>
