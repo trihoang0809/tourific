@@ -6,7 +6,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 // temporary for testing until auth done
-const userID = "6661308f193a6cd9e0ea4d36";
+const userID = "66860537f96086257c3f9792";
 
 // Get all user profiles
 router.get("/", async (req, res) => {
@@ -234,6 +234,9 @@ router.get("/friend/pending-requests", async (req, res) => {
         receiverID: userId,
         friendStatus: 'PENDING',
       },
+      include: {
+        sender: true
+      }
     });
     res.status(StatusCodes.OK).json(pendingRequests);
   } catch (error) {

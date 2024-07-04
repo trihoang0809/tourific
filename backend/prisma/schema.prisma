@@ -53,14 +53,31 @@ model User {
   lastName String
   dateOfBirth DateTime
   avatar Photo
-
+  notification Notification[] 
   inviteeTripInvitations TripMember[] @relation("InviteeToTripInvitations")
-  inviterTripInvitations TripMember[] @relation("InviterToTripInvitations")  
+  inviterTripInvitations TripMember[] @relation("InviterToTripInvitations") 
+  friendRequestSent  Friendship[]   @relation("friendRequestSent")
   friendRequestReceived   Friendship[]   @relation("friendRequestReceived")
+}
+
+model Notification {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  dateCreated DateTime @default(now())
+  type NotificationType
+  senderId String @db.ObjectId
+  sender User @relation(fields: [senderId], references: [id])
+  readStatus Boolean
+  userId String
+}
+
+enum NotificationType {
+  FRIEND_ACCEPT
+  TRIP_ACCEPT
 }
 
 model Friendship {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  sender User  @relation("friendRequestSent", fields: [senderID], references: [id])
   receiver    User     @relation("friendRequestReceived", fields: [receiverID], references: [id])
   receiverID  String   @db.ObjectId
   senderID  String   @db.ObjectId
