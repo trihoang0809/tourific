@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { UserProps } from "../types";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
@@ -15,10 +16,17 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
       <View>
         <Text style={styles.appName}>tourific</Text>
       </View>
-      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-end",
+        }}
+      >
         <TouchableOpacity
           onPress={() => {
-            /* navigate to notifications */
+            router.push("/notification");
           }}
         >
           <Ionicons name="notifications-outline" size={24} color="black" />
@@ -34,10 +42,10 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "white",
     flexDirection: "row",
-    justifyContent: 'space-around',
-    alignItems: 'center',
+    justifyContent: "space-around",
+    alignItems: "center",
     padding: 10,
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   notificationIcon: {
     position: "absolute",
