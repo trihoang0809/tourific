@@ -21,8 +21,8 @@ interface tripProps {
 
 export const TripCard: React.FC<tripProps> = ({
   trip,
-  height = 200,
-  width = 350,
+  height = 220,
+  width = 300,
 }) => {
   const tripImage = trip.image;
   const tripLocation = trip.location;
@@ -54,10 +54,7 @@ export const TripCard: React.FC<tripProps> = ({
 
   return (
     <TouchableHighlight
-      style={[
-        Style.card,
-        { height: height, width: width, marginHorizontal: 20, marginBottom: 5 },
-      ]} // Apply dynamic height and width
+      style={[styles.card, { height: height, width: width }]} // Apply dynamic height and width
       underlayColor="#fffcab"
       onPress={onPressTripCard}
     >
@@ -66,8 +63,8 @@ export const TripCard: React.FC<tripProps> = ({
       >
         <View
           style={{
-            padding: 8,
-            marginTop: 10,
+            paddingVertical: 0,
+            paddingHorizontal: 0,
           }}
         >
           <Image
@@ -82,6 +79,8 @@ export const TripCard: React.FC<tripProps> = ({
                 // height: tripImage === null ? 250 : imageHeight,
                 height: imageHeight,
                 width: "100%",
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
               },
             ]}
           />
@@ -90,7 +89,11 @@ export const TripCard: React.FC<tripProps> = ({
           <View>
             <Text
               numberOfLines={1}
-              style={{ fontSize: fontTripName, fontWeight: "bold" }}
+              style={{
+                fontSize: fontTripName,
+                fontWeight: "bold",
+                paddingBottom: 7,
+              }}
             >
               {tripName}
             </Text>
@@ -98,7 +101,13 @@ export const TripCard: React.FC<tripProps> = ({
 
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             <View style={styles.detail}>
-              <Ionicons name="location-outline" size={18} color="#696e6e" />
+              {/* <Ionicons name="location-outline" size={18} color="#696e6e" /> */}
+              <Image
+                style={styles.icon}
+                source={{
+                  uri: "https://cdn-icons-png.flaticon.com/512/9356/9356230.png",
+                }}
+              />
               <Text
                 numberOfLines={1}
                 style={[Style.tripCardSecondaryText, { marginLeft: 4 }]}
@@ -107,10 +116,16 @@ export const TripCard: React.FC<tripProps> = ({
               </Text>
             </View>
             <View style={styles.detail}>
-              <MaterialCommunityIcons
+              {/* <MaterialCommunityIcons
                 name="timetable"
                 size={17}
                 color="#696e6e"
+              /> */}
+              <Image
+                style={styles.icon}
+                source={{
+                  uri: "https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678116-calendar-512.png",
+                }}
               />
               <Text style={[Style.tripCardSecondaryText, { marginLeft: 4 }]}>
                 {tripDate(new Date(tripStartDate))}
@@ -126,25 +141,40 @@ export const TripCard: React.FC<tripProps> = ({
 const styles = StyleSheet.create({
   card: {
     marginHorizontal: 20,
-    borderRadius: 16,
-    backgroundColor: "#EBF2FF",
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 1, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
+    borderRadius: 20,
+    backgroundColor: "#fff",
+    shadowOffset: { width: 2, height: 2 },
+    shadowColor: "#333",
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 5,
   },
+  // backgroundColor: "#fff",
+  //   borderRadius: 15,
+  //   elevation: 3,
+  //   shadowOffset: { width: 2, height: 2 },
+  //   shadowColor: "#333",
+  //   shadowOpacity: 0.3,
+  //   shadowRadius: 2,
 
   image: {
-    borderRadius: 14,
+    margin: 0,
+    borderWidth: 0,
+    paddingHorizontal: 5,
   },
 
   descriptionContainer: {
-    paddingLeft: 10,
+    paddingTop: 10,
+    paddingLeft: 15,
     // paddingVertical: 10,
     textAlign: "center",
     justifyContent: "space-between",
+  },
+  icon: {
+    width: 15,
+    height: 20,
+    padding: 0,
+    marginBottom: 2,
   },
 
   detail: {

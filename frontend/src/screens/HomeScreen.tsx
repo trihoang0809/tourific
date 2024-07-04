@@ -8,6 +8,7 @@ import {
   Image,
   Dimensions,
   RefreshControl,
+  Button,
 } from "react-native";
 import { TripCard } from "../components/TripCard/TripCard";
 import { HomeScreenHeader } from "../components/HomeScreenHeader";
@@ -21,7 +22,6 @@ import TripCardRect from "@/components/TripCard/TripCardRect";
 import { headerImage } from "@/utils/constants";
 import Style from "Style";
 import { getUserIdFromToken, getToken } from "@/utils";
-import { LinearGradient } from "expo-linear-gradient";
 
 const screenw = Dimensions.get("window").width;
 const titleWidth = screenw - screenw * 0.96;
@@ -83,10 +83,6 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   }, [userId]);
 
   return (
-    // <LinearGradient
-    //   colors={["#FFCB62", "#FEC55B", "#FFB937"]} // Gradient from lighter to heavier orange
-    //   style={styles.container}
-    // >
     <SafeAreaView style={{ flex: 1 }}>
       <HomeScreenHeader user={user} />
       <View style={{ height: 1.5, backgroundColor: "#D3D3D3" }} />
@@ -132,7 +128,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             {ongoingTrips.length > 0 ? (
               ongoingTrips.map((trip) => (
                 <View key={trip.id}>
-                  <TripCard trip={trip} height={250} width={300} />
+                  <TripCard trip={trip} height={230} width={300} />
                 </View>
               ))
             ) : (
@@ -165,13 +161,13 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
           </ScrollView>
         </View>
       </ScrollView>
-      <TouchableOpacity style={Style.addIcon}>
-        <Link href="/trips/create">
-          <Ionicons name="add" size={40} color="white" />
-        </Link>
+      <TouchableOpacity
+        style={Style.addIcon}
+        onPress={() => router.navigate("/trips/create")}
+      >
+        <Ionicons name="add" size={40} color="white" />
       </TouchableOpacity>
     </SafeAreaView>
-    // </LinearGradient>
   );
 };
 

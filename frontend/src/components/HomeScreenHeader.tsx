@@ -1,14 +1,8 @@
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  Pressable,
-} from "react-native";
-import { UserProps } from "../types";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { UserProps } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+
 export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
     <View style={styles.content}>
@@ -24,7 +18,22 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
           justifyContent: "flex-end",
         }}
       >
-        <Image style={styles.avatar} source={{ uri: user.avatar.url }} />
+        <TouchableOpacity
+          onPress={() => router.push("/friends/search")}
+          style={{ marginRight: 5 }}
+        >
+          <Ionicons name="person-add-outline" size={20} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("userProfile/profile")}>
+          <Image
+            style={styles.avatar}
+            source={{
+              uri: user.avatar?.url
+                ? user.avatar.url
+                : "https://t4.ftcdn.net/jpg/03/59/58/91/360_F_359589186_JDLl8dIWoBNf1iqEkHxhUeeOulx0wOC5.jpg",
+            }}
+          />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -60,6 +69,6 @@ const styles = StyleSheet.create({
     width: 25,
     height: 25,
     borderRadius: 20,
-    marginLeft: 20,
+    marginLeft: 15,
   },
 });

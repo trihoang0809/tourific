@@ -29,6 +29,12 @@ export type MapData = {
   radius?: number;
 };
 
+export type TripCardRectProps = {
+  trip: any;
+  width?: number;
+  height?: number;
+};
+
 export type DataItem = {
   id: string;
   component?: JSX.Element; // component property is optional and can contain JSX.Element
@@ -238,3 +244,41 @@ export type Photo = {
   width?: number;
   height?: number;
 };
+
+export interface FriendRequest {
+  friendStatus: Status;
+  receiver: User;
+  receiverID: string;
+  sender: User;
+  senderID: string;
+}
+
+export interface Invitation {
+  id: string;
+  inviter: User;
+  invitee: User;
+  trip: TripData;
+}
+
+export interface InvitationCardProps {
+  invitation: Invitation;
+  onAccept: (id: string) => void;
+  onDecline: (id: string) => void;
+}
+
+export enum Status {
+  "ACCEPTED",
+  "REJECTED",
+  "PENDING",
+}
+
+export interface ContactCardProps {
+  user: User;
+  isChecked: boolean;
+  setChecked: (e: any, userId: string) => void;
+  status: Status;
+}
+
+export interface FriendSearch extends User {
+  friendStatus: Status;
+}

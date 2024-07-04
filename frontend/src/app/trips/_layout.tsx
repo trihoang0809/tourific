@@ -20,7 +20,7 @@ const Layout = () => {
               name="arrow-back"
               size={24}
               color="black"
-              onPress={() => router.navigate("/home")}
+              onPress={() => router.back()}
             />
           ),
         }}
@@ -36,7 +36,7 @@ const Layout = () => {
               name="arrow-back"
               size={24}
               color="black"
-              onPress={() => router.navigate("/home")}
+              onPress={() => router.back()}
             />
           ),
         }}
@@ -44,16 +44,16 @@ const Layout = () => {
       <Stack.Screen
         name="create"
         options={{
-          title: "",
+          title: "Create trip",
           headerShown: true,
-          // headerLeft: () => (
-          //   <MaterialIcons
-          //     name="arrow-back"
-          //     size={24}
-          //     color="black"
-          //     onPress={() => router.navigate("/home")}
-          //   />
-          // ),
+          headerLeft: () => (
+            <MaterialIcons
+              name="arrow-back"
+              size={24}
+              color="black"
+              onPress={() => router.back()}
+            />
+          ),
         }}
       />
     </Stack>

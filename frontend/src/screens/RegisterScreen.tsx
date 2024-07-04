@@ -65,7 +65,7 @@ const RegisterScreen = () => {
       const firebaseUserId = user.uid;
 
       // Upload user data to MongoDB
-      const response = await fetch("http://localhost:3000/user", {
+      const response = await fetch(`http://${process.env.EXPO_PUBLIC_HOST_URL}:3000/user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
