@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { useRouter, Stack } from "expo-router";
-import { HomeScreen } from "../screens/HomeScreen";
 import LoginScreen from "@/screens/LoginScreen";
 
 const Login = () => {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Stack, router, Link, useGlobalSearchParams } from "expo-router";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
+
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
 export default function TripLayout({}) {

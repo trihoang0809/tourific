@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { useRouter, Stack } from "expo-router";
-import { HomeScreen } from "../screens/HomeScreen";
-import LoginScreen from "./login";
-
+import LoginScreen from "@/screens/LoginScreen";
+import { getToken } from "@/utils";
+import { Redirect } from "expo-router";
 const App = () => {
+  const isLoggedIn = getToken();
   // const { user } = useAuth();
   // const router = useRouter();
 
@@ -15,12 +15,22 @@ const App = () => {
   //   }
   // }, [user]);
 
+  if (!isLoggedIn) {
+    return (
+      <SafeAreaView className="flex-1 bg-white">
+        <LoginScreen />
+        <StatusBar style="auto" />
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      {/* <HomeScreen user={sampleUser} /> */}
-      <LoginScreen />
-      <StatusBar style="auto" />
-    </SafeAreaView>
+    <Redirect href="/(tabs)/home" />
+    // <SafeAreaView className="flex-1 bg-white">
+    //   {/* <HomeScreen user={sampleUser} /> */}
+    //   <LoginScreen />
+    //   <StatusBar style="auto" />
+    // </SafeAreaView>
   );
 };
 

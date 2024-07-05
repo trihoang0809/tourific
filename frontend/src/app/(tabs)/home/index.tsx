@@ -1,9 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
-import { SafeAreaView } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { useRouter } from "expo-router";
-import { HomeScreen } from "../screens/HomeScreen";
-import { sampleUser } from "@/mock-data/user";
+import { Stack, Tabs, useRouter } from "expo-router";
+import { HomeScreen } from "@/screens/HomeScreen";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { User } from "@/types";
 import { getToken, decodeToken } from "@/utils";
@@ -29,7 +27,7 @@ const fetchUserInfo = async (userId: string): Promise<User> => {
   return data;
 };
 
-const Home = () => {
+const index = () => {
   const [user, setUser] = useState<User | null>(null);
   const [expoPushToken, setExpoPushToken] = useState("");
   const notificationListener = useRef<Notifications.Subscription>();
@@ -91,6 +89,12 @@ const Home = () => {
 
   return (
     <>
+      <Tabs.Screen
+        options={{
+          title: "Home",
+          headerShown: false,
+        }}
+      />
       <HomeScreen user={user} />
       <StatusBar style="auto" />
       {/* <View
@@ -106,7 +110,7 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default index;
 
 async function registerForPushNotificationsAsync() {
   let token;
