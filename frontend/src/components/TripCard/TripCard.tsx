@@ -55,7 +55,7 @@ export const TripCard: React.FC<tripProps> = ({
   return (
     <TouchableHighlight
       style={[styles.card, { height: height, width: width }]} // Apply dynamic height and width
-      underlayColor="#fffcab"
+      underlayColor="#d3d3d3r"
       onPress={onPressTripCard}
     >
       <View
