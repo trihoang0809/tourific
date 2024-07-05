@@ -98,7 +98,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { SelectCountry } from 'react-native-element-dropdown';
-import { useRouter } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import { EXPO_PUBLIC_HOST_URL, getUserIdFromToken } from '@/utils';
 
 const GlobalItinerary = () => {
@@ -146,35 +146,43 @@ const GlobalItinerary = () => {
 
   const handleTripSelect = (trip: any) => {
     // Assuming trip has an id and itineraryid
-    router.push(`/tabs/trips/${trip?.id}/(tabs)/(itinerary)/index`);
+    router.push(`/(tabs)/trips/${trip.id}/(tabs)/(itinerary)`);
   };
 
   console.log("Trips: ", trips);
   return (
-    <View style={styles.container}>
-      <SelectCountry
-        maxHeight={200}
-        value={null}
-        data={trips.map(trip => ({
-          value: trip.id,
-          label: trip.name,
-          image: {
-            uri: trip.image?.uri || 'https://www.vigcenter.com/public/all/images/default-image.jpg',
-          },
-        }))}
-        valueField="value"
-        labelField="label"
-        imageField="image"
-        placeholder="Select a trip"
-        searchPlaceholder="Search..."
-        onChange={(value) => {
-          console.log("value", value);
-          const selectedTrip = trips.find(trip => trip.id === value.value);
-          console.log("selectedTrip", selectedTrip);
-          handleTripSelect(selectedTrip);
+    <>
+      <Tabs.Screen
+        options={{
+          title: "",
+          headerShown: false,
         }}
       />
-    </View>
+      <View style={styles.container}>
+        <SelectCountry
+          maxHeight={200}
+          value={null}
+          data={trips.map(trip => ({
+            value: trip.id,
+            label: trip.name,
+            image: {
+              uri: trip.image?.uri || 'https://www.vigcenter.com/public/all/images/default-image.jpg',
+            },
+          }))}
+          valueField="value"
+          labelField="label"
+          imageField="image"
+          placeholder="Select a trip"
+          searchPlaceholder="Search..."
+          onChange={(value) => {
+            console.log("value", value);
+            const selectedTrip = trips.find(trip => trip.id === value.value);
+            console.log("selectedTrip", selectedTrip);
+            handleTripSelect(selectedTrip);
+          }}
+        />
+      </View>
+    </>
   );
 };
 

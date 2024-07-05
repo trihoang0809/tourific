@@ -1,6 +1,6 @@
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { FontAwesome, Ionicons } from "@expo/vector-icons";
+import { FontAwesome, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { View, Platform } from "react-native";
 import { Tabs } from "expo-router";
 
@@ -21,7 +21,7 @@ const RootNavigation = () => {
           options={{
             headerShown: false,
             tabBarIcon: ({ color }) => (
-              <FontAwesome size={28} name="home" color={color} />
+              <FontAwesome size={28} name="home" color={color} style={{ paddingTop: 10 }} />
             ),
           }}
         />
@@ -52,7 +52,11 @@ const RootNavigation = () => {
         />
         <Tabs.Screen
           name="globalItinerary/index"
-          options={{ headerShown: true }}
+          options={{
+            headerShown: true,
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons name="calendar-month" size={24} color={color} style={{ paddingTop: 10 }} />),
+          }}
         />
         <Tabs.Screen
           name="friends"

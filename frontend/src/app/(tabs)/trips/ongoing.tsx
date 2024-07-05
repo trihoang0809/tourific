@@ -8,9 +8,7 @@ export default function App() {
   const { userId } = useLocalSearchParams();
   return (
     <View>
-      <SafeAreaView>
-        <ListFilteredCards isUpcoming={false} userId={userId} />
-      </SafeAreaView>
+      <ListFilteredCards isUpcoming={false} userId={userId} />
     </View>
   );
 }

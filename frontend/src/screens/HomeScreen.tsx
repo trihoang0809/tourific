@@ -83,7 +83,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   }, [userId]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       <HomeScreenHeader user={user} />
       <View style={{ height: 1.5, backgroundColor: "#D3D3D3" }} />
       <ScrollView
@@ -161,13 +161,13 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
           </ScrollView>
         </View>
       </ScrollView>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={Style.addIcon}
         onPress={() => router.navigate("/trips/create")}
       >
         <Ionicons name="add" size={40} color="white" />
-      </TouchableOpacity>
-    </SafeAreaView>
+      </TouchableOpacity> */}
+    </View>
   );
 };
 

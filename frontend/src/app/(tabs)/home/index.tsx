@@ -91,7 +91,7 @@ const index = () => {
     <>
       <Tabs.Screen
         options={{
-          title: "Home",
+          title: "",
           headerShown: false,
         }}
       />
