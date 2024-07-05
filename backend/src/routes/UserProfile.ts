@@ -223,9 +223,8 @@ router.post("/find", async (req, res) => {
 });
 
 // Add a friend or cancel a friend request
-router.post("/:id/friends", async (req, res) => {
-  const { friendId } = req.body;
-  const { userId } = req.body;
+router.post("/add-friend", async (req, res) => {
+  const { friendId, userId } = req.body;
   const { add } = req.query;
 
   console.log(friendId, ";", userId);
@@ -234,7 +233,6 @@ router.post("/:id/friends", async (req, res) => {
   }
 
   const MongoUserId = await findMongoDBUser(userId);
-  const MongoFriendId = await findMongoDBUser(friendId);
 
   try {
     // cancel a sent request
@@ -243,7 +241,7 @@ router.post("/:id/friends", async (req, res) => {
         where: {
           receiverID_senderID: {
             senderID: MongoUserId?.id as string,
-            receiverID: MongoFriendId?.id as string,
+            receiverID: friendId,
           },
         },
       });
@@ -257,11 +255,11 @@ router.post("/:id/friends", async (req, res) => {
           OR: [
             {
               senderID: MongoUserId?.id as string,
-              receiverID: MongoFriendId?.id as string,
+              receiverID: friendId,
             },
             {
               senderID: MongoUserId?.id as string,
-              receiverID: MongoFriendId?.id as string,
+              receiverID: friendId,
             },
           ],
         },
@@ -275,7 +273,7 @@ router.post("/:id/friends", async (req, res) => {
       const friend = await prisma.friendship.create({
         data: {
           senderID: MongoUserId?.id as string,
-          receiverID: MongoFriendId?.id as string,
+          receiverID: friendId,
         },
       });
       res.status(StatusCodes.CREATED).json(friend);

@@ -101,8 +101,10 @@ const SearchFriend = () => {
     );
 
     try {
+      console.log("userId", userId);
+      console.log("friendId", friendId);
       const request = await fetch(
-        `http://${EXPO_PUBLIC_HOST_URL}:3000/user/friend?add=true`,
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/user/add-friend?add=true`,
         {
           method: "POST",
           headers: {
@@ -137,7 +139,7 @@ const SearchFriend = () => {
 
     try {
       const request = await fetch(
-        `http://${EXPO_PUBLIC_HOST_URL}:3000/user/friend?add=false`,
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/user/add-friend?add=false`,
         {
           method: "POST",
           headers: {

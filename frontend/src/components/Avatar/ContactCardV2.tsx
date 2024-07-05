@@ -13,24 +13,19 @@ interface ContactCardV2Props {
 const ContactCardV2 = ({ user, addFriend, cancelFriendRequest }: ContactCardV2Props) => {
   let content;
   if (user.friendStatus === "PENDING") {
-    content =
-      <TouchableOpacity
-        onPressIn={() => cancelFriendRequest(user.id)}
-        onPressOut={() => <Text>Cancelled</Text>}>
-        <Text>
-          Cancel Request
-        </Text>
-      </TouchableOpacity>;
+    content = (
+      <TouchableOpacity onPress={() => cancelFriendRequest(user.id)}>
+        <Text>Cancel Request</Text>
+      </TouchableOpacity>
+    );
   } else if (user.friendStatus === "ACCEPTED") {
     content = <Text>Friend</Text>;
   } else {
-    content =
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPressIn={() => addFriend(user.firebaseUserId)}
-        onPressOut={() => <Text>Cancel request</Text>}>
+    content = (
+      <TouchableOpacity style={styles.deleteButton} onPress={() => addFriend(user.id)}>
         <Ionicons name="person-add" size={24} color="black" />
-      </TouchableOpacity>;
+      </TouchableOpacity>
+    );
   }
 
   const onPress = () => {
@@ -50,6 +45,7 @@ const ContactCardV2 = ({ user, addFriend, cancelFriendRequest }: ContactCardV2Pr
     </TouchableOpacity>
   );
 };
+
 
 const styles = StyleSheet.create({
   list: {
