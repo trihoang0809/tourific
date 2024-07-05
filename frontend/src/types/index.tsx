@@ -170,13 +170,7 @@ export interface TripDate {
   range: Number;
 }
 
-export type Mode =
-  | "3days"
-  | "week"
-  | "day"
-  | "custom"
-  | "month"
-  | "itinerary";
+export type Mode = "3days" | "week" | "day" | "custom" | "month" | "itinerary";
 
 export interface AddActivityProps {
   currentDateUpdate: Date;
@@ -234,5 +228,51 @@ export interface FriendRequest {
     lastName: string;
     firstName: string;
     userName: string;
+  };
+}
+
+export interface Notification {
+  createdAt: Date;
+  id: string;
+  readStatus: boolean;
+  sender: {
+    avatar: {
+      url: string;
+    };
+    lastName: string;
+    firstName: string;
+    userName: string;
+  };
+  trip: {
+    id: string | undefined;
+    image: {
+      url: string | undefined;
+    };
+    name: string | undefined;
+    startDate: string | undefined;
+    endDate: string | undefined;
+  };
+}
+
+export interface TripMembership {
+  id: string;
+  trip: {
+    id: string;
+    name: string;
+    startDate: Date;
+    endDate: Date;
+    location: {
+      address: string;
+      citystate: string;
+    };
+    image: {
+      url: string;
+    };
+    participants: User[];
+  };
+  inviter: {
+    id: string;
+    firstName: string;
+    lastName: string;
   };
 }
