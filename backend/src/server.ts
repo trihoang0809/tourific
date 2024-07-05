@@ -3,7 +3,6 @@ import { PrismaClient } from "@prisma/client";
 import { connect } from "./db";
 import TripRouter from "./routes/TripRouter";
 import UserProfile from "./routes/UserProfile";
-import ActivityRouter from "./routes/ActivityRouter";
 
 const app = express();
 const cors = require("cors");
@@ -11,6 +10,7 @@ const port = process.env.PORT || 3000;
 const LOCAL_HOST_URL = process.env.LOCAL_HOST_URL;
 
 const prisma = new PrismaClient();
+const { scheduleTripNotifications } = require("./tasks/tripNotification");
 
 app.use(express.json());
 app.use(cors());
@@ -27,6 +27,8 @@ const startServer = async () => {
   app.listen(port, () => {
     console.log(`Server running at http://${LOCAL_HOST_URL}:${port}`);
   });
+  scheduleTripNotifications();
 };
 
 startServer();
+

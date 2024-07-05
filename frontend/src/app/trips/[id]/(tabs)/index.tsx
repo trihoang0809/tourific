@@ -4,17 +4,17 @@ import {
   ScrollView,
   Image,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useGlobalSearchParams, Stack, router, Link } from "expo-router";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { Dimensions } from "react-native";
+import { Dimensions, RefreshControl } from "react-native";
 import { DateTime } from 'luxon';
-import SplashScreen from "@/components/Loading/SplashScreen";
-import { Avatar } from "react-native-paper";
 import { extractDateTime } from "@/utils";
+import { any } from "zod";
+import { Avatar } from "react-native-paper";
+import SplashScreen from "@/components/Loading/SplashScreen";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 const width = Dimensions.get("window").width; //full width
@@ -36,9 +36,14 @@ const TripDetailsScreen = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const defaultUri =
-    "https://images.unsplash.com/photo-1496950866446-3253e1470e8e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
-
-  const getTrip = async ({ id: text }: { id: string; }) => {
+    "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400";
+  // more setting icon
+  const [schedule, setSchedule] = useState({ route: [any], cost: -1 });
+  const getTrip = async ({
+    id: text,
+  }: {
+    id: string | string[] | undefined;
+  }) => {
     try {
       setIsLoading(true);
       console.log(EXPO_PUBLIC_HOST_URL);
@@ -77,6 +82,7 @@ const TripDetailsScreen = () => {
     }
   };
 
+  console.log("participants", trip.participants);
   // get participants
   const getParticipants = async () => {
     try {
@@ -104,6 +110,15 @@ const TripDetailsScreen = () => {
   console.log("participants", trip.participants);
   console.log("trips", trip);
   useEffect(() => {
+    console.log("id", id);
+    getTrip({ id });
+  }, []);
+
+  const onRefresh = useCallback(() => {
+    getTrip({ id });
+  }, [id]);
+
+  useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
@@ -120,7 +135,7 @@ const TripDetailsScreen = () => {
   }, [id]);
 
   return (
-    <SafeAreaView>
+    <View>
       {
         isLoading ? (
           <View style={{ backgroundColor: 'white' }}>
@@ -249,8 +264,9 @@ const TripDetailsScreen = () => {
               </View>
             </View>
           </ScrollView>
-        )}
-    </SafeAreaView >
+        )
+      }
+    </View>
   );
 };
 

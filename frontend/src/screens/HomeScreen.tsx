@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   Image,
   Dimensions,
   TouchableOpacity,
+  RefreshControl,
+  Button,
 } from "react-native";
 import { TripCard } from "../components/TripCard/TripCard";
 import { HomeScreenHeader } from "../components/HomeScreenHeader";
@@ -22,7 +24,7 @@ import InvitationCard from "@/components/Invitation/InvitationCard";
 // icon and image
 import { Ionicons } from "@expo/vector-icons";
 import { headerImage } from "@/utils/constants";
-import { sampleUser } from "@/mock-data/user";
+import { getUserIdFromToken, getToken } from "@/utils";
 
 const screenw = Dimensions.get("window").width;
 const titleWidth = screenw - screenw * 0.96;
@@ -30,26 +32,59 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [ongoingTrips, setOngoingTrips] = useState<Trip[]>([]);
   const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
   const [invitation, setInvitation] = useState<Invitation[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
   useEffect(() => {
-    const fetchTrips = async () => {
-      try {
-        const ongoing = await fetch(
-          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`,
-        );
-        const upcoming = await fetch(
-          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?upcoming=true`,
-        );
-        const ongoingData = await ongoing.json();
-        const upcomingData = await upcoming.json();
-
-        setOngoingTrips(ongoingData);
-        setUpcomingTrips(getRecentTrips(upcomingData));
-      } catch (error) {
-        console.error("Failed to fetch trips:", error);
-      }
+    const fetchUserId = async () => {
+      const id = await getUserIdFromToken();
+      console.log("user Id logged in: ", id);
+      setUserId(id);
     };
-    fetchTrips();
+    fetchUserId();
   }, []);
+
+  const fetchTrips = async () => {
+    console.log(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`);
+    if (!userId) {
+      console.error("User ID is null");
+      return;
+    }
+    try {
+      // const headers = {
+      //   "Content-Type": "application/json",
+      //   Authorization: `Bearer ${await getToken()}`,
+      // };
+      // console.log("Headers:  ", headers);
+
+      const ongoing = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true&firebaseUserId=${userId}`,
+        // { headers },
+      );
+
+      const upcoming = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?upcoming=true&firebaseUserId=${userId}`,
+        // { headers },
+      );
+
+      const ongoingData = await ongoing.json();
+      const upcomingData = await upcoming.json();
+
+      setOngoingTrips(ongoingData);
+      setUpcomingTrips(getRecentTrips(upcomingData));
+    } catch (error) {
+      console.error("Failed to fetch trips:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (userId) {
+      console.log("got user id: ", userId);
+      fetchTrips();
+    }
+  }, [userId]);
+
+  const onRefresh = useCallback(() => {
+    fetchTrips();
+  }, [userId]);
 
   console.log("up", upcomingTrips);
   console.log("on", ongoingTrips);
@@ -110,24 +145,38 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-      <HomeScreenHeader user={sampleUser} />
-      <ScrollView style={styles.container}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <HomeScreenHeader user={user} />
+      <View style={{ height: 1.5, backgroundColor: "#D3D3D3" }} />
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={false} onRefresh={onRefresh} />
+        }
+      >
         <View style={{ height: 180 }}>
           <Image
             source={{
               uri: randomizeCover(headerImage),
             }}
-            style={{ height: 100, position: "absolute", width: "100%", top: 0 }}
+            style={{
+              height: 180,
+              position: "absolute",
+              width: "100%",
+              top: 0,
+            }}
             resizeMode="cover"
           />
         </View>
-        <View style={{ marginTop: -80 }}>
+        <View style={{ marginTop: -5 }}>
           <View style={styles.inline}>
-            <Text style={styles.title}>Ongoing Trips</Text>
+            <Text style={styles.title}>Ongoing trips</Text>
             <Text
               onPress={() => {
-                router.navigate("/trips/ongoing");
+                router.navigate({
+                  pathname: "/trips/ongoing",
+                  params: { userId: userId },
+                });
               }}
             >
               See all
@@ -140,19 +189,26 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
           >
             {ongoingTrips?.length > 0 ? (
               ongoingTrips.map((trip) => (
-                <TripCard key={trip.tripId} trip={trip.trip} height={250} width={300} />
+                <View key={trip.id}>
+                  <TripCard trip={trip} height={230} width={300} />
+                </View>
               ))
             ) : (
-              <Text style={styles.noTrip}>No ongoing trips</Text>
+              <View style={styles.noTripContainer}>
+                <Text style={styles.noTrip}>No trips yet!</Text>
+              </View>
             )}
           </ScrollView>
         </View>
         <View style={{ marginTop: -5 }}>
           <View style={styles.inline}>
-            <Text style={styles.title}>Upcoming Trips</Text>
+            <Text style={styles.title}>Upcoming trips</Text>
             <Text
               onPress={() => {
-                router.navigate("/trips/upcoming");
+                router.navigate({
+                  pathname: "/trips/upcoming",
+                  params: { userId: userId },
+                });
               }}
             >
               See all
@@ -160,17 +216,18 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
           </View>
           <ScrollView style={{ paddingHorizontal: 10 }}>
             {upcomingTrips.slice(0, 3).map((trip) => (
-              <View style={{ padding: 5, alignItems: "center" }}>
-                <TripCardRect key={trip.id} trip={trip.trip} height={100} />
+              <View key={trip.id} style={{ padding: 5, alignItems: "center" }}>
+                <TripCardRect trip={trip} height={100} />
               </View>
             ))}
           </ScrollView>
         </View>
       </ScrollView>
-      <TouchableOpacity style={Style.addIcon}>
-        <Link href="/trips/create">
-          <Ionicons name="add" size={40} color="white" />
-        </Link>
+      <TouchableOpacity
+        style={Style.addIcon}
+        onPress={() => router.navigate("/trips/create")}
+      >
+        <Ionicons name="add" size={40} color="white" />
       </TouchableOpacity>
       <View>
         {invitation.map((invite: Invitation) => (
@@ -193,9 +250,19 @@ const styles = StyleSheet.create({
   tripScroll: {
     marginVertical: 4,
   },
+  noTripContainer: {
+    flex: 1,
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    marginTop: 5,
+    width: "100%",
+    alignContent: "center",
+    // height: "100%",
+  },
   noTrip: {
     fontSize: 16,
-    color: "red",
+    color: "#808080",
     textAlign: "center",
   },
   buttonContainer: {

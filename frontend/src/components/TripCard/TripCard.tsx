@@ -7,9 +7,9 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import { Trip } from "../../types";
-import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
-import { router } from "expo-router";
-import { noImage } from "@/utils/constants";
+import { Octicons, MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import { Link, router, Stack } from "expo-router";
+import { noImage, defaultAvatar } from "@/utils/constants";
 import { tripDate } from "@/utils";
 import Style from "Style";
 
@@ -21,8 +21,8 @@ interface tripProps {
 
 export const TripCard: React.FC<tripProps> = ({
   trip,
-  height = 200,
-  width = 350,
+  height = 220,
+  width = 300,
 }) => {
   const tripImage = trip.image;
   const tripLocation = trip.location;
@@ -39,27 +39,34 @@ export const TripCard: React.FC<tripProps> = ({
   };
 
   // Calculate image height as 2/3 of the card's height
-  const imageHeight = (height * 1.7) / 3;
+  const imageHeight = (height * 2) / 3;
   const tripState = tripLocation.citystate.split(", ");
 
   useEffect(() => {
     if (tripLocation.citystate.length * fontTripDetail * 0.75 >= width)
       if (tripState.length >= 2)
-        setLocation(tripState[tripState.length - 2] + ", " + tripState[tripState.length - 1]);
-
+        setLocation(
+          tripState[tripState.length - 2] +
+            ", " +
+            tripState[tripState.length - 1],
+        );
   }, []);
 
   return (
     <TouchableHighlight
-      style={[Style.card, { height: height, width: width, marginHorizontal: 20, marginBottom: 5 }]} // Apply dynamic height and width
-      underlayColor="#e3e3e3"
+      style={[styles.card, { height: height, width: width }]} // Apply dynamic height and width
+      underlayColor="#fffcab"
       onPress={onPressTripCard}
     >
-      <View style={{ flexDirection: 'column', justifyContent: 'space-between' }}>
-        <View style={{
-          padding: 8,
-          marginTop: 10
-        }}>
+      <View
+        style={{ flexDirection: "column", justifyContent: "space-between" }}
+      >
+        <View
+          style={{
+            paddingVertical: 0,
+            paddingHorizontal: 0,
+          }}
+        >
           <Image
             source={
               tripImage?.url === undefined
@@ -72,26 +79,54 @@ export const TripCard: React.FC<tripProps> = ({
                 // height: tripImage === null ? 250 : imageHeight,
                 height: imageHeight,
                 width: "100%",
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
               },
             ]}
           />
         </View>
         <View style={styles.descriptionContainer}>
           <View>
-            <Text numberOfLines={1} style={{ fontSize: fontTripName, fontWeight: "bold" }}>
+            <Text
+              numberOfLines={1}
+              style={{
+                fontSize: fontTripName,
+                fontWeight: "bold",
+                paddingBottom: 7,
+              }}
+            >
               {tripName}
             </Text>
           </View>
 
-          <View style={{ flexDirection: "row", flexWrap: "wrap", marginTop: 5 }}>
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             <View style={styles.detail}>
-              <Ionicons name="location-outline" size={18} color="#696e6e" />
-              <Text numberOfLines={1} style={[Style.tripCardSecondaryText, { marginLeft: 4 }]}>
+              {/* <Ionicons name="location-outline" size={18} color="#696e6e" /> */}
+              <Image
+                style={styles.icon}
+                source={{
+                  uri: "https://cdn-icons-png.flaticon.com/512/9356/9356230.png",
+                }}
+              />
+              <Text
+                numberOfLines={1}
+                style={[Style.tripCardSecondaryText, { marginLeft: 4 }]}
+              >
                 {location}
               </Text>
             </View>
             <View style={styles.detail}>
-              <MaterialCommunityIcons name="timetable" size={17} color="#696e6e" />
+              {/* <MaterialCommunityIcons
+                name="timetable"
+                size={17}
+                color="#696e6e"
+              /> */}
+              <Image
+                style={styles.icon}
+                source={{
+                  uri: "https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678116-calendar-512.png",
+                }}
+              />
               <Text style={[Style.tripCardSecondaryText, { marginLeft: 4 }]}>
                 {tripDate(new Date(tripStartDate))}
               </Text>
@@ -106,25 +141,40 @@ export const TripCard: React.FC<tripProps> = ({
 const styles = StyleSheet.create({
   card: {
     marginHorizontal: 20,
-    borderRadius: 16,
-    backgroundColor: "#EBF2FF",
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 1, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
+    borderRadius: 20,
+    backgroundColor: "#fff",
+    shadowOffset: { width: 2, height: 2 },
+    shadowColor: "#333",
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 5,
   },
+  // backgroundColor: "#fff",
+  //   borderRadius: 15,
+  //   elevation: 3,
+  //   shadowOffset: { width: 2, height: 2 },
+  //   shadowColor: "#333",
+  //   shadowOpacity: 0.3,
+  //   shadowRadius: 2,
 
   image: {
-    borderRadius: 14
+    margin: 0,
+    borderWidth: 0,
+    paddingHorizontal: 5,
   },
 
   descriptionContainer: {
-    paddingLeft: 10,
+    paddingTop: 10,
+    paddingLeft: 15,
     // paddingVertical: 10,
-    textAlign: 'center',
+    textAlign: "center",
     justifyContent: "space-between",
+  },
+  icon: {
+    width: 15,
+    height: 20,
+    padding: 0,
+    marginBottom: 2,
   },
 
   detail: {

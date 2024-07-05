@@ -1,10 +1,27 @@
-import React from 'react';
+import React, { useEffect } from "react";
+import { SafeAreaView } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { useRouter, Stack } from "expo-router";
 import { HomeScreen } from "../screens/HomeScreen";
-import { sampleUser } from "@/mock-data/user";
-import { Link } from 'expo-router';
+import LoginScreen from "./login";
 
-export default function App() {
+const App = () => {
+  // const { user } = useAuth();
+  // const router = useRouter();
+
+  // useEffect(() => {
+  //   if (!user) {
+  //     router.replace("/login");
+  //   }
+  // }, [user]);
+
   return (
-    <HomeScreen user={sampleUser} />
+    <SafeAreaView className="flex-1 bg-white">
+      {/* <HomeScreen user={sampleUser} /> */}
+      <LoginScreen />
+      <StatusBar style="auto" />
+    </SafeAreaView>
   );
-}
+};
+
+export default App;

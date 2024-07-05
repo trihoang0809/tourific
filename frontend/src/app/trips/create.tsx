@@ -19,8 +19,13 @@ import { extractDateTime, formatDateTime } from "@/utils";
 import { DateTime } from "luxon";
 import { TripSchema } from "@/validation/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import PhotoAPI from "@/components/PhotoAPI";
+import {
+  fetchGoogleActivities,
+  saveActivitiesToBackend,
+} from "@/utils/fetchAndSaveActivities";
+import { getUserIdFromToken, getToken } from "@/utils";
 import { MaterialIcons } from "@expo/vector-icons";
 
 // CREATING: /trips/create
@@ -39,7 +44,7 @@ export default function CreateTripScreen() {
   });
   const { id: idString } = useLocalSearchParams();
   const [savedPhoto, setSavedPhoto] = useState(
-    "https://images.unsplash.com/photo-1496950866446-3253e1470e8e?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://www.libertytravel.com/sites/default/files/styles/full_size/public/luxury-hero%20%281%29.jpg?itok=NS-iKHU-",
   );
   const [bannerModalVisible, setBannerModalVisible] = useState(false);
   console.log("save banner: ", savedPhoto);
@@ -48,7 +53,7 @@ export default function CreateTripScreen() {
   const isUpdating = !!idString; // id is type of string
 
   //fetch trip if exist
-  async function setTripIfExist(tripId: string) {
+  async function setTripIfExist(tripId: string | string[]) {
     try {
       const response = await fetch(
         `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${tripId}`,
@@ -136,6 +141,16 @@ export default function CreateTripScreen() {
   const [visibleStart, setVisibleStart] = useState(false);
   const [visibleEnd, setVisibleEnd] = useState(false);
 
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const userId = await getUserIdFromToken();
+      setUserId(userId);
+    };
+    fetchUserId();
+  }, []);
+
   const onSubmit = async (data: any) => {
     const { name, location, startTime, endTime, dateRange, image } = data;
     const isoStartDate = DateTime.fromISO(
@@ -144,12 +159,14 @@ export default function CreateTripScreen() {
     const isoEndDate = DateTime.fromISO(
       formatDateTime(dateRange.endDate, endTime.hours, endTime.minutes),
     ).setZone("system");
+
     const req = {
       name: name,
       startDate: isoStartDate,
       endDate: isoEndDate,
       location,
       image: { url: savedPhoto },
+      firebaseUserId: userId,
     };
 
     if (isUpdating) {
@@ -159,7 +176,10 @@ export default function CreateTripScreen() {
           `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${idString}`,
           {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${await getToken()}`,
+            },
             body: JSON.stringify(req),
           },
         );
@@ -172,7 +192,7 @@ export default function CreateTripScreen() {
           {
             text: "Ok!",
             onPress: () => {
-              router.back()
+              router.back();
             },
           },
         ]);
@@ -188,6 +208,7 @@ export default function CreateTripScreen() {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${await getToken()}`,
             },
             body: JSON.stringify(req),
           },
@@ -197,12 +218,32 @@ export default function CreateTripScreen() {
             `Failed to create trip: ${response.status} ${response.statusText}`,
           );
         }
-        // Optionally, you can handle the response here
-        const data = await response.json();
+        const trip = await response.json();
+        console.log("got back trip id: ", trip.id);
+        try {
+          // Fetch activities based on the trip location
+          if (
+            trip.location.latitude &&
+            trip.location.longitude &&
+            trip.location.radius
+          ) {
+            const fetchedActivities = await fetchGoogleActivities(
+              trip.location.latitude,
+              trip.location.longitude,
+              trip.location.radius,
+            );
+            console.log("activities: ", fetchedActivities);
+            // Save fetched activities to backend
+            await saveActivitiesToBackend(trip.id, fetchedActivities);
+          }
+        } catch (error) {
+          console.log("Can't save activities,: ", error);
+        }
+
         Alert.alert("Trip created", "Let's start planning!", [
           {
             text: "Awesome!",
-            onPress: () => router.back()
+            onPress: () => router.back(),
           },
         ]);
       } catch (error: any) {
@@ -297,20 +338,20 @@ export default function CreateTripScreen() {
   );
 
   return (
-    <View>
+    <SafeAreaView>
       {isUpdating ? (
         ""
       ) : (
         <Stack.Screen
           options={{
-            title: "",
+            title: "Create trip",
             headerShown: true,
             headerLeft: () => (
               <MaterialIcons
                 name="arrow-back"
                 size={24}
                 color="black"
-                onPress={() => router.navigate("/")}
+                onPress={() => router.back()}
               />
             ),
           }}
@@ -361,10 +402,10 @@ export default function CreateTripScreen() {
         {/* trip details */}
         <View
           style={{
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
             backgroundColor: "#fff",
-            marginTop: -50,
+            marginTop: -30,
             paddingTop: 20,
             flex: 1,
           }}
@@ -624,6 +665,6 @@ export default function CreateTripScreen() {
           </View>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }

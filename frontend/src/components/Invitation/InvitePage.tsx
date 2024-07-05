@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet, TextInput, Dimensions } from 
 import React, { useEffect, useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import ContactCard from '../Avatar/ContactCard';
-import { EXPO_PUBLIC_HOST_URL } from '@/utils';
+import { EXPO_PUBLIC_HOST_URL, getUserIdFromToken } from '@/utils';
 import { router, useLocalSearchParams } from 'expo-router';
 import { FriendRequest, User } from '@/types';
 import NoFriendDisplay from '../AddFriend/NoFriendDisplay';
@@ -12,14 +12,22 @@ const screenHeight = Dimensions.get("window").height;
 
 const InvitePage = () => {
   const { id } = useLocalSearchParams();
-  const userId = "6669267e34f4cab1d9ddd751";
+  // const userId = "6669267e34f4cab1d9ddd751";
   const [searchTerm, setSearchTerm] = useState("");
   const [friendList, setFriendList] = useState<User[]>([]);
   const [friendsToInvite, setFriendsToInvite] = useState<FriendRequest[]>([]);
   const [invitations, setInvitations] = useState<string[]>([]);
   const [isSending, setIsSending] = useState(false);
   // const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
 
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const userId = await getUserIdFromToken();
+      setUserId(userId);
+    };
+    fetchUserId();
+  }, []);
   // const handleSearch = (text: string) => {
   //   setSearchTerm(text);
   //   if (text) {
@@ -29,7 +37,7 @@ const InvitePage = () => {
 
   const getAllFriends = async () => {
     try {
-      const usersToInvite = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/user/${userId}/friends`, {
+      const usersToInvite = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/user/${userId}/friends?status=ACCEPTED`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -49,7 +57,7 @@ const InvitePage = () => {
 
   const getFriendsToInvite = async () => {
     try {
-      const usersToInvite = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/non-participants`, {
+      const usersToInvite = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/non-participants?${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +67,7 @@ const InvitePage = () => {
       const result = await usersToInvite.json();
       setFriendsToInvite(result);
     } catch (error) {
-      console.error("Failed to fetch trip participants", id, error);
+      console.error("Failed to fetch trip non participants", id, error);
     }
   };
 

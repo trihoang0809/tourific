@@ -1,4 +1,6 @@
 import { Trip, TripData } from "@/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
 
 // format follow UTC
 export function formatDateTime(dateString: Date, hour: number, minute: number) {
@@ -51,6 +53,16 @@ export const tripDate = (date: Date) => {
   return `${date.getDate()} ${month}, ${date.getFullYear()}`;
 };
 
+//weekday
+export const weekday = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 // function to get the most 3 recent upcoming trips
 // @params: trips array
 // return an array of 3 most recent upcoming trips
@@ -82,8 +94,9 @@ export const categories: Record<string, string[]> = {
     "meal_delivery",
     "meal_takeaway",
     "food",
+    "pizza_restaurant",
   ],
-  Entertainment: [
+  Leisure: [
     "movie_theater",
     "night_club",
     "amusement_park",
@@ -94,6 +107,14 @@ export const categories: Record<string, string[]> = {
     "tourist_attraction",
     "casino",
     "bowling_alley",
+    "aquarium",
+    "movie_rental",
+    "book_store",
+    "university",
+    "zoo",
+    "park",
+    "establishment",
+    "point_of_interest",
   ],
   OutdoorRecreation: [
     "park",
@@ -104,6 +125,7 @@ export const categories: Record<string, string[]> = {
     "stadium",
     "city_hall",
     "church",
+    "establishment",
   ],
   Shopping: [
     "clothing_store",
@@ -120,9 +142,11 @@ export const categories: Record<string, string[]> = {
     "convenience_store",
     "movie_rental",
     "hardware_store",
-    "",
+    "department_store",
+    "shoe_store",
   ],
   Services: [
+    "local_government_office",
     "car_rental",
     "car_repair",
     "laundry",
@@ -160,3 +184,52 @@ export const categories: Record<string, string[]> = {
     "beauty_salon",
   ],
 };
+
+// Function to store the token
+export const storeToken = async (token: string) => {
+  try {
+    await AsyncStorage.setItem("userToken", token);
+    console.log("Token stored successfully ", token);
+  } catch (error) {
+    console.error("Error storing the token:", error);
+  }
+};
+
+// Function to retrieve the token
+export const getToken = async (): Promise<string | null> => {
+  try {
+    const token = AsyncStorage.getItem("userToken");
+    console.log("Retrieved token: ", token);
+    return await token;
+  } catch (error) {
+    console.error("Error retrieving the token:", error);
+    return null;
+  }
+};
+
+// Function to decode the token
+export const decodeToken = (token: string): any => {
+  try {
+    const decoded = jwtDecode(token);
+    console.log("Decoded token:", decoded);
+    return decoded;
+  } catch (error) {
+    console.error("Error decoding the token:", error);
+    return null;
+  }
+};
+
+// Function to retrieve the userId from the token
+export const getUserIdFromToken = async (): Promise<string | null> => {
+  const token = await getToken();
+  if (token) {
+    const decodedToken = decodeToken(token);
+    const userId = decodedToken.user_id || decodedToken.sub; // Firebase stores user ID in 'sub'
+    console.log("Decoded userId: ", userId);
+    return userId || null;
+  }
+  return null;
+};
+
+export const defaultAvatar =
+  "https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg";

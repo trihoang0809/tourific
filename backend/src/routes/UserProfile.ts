@@ -1,17 +1,53 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Status } from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
+import bcrypt from "bcrypt";
+import { findMongoDBUser } from "../utils/index";
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// temporary for testing until auth done
-const userID = "6661308f193a6cd9e0ea4d36";
+const saltRounds = 10; // The cost factor for bcrypt
 
 // Get all user profiles
 router.get("/", async (req, res) => {
+  // Get all users with their 3 most recent upcoming trips
   try {
-    const users = await prisma.user.findMany();
+    let queryConditions = {};
+    if (req.query.upcoming === "true") {
+      queryConditions = {
+        where: {
+          inviteeTripInvitations: {
+            some: {
+              status: "ACCEPTED",
+              trip: {
+                endDate: {
+                  gt: new Date(), // Filter for upcoming trips
+                },
+              },
+            },
+          },
+        },
+        include: {
+          inviteeTripInvitations: {
+            include: {
+              trip: {
+                include: {
+                  activities: true,
+                },
+              },
+            },
+            orderBy: {
+              trip: {
+                startDate: "asc", // Order trips by start date ascending
+              },
+            },
+            take: 3, // Get only 3 the earliest upcoming trips
+          },
+        },
+      };
+    }
+    const users = await prisma.user.findMany(queryConditions);
     res.json(users);
   } catch (error) {
     console.log(error);
@@ -20,46 +56,84 @@ router.get("/", async (req, res) => {
 });
 
 // Get a user profile
-router.get("/:userId", async (req, res) => {
-  const { userId } = req.params;
+router.get("/:firebaseUserId", async (req, res) => {
+  const { firebaseUserId } = req.params;
   try {
     const userProfile = await prisma.user.findUnique({
       where: {
-        id: userId,
+        firebaseUserId: firebaseUserId,
       },
     });
 
     if (!userProfile) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: `There is no user with Id: ${userId}` });
+      return res.status(StatusCodes.NOT_FOUND).json({ error: `There is no user with Id: ${firebaseUserId}` });
     }
+
     res.status(StatusCodes.OK).json(userProfile);
   } catch (error) {
     console.log("Some errors happen while getting user profile");
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: `An error occurred while fetching user profile with Id: ${userId}` });
+      .json({ error: `An error occurred while fetching user profile with Id: ${firebaseUserId}` });
   }
 });
 
+
 // Create a user profile
 router.post("/", async (req, res) => {
-  const { userName, email, password, firstName, lastName, dateOfBirth, avatar } = req.body;
+  const { userName, email, password, firstName, lastName, dateOfBirth, avatar, firebaseUserId } = req.body;
+
+  // Validate the email format and password strength
+  const emailRegex = /\S+@\S+\.\S+/;
+  if (!emailRegex.test(email)) {
+    return res.status(StatusCodes.BAD_REQUEST).json({ error: "Invalid email format" });
+  }
+
+  if (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password)) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      error:
+        "Password must be at least 8 characters long and contain an uppercase letter, a lowercase letter, and a number",
+    });
+  }
+
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!dateRegex.test(dateOfBirth)) {
+    return res.status(StatusCodes.BAD_REQUEST).json({ error: "Invalid date of birth format. Use YYYY-MM-DD." });
+  }
+  const parsedDateOfBirth = new Date(dateOfBirth);
+  if (isNaN(parsedDateOfBirth.getTime())) {
+    return res.status(StatusCodes.BAD_REQUEST).json({ error: "Invalid date of birth." });
+  }
+
   try {
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ userName }, { email }],
+      },
+    });
+
+    if (existingUser) {
+      return res.status(StatusCodes.CONFLICT).json({ error: "Username or email is already in use" });
+    }
+    console.log("all good up to here!");
+
+    const hashedPassword = await bcrypt.hash(password, saltRounds); // Hash the password
     const user = await prisma.user.create({
       data: {
         userName,
         email,
-        password,
+        password: hashedPassword, // Store the hashed password
         firstName,
         lastName,
-        dateOfBirth,
+        dateOfBirth: parsedDateOfBirth,
         avatar,
+        firebaseUserId,
       },
     });
     res.status(StatusCodes.CREATED).json(user);
   } catch (error) {
-    console.log("Some errors happen while creating user profile");
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: `An error occurred while creating user profile` });
+    console.log("Some errors happened while creating the user profile:", error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while creating the user profile" });
   }
 });
 
@@ -117,76 +191,126 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-// Add a friend
-router.post("/friend", async (req, res) => {
-  const { friendId } = req.body;
-  const userId = userID;
+// find a user profile by username and email that matches the text
+// case insensitive
+router.post("/find", async (req, res) => {
+  const { text } = req.body;
   try {
-    const friend = await prisma.friendship.create({
-      data: {
-        senderID: userId,
-        receiverID: friendId,
-      },
-    });
-    res.status(StatusCodes.CREATED).json(friend);
-  }
-  catch (error) {
-    console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while adding a friend." });
-  }
-});
-
-// get all friends
-router.get("/:id/friends", async (req, res) => {
-  const userId = userID;
-  try {
-    const friends = await prisma.friendship.findMany({
+    const user = await prisma.user.findMany({
       where: {
-        // get all friends that have accepted the friend request
         OR: [
           {
-            senderID: userId,
-            friendStatus: "ACCEPTED",
-            receiverID: {
-              not: userId
-            }
+            userName: {
+              startsWith: text,
+              mode: 'insensitive',
+            },
           },
           {
-            receiverID: userId,
-            friendStatus: "ACCEPTED",
-            senderID: {
-              not: userId
-            }
+            email: {
+              startsWith: text,
+              mode: 'insensitive',
+            },
           },
         ],
       },
     });
-    res.status(StatusCodes.OK).json(friends);
+    res.status(StatusCodes.OK).json(user);
   }
   catch (error) {
     console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting sent friend requests." });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while finding a user." });
+  }
+});
+
+// Add a friend or cancel a friend request
+router.post("/:id/friends", async (req, res) => {
+  const { friendId } = req.body;
+  const { userId } = req.body;
+  const { add } = req.query;
+
+  console.log(friendId, ";", userId);
+  if (!friendId || !userId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing userId or friendId" });
+  }
+
+  const MongoUserId = await findMongoDBUser(userId);
+  const MongoFriendId = await findMongoDBUser(friendId);
+
+  try {
+    // cancel a sent request
+    if (add === "false") {
+      const cancelRequest = await prisma.friendship.delete({
+        where: {
+          receiverID_senderID: {
+            senderID: MongoUserId?.id as string,
+            receiverID: MongoFriendId?.id as string,
+          },
+        },
+      });
+      res.status(StatusCodes.OK).json(cancelRequest);
+    } else if (add === "true") {
+      // send a friend request
+
+      // check if the friend request already exists
+      const existingRequest = await prisma.friendship.findFirst({
+        where: {
+          OR: [
+            {
+              senderID: MongoUserId?.id as string,
+              receiverID: MongoFriendId?.id as string,
+            },
+            {
+              senderID: MongoUserId?.id as string,
+              receiverID: MongoFriendId?.id as string,
+            },
+          ],
+        },
+      });
+
+      if (existingRequest) {
+        res.status(StatusCodes.BAD_REQUEST).json({ error: "Friend request already exists." });
+        return;
+      }
+
+      const friend = await prisma.friendship.create({
+        data: {
+          senderID: MongoUserId?.id as string,
+          receiverID: MongoFriendId?.id as string,
+        },
+      });
+      res.status(StatusCodes.CREATED).json(friend);
+    }
+  }
+  catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while adding/cancelling a friend." });
   }
 });
 
 // accept or decline a friend request
-// to accept: /friend?accept=true 
+// to accept: /friend?accept=true
 // to reject: /friend?accept=false
 router.patch("/friend", async (req, res) => {
-  const { friendId } = req.body;
+  const { friendId, userId } = req.body;
   const { accept } = req.query;
-  const userId = userID;
+
+  if (!friendId || !userId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing userId or friendId" });
+  }
+
+  const MongoUserId = await findMongoDBUser(userId);
+  const MongoFriendId = await findMongoDBUser(friendId);
   try {
     if (accept === "true") {
       const friend = await prisma.friendship.update({
         where: {
           receiverID_senderID: {
-            senderID: friendId,
-            receiverID: userId,
+            senderID: MongoFriendId?.id as string,
+            receiverID: MongoUserId?.id as string,
           },
         },
         data: {
-          friendStatus: "ACCEPTED"
+          friendStatus: "ACCEPTED",
         },
       });
       res.status(StatusCodes.OK).json(friend);
@@ -194,8 +318,8 @@ router.patch("/friend", async (req, res) => {
       const rejectFriend = await prisma.friendship.delete({
         where: {
           receiverID_senderID: {
-            senderID: friendId,
-            receiverID: userId,
+            senderID: MongoFriendId?.id as string,
+            receiverID: MongoUserId?.id as string,
           },
         },
       });
@@ -208,30 +332,78 @@ router.patch("/friend", async (req, res) => {
   }
 });
 
+// get all friendship by status
+router.get("/:userId/friends", async (req, res) => {
+  const { userId } = req.params;
+  const { status } = req.query;
+  try {
+    const MongoUserId = await findMongoDBUser(userId);
+    const friends = await prisma.friendship.findMany({
+      where: {
+        // get all friends that have accepted the friend request
+        OR: [
+          {
+            senderID: MongoUserId?.id as string,
+            friendStatus: status as Status,
+            receiverID: {
+              not: MongoUserId?.id as string
+            }
+          },
+          {
+            receiverID: MongoUserId?.id as string,
+            friendStatus: status as Status,
+            senderID: {
+              not: MongoUserId?.id as string
+            }
+          },
+        ],
+      },
+    });
+    res.status(StatusCodes.OK).json(friends);
+  }
+  catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting friends." });
+  }
+});
+
 // get all sent requests
 router.get("/friend/sent-requests", async (req, res) => {
-  const userId = userID;
+  const { userId } = req.body;
+
+  if (!userId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing userId" });
+  }
+
+  const MongoUserId = await findMongoDBUser(userId);
   try {
     const sentRequests = await prisma.friendship.findMany({
       where: {
-        senderID: userId,
+        senderID: MongoUserId?.id as string,
         friendStatus: 'PENDING',
       },
     });
     res.status(StatusCodes.OK).json(sentRequests);
   } catch (error) {
     console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting sent friend requests." });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while getting sent friend requests." });
   }
 });
 
 // get all pending requests
 router.get("/friend/pending-requests", async (req, res) => {
-  const userId = userID;
+  const { userId } = req.body;
+  if (!userId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing userId" });
+  }
+
+  const MongoUserId = await findMongoDBUser(userId);
   try {
     const pendingRequests = await prisma.friendship.findMany({
       where: {
-        receiverID: userId,
+        receiverID: MongoUserId?.id as string,
         friendStatus: 'PENDING',
       },
     });
@@ -239,6 +411,32 @@ router.get("/friend/pending-requests", async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting pending friend requests." });
+  }
+});
+
+// Login a user
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!user) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Invalid email or password" });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(StatusCodes.UNAUTHORIZED).json({ error: "Invalid email or password" });
+    }
+
+    res.status(StatusCodes.OK).json({ message: "Login successful", user });
+  } catch (error) {
+    console.log("Some errors happened while logging in:", error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while logging in" });
   }
 });
 
