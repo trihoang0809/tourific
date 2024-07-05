@@ -40,7 +40,6 @@ router.get("/:id/schedule", async (req, res) => {
           where: {
             tripId: id,
             googlePlacesId: "",
-            name: "okok",
           },
         });
         console.log(activities);

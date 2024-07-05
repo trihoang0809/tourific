@@ -13,19 +13,9 @@ const viewActivity = () => {
   const { id } = useGlobalSearchParams();
   const { activityid } = useGlobalSearchParams();
   const { ggMapid } = useLocalSearchParams();
-  const navigation = useNavigation();
-
-  useEffect(() => {
-    navigation.setOptions({ headerShown: false });
-  }, [navigation]);
 
   return (
     <View style={{ flex: 1 }}>
-      <Stack.Screen
-        options={{
-          headerShown: false,
-        }}
-      />
       {ggMapid === "" ? (
         <ActivityDetail
           tripId={String(id)}

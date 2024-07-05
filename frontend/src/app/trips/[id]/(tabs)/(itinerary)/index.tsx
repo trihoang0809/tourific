@@ -531,8 +531,8 @@ const Itinerary = () => {
           end: new Date(activity.endTime),
           children: eventNotes,
           activityid: activity.id,
-          url: activity.image?.url
-            ? activity.image?.url
+          url: activity.imageUrl
+            ? activity.imageUrl
             : "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400",
         };
       });
@@ -625,7 +625,6 @@ const Itinerary = () => {
             const url = `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/schedule`;
             try {
               const response = await fetch(url);
-              setSavedActivityId("");
             } catch (error: any) {
               console.error("Error fetching trip:", error.toString());
             }
