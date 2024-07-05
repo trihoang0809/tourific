@@ -4,6 +4,20 @@ import { StatusBar } from "expo-status-bar";
 import { useRouter, Stack } from "expo-router";
 import { HomeScreen } from "../screens/HomeScreen";
 import LoginScreen from "./login";
+import {LogBox} from 'react-native';
+
+// Ignore log notification by message
+LogBox.ignoreLogs([
+  // Exact message
+  'Warning: componentWillReceiveProps has been renamed',
+
+  // Substring or regex match
+  /GraphQL error: .*/,
+]);
+
+// Ignore all log notifications
+LogBox.ignoreAllLogs();
+
 
 const App = () => {
   // const { user } = useAuth();
