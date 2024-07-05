@@ -56,7 +56,7 @@ router.get("/:activityId", async (req: Request<ActivityParams>, res) => {
 router.post("/", async (req: Request<ActivityParams>, res) => {
   const { tripId } = req.params;
   console.log("trip id: ", tripId);
-  const { name, description, startTime, endTime, location, notes, imageUrl, googlePlacesId } = req.body;
+  const { name, description, startTime, endTime, location, category, notes, imageUrl, googlePlacesId } = req.body;
 
   if (!tripId) {
     res.status(StatusCodes.NOT_FOUND).json({ error: "Trip ID does not exist" });
@@ -74,6 +74,7 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
             startTime,
             endTime,
             location,
+            category,
             notes,
             googlePlacesId,
             imageUrl,
