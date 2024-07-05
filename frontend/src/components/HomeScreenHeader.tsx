@@ -132,7 +132,17 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
           onPress={() => router.push("/friends/search")}
           style={{ marginRight: 5 }}
         >
-          <Ionicons name="notifications-outline" size={24} color="black" />
+          <Ionicons name="person-add-outline" size={20} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("userProfile/profile")}>
+          <Image
+            style={styles.avatar}
+            source={{
+              uri: user.avatar?.url
+                ? user.avatar.url
+                : "https://t4.ftcdn.net/jpg/03/59/58/91/360_F_359589186_JDLl8dIWoBNf1iqEkHxhUeeOulx0wOC5.jpg",
+            }}
+          />
         </TouchableOpacity>
       </View>
     </View>
