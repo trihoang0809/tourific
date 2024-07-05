@@ -9,7 +9,11 @@ import { getTimeDuration, createNotification } from "@/utils";
 import { storeNotificationCount } from "@/utils/AsyncStorageUtils";
 import { EXPO_PUBLIC_HOST_URL, getUserIdFromToken } from "@/utils";
 
-const NotificationTab = (userId: string) => {
+interface NotificationTabProps {
+  userId: string | null;
+}
+
+const NotificationTab: React.FC<NotificationTabProps> = ({ userId }) => {
   const [activeTab, setActiveTab] = useState("friendRequests");
   // Fetch all pending friend requests
   const [requests, setRequests] = useState<FriendRequestForNotification[]>([]);
@@ -21,8 +25,7 @@ const NotificationTab = (userId: string) => {
     [],
   );
 
-  useEffect(() => {}, []);
-
+  console.log("userID in notification tab: ", userId);
   useEffect(() => {
     const totalNotifications = requests.length + invitations.length;
     console.log("totalnoti: ", totalNotifications);
@@ -185,7 +188,7 @@ export default NotificationTab;
 const FriendRequests: React.FC<{
   requests: FriendRequestForNotification[];
   friendNotifications: Notification[];
-  userId: string;
+  userId: string | null;
 }> = ({ requests, friendNotifications, userId }) => {
   return (
     <View>
@@ -206,7 +209,7 @@ const FriendRequests: React.FC<{
 const TripInvitations: React.FC<{
   invitations: TripMembership[];
   tripNotifications: Notification[];
-  userId: string;
+  userId: string | null;
 }> = ({ invitations, tripNotifications, userId }) => {
   return (
     <View>
@@ -228,7 +231,7 @@ const TripInvitations: React.FC<{
 
 const FriendRequestCard: React.FC<{
   request: FriendRequestForNotification;
-  userId: string;
+  userId: string | null;
 }> = ({ request, userId }) => {
   const [isAccepted, setIsAccepted] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
@@ -334,7 +337,7 @@ const FriendAcceptCard: React.FC<{
 
 const TripInvitationCard: React.FC<{
   invitation: TripMembership;
-  userId: string;
+  userId: string | null;
 }> = ({ invitation, userId }) => {
   const [isAccepted, setIsAccepted] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);

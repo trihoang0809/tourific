@@ -258,7 +258,7 @@ export const getTimeDuration = (createdAt: Date) => {
   }
 };
 
-export const createNotification = async (receiverId: string, senderId: string, type: string, tripId?: string) => {
+export const createNotification = async (receiverId: string, senderId: string | null, type: string, tripId?: string) => {
   try {
     const req = {
       type: type,
@@ -266,6 +266,7 @@ export const createNotification = async (receiverId: string, senderId: string, t
       receiverId: receiverId,
       ...(tripId ? { tripId: tripId } : {})
     };
+    console.log("createNotification before send", req)
     const response = await fetch(
       `http://${EXPO_PUBLIC_HOST_URL}:3000/notification`,
       {

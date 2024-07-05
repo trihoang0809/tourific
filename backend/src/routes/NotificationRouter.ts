@@ -1,6 +1,7 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
+import { findMongoDBUser } from "../utils/index";
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -70,11 +71,17 @@ router.get("/", async (req, res) => {
 // Create a notification for a user
 router.post("/", async (req, res) => {
   const { type, senderId, receiverId } = req.body;
+
+  if (!senderId || !receiverId) {
+    return res.status(StatusCodes.BAD_REQUEST).json({ error: "Sender and receiver IDs are required." });
+  }
+
+  const MongoDBUserId = await findMongoDBUser(senderId as string);
   try {
     const notification = await prisma.notification.create({
       data: {
         type,
-        senderId,
+        senderId: MongoDBUserId?.id as string,
         receiverId,
       },
     });
@@ -84,5 +91,6 @@ router.post("/", async (req, res) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while creating the notification." });
   }
 });
+
 
 export default router;
