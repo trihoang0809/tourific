@@ -34,6 +34,7 @@ const RootNavigation = () => {
         <Stack.Screen name="register" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="friends" options={{ headerShown: false }} />
+        <Stack.Screen name="notification" options={{ headerShown: false }} />
         <Stack.Screen
           name="userProfile/profile"
           options={{ title: "Profile", headerShown: true }}

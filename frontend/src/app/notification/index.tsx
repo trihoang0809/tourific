@@ -1,8 +1,8 @@
 import { View } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Stack } from "expo-router";
 import NotificationTab from "@/components/NotificationTab";
 import { EXPO_PUBLIC_HOST_URL, getUserIdFromToken } from "@/utils";
+import Stack from "expo-router/stack";
 
 const search = () => {
   const [userId, setUserId] = useState<string | null>(null);

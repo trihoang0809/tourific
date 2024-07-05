@@ -287,7 +287,7 @@ export default function CreateTripScreen() {
   }, [setOpen]);
 
   const onConfirm = useCallback(
-    ({ startDate, endDate }: { startDate: Date; endDate: Date }) => {
+    ({ startDate, endDate }: { startDate: Date; endDate: Date; }) => {
       setOpen(false);
       // Check if startDate and endDate are already set in formData
       setFormData(
@@ -317,7 +317,7 @@ export default function CreateTripScreen() {
   );
 
   const onConfirmStartTime = useCallback(
-    ({ hours, minutes }: { hours: number; minutes: number }) => {
+    ({ hours, minutes }: { hours: number; minutes: number; }) => {
       setFormData(
         (prevFormData) =>
           ({
@@ -334,7 +334,7 @@ export default function CreateTripScreen() {
   );
 
   const onConfirmEndTime = useCallback(
-    ({ hours, minutes }: { hours: number; minutes: number }) => {
+    ({ hours, minutes }: { hours: number; minutes: number; }) => {
       setFormData(
         (prevFormData) =>
           ({
@@ -362,7 +362,7 @@ export default function CreateTripScreen() {
   );
 
   return (
-    <SafeAreaView>
+    <View>
       {isUpdating ? (
         ""
       ) : (
@@ -552,21 +552,21 @@ export default function CreateTripScreen() {
                     }}
                   >
                     {typeof formData?.startTime.hours === "number" &&
-                    typeof formData.startTime.minutes === "number"
+                      typeof formData.startTime.minutes === "number"
                       ? new Date(
-                          1970,
-                          0,
-                          1,
-                          formData.startTime.hours,
-                          formData.startTime.minutes,
-                        ).toLocaleTimeString("en-US", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
+                        1970,
+                        0,
+                        1,
+                        formData.startTime.hours,
+                        formData.startTime.minutes,
+                      ).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
                       : new Date(1970, 0, 1, 8, 0).toLocaleTimeString("en-US", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                   </Text>
                 </TouchableOpacity>
                 <Controller
@@ -608,21 +608,21 @@ export default function CreateTripScreen() {
                     }}
                   >
                     {typeof formData?.endTime.hours === "number" &&
-                    typeof formData.endTime.minutes === "number"
+                      typeof formData.endTime.minutes === "number"
                       ? new Date(
-                          1970,
-                          0,
-                          1,
-                          formData.endTime.hours,
-                          formData.endTime.minutes,
-                        ).toLocaleTimeString("en-US", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
+                        1970,
+                        0,
+                        1,
+                        formData.endTime.hours,
+                        formData.endTime.minutes,
+                      ).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
                       : new Date(1970, 0, 1, 8, 0).toLocaleTimeString("en-US", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                   </Text>
                 </TouchableOpacity>
                 <Controller
@@ -689,6 +689,6 @@ export default function CreateTripScreen() {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
