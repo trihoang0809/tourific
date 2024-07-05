@@ -151,7 +151,7 @@ export const GGMapActivityDetail: React.FC<Actprops> = (id: Actprops) => {
           flex: 1,
           borderTopRightRadius: 20,
           borderTopLeftRadius: 20,
-          borderWidth: 1,
+          // borderWidth: 1,
           marginTop: -40,
           backgroundColor: "white",
         }}
