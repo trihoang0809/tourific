@@ -19,6 +19,7 @@ model Trip {
   image Photo?
   activities Activity[]
   participants TripMember[]
+  notifications Notification[] @relation("TripNotifications")
 }
 
 model TripMember {
@@ -53,7 +54,8 @@ model User {
   lastName String
   dateOfBirth DateTime
   avatar Photo
-  notification Notification[] 
+  notificationsReceived Notification[] @relation("NotificationReceiver")
+  notificationsSent Notification[] @relation("NotificationSender")
   inviteeTripInvitations TripMember[] @relation("InviteeToTripInvitations")
   inviterTripInvitations TripMember[] @relation("InviterToTripInvitations") 
   friendRequestSent  Friendship[]   @relation("friendRequestSent")
@@ -62,12 +64,15 @@ model User {
 
 model Notification {
   id String @id @default(auto()) @map("_id") @db.ObjectId
-  dateCreated DateTime @default(now())
+  createdAt DateTime @default(now())
   type NotificationType
   senderId String @db.ObjectId
-  sender User @relation(fields: [senderId], references: [id])
-  readStatus Boolean
-  userId String
+  sender User @relation("NotificationSender", fields: [senderId], references: [id])
+  receiverId String @db.ObjectId
+  receiver User @relation("NotificationReceiver", fields: [receiverId], references: [id])
+  readStatus Boolean @default(false)
+  tripId String? @db.ObjectId
+  trip Trip? @relation("TripNotifications", fields: [tripId], references: [id])
 }
 
 enum NotificationType {
