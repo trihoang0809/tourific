@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, Image, TouchableOpacity, Pressable } from "react-native";
 import React, { useState, useEffect } from "react";
 import favicon from "@/assets/favicon.png";
 import { useGlobalSearchParams } from "expo-router";
@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Dimensions } from "react-native";
 import { DateTime } from "luxon";
 import { StyleSheet } from "react-native";
+import { router } from "expo-router";
 import { Rating } from "react-native-ratings";
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
@@ -74,6 +75,12 @@ const ViewActivity = () => {
     <View style={{ height: Dimensions.get("window").height, flex: 1 }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.imageContainer}>
+        <Pressable
+          style={{ zIndex: 1, margin: 10, position: "absolute" }}
+          onPress={() => router.back()}
+        >
+          <Ionicons name="chevron-back-outline" size={35} color="transparent" />
+        </Pressable>
           <Image
             style={styles.image}
             source={{

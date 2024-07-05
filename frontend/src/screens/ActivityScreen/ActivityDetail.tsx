@@ -184,7 +184,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
             <Ionicons
               name="chevron-back-outline"
               size={35}
-              color="black"
+              color="transparent"
               style={{ zIndex: 10, margin: 10 }}
             />
           </Pressable>

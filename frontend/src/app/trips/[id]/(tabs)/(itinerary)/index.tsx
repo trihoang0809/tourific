@@ -863,7 +863,7 @@ const Itinerary = () => {
                             <TouchableWithoutFeedback
                               onPress={() => {
                                 router.push(
-                                  `trips/${id}/(activities)/${event.activityid}`,
+                                  `trips/${id}/(itinerary)/${event.activityid}`,
                                 );
                               }}
                             >

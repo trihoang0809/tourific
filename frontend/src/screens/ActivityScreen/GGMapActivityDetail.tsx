@@ -116,7 +116,7 @@ export const GGMapActivityDetail: React.FC<Actprops> = (id: Actprops) => {
           style={{ zIndex: 1, margin: 10, position: "absolute" }}
           onPress={() => router.back()}
         >
-          <Ionicons name="chevron-back-outline" size={35} color="black" />
+          <Ionicons name="chevron-back-outline" size={35} color="transparent" />
         </Pressable>
         <ScrollView
           style={{ flex: 1 }}
