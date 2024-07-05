@@ -1,52 +1,37 @@
-// [x] fetch real friend requests
-// [x] TODO: "Accepted" after we click the button
-// [ ] actual accept/decline after clicking the button
-// [ ] fetch "accepted notification" from database
-
-// [ ] fetch trip invitation
-// [ ] TODO: "Accepted" after we click the button
-// [ ] fetch "accepted notification" from database
-
-//  Friend requests fetch: [{"friendStatus": "PENDING", "id": "6686af15221f4ff006d27f1f", "receiverID": "66860537f96086257c3f9792",
-// "sender": {"avatar": [Object], "dateOfBirth": "2021-01-29T00:00:00.000Z", "email": "duyduy@gmail.com", "firstName": "Duy Kha",
-// "id": "66842fd7f7e0a898807a4167", "lastName": "Tran", "password": "$2b$10$Yz5MG2MnGFpM7GKnQClQE.6NjSEt9WimAN031fghkWsuzTqSNVhem", "userName": "Kha Tran"},
-// "senderID": "66842fd7f7e0a898807a4167"},
-// {"friendStatus": "PENDING", "id": "6686af01221f4ff006d27f1e", "receiverID": "66860537f96086257c3f9792", "sender": {"avatar": [Object], "dateOfBirth": "2004-09-08T00:00:00.000Z", "email": "leomessi@gmail.com", "firstName": "Leo", "id": "6684ef6ca3ea75b07fde4608", "lastName": "Messi", "password": "$2b$10$/HrO3fd1QDas3Q5NwA0JguoOYKilqFuUbwR8W4CdOkW/VUOGeSLVy", "userName": "messi"}, "senderID": "6684ef6ca3ea75b07fde4608"}, {"friendStatus": "PENDING", "id": "6686aeb7221f4ff006d27f1c", "receiverID": "66860537f96086257c3f9792", "sender": {"avatar": [Object], "dateOfBirth": "2017-02-01T00:00:00.000Z", "email": "thanhvan@gmail.com", "firstName": "thanh", "id": "66860537f96086257c3f9792", "lastName": "van", "password": "$2b$10$rGxARuJlGtvBmB4SMmL27OtMkF4QLNmZ.T/RPnUoS/bjNS660EhBm", "userName": "thanhvan123"}, "senderID": "66860537f96086257c3f9792"}]
+const userID = "66860537f96086257c3f9792";
 
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
-import { FriendRequest } from "@/types";
+import { FriendRequest, Notification, TripMembership } from "@/types";
+import { getTimeDuration, createNotification } from "@/utils";
+import { storeNotificationCount } from "@/utils/AsyncStorageUtils";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
-
-const mockUser = {
-  firstName: "Mỹ",
-  lastName: "Anh",
-  userName: "meomuop",
-  avatar: {
-    url: "https://images.unsplash.com/photo-1608292415726-265dc19ae70c?q=80&w=3388&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-};
-const mockTrip = {
-  name: "Di Tham Ba Ngoai",
-  location: {
-    citystate: "San Francisco, CA",
-  },
-  startDate: "2024-07-23T23:04:59.000+00:00",
-  endDate: "2024-08-08T10:03:00.000+00:00",
-  image: {
-    url: "https://images.unsplash.com/photo-1719858403457-c03d19d28e86?q=80&w=3387&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-};
 
 const NotificationTab = () => {
   const [activeTab, setActiveTab] = useState("friendRequests");
   // Fetch all pending friend requests
-  const [requests, setRequests] = useState([]);
+  const [requests, setRequests] = useState<FriendRequest[]>([]);
+  const [invitations, setInvitations] = useState<TripMembership[]>([]);
+  const [friendNotification, setFriendNotification] = useState<Notification[]>(
+    [],
+  );
+  const [tripNotifications, setTripNotifications] = useState<Notification[]>(
+    [],
+  );
+  useEffect(() => {
+    const totalNotifications = requests.length + invitations.length;
+    console.log("totalnoti: ", totalNotifications)
+    storeNotificationCount(totalNotifications)
+  }, [requests, invitations]);
 
   useEffect(() => {
     getFriendRequests();
+    getTripInvitations();
+    getNotification();
   }, []);
+  // Fetch all pending trip invitations
+
   const getFriendRequests = async () => {
     try {
       const response = await fetch(
@@ -59,7 +44,7 @@ const NotificationTab = () => {
         },
       );
       if (!response.ok) {
-        throw new Error("Failed to fetch friend requests");
+        console.error("Failed to fetch friend requests");
       }
       const data = await response.json();
       setRequests(data);
@@ -67,6 +52,71 @@ const NotificationTab = () => {
     } catch (error: any) {
       console.error(
         "Error fetching pending friend requests:",
+        error.toString(),
+      );
+    }
+  };
+
+  const getNotification = async () => {
+    try {
+      // Fetch FRIEND_ACCEPT notifications
+      const friendResponse = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/notification?type=FRIEND_ACCEPT`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      if (!friendResponse.ok) {
+        console.error("Failed to fetch friend-related notifications");
+      }
+      const friendData = await friendResponse.json();
+      setFriendNotification(friendData);
+      console.log("Friend-related notifications fetched:", friendData);
+
+      // Fetch TRIP_ACCEPT notifications
+      const tripResponse = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/notification?type=TRIP_ACCEPT`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      if (!tripResponse.ok) {
+        console.error("Failed to fetch trip-related notifications");
+      }
+      const tripData = await tripResponse.json();
+      setTripNotifications(tripData);
+      console.log("Trip-related notifications fetched:", tripData);
+    } catch (error: any) {
+      console.error("Error fetching notifications:", error.toString());
+    }
+  };
+
+  const getTripInvitations = async () => {
+    try {
+      const response = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/all-received`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      if (!response.ok) {
+        console.error("Failed to fetch trip invitations");
+      }
+      const data = await response.json();
+      setInvitations(data);
+      console.log("Trip invitations fetch:", data);
+    } catch (error: any) {
+      console.error(
+        "Error fetching pending trip invitations:",
         error.toString(),
       );
     }
@@ -108,80 +158,99 @@ const NotificationTab = () => {
           </Text>
         </TouchableOpacity>
       </View>
-      {activeTab === "friendRequests" && <FriendRequests requests={requests} />}
-      {activeTab === "tripInvitations" && <TripInvitations />}
+      {activeTab === "friendRequests" && (
+        <FriendRequests
+          requests={requests}
+          friendNotifications={friendNotification}
+        />
+      )}
+      {activeTab === "tripInvitations" && (
+        <TripInvitations
+          invitations={invitations}
+          tripNotifications={tripNotifications}
+        />
+      )}
     </View>
   );
 };
 
 export default NotificationTab;
 
-const FriendRequests: React.FC<{ requests: FriendRequest[] }> = ({
-  requests,
-}) => {
+const FriendRequests: React.FC<{
+  requests: FriendRequest[];
+  friendNotifications: Notification[];
+}> = ({ requests, friendNotifications }) => {
   return (
     <View>
       {requests &&
         requests.map((request, index) => (
-          <FriendRequestCard
+          <FriendRequestCard key={index} request={request} />
+        ))}
+      {friendNotifications &&
+        friendNotifications.map((friendNotification, index) => (
+          <FriendAcceptCard
             key={index}
-            request={request}
-            // user={request.sender}
-            // isPending={request.isPending}
+            friendNotification={friendNotification}
           />
         ))}
     </View>
   );
 };
-const TripInvitations = () => (
-  <View>
-    <View style={styles.notification}>
-      <Image source={{ uri: mockTrip.image.url }} style={styles.trip} />
-      <View style={styles.textContainer}>
-        <Text numberOfLines={1} style={styles.userName}>
-          {mockTrip.name}
-        </Text>
-        <Text numberOfLines={2} style={{ marginBottom: 10 }}>
-          {mockUser.firstName} {mockUser.lastName} invited you to join this
-          5-day trip with 2 others.
-        </Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.acceptButton}>
-            <Text style={styles.acceptButtonText}>Accept</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.deleteButton}>
-            <Text style={styles.deleteButtonText}>Decline</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+const TripInvitations: React.FC<{
+  invitations: TripMembership[];
+  tripNotifications: Notification[];
+}> = ({ invitations, tripNotifications }) => {
+  return (
+    <View>
+      {invitations &&
+        invitations.map((invitation, index) => (
+          <TripInvitationCard key={index} invitation={invitation} />
+        ))}
+      {tripNotifications &&
+        tripNotifications.map((tripNotification, index) => (
+          <TripNewMemberCard key={index} tripNotification={tripNotification} />
+        ))}
     </View>
-    <View style={styles.notification}>
-      <Image source={{ uri: mockTrip.image.url }} style={styles.trip} />
-      <View style={styles.textContainer}>
-        <Text numberOfLines={1} style={styles.userName}>
-          {mockTrip.name}
-        </Text>
-        <Text numberOfLines={2} style={{ marginBottom: 10 }}>
-          {mockUser.firstName} {mockUser.lastName} has just joined your trip.
-        </Text>
-      </View>
-    </View>
-    {/* Add more trip invitation cards here */}
-  </View>
-);
-// TODO: ReceivedFriendAcceptCard
+  );
+};
+
 const FriendRequestCard: React.FC<{ request: FriendRequest }> = ({
   request,
 }) => {
   const [isAccepted, setIsAccepted] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const handleAccept = () => {
+    updateFriendship("true", request.sender.id);
+    createNotification(request.sender.id, userID, "FRIEND_ACCEPT");
     setIsAccepted(true);
-    // TODO: update backend
   };
   const handleDelete = () => {
+    updateFriendship("false", request.sender.id);
     setIsDeleted(true);
-    // TODO: delete from backend
+  };
+  const updateFriendship = async (status: string, friendId: string) => {
+    try {
+      const req = {
+        friendId: friendId,
+      };
+      const response = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/user/friend?accept=${status}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(req),
+        },
+      );
+      if (!response.ok) {
+        console.error("Failed to update friend status");
+      }
+      const data = await response.json();
+      console.log("Friend status updated:", data);
+    } catch (error: any) {
+      console.error("Error updating friendship:", error.toString());
+    }
   };
 
   return isDeleted ? null : (
@@ -194,13 +263,6 @@ const FriendRequestCard: React.FC<{ request: FriendRequest }> = ({
         <Text style={styles.userName}>
           {request.sender.firstName} {request.sender.lastName}
         </Text>
-        {/* {isPending ? ( */}
-        {/* // ) : (
-      //   <>
-      //     <Text style={{ marginBottom: 10 }}>has become your friend.</Text>
-      //     <Text style={{ color: "gray" }}>3 hours ago</Text>
-      //   </>
-      // )} */}
         <>
           <Text style={{ marginBottom: 10 }}>wants to become your friend.</Text>
           <View style={styles.buttonContainer}>
@@ -230,30 +292,82 @@ const FriendRequestCard: React.FC<{ request: FriendRequest }> = ({
     </View>
   );
 };
-const TripInvitationCard: React.FC<{ request: FriendRequest }> = ({
-  request,
+
+const FriendAcceptCard: React.FC<{
+  friendNotification: Notification;
+}> = ({ friendNotification }) => {
+  return (
+    <View style={styles.notification}>
+      <Image
+        source={{ uri: friendNotification.sender.avatar.url }}
+        style={styles.avatar}
+      />
+      <View style={styles.textContainer}>
+        <Text style={styles.userName}>
+          {friendNotification.sender.firstName}{" "}
+          {friendNotification.sender.lastName}
+        </Text>
+        <>
+          <Text style={{ marginBottom: 10 }}>has become your friend.</Text>
+          <Text style={{ color: "gray" }}>
+            {getTimeDuration(friendNotification.createdAt)}
+          </Text>
+        </>
+      </View>
+    </View>
+  );
+};
+
+const TripInvitationCard: React.FC<{ invitation: TripMembership }> = ({
+  invitation,
 }) => {
   const [isAccepted, setIsAccepted] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const handleAccept = () => {
+    invitation.trip.participants &&
+      invitation.trip.participants.map((participant) => {
+        createNotification(participant.id, userID, "TRIP_ACCEPT");
+      });
+    updateTripMembership("ACCEPTED", invitation.id);
     setIsAccepted(true);
-    // TODO: update backend
   };
   const handleDelete = () => {
+    updateTripMembership("REJECTED", invitation.id);
     setIsDeleted(true);
-    // TODO: delete from backend
   };
-  return (
+
+  const updateTripMembership = async (status: string, invitationId: string) => {
+    try {
+      const response = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/${invitationId}?status=${status}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      if (!response.ok) {
+        console.error("Failed to update trip membership status");
+      }
+      const data = await response.json();
+      console.log("Trip membership status updated:", data);
+    } catch (error: any) {
+      console.error("Error updating trip membership status:", error.toString());
+    }
+  };
+
+  return isDeleted ? null : (
     <View style={styles.notification}>
-      <Image source={{ uri: trip.image.url }} style={styles.trip} />
+      <Image source={{ uri: invitation.trip.image.url }} style={styles.trip} />
       <View style={styles.textContainer}>
         <Text numberOfLines={1} style={styles.userName}>
-          {trip.name}
+          {invitation.trip.name}
         </Text>
         <>
           <Text numberOfLines={2} style={{ marginBottom: 10 }}>
-            {user.firstName} {user.lastName} invited you to join this 5-day trip
-            with 2 others.
+            {invitation.inviter?.firstName} {invitation.inviter?.lastName}{" "}
+            invited you to join this trip.
           </Text>
           <View style={styles.buttonContainer}>
             {isAccepted ? (
@@ -276,20 +390,33 @@ const TripInvitationCard: React.FC<{ request: FriendRequest }> = ({
                 </TouchableOpacity>
               </>
             )}
-
-            {/* <TouchableOpacity style={styles.acceptButton}>
-            <Text style={styles.acceptButtonText}>Accept</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.deleteButton}>
-            <Text style={styles.deleteButtonText}>Decline</Text>
-          </TouchableOpacity> */}
           </View>
         </>
-        {/* ) : (
-        <Text numberOfLines={2} style={{ marginBottom: 10 }}>
-          {user.firstName} {user.lastName} has just joined your trip.
+      </View>
+    </View>
+  );
+};
+
+const TripNewMemberCard: React.FC<{ tripNotification: Notification }> = ({
+  tripNotification,
+}) => {
+  return (
+    <View style={styles.notification}>
+      <Image
+        source={{ uri: tripNotification.trip.image.url }}
+        style={styles.trip}
+      />
+      <View style={styles.textContainer}>
+        <Text numberOfLines={1} style={styles.userName}>
+          {tripNotification.trip.name}
         </Text>
-      )} */}
+        <Text numberOfLines={2} style={{ marginBottom: 10 }}>
+          {tripNotification.sender.firstName} {tripNotification.sender.lastName}{" "}
+          has joined your trip.
+        </Text>
+        <Text style={{ color: "gray" }}>
+          {getTimeDuration(tripNotification.createdAt)}
+        </Text>
       </View>
     </View>
   );
@@ -351,7 +478,7 @@ const styles = StyleSheet.create({
   },
   trip: {
     width: 75,
-    height: 100,
+    height: 85,
     borderRadius: 5,
     marginRight: 15,
   },
