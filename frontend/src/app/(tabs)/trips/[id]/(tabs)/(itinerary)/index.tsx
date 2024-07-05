@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useReducer,
+} from "react";
 import {
   View,
   Text,
@@ -17,7 +23,11 @@ import { useGlobalSearchParams, router } from "expo-router";
 import { Calendar, DateRangeHandler } from "react-native-big-calendar";
 // import { Mode } from "react-native-big-calendar/build/interfaces";
 import { StyleSheet } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import {
+  AntDesign,
+  FontAwesome5,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -41,6 +51,7 @@ import {
   GestureHandlerRootView,
   RectButton,
 } from "react-native-gesture-handler";
+import Style from "Style";
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
 const Itinerary = () => {
@@ -83,6 +94,7 @@ const Itinerary = () => {
       minutes: undefined,
     },
   });
+  const [descriptionModal, setDescriptionModal] = useState(false);
   let prevOpenedRow: any;
   const rowRefs = useRef<{ [key: string]: Swipeable }>({});
 
@@ -367,7 +379,7 @@ const Itinerary = () => {
           start: dateForUpdateForm.startDate,
           end: dateForUpdateForm.endDate,
           children: eventNotes,
-          activityid: eventToMove.id,
+          activityid: eventToMove.id!,
           url: eventToMove.image?.url
             ? eventToMove.image?.url
             : "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400",
@@ -515,12 +527,12 @@ const Itinerary = () => {
         ) : null;
         return {
           title: activity.name,
-          start: new Date(activity.startTime),
-          end: new Date(activity.endTime),
+          start: new Date(activity.startTime!),
+          end: new Date(activity.endTime!),
           children: eventNotes,
           activityid: activity.id,
-          url: activity.image?.url
-            ? activity.image?.url
+          url: activity.imageUrl
+            ? activity.imageUrl
             : "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400",
         };
       });
@@ -596,6 +608,31 @@ const Itinerary = () => {
   );
 
   const [isModalVisible, setModalVisible] = useState(false);
+
+  const generateAlert = () =>
+    Alert.alert(
+      "Autogenerate schedule",
+      "This will overwrite existing events if any",
+      [
+        {
+          text: "Cancel",
+          onPress: () => {},
+          style: "cancel",
+        },
+        {
+          text: "Do it",
+          onPress: async () => {
+            const url = `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/schedule`;
+            try {
+              const response = await fetch(url);
+            } catch (error: any) {
+              console.error("Error fetching trip:", error.toString());
+            }
+          },
+        },
+      ],
+    );
+
   const customTheme = {
     palette: {
       primary: {
@@ -669,7 +706,9 @@ const Itinerary = () => {
           <TouchableOpacity onPress={() => setModalVisible(true)}>
             <View style={styles.monthContainer}>
               {calendarMode === "itinerary" ? (
-                <Text style={styles.h1}>Intinerary</Text>
+                <>
+                  <Text style={styles.h1}>Intinerary</Text>
+                </>
               ) : (
                 <Text style={styles.h1}>
                   {monthNames[currentDate.getMonth()]}
@@ -705,6 +744,7 @@ const Itinerary = () => {
             </TouchableOpacity>
           )}
         </View>
+
         {/* Modal to pick calendar view */}
         <Modal animationType="fade" visible={isModalVisible} transparent={true}>
           <View style={styles.modalOverlay}>
@@ -823,7 +863,7 @@ const Itinerary = () => {
                             <TouchableWithoutFeedback
                               onPress={() => {
                                 router.push(
-                                  `trips/${id}/(itinerary)/${event.activityid}`,
+                                  `trips/${id}/(activities)/${event.activityid}`,
                                 );
                               }}
                             >
@@ -888,7 +928,8 @@ const Itinerary = () => {
                                         styles.setField,
                                         {
                                           backgroundColor: "darkblue",
-                                          height: 20,
+                                          height: 22,
+                                          paddingHorizontal: 10,
                                         },
                                       ]}
                                     >
@@ -1189,6 +1230,119 @@ const Itinerary = () => {
             theme={customTheme}
           />
         )}
+
+        {/* Generating Button  */}
+        <Pressable
+          style={[Style.addIcon, { width: 60, height: 60 }]}
+          onPress={() => {
+            setDescriptionModal(true);
+          }}
+        >
+          <Ionicons name="color-wand-sharp" size={30} color="#FFFFFF" />
+        </Pressable>
+
+        {/* Description Modal */}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={descriptionModal}
+          onRequestClose={() => {
+            setModalVisible(!descriptionModal);
+          }}
+        >
+          <View
+            style={{
+              flex: 2,
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 22,
+              backgroundColor: "rgba(0,0,0,0.5)",
+            }}
+          >
+            <View
+              style={{
+                margin: 20,
+                backgroundColor: "white",
+                borderRadius: 20,
+                padding: 35,
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                justifyContent: "space-around",
+                rowGap: 30,
+                alignItems: "center",
+              }}
+            >
+              {/* <FontAwesome5 name="robot" size={80} color="#2196F3" /> */}
+              <Image
+                style={{ width: 300, height: 200 }}
+                source={{
+                  uri: "https://img.freepik.com/free-vector/camping-place-cartoon-composition-with-yellow-tent-lamp-pot-with-dinner-fire-night-sky_1284-54945.jpg?size=626&ext=jpg&ga=GA1.1.1887574231.1711929600&semt=ais",
+                }}
+              />
+              <Text
+                style={[
+                  styles.modalText,
+                  { textAlign: "center", fontSize: 23 },
+                ]}
+              >
+                Automatically generate your schedule with just one tap.
+              </Text>
+              <View style={{ alignItems: "center" }}>
+                <Pressable
+                  style={[
+                    {
+                      borderRadius: 20,
+                      padding: 10,
+                      elevation: 2,
+                      backgroundColor: "#2196F3",
+                      width: 200,
+                    },
+                  ]}
+                  onPress={() => {
+                    setDescriptionModal(false);
+                    generateAlert();
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "white",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                      fontSize: 22,
+                    }}
+                  >
+                    Continue
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[
+                    {
+                      paddingTop: 15,
+                      width: "100%",
+                    },
+                  ]}
+                  onPress={() => {
+                    setDescriptionModal(false);
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "grey",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                      fontSize: 17,
+                    }}
+                  >
+                    Close
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </GestureHandlerRootView>
   );
@@ -1328,6 +1482,7 @@ const styles = StyleSheet.create({
   setField: {
     alignSelf: "flex-start",
     padding: 3,
+    paddingHorizontal: 5,
     marginVertical: 5,
     borderRadius: 5,
   },

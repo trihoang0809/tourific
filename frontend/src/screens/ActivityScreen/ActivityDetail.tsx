@@ -44,8 +44,6 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
   const [delEdit, setDelEdit] = useState(false);
   const [startDatePickerVisibility, setStartDatePickerVisibility] =
     useState(false);
-  const coverImage =
-    "https://media.istockphoto.com/id/904172104/photo/weve-made-it-all-this-way-i-am-proud.jpg?s=612x612&w=0&k=20&c=MewnsAhbeGRcMBN9_ZKhThmqPK6c8nCT8XYk5ZM_hdg=";
   const [descriptionSeeMore, setDescriptionSeeMore] = useState(3);
   const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
   useEffect(() => {
@@ -76,7 +74,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
 
   if (activityData.category !== undefined) {
     activityData.category.length === 0
-      ? activityData.category.push("User Custom")
+      ? activityData.category.push("Adventure")
       : {};
   }
 
@@ -116,13 +114,13 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
   };
 
   const deleteConfirm = () => {
-    Alert.alert("Are you sure?", "Think again bro, it's fun I promise", [
+    Alert.alert("Are you sure?", "", [
       {
         text: "Cancel",
         style: "cancel",
       },
       {
-        text: "Do it anyway, sorry bro",
+        text: "Do it anyway",
         onPress: () => deleteActivity(),
       },
     ]);
@@ -178,7 +176,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
             },
           ]}
           source={{
-            uri: coverImage,
+            uri: activityData.imageUrl,
           }}
         >
           <Pressable onPress={() => router.back()}>

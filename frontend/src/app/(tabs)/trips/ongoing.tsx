@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function App() {
   const { userId } = useLocalSearchParams();
   return (
-    <View>
+    <View style={{ backgroundColor: "white" }}>
       <ListFilteredCards isUpcoming={false} userId={userId} />
     </View>
   );

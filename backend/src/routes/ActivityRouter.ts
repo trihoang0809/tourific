@@ -31,6 +31,23 @@ router.get("/", async (req: Request<TripParams>, res) => {
   }
 });
 
+//Get activities that are created by user
+router.get("/userCustom", async (req: Request<ActivityParams>, res) => {
+  const { tripId } = req.params;
+  try {
+    const activities = await prisma.activity.findMany({
+      where: {
+        tripId: tripId,
+        googlePlacesId: "",
+      },
+    });
+    res.status(StatusCodes.ACCEPTED).json(activities);
+  } catch (error) {
+    console.log(error);
+    res.status(StatusCodes.NOT_FOUND).json([]);
+  }
+});
+
 // Get an activity
 router.get("/:activityId", async (req: Request<ActivityParams>, res) => {
   const { activityId, tripId } = req.params;
@@ -56,7 +73,7 @@ router.get("/:activityId", async (req: Request<ActivityParams>, res) => {
 router.post("/", async (req: Request<ActivityParams>, res) => {
   const { tripId } = req.params;
   console.log("trip id: ", tripId);
-  const { name, description, startTime, endTime, location, notes, imageUrl, googlePlacesId } = req.body;
+  const { name, description, startTime, endTime, location, category, notes, imageUrl, googlePlacesId } = req.body;
 
   if (!tripId) {
     res.status(StatusCodes.NOT_FOUND).json({ error: "Trip ID does not exist" });
@@ -74,6 +91,7 @@ router.post("/", async (req: Request<ActivityParams>, res) => {
             startTime,
             endTime,
             location,
+            category,
             notes,
             googlePlacesId,
             imageUrl,
@@ -117,7 +135,7 @@ router.put("/:activityId", async (req: Request<ActivityParams>, res) => {
         endTime,
         location,
         notes,
-        // image,
+        image,
       },
     });
     res.status(StatusCodes.OK).json(activity);
@@ -155,7 +173,9 @@ router.put("/:activityId/toggle", async (req: Request<ActivityParams>, res) => {
     });
     res.status(StatusCodes.OK).json(activity);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while updating the activity." });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while updating the calendar status of an activity." });
   }
 });
 

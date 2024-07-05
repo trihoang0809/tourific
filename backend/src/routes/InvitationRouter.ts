@@ -2,6 +2,7 @@ import express, { Request } from "express";
 import { PrismaClient, Status } from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
 import { TripParams } from "./TripRouter";
+import { findMongoDBUser } from "src/utils";
 
 const router = express.Router({ mergeParams: true });
 const prisma = new PrismaClient();
@@ -13,16 +14,30 @@ export interface InvitationParams extends TripParams {
 }
 
 // temporary for testing until auth done
-const userID = "6669267e34f4cab1d9ddd751";
+// const userID = "6669267e34f4cab1d9ddd751";
 
 // get an invitation by status
 // example endpoint: /invite?status=PENDING
 router.get("/", async (req: Request<InvitationParams>, res) => {
-  const { status } = req.query;
+  const { status, firebaseUserId } = req.query;
+
+  if (!firebaseUserId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "No user ID provided" });
+  }
+
+  const MongoDBUserId = await prisma.user.findUnique({
+    where: {
+      firebaseUserId: firebaseUserId as string,
+    },
+    select: {
+      id: true,
+    },
+  });
+
   try {
     const invitations = await prisma.tripMember.findMany({
       where: {
-        inviteeId: userID,
+        inviteeId: MongoDBUserId?.id as string,
         status: status as Status
       },
     });
@@ -35,14 +50,33 @@ router.get("/", async (req: Request<InvitationParams>, res) => {
 
 // get all received invitations of a user, including trip details
 router.get("/all-received", async (req: Request, res) => {
+  const { firebaseUserId } = req.query;
+
+  if (!firebaseUserId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "No user ID provided" });
+  }
+
+  const MongoDBUserId = await prisma.user.findUnique({
+    where: {
+      firebaseUserId: firebaseUserId as string,
+    },
+    select: {
+      id: true,
+    },
+  });
+
   try {
     const invitations = await prisma.tripMember.findMany({
       where: {
-        inviteeId: userID,
+        inviteeId: MongoDBUserId?.id as string,
         status: 'PENDING'
       },
       include: {
-        trip: true,
+        trip: {
+          include: {
+            participants: true
+          }
+        },
         inviter: true
       }
     });
@@ -56,10 +90,25 @@ router.get("/all-received", async (req: Request, res) => {
 
 // get all sent invitations of a user, including trip details
 router.get("/all-sent", async (req: Request, res) => {
+  const { firebaseUserId } = req.query;
+
+  if (!firebaseUserId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "No user ID provided" });
+  }
+
+  const MongoDBUserId = await prisma.user.findUnique({
+    where: {
+      firebaseUserId: firebaseUserId as string,
+    },
+    select: {
+      id: true,
+    },
+  });
+
   try {
     const invitations = await prisma.tripMember.findMany({
       where: {
-        inviterId: userID,
+        inviterId: MongoDBUserId?.id as string,
       },
       include: {
         trip: true,
@@ -82,8 +131,34 @@ router.get("/all-sent", async (req: Request, res) => {
 // invite users, accept list of users' id
 router.post("/:tripId", async (req: Request<InvitationParams>, res) => {
   const { tripId } = req.params;
-  const inviteeIds = req.body.inviteeIds;
-  const inviterId = userID;
+
+  // inviteeids are firebasei
+  const { inviteeIds, firebaseUserId } = req.body;
+  console.log("inviteeIds", inviteeIds);
+
+  if (!firebaseUserId) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "No user ID provided" });
+  }
+
+  const MongoDBInviterId = await prisma.user.findUnique({
+    where: {
+      firebaseUserId: firebaseUserId as string,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  // const MongoDBInviteeIds = await Promise.all(inviteeIds.map(async (id: string) => {
+  //   return await prisma.user.findUnique({
+  //     where: {
+  //       firebaseUserId: id,
+  //     },
+  //     select: {
+  //       id: true,
+  //     },
+  //   });
+  // }));
 
   try {
     console.log("inviteeIds", inviteeIds);
@@ -133,7 +208,7 @@ router.post("/:tripId", async (req: Request<InvitationParams>, res) => {
         data: newInviteeIds.map((inviteeId: string) => ({
           tripId: tripId,
           inviteeId: inviteeId,
-          inviterId: inviterId,
+          inviterId: MongoDBInviterId?.id as string,
           status: 'PENDING'
         })),
       });

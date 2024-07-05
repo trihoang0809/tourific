@@ -88,9 +88,7 @@ const GoogleMapInput = ({
           width: "100%",
           height: "100%",
         }}
-        provider={PROVIDER_GOOGLE}
         onPress={async (e) => {
-          //console.log(e.nativeEvent.coordinate);
           setCoord({
             latitude: e.nativeEvent.coordinate.latitude,
             longitude: e.nativeEvent.coordinate.longitude,

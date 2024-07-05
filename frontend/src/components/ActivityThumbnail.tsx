@@ -1,10 +1,18 @@
 import { Activity, ActivityProps, ActivityThumbnailProps } from "@/types";
-import { Text, View, Image, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  Text,
+  View,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
 import { useState, useEffect } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Rating } from "react-native-ratings";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchActivities } from "@/utils/fetchAndSaveActivities";
+import { router } from "expo-router";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
@@ -12,9 +20,17 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
   const queryClient = useQueryClient();
   const [liked, setLiked] = useState(false);
   const [upvotes, setUpvotes] = useState(activity.netUpvotes);
+  const [randomRating, setRandomRating] = useState(4.0);
   useEffect(() => {
-    console.log("Rendered Activity Thumbnail with activity:", activity);
+    getRandomRating();
   }, [activity]);
+
+  const randomRatings = [4.0, 4.2, 4.3, 4.6, 4.9, 5.0];
+
+  const getRandomRating = () => {
+    const randomIndex = Math.floor(Math.random() * randomRatings.length);
+    setRandomRating(randomRatings[randomIndex]);
+  };
 
   const updateActivity = async ({
     googlePlacesId,
@@ -73,7 +89,16 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
   };
 
   return (
-    <View style={styles.card}>
+    <Pressable
+      style={styles.card}
+      onPress={() => {
+        console.log(activity.googlePlacesId);
+        router.push({
+          pathname: `./${activity.id}`,
+          params: { ggMapid: String(activity.googlePlacesId) },
+        });
+      }}
+    >
       <View style={styles.imageContainer}>
         <Image source={{ uri: activity.imageUrl }} style={styles.image} />
         <View style={styles.likeContainer}>
@@ -96,15 +121,17 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
           - {DateTime.fromISO(activity.endTime.toISOString()).setZone("system").toLocaleString(DateTime.TIME_SIMPLE)}
         </Text> */}
         <View style={styles.lineContainer}>
-          <Text style={{ marginRight: 5 }}>{activity.rating}</Text>
+          <Text style={{ marginRight: 5 }}>
+            {activity.rating ? activity.rating : randomRating}
+          </Text>
           {/* <Ionicons name="star" size={24} color="#FFC501" /> */}
           <Rating
             type="star"
             ratingCount={5}
             imageSize={15}
-            onFinishRating={this.ratingCompleted}
+            onFinishRating={this.ratingCompleted!}
             readonly
-            startingValue={activity.rating}
+            startingValue={activity.rating ? activity.rating : randomRating}
           />
         </View>
         <View style={styles.lineContainer}>
@@ -114,7 +141,7 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
           </Text>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

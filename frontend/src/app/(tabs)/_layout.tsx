@@ -26,11 +26,11 @@ const RootNavigation = () => {
           }}
         />
         <Tabs.Screen
-          name="trips"
+          name="create/index"
           options={{
             title: "",
             headerShown: false,
-            href: "trips/create",
+            // href: "trips/create",
             tabBarIcon: ({ focused }: { focused: boolean; }) => {
               return (
                 <View
@@ -57,6 +57,10 @@ const RootNavigation = () => {
             tabBarIcon: ({ color }) => (
               <MaterialCommunityIcons name="calendar-month" size={24} color={color} style={{ paddingTop: 10 }} />),
           }}
+        />
+        <Tabs.Screen
+          name="trips"
+          options={{ href: null, headerShown: false }}
         />
         <Tabs.Screen
           name="friends"

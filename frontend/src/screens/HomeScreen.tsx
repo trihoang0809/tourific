@@ -4,23 +4,26 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   Image,
   Dimensions,
+  TouchableOpacity,
   RefreshControl,
   Button,
 } from "react-native";
 import { TripCard } from "../components/TripCard/TripCard";
 import { HomeScreenHeader } from "../components/HomeScreenHeader";
 import { useState, useEffect } from "react";
-import { UserProps, Trip } from "../types";
+import { UserProps, Trip, Invitation } from "../types";
 import { Link, router } from "expo-router";
 import { EXPO_PUBLIC_HOST_URL, getRecentTrips, randomizeCover } from "@/utils";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
 import TripCardRect from "@/components/TripCard/TripCardRect";
-import { headerImage } from "@/utils/constants";
 import Style from "Style";
+import InvitationCard from "@/components/Invitation/InvitationCard";
+
+// icon and image
+import { Ionicons } from "@expo/vector-icons";
+import { headerImage } from "@/utils/constants";
 import { getUserIdFromToken, getToken } from "@/utils";
 
 const screenw = Dimensions.get("window").width;
@@ -28,6 +31,7 @@ const titleWidth = screenw - screenw * 0.96;
 export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   const [ongoingTrips, setOngoingTrips] = useState<Trip[]>([]);
   const [upcomingTrips, setUpcomingTrips] = useState<Trip[]>([]);
+  const [invitation, setInvitation] = useState<Invitation[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   useEffect(() => {
     const fetchUserId = async () => {
@@ -82,6 +86,9 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
     fetchTrips();
   }, [userId]);
 
+  console.log("up", upcomingTrips);
+  console.log("on", ongoingTrips);
+
   return (
     <View style={{ flex: 1 }}>
       <HomeScreenHeader user={user} />
@@ -125,7 +132,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             showsHorizontalScrollIndicator={false}
             style={styles.tripScroll}
           >
-            {ongoingTrips.length > 0 ? (
+            {ongoingTrips?.length > 0 ? (
               ongoingTrips.map((trip) => (
                 <View key={trip.id}>
                   <TripCard trip={trip} height={230} width={300} />

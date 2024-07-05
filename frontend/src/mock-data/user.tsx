@@ -54,3 +54,39 @@ export const sampleUser: User = {
     url: "https://scontent-hou1-1.xx.fbcdn.net/v/t1.6435-9/67549543_1677313342402190_2404123813840158720_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=5f2048&_nc_ohc=pDHdI8PBFUwAb5JLH3r&_nc_ht=scontent-hou1-1.xx&oh=00_AfD5qhcs4aJFMg8m7IrWQWCU-WdOUiJD_vOruMURm0JLMA&oe=664D6F85",
   },
 };
+
+// export const mockUsers: User[] = [
+//   {
+//     id: 'user-001',
+//     userName: 'john.doe',
+//     password: 'securepassword123',
+//     friendRequestReceived: [],
+//     tripID: ['trip-001'],
+//     trips: [],
+//     firstName: 'John',
+//     lastName: 'Doe',
+//     dateOfBirth: new Date(1990, 6, 15),
+//     avatar: {
+//       height: 150,
+//       width: 150,
+//       url: 'https://example.com/avatar/user-001.jpg'
+//     }
+//   },
+//   {
+//     id: 'user-002',
+//     userName: 'jane.smith',
+//     password: 'anothersecurepassword123',
+//     friendRequestReceived: [],
+//     tripID: ['trip-002'],
+//     trips: [],
+//     firstName: 'Jane',
+//     lastName: 'Smith',
+//     dateOfBirth: new Date(1988, 2, 25),
+//     avatar: {
+//       height: 150,
+//       width: 150,
+//       url: 'https://example.com/avatar/user-002.jpg'
+//     }
+//   }
+// ];
+

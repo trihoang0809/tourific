@@ -1,12 +1,11 @@
 import {
   View,
   Text,
-  SafeAreaView,
   TextInput,
   FlatList,
   Alert,
 } from "react-native";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import Style from "Style";
 import { Feather } from "@expo/vector-icons";
 import ContactCardV2 from "../Avatar/ContactCardV2.tsx";
@@ -17,9 +16,11 @@ const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
 const SearchFriend = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState<FriendSearch[]>([]);
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const searchCache = useRef<{ [key: string]: FriendSearch[] }>({});
+
   useEffect(() => {
     const fetchUserId = async () => {
       const id = await getUserIdFromToken();
@@ -35,7 +36,11 @@ const SearchFriend = () => {
       clearTimeout(debounceTimeout.current);
     }
     debounceTimeout.current = setTimeout(() => {
-      fetchData(text);
+      if (searchCache.current[text]) {
+        setSearchResults(searchCache.current[text]);
+      } else {
+        fetchData(text);
+      }
     }, 300);
   };
 
@@ -81,6 +86,7 @@ const SearchFriend = () => {
       const filteredS = enhancedS.filter(
         (user: FriendSearch) => user.id !== userId,
       );
+      searchCache.current[term] = filteredS;
       setSearchResults(filteredS);
     } catch (error) {
       console.error("Failed to fetch data:", error);
@@ -95,8 +101,10 @@ const SearchFriend = () => {
     );
 
     try {
+      console.log("userId", userId);
+      console.log("friendId", friendId);
       const request = await fetch(
-        `http://${EXPO_PUBLIC_HOST_URL}:3000/user/friend?add=true`,
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/user/add-friend?add=true`,
         {
           method: "POST",
           headers: {
@@ -131,7 +139,7 @@ const SearchFriend = () => {
 
     try {
       const request = await fetch(
-        `http://${EXPO_PUBLIC_HOST_URL}:3000/user/friend?add=false`,
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/user/add-friend?add=false`,
         {
           method: "POST",
           headers: {

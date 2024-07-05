@@ -94,8 +94,9 @@ export const categories: Record<string, string[]> = {
     "meal_delivery",
     "meal_takeaway",
     "food",
+    "pizza_restaurant",
   ],
-  Entertainment: [
+  Leisure: [
     "movie_theater",
     "night_club",
     "amusement_park",
@@ -106,6 +107,14 @@ export const categories: Record<string, string[]> = {
     "tourist_attraction",
     "casino",
     "bowling_alley",
+    "aquarium",
+    "movie_rental",
+    "book_store",
+    "university",
+    "zoo",
+    "park",
+    "establishment",
+    "point_of_interest",
   ],
   OutdoorRecreation: [
     "park",
@@ -116,6 +125,7 @@ export const categories: Record<string, string[]> = {
     "stadium",
     "city_hall",
     "church",
+    "establishment",
   ],
   Shopping: [
     "clothing_store",
@@ -132,9 +142,11 @@ export const categories: Record<string, string[]> = {
     "convenience_store",
     "movie_rental",
     "hardware_store",
-    "",
+    "department_store",
+    "shoe_store",
   ],
   Services: [
+    "local_government_office",
     "car_rental",
     "car_repair",
     "laundry",
@@ -221,3 +233,56 @@ export const getUserIdFromToken = async (): Promise<string | null> => {
 
 export const defaultAvatar =
   "https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg";
+
+export const getTimeDuration = (createdAt: Date) => {
+  const now = new Date();
+  const notificationTime = new Date(createdAt);
+  const diffInSeconds = Math.floor(
+    (now.getTime() - notificationTime.getTime()) / 1000,
+  );
+  const minutes = Math.floor(diffInSeconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+
+  if (weeks > 0) {
+    return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
+  } else if (days > 0) {
+    return `${days} day${days > 1 ? "s" : ""} ago`;
+  } else if (hours > 0) {
+    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  } else if (minutes > 0) {
+    return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+  } else {
+    return "Just now";
+  }
+};
+
+export const createNotification = async (receiverId: string, senderId: string | null, type: string, tripId?: string) => {
+  try {
+    const req = {
+      type: type,
+      senderId: senderId,
+      receiverId: receiverId,
+      ...(tripId ? { tripId: tripId } : {})
+    };
+    console.log("createNotification before send", req)
+    const response = await fetch(
+      `http://${EXPO_PUBLIC_HOST_URL}:3000/notification`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(req),
+      },
+    );
+    if (!response.ok) {
+      console.error("Failed to create notification");
+    }
+    const data = await response.json();
+    console.log("Notification created:", data);
+  } catch (error: any) {
+    console.error("Error creating notification:", error.toString());
+  }
+};

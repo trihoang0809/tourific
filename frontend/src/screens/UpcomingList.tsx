@@ -11,7 +11,7 @@ import {
 import { useState, useEffect } from "react";
 import { TripCard } from "@/components/TripCard/TripCard";
 import { Trip, UserProps } from "../types";
-import { AntDesign, Feather, MaterialIcons } from "@expo/vector-icons";
+import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { getRecentTrips } from "@/utils";
 import Style from "Style";
@@ -67,6 +67,7 @@ export const ListFilteredCards = ({ isUpcoming, userId }: listprops) => {
           : `http://${serverUrl}:3000/trips?ongoing=true&firebaseUserId=${userId}`;
         const upcoming = await fetch(link);
         let data = await upcoming.json();
+
         setUpcoming(getRecentTrips(data));
         setFilteredTrips(getRecentTrips(data));
       } catch (error) {
@@ -94,7 +95,7 @@ export const ListFilteredCards = ({ isUpcoming, userId }: listprops) => {
       <View style={styles.searchContainer}>
         <Feather name="search" size={20} color="black" />
         <TextInput
-          placeholder="Search for people..."
+          placeholder="Search for trips..."
           value={searchTerm}
           onChangeText={handleSearch}
           style={styles.searchInput}
@@ -127,6 +128,7 @@ const styles = StyleSheet.create({
   container: {
     height: "100%",
     paddingTop: 20,
+    backgroundColor: "white",
   },
   searchContainer: {
     flexDirection: "row",

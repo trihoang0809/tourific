@@ -1,102 +1,5 @@
-// import React, { useEffect, useState } from 'react';
-// import { View, StyleSheet } from 'react-native';
-// import { SelectCountry } from 'react-native-element-dropdown';
-// import { useRouter } from 'expo-router';
-// import { EXPO_PUBLIC_HOST_URL, getUserIdFromToken } from '@/utils';
-
-// const GlobalItinerary = () => {
-//   const [trips, setTrips] = useState([]);
-//   const [userId, setUserId] = useState(null);
-//   const router = useRouter();
-
-//   useEffect(() => {
-//     const fetchUserId = async () => {
-//       const id = await getUserIdFromToken();
-//       console.log("user Id logged in: ", id);
-//       setUserId(id);
-//     };
-//     fetchUserId();
-//   }, []);
-
-//   const fetchTrips = async () => {
-//     console.log(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true`);
-//     if (!userId) {
-//       console.error("User ID is null");
-//       return;
-//     }
-//     try {
-//       // const headers = {
-//       //   "Content-Type": "application/json",
-//       //   Authorization: `Bearer ${await getToken()}`,
-//       // };
-//       // console.log("Headers:  ", headers);
-
-//       const ongoing = await fetch(
-//         `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?ongoing=true&firebaseUserId=${userId}`,
-//         // { headers },
-//       );
-
-//       const upcoming = await fetch(
-//         `http://${EXPO_PUBLIC_HOST_URL}:3000/trips?upcoming=true&firebaseUserId=${userId}`,
-//         // { headers },
-//       );
-
-//       const ongoingData = await ongoing.json();
-//       const upcomingData = await upcoming.json();
-
-//       setTrips([...ongoingData, ...upcomingData]);
-//     } catch (error) {
-//       console.error("Failed to fetch trips:", error);
-//     }
-//   };
-
-//   const handleTripSelect = (trip) => {
-//     // Assuming trip has an id and itineraryid
-//     router.push(`/tabs/trips/${trip.id}/tabs/itinerary/${trip.itineraryid}`);
-//   };
-
-//   useEffect(() => {
-//     fetchTrips();
-//   }, []);
-
-//   return (
-//     <View style={styles.container}>
-//       <SelectCountry
-//         maxHeight={200}
-//         value={null}
-//         data={trips.map(trip => ({
-//           value: trip.id,
-//           label: trip.name,
-//           image: {
-//             uri: trip.image?.uri || 'https://www.vigcenter.com/public/all/images/default-image.jpg',
-//           },
-//         }))}
-//         valueField="value"
-//         labelField="label"
-//         imageField="image"
-//         placeholder="Select a trip"
-//         searchPlaceholder="Search..."
-//         onChange={(value) => {
-//           const selectedTrip = trips.find(trip => trip.id === value);
-//           handleTripSelect(selectedTrip);
-//         }}
-//       />
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     padding: 20,
-//   },
-// });
-
-// export default GlobalItinerary;
-
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import { SelectCountry } from 'react-native-element-dropdown';
 import { Tabs, useRouter } from 'expo-router';
 import { EXPO_PUBLIC_HOST_URL, getUserIdFromToken } from '@/utils';
@@ -143,13 +46,13 @@ const GlobalItinerary = () => {
       console.error("Failed to fetch trips:", error);
     }
   };
+  console.log("trips in global itinerary", trips);
 
   const handleTripSelect = (trip: any) => {
     // Assuming trip has an id and itineraryid
     router.push(`/(tabs)/trips/${trip.id}/(tabs)/(itinerary)`);
   };
 
-  console.log("Trips: ", trips);
   return (
     <>
       <Tabs.Screen
@@ -159,14 +62,21 @@ const GlobalItinerary = () => {
         }}
       />
       <View style={styles.container}>
+        <View style={{}}>
+          <Text style={{ fontSize: 30, fontWeight: 'bold', marginBottom: 20 }}>Continue planning your itinerary 🌱</Text>
+        </View>
         <SelectCountry
-          maxHeight={200}
+          imageStyle={{ width: 80, height: 80, borderRadius: 10, marginRight: 10 }}
+          itemTextStyle={{ fontSize: 120 }}
+          containerStyle={{ borderRadius: 10 }}
+          selectedTextStyle={{ color: 'black' }}
+          maxHeight={800}
           value={null}
           data={trips.map(trip => ({
             value: trip.id,
             label: trip.name,
             image: {
-              uri: trip.image?.uri || 'https://www.vigcenter.com/public/all/images/default-image.jpg',
+              uri: trip.image?.url || 'https://www.vigcenter.com/public/all/images/default-image.jpg',
             },
           }))}
           valueField="value"
@@ -175,9 +85,7 @@ const GlobalItinerary = () => {
           placeholder="Select a trip"
           searchPlaceholder="Search..."
           onChange={(value) => {
-            console.log("value", value);
             const selectedTrip = trips.find(trip => trip.id === value.value);
-            console.log("selectedTrip", selectedTrip);
             handleTripSelect(selectedTrip);
           }}
         />
@@ -188,7 +96,7 @@ const GlobalItinerary = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // flex: 1,
     justifyContent: 'center',
     padding: 20,
   },

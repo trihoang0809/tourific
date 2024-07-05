@@ -17,14 +17,25 @@ export const fetchGoogleActivities = async (
   };
 
   try {
-    const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude}%2C${longitude}&radius=${radius}&key=${GOOGLE_PLACES_API_KEY}`;
-    const response = await fetch(url);
-    const data = await response.json();
+    const places: any[] = [];
+    let nextPageToken;
+    let url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude}%2C${longitude}&radius=${radius}&key=${GOOGLE_PLACES_API_KEY}`;
 
-    const activitiesData: ActivityProps[] = data.results.map((place: any) => ({
-      name: place.name,
+    do {
+      const response = await fetch(url);
+      const data = await response.json();
+      places.push(...data.results);
+      nextPageToken = data.next_page_token;
+      if (nextPageToken) {
+        await new Promise((resolve) => setTimeout(resolve, 500)); // Wait for 2 seconds before making the next request
+        url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?pagetoken=${nextPageToken}&key=${GOOGLE_PLACES_API_KEY}`;
+      }
+    } while (nextPageToken);
+
+    const activitiesData: ActivityProps[] = places.map((place: any) => ({
+      name: place.name as string,
       description: "",
-      imageUrl: getImageUrl(place.photos, GOOGLE_PLACES_API_KEY),
+      imageUrl: getImageUrl(place.photos, GOOGLE_PLACES_API_KEY) as string,
       location: {
         address: place.vicinity,
         latitude: place.geometry.location.lat,

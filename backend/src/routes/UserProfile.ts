@@ -223,9 +223,8 @@ router.post("/find", async (req, res) => {
 });
 
 // Add a friend or cancel a friend request
-router.post("/friend", async (req, res) => {
-  const { friendId } = req.body;
-  const { userId } = req.body;
+router.post("/add-friend", async (req, res) => {
+  const { friendId, userId } = req.body;
   const { add } = req.query;
 
   console.log(friendId, ";", userId);
@@ -234,7 +233,6 @@ router.post("/friend", async (req, res) => {
   }
 
   const MongoUserId = await findMongoDBUser(userId);
-  const MongoFriendId = await findMongoDBUser(friendId);
 
   try {
     // cancel a sent request
@@ -243,7 +241,7 @@ router.post("/friend", async (req, res) => {
         where: {
           receiverID_senderID: {
             senderID: MongoUserId?.id as string,
-            receiverID: MongoFriendId?.id as string,
+            receiverID: friendId,
           },
         },
       });
@@ -257,11 +255,11 @@ router.post("/friend", async (req, res) => {
           OR: [
             {
               senderID: MongoUserId?.id as string,
-              receiverID: MongoFriendId?.id as string,
+              receiverID: friendId,
             },
             {
               senderID: MongoUserId?.id as string,
-              receiverID: MongoFriendId?.id as string,
+              receiverID: friendId,
             },
           ],
         },
@@ -275,7 +273,7 @@ router.post("/friend", async (req, res) => {
       const friend = await prisma.friendship.create({
         data: {
           senderID: MongoUserId?.id as string,
-          receiverID: MongoFriendId?.id as string,
+          receiverID: friendId,
         },
       });
       res.status(StatusCodes.CREATED).json(friend);
@@ -292,6 +290,7 @@ router.post("/friend", async (req, res) => {
 // to reject: /friend?accept=false
 router.patch("/friend", async (req, res) => {
   const { friendId, userId } = req.body;
+  console.log("friendId: ", friendId, "userId: ", userId);
   const { accept } = req.query;
 
   if (!friendId || !userId) {
@@ -299,13 +298,12 @@ router.patch("/friend", async (req, res) => {
   }
 
   const MongoUserId = await findMongoDBUser(userId);
-  const MongoFriendId = await findMongoDBUser(friendId);
   try {
     if (accept === "true") {
       const friend = await prisma.friendship.update({
         where: {
           receiverID_senderID: {
-            senderID: MongoFriendId?.id as string,
+            senderID: friendId,
             receiverID: MongoUserId?.id as string,
           },
         },
@@ -318,7 +316,7 @@ router.patch("/friend", async (req, res) => {
       const rejectFriend = await prisma.friendship.delete({
         where: {
           receiverID_senderID: {
-            senderID: MongoFriendId?.id as string,
+            senderID: friendId,
             receiverID: MongoUserId?.id as string,
           },
         },
@@ -337,7 +335,13 @@ router.get("/:userId/friends", async (req, res) => {
   const { userId } = req.params;
   const { status } = req.query;
   try {
+    console.log("user: ", userId);
+    if (!userId) {
+      res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing userId" });
+    }
+
     const MongoUserId = await findMongoDBUser(userId);
+    console.log("MongoUserId: ", MongoUserId);
     const friends = await prisma.friendship.findMany({
       where: {
         // get all friends that have accepted the friend request
@@ -369,13 +373,13 @@ router.get("/:userId/friends", async (req, res) => {
 
 // get all sent requests
 router.get("/friend/sent-requests", async (req, res) => {
-  const { userId } = req.body;
+  const { userId } = req.query;
 
   if (!userId) {
     res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing userId" });
   }
 
-  const MongoUserId = await findMongoDBUser(userId);
+  const MongoUserId = await findMongoDBUser(userId as string);
   try {
     const sentRequests = await prisma.friendship.findMany({
       where: {
@@ -394,18 +398,21 @@ router.get("/friend/sent-requests", async (req, res) => {
 
 // get all pending requests
 router.get("/friend/pending-requests", async (req, res) => {
-  const { userId } = req.body;
+  const { userId } = req.query;
   if (!userId) {
     res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing userId" });
   }
 
-  const MongoUserId = await findMongoDBUser(userId);
+  const MongoUserId = await findMongoDBUser(userId as string);
   try {
     const pendingRequests = await prisma.friendship.findMany({
       where: {
         receiverID: MongoUserId?.id as string,
         friendStatus: 'PENDING',
       },
+      include: {
+        sender: true
+      }
     });
     res.status(StatusCodes.OK).json(pendingRequests);
   } catch (error) {

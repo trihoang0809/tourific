@@ -1,5 +1,7 @@
 import { Ionicons, Feather } from "@expo/vector-icons";
 import React from "react";
+import { Image } from "react-native";
+import { DimensionValue } from "react-native";
 
 export interface TripData {
   name: string;
@@ -60,12 +62,12 @@ export interface GoogleMapInputProps {
 }
 
 export interface ActivityProps {
-  id: string;
+  id?: string;
   name: string;
   description: string;
   imageUrl: string;
-  startTime: Date;
-  endTime: Date;
+  startTime?: Date;
+  endTime?: Date;
   location: MapData;
   notes: string;
   netUpvotes: number;
@@ -130,37 +132,86 @@ export const categoriesMap = [
   {
     key: "All",
     name: "All",
-    icon: <Ionicons name="apps-outline" size={24} color="black" />,
+    icon: (
+      <Image
+        style={{ height: 27, width: 27 }}
+        source={{
+          uri: "https://cdn-icons-png.freepik.com/512/2534/2534036.png",
+        }}
+      />
+    ),
   },
   {
     key: "Dining",
     name: "Dining",
-    icon: <Ionicons name="restaurant-outline" size={24} color="black" />,
+    icon: (
+      <Image
+        style={{ height: 27, width: 27 }}
+        source={{
+          uri: "https://cdn-icons-png.flaticon.com/512/2082/2082063.png",
+        }}
+      />
+    ),
   },
   {
-    key: "Entertainment",
-    name: "Entertainment",
-    icon: <Ionicons name="film-outline" size={24} color="black" />,
+    key: "Leisure",
+    name: "Leisure",
+    icon: (
+      <Image
+        style={{ height: 27, width: 27 }}
+        source={{
+          uri: "https://cdn-icons-png.flaticon.com/512/9200/9200949.png",
+        }}
+      />
+    ),
   },
   {
     key: "OutdoorRecreation",
     name: "Outdoor",
-    icon: <Ionicons name="partly-sunny-outline" size={24} color="black" />,
+    icon: (
+      <Image
+        style={{ height: 27, width: 27 }}
+        source={{
+          uri: "https://cdn-icons-png.freepik.com/512/1612/1612688.png",
+        }}
+      />
+    ),
   },
   {
     key: "Shopping",
     name: "Shopping",
-    icon: <Feather name="shopping-cart" size={24} color="black" />,
+    icon: (
+      <Image
+        style={{ height: 27, width: 27 }}
+        source={{
+          uri: "https://cdn-icons-png.freepik.com/512/9638/9638882.png",
+        }}
+      />
+    ),
   },
   {
     key: "Services",
     name: "Services",
-    icon: <Ionicons name="settings-outline" size={24} color="black" />,
+    icon: (
+      <Image
+        style={{ height: 27, width: 27 }}
+        source={{
+          uri: "https://cdn-icons-png.flaticon.com/512/9727/9727444.png",
+        }}
+      />
+    ),
   },
   {
     key: "Wellness",
     name: "Wellness",
-    icon: <Feather name="activity" size={24} color="black" />,
+    icon: (
+      <Image
+        style={{ height: 27, width: 27 }}
+        source={{
+          uri: "https://cdn-icons-png.flaticon.com/512/11443/11443758.png",
+        }}
+      />
+    ),
   },
 ];
 
@@ -266,12 +317,6 @@ export interface InvitationCardProps {
   onDecline: (id: string) => void;
 }
 
-export enum Status {
-  "ACCEPTED",
-  "REJECTED",
-  "PENDING",
-}
-
 export interface ContactCardProps {
   user: User;
   isChecked: boolean;
@@ -281,4 +326,113 @@ export interface ContactCardProps {
 
 export interface FriendSearch extends User {
   friendStatus: Status;
+}
+
+export interface AvatarCardProps extends UserProps {
+  size?: DimensionValue;
+}
+
+export interface AvatarGroupProps {
+  users: Invitation[];
+  size?: DimensionValue;
+}
+
+export interface Invitation {
+  id: string;
+  inviter: User;
+  invitee: User;
+  trip: TripData;
+}
+
+export interface InvitationCardProps {
+  invitation: Invitation;
+  onAccept: (id: string) => void;
+  onDecline: (id: string) => void;
+}
+
+export interface BottomSliderProps {
+  handlePresentModalPress: () => void;
+  handleSheetChanges: (index: number) => void;
+}
+
+export enum Status {
+  'ACCEPTED',
+  'REJECTED',
+  'PENDING',
+
+
+
+  
+}
+
+export interface FriendRequest {
+  friendStatus: Status;
+  receiver: User,
+  senderId?: string;
+}
+
+export interface ContactCardProps {
+  user: User;
+  isChecked: boolean;
+  setChecked: (e: any, userId: string) => void;
+  status: Status;
+}
+
+export interface FriendRequestForNotification {
+  friendStatus: string;
+  sender: {
+    id: string;
+    avatar: {
+      url: string;
+    };
+    lastName: string;
+    firstName: string;
+    userName: string;
+  };
+}
+
+export interface Notification {
+  createdAt: Date;
+  id: string;
+  readStatus: boolean;
+  sender: {
+    avatar: {
+      url: string;
+    };
+    lastName: string;
+    firstName: string;
+    userName: string;
+  };
+  trip: {
+    id: string | undefined;
+    image: {
+      url: string | undefined;
+    };
+    name: string | undefined;
+    startDate: string | undefined;
+    endDate: string | undefined;
+  };
+}
+
+export interface TripMembership {
+  id: string;
+  trip: {
+    id: string;
+    name: string;
+    startDate: Date;
+    endDate: Date;
+    location: {
+      address: string;
+      citystate: string;
+    };
+    image: {
+      url: string;
+    };
+    participants: User[];
+  };
+  inviter: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
 }

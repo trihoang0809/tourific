@@ -1,5 +1,9 @@
 {
   "devDependencies": {
     "prisma": "^5.14.0"
+  },
+  "dependencies": {
+    "@react-navigation/material-top-tabs": "^6.6.13",
+    "react-native-tab-view": "^3.5.2"
   }
 }
