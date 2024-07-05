@@ -1,16 +1,22 @@
 import { ActivityDetail } from "@/screens/ActivityScreen/ActivityDetail";
 import { GGMapActivityDetail } from "@/screens/ActivityScreen/GGMapActivityDetail";
-import { useGlobalSearchParams } from "expo-router";
+import {
+  Stack,
+  useGlobalSearchParams,
+  useLocalSearchParams,
+  useNavigation,
+} from "expo-router";
 import { View } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 
 const viewActivity = () => {
   const { id } = useGlobalSearchParams();
   const { activityid } = useGlobalSearchParams();
+  const { ggMapid } = useLocalSearchParams();
 
   return (
     <View style={{ flex: 1 }}>
-      {activityid?.slice(0, 3) === "668" ? (
+      {ggMapid === "" ? (
         <ActivityDetail
           tripId={String(id)}
           actID={String(activityid)}
@@ -18,7 +24,7 @@ const viewActivity = () => {
       ) : (
         <GGMapActivityDetail
           tripId={String(id)}
-          ggMapId={String(activityid)}
+          ggMapId={String(ggMapid)}
         ></GGMapActivityDetail>
       )}
     </View>

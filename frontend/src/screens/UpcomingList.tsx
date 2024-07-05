@@ -67,6 +67,7 @@ export const ListFilteredCards = ({ isUpcoming, userId }: listprops) => {
           : `http://${serverUrl}:3000/trips?ongoing=true&firebaseUserId=${userId}`;
         const upcoming = await fetch(link);
         let data = await upcoming.json();
+
         setUpcoming(getRecentTrips(data));
         setFilteredTrips(getRecentTrips(data));
       } catch (error) {
@@ -126,6 +127,7 @@ export const ListFilteredCards = ({ isUpcoming, userId }: listprops) => {
 const styles = StyleSheet.create({
   container: {
     height: "100%",
+    backgroundColor: "white",
   },
   searchContainer: {
     flexDirection: "row",

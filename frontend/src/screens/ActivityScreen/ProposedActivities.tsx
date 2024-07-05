@@ -7,16 +7,13 @@ import {
   Alert,
   Pressable,
   Modal,
-  Button,
-  Image,
 } from "react-native";
-import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import { material } from "react-native-typography";
 import React, { useState, useEffect } from "react";
 import GoogleMapInput from "@/components/GoogleMaps/GoogleMapInput";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { router, usePathname } from "expo-router";
-import { EXPO_PUBLIC_HOST_URL, tripDate } from "@/utils";
+import { EXPO_PUBLIC_HOST_URL } from "@/utils";
 
 interface props {
   id: String;
@@ -38,8 +35,6 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
 
   const [activityStartDate, setActivityStartDate] = useState(new Date());
   const [activityEndDate, setActivityEndDate] = useState(new Date());
-  const [startDatePickerVisibility, setStartDatePickerVisibility] =
-    useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isFormFilled, setIsFormFilled] = useState(false);
   const [mapVisible, setMapVisible] = useState(false);
@@ -80,9 +75,22 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
 
   const onPressSubmit = async () => {
     validateForm();
-    console.log("Submit: " + activityNote);
-    console.log(isFormFilled);
-    console.log(activityLocation.address);
+    const getRandomCover = async () => {
+      try {
+        let response = await fetch(
+          `https://api.unsplash.com/search/photos?page=1&per_page=30&query=scenery&client_id=${process.env.EXPO_PUBLIC_UNSPLASH_API_KEY}`,
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch images");
+        }
+        let data = await response.json();
+        return data.results[Math.floor(Math.random() * data.results.length)]
+          ?.urls?.small;
+      } catch (error: any) {
+        console.error("Error fetching trip:", error.toString());
+      }
+    };
+
     if (true) {
       try {
         const createActivity = await fetch(
@@ -105,6 +113,8 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
                 radius: 0,
               },
               notes: activityNote,
+              imageUrl: await getRandomCover(),
+              googlePlacesId: "",
             }),
           },
         );
@@ -120,157 +130,153 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
 
   const SubmitButton = () => (
     <TouchableWithoutFeedback onPress={onPressSubmit}>
-      <View style={styles.button}>
-        <Text style={styles.buttonText}>Save and Continue</Text>
+      <View style={styles.submitButton}>
+        <Text style={[{ color: "white", fontWeight: "bold", fontSize: 23 }]}>
+          Save
+        </Text>
       </View>
     </TouchableWithoutFeedback>
   );
 
-  const hideStartDatePicker = () => {
-    setStartDatePickerVisibility(false);
-  };
-
-  const handleConfirm = (date: Date) => {
-    setActivityStartDate(date);
-    hideStartDatePicker();
-  };
-
   return (
-    <View style={{ flex: 1, padding: 3, backgroundColor: "white" }}>
-      <View style={styles.formContainer}>
-        {/* Form */}
+    <View
+      style={{
+        flex: 1,
+        padding: 3,
+        backgroundColor: "white",
+        justifyContent: "space-around",
+      }}
+    >
+      <View>
+        <Text style={{ fontSize: 32, fontWeight: "bold", alignSelf: "center" }}>
+          Plan your activity
+        </Text>
+        <Text
+          style={{
+            fontSize: 24,
+            fontWeight: "300",
+            alignSelf: "center",
+            textAlign: "center",
+            marginTop: 10,
+            marginHorizontal: 8,
+          }}
+        >
+          Tour Like a Boss: Crafting Your Own Fun, One Thrilling Adventure at a
+          Time!
+        </Text>
+      </View>
+      <View style={{ flex: 0.5 }}>
+        <View style={styles.formContainer}>
+          {/* Form */}
 
-        {/* Activity Title input  */}
-        <View style={[{ rowGap: 7 }]}>
+          {/* Activity Title input  */}
+          <View style={[{ rowGap: 7 }]}>
+            <TextInput
+              onChangeText={(value) => {
+                setActivityName(value);
+              }}
+              style={[material.title, { fontSize: 30, fontStyle: "italic" }]}
+              placeholder="Add a title"
+              placeholderTextColor={"grey"}
+              value={activityName}
+            ></TextInput>
+
+            {/* Map Pressable + Note Creator Button */}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <Pressable
+                style={[
+                  { flexDirection: "row", flex: 1, alignItems: "center" },
+                ]}
+                onPress={() => setMapVisible(true)}
+              >
+                <Entypo name="location-pin" size={22} color="#5491FC" />
+                <Text
+                  style={[{ color: "#3774DF", fontSize: 20, width: "92%" }]}
+                  numberOfLines={1}
+                >
+                  {activityLocation.address + " " + activityLocation.citystate}
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+
+          {/* Activity Note input */}
           <TextInput
             onChangeText={(value) => {
-              setActivityName(value);
+              setActivityNote(value);
             }}
             style={[
               material.title,
-              { fontSize: 25, fontWeight: "normal", fontStyle: "italic" },
+              {
+                fontStyle: "italic",
+                verticalAlign: "top",
+              },
+              styles.noteInputFocus,
             ]}
-            placeholder="Title"
-            placeholderTextColor={"grey"}
-            value={activityName}
-          ></TextInput>
+            placeholder="Add your notes here"
+            value={activityNote}
+            multiline={true}
+          />
 
-          {/* Map Pressable + Note Creator Button */}
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <Pressable
-              style={[{ flexDirection: "row", flex: 1, alignItems: "center" }]}
-              onPress={() => setMapVisible(true)}
-            >
-              <Image
-                style={{
-                  width: 15,
-                  height: 22,
-                  paddingRight: 10,
-                  marginBottom: 2,
-                }}
-                source={{
-                  uri: "https://cdn-icons-png.flaticon.com/512/9356/9356230.png",
-                }}
-              />
-              <Text
-                style={[
-                  material.title,
-                  {
-                    color: "#3774DF",
-                    fontSize: 17,
-                    width: "100%",
-                    paddingLeft: 7,
-                  },
-                ]}
-                numberOfLines={1}
-              >
-                {activityLocation.address + " " + activityLocation.citystate}
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-
-        {/* Activity Note input */}
-        <TextInput
-          onChangeText={(value) => {
-            setActivityNote(value);
-          }}
-          style={[
-            material.title,
-            {
-              verticalAlign: "top",
-              fontWeight: "normal",
-            },
-            styles.noteInputFocus,
-          ]}
-          placeholder="Add your notes here"
-          value={activityNote}
-          multiline={true}
-        />
-
-        {/* Map Input */}
-        <Modal animationType="slide" transparent={true} visible={mapVisible}>
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "rgba(0,0,0,0.5)",
-            }}
-          >
-            <Pressable
+          {/* Map Input */}
+          <Modal animationType="fade" transparent={true} visible={mapVisible}>
+            <View
               style={{
-                height: "15%",
+                flex: 1,
+                backgroundColor: "rgba(0,0,0,0.5)",
               }}
-              onPress={() => setMapVisible(false)}
-            ></Pressable>
-            <View style={[styles.modalMapView]}>
-              <Text
-                style={[
-                  material.title,
-                  { alignSelf: "center", fontSize: 30, fontWeight: "400" },
-                ]}
-              >
-                Add a place
-              </Text>
-              <View
-                style={{ height: "100%", flex: 2, backgroundColor: "white" }}
-              >
-                <GoogleMapInput
-                  onLocationSelect={(
-                    location = {
-                      ...activityLocation,
-                    },
-                  ) => {
-                    setActivityLocation({
-                      address: String(location.address),
-                      citystate: String(location.citystate),
-                      longitude: location.longitude,
-                      latitude: location.latitude,
-                      radius: location.radius!,
-                    });
+            >
+              <Pressable
+                style={{
+                  height: "15%",
+                }}
+                onPress={() => setMapVisible(false)}
+              ></Pressable>
+              <View style={[styles.modalMapView]}>
+                <Text
+                  style={[
+                    material.title,
+                    { alignSelf: "center", fontSize: 30 },
+                  ]}
+                >
+                  Add a Place
+                </Text>
+                <View
+                  style={{
+                    height: "100%",
+                    flex: 2,
+                    backgroundColor: "white",
                   }}
-                  value={""}
-                  location={activityLocation}
-                />
+                >
+                  <GoogleMapInput
+                    onLocationSelect={(
+                      location = {
+                        ...activityLocation,
+                      },
+                    ) => {
+                      setActivityLocation({
+                        address: String(location.address),
+                        citystate: String(location.citystate),
+                        longitude: location.longitude,
+                        latitude: location.latitude,
+                        radius: location.radius || 0,
+                      });
+                    }}
+                    value={""}
+                    location={activityLocation}
+                  />
+                </View>
               </View>
             </View>
-          </View>
-        </Modal>
-
-        <DateTimePickerModal
-          isVisible={startDatePickerVisibility}
-          mode="date"
-          onConfirm={handleConfirm}
-          onCancel={hideStartDatePicker}
-          date={activityStartDate}
-        />
+          </Modal>
+        </View>
       </View>
 
-      {/* Submit Button to submit user's answer */}
       <SubmitButton />
     </View>
   );
@@ -280,16 +286,16 @@ const styles = StyleSheet.create({
   noteInputFocus: {
     backgroundColor: "#F6F5F5",
     padding: 10,
-    borderRadius: 5,
-    flex: 1,
+    borderRadius: 14,
+    height: 200,
     marginTop: 15,
   },
 
   formContainer: {
     flex: 1,
     padding: 15,
+    margin: 7,
     backgroundColor: "white",
-    borderRadius: 20,
   },
   button: {
     width: "100%",
@@ -308,10 +314,9 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     alignSelf: "center",
-    borderWidth: 1,
-    borderRadius: 10,
-    backgroundColor: "#5491FC",
-    width: "94%",
+    borderRadius: 30,
+    backgroundColor: "#007AFF",
+    width: "60%",
     flexDirection: "row",
     padding: 10,
     justifyContent: "center",
