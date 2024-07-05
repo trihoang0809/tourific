@@ -11,6 +11,7 @@ import {
   SafeAreaView,
   Linking,
   ImageBackground,
+  Image
 } from "react-native";
 import {
   AntDesign,
@@ -272,17 +273,36 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
             )}
             {!nameEdit && (
               <TouchableWithoutFeedback
-                onPress={() => {
-                  setNameEdit(true);
-                  setName(activityData.name);
+              onPress={() => {
+                setNameEdit(true);
+                setName(activityData.name);
+              }}
+            >
+              <View
+                style={{
+                  width: 45,
+                  height: 45,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: 25, // Adjusted for a perfect circle
+                  backgroundColor: "#EFEFC3",
+                  shadowColor: "#000",
+                  shadowOffset: {
+                    width: 0,
+                    height: 2,
+                  },
+                  shadowOpacity: 0.25,
+                  shadowRadius: 3.84,
+                  elevation: 5,
                 }}
               >
                 <Feather
                   name="edit-2"
-                  size={20}
+                  size={22}
                   color="black"
                   style={{ alignSelf: "center" }}
                 />
+                </View>
               </TouchableWithoutFeedback>
             )}
             {nameEdit && (
@@ -328,7 +348,17 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
             }}
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <EvilIcons name="location" size={24} color="blue" />
+              {/* <EvilIcons name="location" size={24} color="blue" /> */}
+              <Image
+                  style={{    width: 25,
+                    height: 25,
+                    padding: 0,
+                    marginBottom: 2,
+                    marginRight: 3,}}
+                  source={{
+                    uri: "https://cdn-icons-png.flaticon.com/512/9356/9356230.png",
+                  }}
+                />
               <Text numberOfLines={1} style={{ fontSize: 16, padding: 4 }}>
                 {activityData.location !== undefined
                   ? activityData.location.address +
@@ -341,7 +371,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
         </View>
 
         {/* Date */}
-        <View style={[styles.informationBlock, { flexDirection: "row" }]}>
+        <View style={[styles.informationBlock, { flexDirection: "row", borderBottomWidth: 0, paddingBottom: 5 }]}>
           <View style={{ flex: 1, flexDirection: "row", columnGap: 15 }}>
             <View style={{}}>
               <Text style={{ fontSize: 20, fontWeight: "bold" }}>
@@ -367,16 +397,25 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
           <TouchableWithoutFeedback onPress={showStartDatePicker}>
             <View
               style={{
-                borderWidth: 1,
-                width: 50,
+                width: 45,
+                height: 45,
                 justifyContent: "center",
                 alignItems: "center",
                 borderRadius: 30,
+                backgroundColor: "#EFEFC3",
+                shadowColor: "#000",
+                shadowOffset: {
+                  width: 0,
+                  height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
               }}
             >
               <MaterialCommunityIcons
                 name="timetable"
-                size={35}
+                size={27}
                 color="black"
               />
             </View>
@@ -420,7 +459,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
         )}
 
         {/* Note */}
-        <View style={[styles.informationBlock]}>
+        <View style={[styles.informationBlock, {borderBottomWidth: 0, paddingBottom: 0}]}>
           <Pressable
             style={[styles.messageBox]}
             onPress={() => {
@@ -432,17 +471,18 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
               style={{
                 flexDirection: "row",
                 marginBottom: 10,
-                borderBottomWidth: 0.5,
+                // borderBottomWidth: 0.5,
                 justifyContent: "space-between",
               }}
             >
               <Text
                 style={{
-                  fontSize: 28,
+                  fontSize: 22,
                   verticalAlign: "middle",
+                  fontWeight: 700
                 }}
               >
-                Note
+                Notes
               </Text>
               {noteEdit && (
                 <View style={{ flexDirection: "row", columnGap: 10 }}>
@@ -475,10 +515,10 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
               )}
             </View>
             {!noteEdit ? (
-              <Text style={{ fontSize: 20 }}>{activityData.notes}</Text>
+              <Text style={{ fontSize: 18 }}>{activityData.notes}</Text>
             ) : (
               <TextInput
-                style={{ fontSize: 20 }}
+                style={{ fontSize: 18 }}
                 onChangeText={setNote}
                 value={note}
                 multiline={true}
@@ -500,10 +540,9 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
                 key={index}
                 style={{
                   padding: 5,
-                  borderWidth: 1,
-                  backgroundColor: "white",
-                  borderRadius: 4,
-                  fontSize: 23,
+                  borderWidth: 0.3,
+                  backgroundColor: "#EFEFC3",
+                  fontSize: 15,
                   margin: 5,
                   textAlign: "center",
                 }}
@@ -532,13 +571,13 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 40,
+    fontSize: 30,
     color: "black",
     fontWeight: "bold",
   },
 
   informationBlock: {
-    paddingBottom: 30,
+    paddingBottom: 20,
     paddingHorizontal: 20,
     borderBottomWidth: 0.35,
     borderRadius: 20,
@@ -560,11 +599,24 @@ const styles = StyleSheet.create({
   },
 
   messageBox: {
-    overflow: "hidden",
-    borderWidth: 0.5,
+    // overflow: "hidden",
+    // borderWidth: 0.5,
     borderRadius: 10,
-    backgroundColor: "white",
+    // backgroundColor: "white",
     padding: 8,
     flex: 1,
+    // width: 50,
+    // height: 50,
+    // borderRadius: 30,
+    // backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    backgroundColor: "#FFDBBB"
   },
 });

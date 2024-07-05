@@ -156,7 +156,12 @@ export const GGMapActivityDetail: React.FC<Actprops> = (id: Actprops) => {
           backgroundColor: "white",
         }}
       >
-        <View style={[styles.informationBlock, { marginTop: 15, rowGap: 10 }]}>
+        <View
+          style={[
+            styles.informationBlock,
+            { marginTop: 15, rowGap: 10, borderBottomWidth: 0.35 },
+          ]}
+        >
           <Text style={styles.title}>{activityData.name}</Text>
           <View
             style={{
@@ -164,19 +169,19 @@ export const GGMapActivityDetail: React.FC<Actprops> = (id: Actprops) => {
               columnGap: 10,
             }}
           >
-            <Text style={{ fontSize: 20, alignSelf: "center", color: "gray" }}>
+            <Text style={{ fontSize: 18, alignSelf: "center", color: "gray" }}>
               {activityData.rating}
             </Text>
             <Rating
               type="star"
               ratingCount={5}
-              imageSize={20}
+              imageSize={18}
               onFinishRating={this.ratingCompleted}
               readonly
               startingValue={activityData.rating}
               style={{ alignSelf: "center" }}
             />
-            <Text style={{ fontSize: 20, alignSelf: "center", color: "gray" }}>
+            <Text style={{ fontSize: 18, alignSelf: "center", color: "gray" }}>
               {"(" + activityData.userRatingNum + ")"}
             </Text>
           </View>
@@ -193,7 +198,17 @@ export const GGMapActivityDetail: React.FC<Actprops> = (id: Actprops) => {
             }}
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <EvilIcons name="location" size={24} color="blue" />
+              {/* <EvilIcons name="location" size={24} color="black" /> */}
+              <Image
+                  style={{    width: 25,
+                    height: 25,
+                    padding: 0,
+                    marginBottom: 2,
+                    marginRight: 3,}}
+                  source={{
+                    uri: "https://cdn-icons-png.flaticon.com/512/9356/9356230.png",
+                  }}
+                />
               <Text
                 numberOfLines={1}
                 style={{
@@ -208,22 +223,24 @@ export const GGMapActivityDetail: React.FC<Actprops> = (id: Actprops) => {
             </View>
           </TouchableWithoutFeedback>
 
-          <Text
-            style={[
-              { fontSize: 20 },
-              activityData.openNow === "Open"
-                ? { color: "green" }
-                : { color: "red" },
-            ]}
-          >
-            {activityData.openNow !== undefined && activityData.openNow + ""}
-          </Text>
+          {activityData.openNow && (
+            <Text
+              style={[
+                { fontSize: 20 },
+                activityData.openNow === "Open"
+                  ? { color: "green" }
+                  : { color: "red" },
+              ]}
+            >
+              {activityData.openNow + ""}
+            </Text>
+          )}
         </View>
 
         {/* Description */}
         {activityData.description !== "" && (
-          <View style={styles.informationBlock}>
-            <Text style={{ fontSize: 20 }} numberOfLines={descriptionSeeMore}>
+          <View style={[styles.informationBlock, { paddingBottom: 5 }]}>
+            <Text style={{ fontSize: 18 }} numberOfLines={descriptionSeeMore}>
               {activityData.description}
             </Text>
             {descriptionSeeMore < 10000000 &&
@@ -236,7 +253,7 @@ export const GGMapActivityDetail: React.FC<Actprops> = (id: Actprops) => {
                   <Text
                     style={{
                       fontSize: 20,
-                      borderBottomWidth: 1,
+                      // borderBottomWidth: 1,
                       fontWeight: "bold",
                       width: 86,
                     }}
@@ -261,15 +278,14 @@ export const GGMapActivityDetail: React.FC<Actprops> = (id: Actprops) => {
                 key={index}
                 style={{
                   padding: 5,
-                  borderWidth: 1,
-                  backgroundColor: "white",
-                  borderRadius: 4,
-                  fontSize: 23,
+                  borderWidth: 0.3,
+                  backgroundColor: "#EFEFC3",
+                  fontSize: 15,
                   margin: 5,
                   textAlign: "center",
                 }}
               >
-                {category}
+                #{category}
               </Text>
             ))
           ) : (
@@ -293,15 +309,15 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 40,
+    fontSize: 30,
     color: "black",
     fontWeight: "bold",
   },
 
   informationBlock: {
-    paddingBottom: 30,
+    paddingBottom: 20,
     paddingHorizontal: 20,
-    borderBottomWidth: 0.35,
+    // borderBottomWidth: 0.35,
     borderRadius: 20,
     borderColor: "grey",
     marginBottom: 30,
