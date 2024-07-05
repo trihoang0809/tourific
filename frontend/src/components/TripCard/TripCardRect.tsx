@@ -82,7 +82,7 @@ const TripCardRect = ({
                   }}
                 />
                 <Text numberOfLines={1} style={Style.tripCardSecondaryText}>
-                  {trip.location.address}
+                  {trip.location.citystate}
                 </Text>
               </View>
               <View style={{ flexDirection: "row" }}>
