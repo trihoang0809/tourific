@@ -270,6 +270,8 @@ const FriendRequestCard: React.FC<{
     }
   };
 
+  console.log("sender: ", request.sender);
+  console.log("user: ", userId);
   return isDeleted ? null : (
     <View style={styles.notification}>
       <Image

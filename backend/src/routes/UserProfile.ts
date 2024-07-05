@@ -292,6 +292,7 @@ router.post("/:id/friends", async (req, res) => {
 // to reject: /friend?accept=false
 router.patch("/friend", async (req, res) => {
   const { friendId, userId } = req.body;
+  console.log("friendId: ", friendId, "userId: ", userId);
   const { accept } = req.query;
 
   if (!friendId || !userId) {
@@ -299,13 +300,12 @@ router.patch("/friend", async (req, res) => {
   }
 
   const MongoUserId = await findMongoDBUser(userId);
-  const MongoFriendId = await findMongoDBUser(friendId);
   try {
     if (accept === "true") {
       const friend = await prisma.friendship.update({
         where: {
           receiverID_senderID: {
-            senderID: MongoFriendId?.id as string,
+            senderID: friendId,
             receiverID: MongoUserId?.id as string,
           },
         },
@@ -318,7 +318,7 @@ router.patch("/friend", async (req, res) => {
       const rejectFriend = await prisma.friendship.delete({
         where: {
           receiverID_senderID: {
-            senderID: MongoFriendId?.id as string,
+            senderID: friendId,
             receiverID: MongoUserId?.id as string,
           },
         },
