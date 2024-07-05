@@ -375,13 +375,13 @@ router.get("/:userId/friends", async (req, res) => {
 
 // get all sent requests
 router.get("/friend/sent-requests", async (req, res) => {
-  const { userId } = req.body;
+  const { userId } = req.query;
 
   if (!userId) {
     res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing userId" });
   }
 
-  const MongoUserId = await findMongoDBUser(userId);
+  const MongoUserId = await findMongoDBUser(userId as string);
   try {
     const sentRequests = await prisma.friendship.findMany({
       where: {
@@ -400,12 +400,12 @@ router.get("/friend/sent-requests", async (req, res) => {
 
 // get all pending requests
 router.get("/friend/pending-requests", async (req, res) => {
-  const { userId } = req.body;
+  const { userId } = req.query;
   if (!userId) {
     res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing userId" });
   }
 
-  const MongoUserId = await findMongoDBUser(userId);
+  const MongoUserId = await findMongoDBUser(userId as string);
   try {
     const pendingRequests = await prisma.friendship.findMany({
       where: {

@@ -89,61 +89,6 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
   console.log("up", upcomingTrips);
   console.log("on", ongoingTrips);
 
-  useEffect(() => {
-    const fetchInvitations = async () => {
-      try {
-        const invitations = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/all-received`);
-        const invites = await invitations.json();
-        setInvitation(invites);
-      } catch (error) {
-        console.error("Failed to fetch invitations", error);
-      }
-    };
-
-    fetchInvitations();
-  }, []);
-
-  console.log("inv", invitation);
-  const onAccept = async (id: string) => {
-    try {
-      console.log("accepting", id);
-      const sendAccept = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/${id}/accept`, {
-        method: "PATCH",
-      });
-
-      if (!sendAccept.ok) {
-        throw new Error("Failed to accept invitation");
-      }
-
-      const newInvitations = invitation.filter((invite) => invite.id !== id);
-      setInvitation(newInvitations);
-
-      const acceptedInvite = await sendAccept.json();
-      if (acceptedInvite.trip) {
-        router.replace(`/trips/${acceptedInvite.trip.id}`);
-      }
-    } catch (error) {
-      console.error("Failed to accept invitation", error);
-    }
-  };
-
-  const onDecline = async (id: string) => {
-    try {
-      const sendDecline = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/invite/${id}/decline`, {
-        method: "PATCH",
-      });
-
-      if (!sendDecline.ok) {
-        throw new Error("Failed to decline invitation");
-      }
-
-      const newInvitations = invitation.filter((invite) => invite.id !== id);
-      setInvitation(newInvitations);
-    } catch (error) {
-      console.error("Failed to decline invitation", error);
-    }
-  };
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <HomeScreenHeader user={user} />
@@ -229,11 +174,6 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
       >
         <Ionicons name="add" size={40} color="white" />
       </TouchableOpacity>
-      <View>
-        {invitation.map((invite: Invitation) => (
-          <InvitationCard key={invite.id} invitation={invite} onAccept={onAccept} onDecline={onDecline} />
-        ))}
-      </View>
     </SafeAreaView>
   );
 };

@@ -55,9 +55,11 @@ const InvitePage = () => {
     }
   };
 
+  console.log("friendsToInvite", friendsToInvite);
+
   const getFriendsToInvite = async () => {
     try {
-      const usersToInvite = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/non-participants?${userId}`, {
+      const usersToInvite = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/non-participants?firebaseUserId=${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -99,7 +101,7 @@ const InvitePage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ inviteeIds }),
+        body: JSON.stringify({ inviteeIds, firebaseUserId: userId}),
       });
 
       if (response.ok) {
