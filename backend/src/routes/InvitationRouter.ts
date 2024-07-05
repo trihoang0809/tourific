@@ -13,7 +13,7 @@ export interface InvitationParams extends TripParams {
 }
 
 // temporary for testing until auth done
-const userID = "6669267e34f4cab1d9ddd751";
+const userID = "66860537f96086257c3f9792";
 
 // get an invitation by status
 // example endpoint: /invite?status=PENDING
@@ -42,7 +42,11 @@ router.get("/all-received", async (req: Request, res) => {
         status: 'PENDING'
       },
       include: {
-        trip: true,
+        trip: {
+          include: {
+            participants: true
+          }
+        },
         inviter: true
       }
     });
