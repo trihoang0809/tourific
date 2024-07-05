@@ -8,6 +8,7 @@ import {
   Pressable,
   Modal,
   Button,
+  Image,
 } from "react-native";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { material } from "react-native-typography";
@@ -119,10 +120,8 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
 
   const SubmitButton = () => (
     <TouchableWithoutFeedback onPress={onPressSubmit}>
-      <View style={styles.submitButton}>
-        <Text style={[material.headline, { color: "white" }]}>
-          Save and Continue
-        </Text>
+      <View style={styles.button}>
+        <Text style={styles.buttonText}>Save and Continue</Text>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -147,8 +146,11 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
             onChangeText={(value) => {
               setActivityName(value);
             }}
-            style={[material.title, { fontSize: 30, fontStyle: "italic" }]}
-            placeholder="Add a title"
+            style={[
+              material.title,
+              { fontSize: 25, fontWeight: "normal", fontStyle: "italic" },
+            ]}
+            placeholder="Title"
             placeholderTextColor={"grey"}
             value={activityName}
           ></TextInput>
@@ -164,11 +166,26 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
               style={[{ flexDirection: "row", flex: 1, alignItems: "center" }]}
               onPress={() => setMapVisible(true)}
             >
-              <Entypo name="location-pin" size={22} color="#5491FC" />
+              <Image
+                style={{
+                  width: 15,
+                  height: 22,
+                  paddingRight: 10,
+                  marginBottom: 2,
+                }}
+                source={{
+                  uri: "https://cdn-icons-png.flaticon.com/512/9356/9356230.png",
+                }}
+              />
               <Text
                 style={[
                   material.title,
-                  { color: "#3774DF", fontSize: 15, width: "100%" },
+                  {
+                    color: "#3774DF",
+                    fontSize: 17,
+                    width: "100%",
+                    paddingLeft: 7,
+                  },
                 ]}
                 numberOfLines={1}
               >
@@ -186,8 +203,8 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
           style={[
             material.title,
             {
-              fontStyle: "italic",
               verticalAlign: "top",
+              fontWeight: "normal",
             },
             styles.noteInputFocus,
           ]}
@@ -212,9 +229,12 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
             ></Pressable>
             <View style={[styles.modalMapView]}>
               <Text
-                style={[material.title, { alignSelf: "center", fontSize: 30 }]}
+                style={[
+                  material.title,
+                  { alignSelf: "center", fontSize: 30, fontWeight: "400" },
+                ]}
               >
-                Add a Place
+                Add a place
               </Text>
               <View
                 style={{ height: "100%", flex: 2, backgroundColor: "white" }}
@@ -230,7 +250,7 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
                       citystate: String(location.citystate),
                       longitude: location.longitude,
                       latitude: location.latitude,
-                      radius: location.radius,
+                      radius: location.radius!,
                     });
                   }}
                   value={""}
@@ -271,7 +291,21 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 20,
   },
-
+  button: {
+    width: "100%",
+    height: 50,
+    backgroundColor: "#1e90ff",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 17,
+    fontWeight: "bold",
+    marginLeft: 8,
+  },
   submitButton: {
     alignSelf: "center",
     borderWidth: 1,

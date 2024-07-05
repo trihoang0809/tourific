@@ -339,12 +339,12 @@ export default function CreateTripScreen() {
 
   return (
     <SafeAreaView>
-      {/* {isUpdating ? (
+      {isUpdating ? (
         ""
       ) : (
         <Stack.Screen
           options={{
-            title: "",
+            title: "Create trip",
             headerShown: true,
             headerLeft: () => (
               <MaterialIcons
@@ -356,7 +356,7 @@ export default function CreateTripScreen() {
             ),
           }}
         />
-      )} */}
+      )}
       <ScrollView nestedScrollEnabled={true}>
         {/* trips banner */}
         <View style={{ position: "relative" }}>

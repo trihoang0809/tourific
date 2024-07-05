@@ -1,5 +1,6 @@
 import { Ionicons, Feather } from "@expo/vector-icons";
 import React from "react";
+import { Image } from "react-native";
 
 export interface TripData {
   name: string;
@@ -60,12 +61,12 @@ export interface GoogleMapInputProps {
 }
 
 export interface ActivityProps {
-  id: string;
+  id?: string;
   name: string;
   description: string;
   imageUrl: string;
-  startTime: Date;
-  endTime: Date;
+  startTime?: Date;
+  endTime?: Date;
   location: MapData;
   notes: string;
   netUpvotes: number;
@@ -130,37 +131,86 @@ export const categoriesMap = [
   {
     key: "All",
     name: "All",
-    icon: <Ionicons name="apps-outline" size={24} color="black" />,
+    icon: (
+      <Image
+        style={{ height: 27, width: 27 }}
+        source={{
+          uri: "https://cdn-icons-png.freepik.com/512/2534/2534036.png",
+        }}
+      />
+    ),
   },
   {
     key: "Dining",
     name: "Dining",
-    icon: <Ionicons name="restaurant-outline" size={24} color="black" />,
+    icon: (
+      <Image
+        style={{ height: 27, width: 27 }}
+        source={{
+          uri: "https://cdn-icons-png.flaticon.com/512/2082/2082063.png",
+        }}
+      />
+    ),
   },
   {
-    key: "Entertainment",
-    name: "Entertainment",
-    icon: <Ionicons name="film-outline" size={24} color="black" />,
+    key: "Leisure",
+    name: "Leisure",
+    icon: (
+      <Image
+        style={{ height: 27, width: 27 }}
+        source={{
+          uri: "https://cdn-icons-png.flaticon.com/512/9200/9200949.png",
+        }}
+      />
+    ),
   },
   {
     key: "OutdoorRecreation",
     name: "Outdoor",
-    icon: <Ionicons name="partly-sunny-outline" size={24} color="black" />,
+    icon: (
+      <Image
+        style={{ height: 27, width: 27 }}
+        source={{
+          uri: "https://cdn-icons-png.freepik.com/512/1612/1612688.png",
+        }}
+      />
+    ),
   },
   {
     key: "Shopping",
     name: "Shopping",
-    icon: <Feather name="shopping-cart" size={24} color="black" />,
+    icon: (
+      <Image
+        style={{ height: 27, width: 27 }}
+        source={{
+          uri: "https://cdn-icons-png.freepik.com/512/9638/9638882.png",
+        }}
+      />
+    ),
   },
   {
     key: "Services",
     name: "Services",
-    icon: <Ionicons name="settings-outline" size={24} color="black" />,
+    icon: (
+      <Image
+        style={{ height: 27, width: 27 }}
+        source={{
+          uri: "https://cdn-icons-png.flaticon.com/512/9727/9727444.png",
+        }}
+      />
+    ),
   },
   {
     key: "Wellness",
     name: "Wellness",
-    icon: <Feather name="activity" size={24} color="black" />,
+    icon: (
+      <Image
+        style={{ height: 27, width: 27 }}
+        source={{
+          uri: "https://cdn-icons-png.flaticon.com/512/11443/11443758.png",
+        }}
+      />
+    ),
   },
 ];
 

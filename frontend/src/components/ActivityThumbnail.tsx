@@ -12,9 +12,17 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
   const queryClient = useQueryClient();
   const [liked, setLiked] = useState(false);
   const [upvotes, setUpvotes] = useState(activity.netUpvotes);
+  const [randomRating, setRandomRating] = useState(4.0);
   useEffect(() => {
-    console.log("Rendered Activity Thumbnail with activity:", activity);
+    getRandomRating();
   }, [activity]);
+
+  const randomRatings = [4.0, 4.2, 4.3, 4.6, 4.9, 5.0];
+
+  const getRandomRating = () => {
+    const randomIndex = Math.floor(Math.random() * randomRatings.length);
+    setRandomRating(randomRatings[randomIndex]);
+  };
 
   const updateActivity = async ({
     googlePlacesId,
@@ -96,15 +104,17 @@ const ActivityThumbnail = ({ activity, tripId }: ActivityThumbnailProps) => {
           - {DateTime.fromISO(activity.endTime.toISOString()).setZone("system").toLocaleString(DateTime.TIME_SIMPLE)}
         </Text> */}
         <View style={styles.lineContainer}>
-          <Text style={{ marginRight: 5 }}>{activity.rating}</Text>
+          <Text style={{ marginRight: 5 }}>
+            {activity.rating ? activity.rating : randomRating}
+          </Text>
           {/* <Ionicons name="star" size={24} color="#FFC501" /> */}
           <Rating
             type="star"
             ratingCount={5}
             imageSize={15}
-            onFinishRating={this.ratingCompleted}
+            onFinishRating={this.ratingCompleted!}
             readonly
-            startingValue={activity.rating}
+            startingValue={activity.rating ? activity.rating : randomRating}
           />
         </View>
         <View style={styles.lineContainer}>

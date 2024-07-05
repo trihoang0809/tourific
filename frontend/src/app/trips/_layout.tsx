@@ -15,6 +15,9 @@ const Layout = () => {
           title: "Upcoming trips",
           headerShown: true,
           headerTitleAlign: "center",
+          headerStyle: {
+            backgroundColor: "#fff", // Customize the background color
+          },
           headerLeft: () => (
             <MaterialIcons
               name="arrow-back"
@@ -41,11 +44,14 @@ const Layout = () => {
           ),
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="create"
         options={{
           title: "Create trip",
-          headerShown: true,
+          headerShown: false,
+          headerStyle: {
+            backgroundColor: "#red", // Customize the background color
+          },
           headerLeft: () => (
             <MaterialIcons
               name="arrow-back"
@@ -55,7 +61,7 @@ const Layout = () => {
             />
           ),
         }}
-      />
+      /> */}
     </Stack>
   );
 };
