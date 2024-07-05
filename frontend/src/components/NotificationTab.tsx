@@ -1,4 +1,11 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  ScrollView,
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import {
   FriendRequestForNotification,
@@ -165,20 +172,22 @@ const NotificationTab: React.FC<NotificationTabProps> = ({ userId }) => {
           </Text>
         </TouchableOpacity>
       </View>
-      {activeTab === "friendRequests" && (
-        <FriendRequests
-          requests={requests}
-          friendNotifications={friendNotification}
-          userId={userId}
-        />
-      )}
-      {activeTab === "tripInvitations" && (
-        <TripInvitations
-          invitations={invitations}
-          tripNotifications={tripNotifications}
-          userId={userId}
-        />
-      )}
+      <ScrollView>
+        {activeTab === "friendRequests" && (
+          <FriendRequests
+            requests={requests}
+            friendNotifications={friendNotification}
+            userId={userId}
+          />
+        )}
+        {activeTab === "tripInvitations" && (
+          <TripInvitations
+            invitations={invitations}
+            tripNotifications={tripNotifications}
+            userId={userId}
+          />
+        )}
+      </ScrollView>
     </View>
   );
 };

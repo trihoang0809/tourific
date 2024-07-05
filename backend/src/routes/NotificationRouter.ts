@@ -2,7 +2,6 @@ import express from "express";
 import { PrismaClient } from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
 import { findMongoDBUser } from "../utils/index";
-import { findMongoDBUser } from "src/utils";
 
 const router = express.Router();
 const prisma = new PrismaClient();
