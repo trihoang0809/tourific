@@ -1,8 +1,17 @@
 import { solotravel } from '@/constants/images';
+import { router } from 'expo-router';
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 
 const NoFriendDisplay = () => {
+  const handleAddFriends = () => {
+    try {
+      // Replace with your navigation logic
+      router.push('/friends/search');
+    } catch (error) {
+      console.error('Error navigating to add friends:', error);
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -18,7 +27,7 @@ const NoFriendDisplay = () => {
       {/* <TouchableOpacity style={styles.button}>
         <Text style={styles.buttonText}>Give permission to access your contacts to invite your friends</Text>
       </TouchableOpacity> */}
-      <TouchableOpacity style={styles.inviteButton}>
+      <TouchableOpacity style={styles.inviteButton} onPress={handleAddFriends}>
         <Text style={styles.inviteButtonText}>Add more friends</Text>
       </TouchableOpacity>
     </View>
@@ -35,14 +44,12 @@ const styles = StyleSheet.create({
   },
   header: {
     position: 'absolute',
-    top: 0,
+    top: 40,
     left: 0,
     right: 0,
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc'
   },
   headerText: {
     fontSize: 20,

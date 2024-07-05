@@ -8,7 +8,7 @@ import { StatusCodes } from "http-status-codes";
 import { verifyToken } from "../middleware/authMiddleware";
 import { generateSchedule } from "../middleware/GenerateSchedule/schedule";
 import InvitationRouter from "./InvitationRouter";
-import { any } from "zod";
+import { findMongoDBUser } from "src/utils";
 
 // const express = require('express')
 const router = express.Router();
@@ -21,7 +21,7 @@ export interface TripParams {
   userId: string;
 }
 
-const userID = "66806671b368fc776a512ad5";
+// const userID = "66806671b368fc776a512ad5";
 
 // router.use(verifyToken);
 
@@ -145,16 +145,10 @@ router.use("/invite", InvitationRouter);
 // Get all trips of a user
 router.get("/", async (req: Request<TripParams>, res) => {
   console.log("Request body: ", req);
-  const { firebaseUserId } = req.query;
-  console.log("firebase User Id: ", firebaseUserId);
-
+  const { firebaseUserId }: any = req.query;
   try {
     let queryConditions: any = {
-      where: {
-        participantsID: {
-          has: firebaseUserId,
-        },
-      },
+      where: {},
     };
     const now = new Date();
 
@@ -181,9 +175,20 @@ router.get("/", async (req: Request<TripParams>, res) => {
       };
     }
     console.log("query conditions: ", queryConditions);
+    const MongoUserId = await prisma.user.findUnique({
+      where: {
+        firebaseUserId: firebaseUserId as string,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    console.log("MongoUserId: ", MongoUserId?.id);
+
     const trips = await prisma.tripMember.findMany({
       where: {
-        inviteeId: userID,
+        inviteeId: MongoUserId?.id as string,
         status: "ACCEPTED",
         trip: queryConditions.where,
       },
@@ -191,68 +196,9 @@ router.get("/", async (req: Request<TripParams>, res) => {
         trip: true,
       },
     });
+    console.log("trips: ", trips);
     const tripData = trips.map((tripMember) => tripMember.trip);
     res.status(StatusCodes.OK).json(tripData);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "An error occurred while fetching trips." });
-  }
-});
-
-// Get all trips of all users
-router.get("/all", async (req: Request<TripParams>, res) => {
-  try {
-    let queryConditions = {};
-    const now = new Date();
-
-    if (req.query.ongoing === "true") {
-      queryConditions = {
-        AND: [
-          {
-            startDate: {
-              lt: now,
-            },
-          },
-          {
-            endDate: {
-              gt: now,
-            },
-          },
-        ],
-      };
-    } else if (req.query.past === "true") {
-      queryConditions = {
-        endDate: {
-          lt: now,
-        },
-      };
-    } else if (req.query.upcoming === "true") {
-      // Fetch trips that have start date in a specific range
-      if (typeof req.query.startTimeLocal === "string" && typeof req.query.endTimeLocal === "string") {
-        const startOfDay = new Date(req.query.startTimeLocal);
-        const endOfDay = new Date(req.query.endTimeLocal);
-        console.log("Start of Day:", startOfDay);
-        console.log("End of Day:", endOfDay);
-        queryConditions = {
-          startDate: {
-            gte: startOfDay,
-            lte: endOfDay,
-          },
-        };
-      } else {
-        queryConditions = {
-          startDate: {
-            gt: now,
-          },
-        };
-        // console.log(now);
-      }
-    }
-
-    const trips = await prisma.trip.findMany({
-      where: queryConditions,
-    });
-    res.status(StatusCodes.OK).json(trips);
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "An error occurred while fetching trips." });
@@ -263,6 +209,14 @@ router.get("/all", async (req: Request<TripParams>, res) => {
 router.post("/", validateData(tripCreateSchema), async (req, res) => {
   try {
     const { name, startDate, endDate, location, image, firebaseUserId } = req.body;
+    const MongoDBUserId = await prisma.user.findUnique({
+      where: {
+        firebaseUserId: firebaseUserId as string,
+      },
+      select: {
+        id: true,
+      },
+    });
     const trip = await prisma.trip.create({
       data: {
         name,
@@ -272,8 +226,8 @@ router.post("/", validateData(tripCreateSchema), async (req, res) => {
         image,
         participants: {
           create: {
-            inviteeId: userID,
-            inviterId: userID,
+            inviteeId: MongoDBUserId?.id as string,
+            inviterId: MongoDBUserId?.id as string,
             status: "ACCEPTED",
           },
         },
@@ -376,8 +330,9 @@ router.delete("/:id", async (req, res) => {
 });
 
 // GET all participant in a trip
-router.get("/:id/participants", async (req: Request<TripParams>, res) => {
+router.get("/:tripId/participants", async (req: Request<TripParams>, res) => {
   const { tripId } = req.params;
+  console.log("tripId", tripId);
   try {
     const participants = await prisma.tripMember.findMany({
       where: {
@@ -388,7 +343,7 @@ router.get("/:id/participants", async (req: Request<TripParams>, res) => {
         invitee: true,
       },
     });
-    res.json(participants);
+    res.status(StatusCodes.OK).json(participants);
   } catch (error) {
     console.error("Error retrieving trip participants:", error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while retrieving participants." }); // Send an error response
@@ -398,18 +353,32 @@ router.get("/:id/participants", async (req: Request<TripParams>, res) => {
 // GET all contact/friends not in a group
 router.get("/:id/non-participants", async (req, res) => {
   const { id: tripId } = req.params;
-  const userId = userID;
+  const { firebaseUserId } = req.query;
+
+  if (!firebaseUserId) {
+    return res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing firebaseUserId" });
+  }
+
+  const MongoUserId = await prisma.user.findUnique({
+    where: {
+      firebaseUserId: firebaseUserId as string,
+    },
+    select: {
+      id: true,
+    },
+  });
   try {
     // Fetch all friends of the user where the friendship status is ACCEPTED
     const friends = await prisma.friendship.findMany({
       where: {
         OR: [
-          { receiverID: userId, friendStatus: "ACCEPTED" },
-          { senderID: userId, friendStatus: "ACCEPTED" },
+          { receiverID: MongoUserId?.id, friendStatus: "ACCEPTED" },
+          { senderID: MongoUserId?.id, friendStatus: "ACCEPTED" },
         ],
       },
       include: {
         receiver: true,
+        sender: true,
       },
     });
     console.log("friends", friends);
@@ -425,6 +394,7 @@ router.get("/:id/non-participants", async (req, res) => {
       },
       select: {
         inviteeId: true,
+        inviterId: true,
         status: true,
       },
     });
@@ -433,31 +403,37 @@ router.get("/:id/non-participants", async (req, res) => {
       return res.status(StatusCodes.NOT_FOUND).json({ error: "Trip not found" });
     }
 
+    console.log("participants", participants);
     // Map participants to their status
     const participantIdsToStatus = new Map(participants.map((p) => [p.inviteeId, p.status]));
+    console.log("participantIdsToStatus", participantIdsToStatus);
 
     // Filter and prepare data for friends not fully accepted into the trip
     const contactsNotInTrip = friends.reduce((acc: any, friend) => {
-      const friendId = friend.receiverID === userId ? friend.senderID : friend.receiverID;
+      const friendId = friend.receiverID === MongoUserId?.id ? friend.senderID : friend.receiverID;
+      console.log("friendId", friendId);
       const status = participantIdsToStatus.get(friendId);
+      console.log("status", status);
 
-      if (!status || status !== "ACCEPTED") {
+      if (!status || (status !== "ACCEPTED" && status !== "PENDING")) {
         // check if not part of the trip or not accepted
         acc.push({
-          receiver: friend.receiver,
+          receiver: friend.receiverID === MongoUserId?.id ? friend.sender : friend.receiver,
           status: status || "NOT_INVITED", // return status or 'NOT_INVITED' if no status found (user has not been invited)
         });
       }
+
+      // filter out the user from the list of friends
+      acc = acc.filter((contact: any) => contact.receiver.id !== MongoUserId?.id);
+
       return acc;
     }, []);
 
-    res.json(contactsNotInTrip);
+    res.status(StatusCodes.OK).json(contactsNotInTrip);
   } catch (error) {
     console.error("Failed to fetch contacts not in trip: ", error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send("Server error");
   }
 });
-
-// DELETE PARTICIPANT OUT OF TRIPS
 
 export default router;

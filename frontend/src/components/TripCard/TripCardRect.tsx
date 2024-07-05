@@ -25,6 +25,8 @@ const TripCardRect = ({
     const route = `/trips/${trip.id}`;
     router.push(route);
   };
+
+  console.log("trips in rect:", trip);
   return (
     <TouchableHighlight onPress={onPressTripCard} style={{ borderRadius: 15 }}>
       <View style={[styles.card, { width: desiredWidth, height: height }]}>

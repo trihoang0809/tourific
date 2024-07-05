@@ -1,6 +1,7 @@
 import { Ionicons, Feather } from "@expo/vector-icons";
 import React from "react";
 import { Image } from "react-native";
+import { DimensionValue } from "react-native";
 
 export interface TripData {
   name: string;
@@ -316,12 +317,6 @@ export interface InvitationCardProps {
   onDecline: (id: string) => void;
 }
 
-export enum Status {
-  "ACCEPTED",
-  "REJECTED",
-  "PENDING",
-}
-
 export interface ContactCardProps {
   user: User;
   isChecked: boolean;
@@ -331,4 +326,50 @@ export interface ContactCardProps {
 
 export interface FriendSearch extends User {
   friendStatus: Status;
+}
+
+export interface AvatarCardProps extends UserProps {
+  size?: DimensionValue;
+}
+
+export interface AvatarGroupProps {
+  users: Invitation[];
+  size?: DimensionValue;
+}
+
+export interface Invitation {
+  id: string;
+  inviter: User;
+  invitee: User;
+  trip: TripData;
+}
+
+export interface InvitationCardProps {
+  invitation: Invitation;
+  onAccept: (id: string) => void;
+  onDecline: (id: string) => void;
+}
+
+export interface BottomSliderProps {
+  handlePresentModalPress: () => void;
+  handleSheetChanges: (index: number) => void;
+}
+
+export enum Status {
+  'ACCEPTED',
+  'REJECTED',
+  'PENDING',
+}
+
+export interface FriendRequest {
+  friendStatus: Status;
+  receiver: User,
+  senderId?: string;
+}
+
+export interface ContactCardProps {
+  user: User;
+  isChecked: boolean;
+  setChecked: (e: any, userId: string) => void;
+  status: Status;
 }

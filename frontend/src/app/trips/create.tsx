@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { Stack, router, useLocalSearchParams } from "expo-router";
+import { Link, Stack, router, useLocalSearchParams } from "expo-router";
 import { MapData, TripData } from "@/types";
 import GooglePlacesInput from "@/components/GoogleMaps/GooglePlacesInput";
 import {

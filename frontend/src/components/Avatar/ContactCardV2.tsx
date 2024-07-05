@@ -41,7 +41,7 @@ const ContactCardV2 = ({ user, addFriend, cancelFriendRequest }: ContactCardV2Pr
     <TouchableOpacity style={styles.contactItem} onPress={onPress}>
       <Image source={{ uri: user.avatar?.url }} style={styles.profilePic} />
       <View style={{ flex: 1, justifyContent: 'center', gap: 5 }}>
-        <Text style={styles.name}>{user.firstName}</Text>
+        <Text style={styles.name}>{`${user.firstName} ${user.lastName}`}</Text>
         <Text style={styles.username}>{user.userName}</Text>
       </View>
       <View>

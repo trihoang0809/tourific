@@ -223,7 +223,7 @@ router.post("/find", async (req, res) => {
 });
 
 // Add a friend or cancel a friend request
-router.post("/friend", async (req, res) => {
+router.post("/:id/friends", async (req, res) => {
   const { friendId } = req.body;
   const { userId } = req.body;
   const { add } = req.query;
@@ -337,7 +337,13 @@ router.get("/:userId/friends", async (req, res) => {
   const { userId } = req.params;
   const { status } = req.query;
   try {
+    console.log("user: ", userId);
+    if (!userId) {
+      res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing userId" });
+    }
+
     const MongoUserId = await findMongoDBUser(userId);
+    console.log("MongoUserId: ", MongoUserId);
     const friends = await prisma.friendship.findMany({
       where: {
         // get all friends that have accepted the friend request
