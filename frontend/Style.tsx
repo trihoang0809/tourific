@@ -56,8 +56,8 @@ export default StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#E6E6E6",
-    borderRadius: 20,
-    borderWidth: 1,
+    borderRadius: 15,
+    borderWidth: 0.1,
     padding: 10,
     margin: 10,
   },
@@ -69,4 +69,3 @@ export default StyleSheet.create({
     color: "black",
   },
 });
-
