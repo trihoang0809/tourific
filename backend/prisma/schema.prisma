@@ -20,6 +20,7 @@ model Trip {
   participants TripMember[]
   participantsID String[]
   image Photo?
+  notifications Notification[] @relation("TripNotifications")
 }
 
 model TripMember {
@@ -52,16 +53,36 @@ model User {
   lastName String
   dateOfBirth DateTime
   avatar Photo
+  notificationsReceived Notification[] @relation("NotificationReceiver")
+  notificationsSent Notification[] @relation("NotificationSender")
   inviteeTripInvitations TripMember[] @relation("InviteeToTripInvitations")
-  inviterTripInvitations TripMember[] @relation("InviterToTripInvitations")  
+  inviterTripInvitations TripMember[] @relation("InviterToTripInvitations") 
+  friendRequestSent  Friendship[]   @relation("friendRequestSent")
   friendRequestReceived   Friendship[]   @relation("friendRequestReceived")
-  friendRequestSent   Friendship[]   @relation("friendRequestSent")
+}
+
+model Notification {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  type NotificationType
+  senderId String @db.ObjectId
+  sender User @relation("NotificationSender", fields: [senderId], references: [id])
+  receiverId String @db.ObjectId
+  receiver User @relation("NotificationReceiver", fields: [receiverId], references: [id])
+  readStatus Boolean @default(false)
+  tripId String? @db.ObjectId
+  trip Trip? @relation("TripNotifications", fields: [tripId], references: [id])
+}
+
+enum NotificationType {
+  FRIEND_ACCEPT
+  TRIP_ACCEPT
 }
 
 model Friendship {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  sender User  @relation("friendRequestSent", fields: [senderID], references: [id])
   receiver    User     @relation("friendRequestReceived", fields: [receiverID], references: [id])
-  sender    User     @relation("friendRequestSent", fields: [senderID], references: [id])
   receiverID  String   @db.ObjectId
   senderID  String   @db.ObjectId
   friendStatus    Status @default(PENDING)

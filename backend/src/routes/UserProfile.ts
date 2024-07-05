@@ -412,6 +412,9 @@ router.get("/friend/pending-requests", async (req, res) => {
         receiverID: MongoUserId?.id as string,
         friendStatus: 'PENDING',
       },
+      include: {
+        sender: true
+      }
     });
     res.status(StatusCodes.OK).json(pendingRequests);
   } catch (error) {

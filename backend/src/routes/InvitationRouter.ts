@@ -72,7 +72,11 @@ router.get("/all-received", async (req: Request, res) => {
         status: 'PENDING'
       },
       include: {
-        trip: true,
+        trip: {
+          include: {
+            participants: true
+          }
+        },
         inviter: true
       }
     });
