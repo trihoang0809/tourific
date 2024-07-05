@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { Stack } from "expo-router";
 import SearchFriend from "@/components/AddFriend/SearchFriend";
 
