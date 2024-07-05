@@ -23,8 +23,7 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "package": "com.anonymous.frontend"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -32,6 +31,7 @@
     },
     "scheme": "tourific",
     "plugins": [
+      "expo-router",
       [
         "expo-build-properties",
         {
@@ -39,23 +39,7 @@
             "usesCleartextTraffic": true
           }
         }
-      ],
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "Allow Tourific to access your photos",
-          "cameraPermission": "Allow Tourific to access your photos",
-          "microphonePermission": "Allow Tourific to access your photos"
-        }
       ]
-    ],
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "705c2be4-e3d0-4e6f-82e1-bd7b4d842c0d"
-      }
-    }
+    ]
   }
 }

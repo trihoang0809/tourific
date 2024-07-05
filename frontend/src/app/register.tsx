@@ -3,7 +3,6 @@ import { SafeAreaView } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useRouter, Stack } from "expo-router";
 import { HomeScreen } from "../screens/HomeScreen";
-import sampleUser from "@/mock-data/userNickDoan";
 import RegisterScreen from "@/screens/RegisterScreen";
 
 const Register = () => {

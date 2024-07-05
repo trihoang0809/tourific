@@ -105,7 +105,7 @@ const TripDetailsScreen = () => {
             borderTopLeftRadius: 30,
             borderTopRightRadius: 30,
             flex: 1,
-            marginTop: -50,
+            marginTop: -20,
           }}
           className="bg-white h-full"
         >

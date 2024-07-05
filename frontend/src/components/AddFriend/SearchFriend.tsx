@@ -1,10 +1,17 @@
-import { View, Text, SafeAreaView, TextInput, FlatList, Alert } from 'react-native';
-import React, { useEffect, useState, useRef } from 'react';
-import Style from 'Style';
-import { Feather } from '@expo/vector-icons';
-import ContactCardV2 from '../Avatar/ContactCardV2.tsx';
-import { FriendRequest, FriendSearch, User } from '@/types';
-import { getUserIdFromToken } from '@/utils/index.ts';
+import {
+  View,
+  Text,
+  SafeAreaView,
+  TextInput,
+  FlatList,
+  Alert,
+} from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import Style from "Style";
+import { Feather } from "@expo/vector-icons";
+import ContactCardV2 from "../Avatar/ContactCardV2.tsx";
+import { FriendRequest, FriendSearch, User } from "@/types";
+import { getUserIdFromToken } from "@/utils/index.ts";
 
 const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
 
@@ -61,14 +68,19 @@ const SearchFriend = () => {
       ]);
 
       const enhancedS = searchResults.map((user: User) => {
-        const matchingFriend = friendsResults.find((friend: FriendRequest) => friend.receiverID === user.id || friend.senderID === user.id);
+        const matchingFriend = friendsResults.find(
+          (friend: FriendRequest) =>
+            friend.receiverID === user.id || friend.senderID === user.id,
+        );
         return {
           ...user,
-          friendStatus: matchingFriend ? matchingFriend.friendStatus : null
+          friendStatus: matchingFriend ? matchingFriend.friendStatus : null,
         };
       });
 
-      const filteredS = enhancedS.filter((user: FriendSearch) => user.id !== userId);
+      const filteredS = enhancedS.filter(
+        (user: FriendSearch) => user.id !== userId,
+      );
       setSearchResults(filteredS);
     } catch (error) {
       console.error("Failed to fetch data:", error);
@@ -78,27 +90,30 @@ const SearchFriend = () => {
   const handleAddFriend = async (friendId: string) => {
     setSearchResults((prevResults: any) =>
       prevResults.map((user: any) =>
-        user.id === friendId ? { ...user, friendStatus: 'PENDING' } : user
-      )
+        user.id === friendId ? { ...user, friendStatus: "PENDING" } : user,
+      ),
     );
 
     try {
-      const request = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/user/friend?add=true`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const request = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/user/friend?add=true`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            friendId: friendId,
+            userId: userId,
+          }),
         },
-        body: JSON.stringify({
-          friendId: friendId,
-          userId: userId,
-        }),
-      });
+      );
 
       if (!request.ok) {
         setSearchResults((prevResults: any) =>
           prevResults.map((user: any) =>
-            user.id === friendId ? { ...user, friendStatus: null } : user
-          )
+            user.id === friendId ? { ...user, friendStatus: null } : user,
+          ),
         );
         Alert.alert("Failed to send friend request");
       }
@@ -110,26 +125,30 @@ const SearchFriend = () => {
   const cancelFriendRequest = async (friendId: string) => {
     setSearchResults((prevResults: any) =>
       prevResults.map((user: any) =>
-        user.id === friendId ? { ...user, friendStatus: null } : user
-      )
+        user.id === friendId ? { ...user, friendStatus: null } : user,
+      ),
     );
 
     try {
-      const request = await fetch(`http://${EXPO_PUBLIC_HOST_URL}:3000/user/friend?add=false`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const request = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/user/friend?add=false`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            friendId: friendId,
+            userId: userId,
+          }),
         },
-        body: JSON.stringify({
-          friendId: friendId, userId: userId,
-        }),
-      });
+      );
 
       if (!request.ok) {
         setSearchResults((prevResults: any) =>
           prevResults.map((user: any) =>
-            user.id === friendId ? { ...user, friendStatus: 'PENDING' } : user
-          )
+            user.id === friendId ? { ...user, friendStatus: "PENDING" } : user,
+          ),
         );
         Alert.alert("Failed to cancel friend request");
       }
@@ -139,7 +158,7 @@ const SearchFriend = () => {
   };
 
   return (
-    <View style={{ height: '100%', paddingTop: 20, backgroundColor: '#fff' }}>
+    <View style={{ height: "100%", backgroundColor: "#fff" }}>
       <View style={Style.searchContainer}>
         <Feather name="search" size={20} color="black" />
         <TextInput
@@ -154,10 +173,18 @@ const SearchFriend = () => {
         keyExtractor={(item: FriendSearch) => item.id}
         renderItem={({ item }) => (
           <View key={item.id}>
-            <ContactCardV2 user={item} addFriend={handleAddFriend} cancelFriendRequest={cancelFriendRequest} />
+            <ContactCardV2
+              user={item}
+              addFriend={handleAddFriend}
+              cancelFriendRequest={cancelFriendRequest}
+            />
           </View>
         )}
-        ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 10 }}>No results found</Text>}
+        ListEmptyComponent={
+          <Text style={{ textAlign: "center", marginTop: 10 }}>
+            No results found
+          </Text>
+        }
       />
     </View>
   );

@@ -68,7 +68,7 @@ export default function CreateTripScreen() {
   });
   const { id: idString } = useLocalSearchParams();
   const [savedPhoto, setSavedPhoto] = useState(
-    "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400",
+    "https://www.libertytravel.com/sites/default/files/styles/full_size/public/luxury-hero%20%281%29.jpg?itok=NS-iKHU-",
   );
   const [bannerModalVisible, setBannerModalVisible] = useState(false);
   console.log("save banner: ", savedPhoto);
@@ -246,11 +246,15 @@ export default function CreateTripScreen() {
         console.log("got back trip id: ", trip.id);
         try {
           // Fetch activities based on the trip location
-          if (location.latitude && location.longitude && location.radius) {
+          if (
+            trip.location.latitude &&
+            trip.location.longitude &&
+            trip.location.radius
+          ) {
             const fetchedActivities = await fetchGoogleActivities(
-              location.latitude,
-              location.longitude,
-              location.radius,
+              trip.location.latitude,
+              trip.location.longitude,
+              trip.location.radius,
             );
             console.log("activities: ", fetchedActivities);
             // Save fetched activities to backend
@@ -364,7 +368,7 @@ export default function CreateTripScreen() {
       ) : (
         <Stack.Screen
           options={{
-            title: "",
+            title: "Create trip",
             headerShown: true,
             headerLeft: () => (
               <MaterialIcons
@@ -422,10 +426,10 @@ export default function CreateTripScreen() {
         {/* trip details */}
         <View
           style={{
-            borderTopLeftRadius: 40,
-            borderTopRightRadius: 40,
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
             backgroundColor: "#fff",
-            marginTop: -50,
+            marginTop: -30,
             paddingTop: 20,
             flex: 1,
           }}

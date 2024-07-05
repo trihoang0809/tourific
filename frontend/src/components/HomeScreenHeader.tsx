@@ -1,5 +1,6 @@
-import { View, Image, StyleSheet, Pressable } from "react-native";
-import { UserProps } from "../types";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { UserProps } from "@/types";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
 
@@ -7,7 +8,7 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
   return (
     <View style={styles.content}>
       <Image
-        style={{ width: 180, height: 60 }}
+        style={styles.logo}
         source={require("@/assets/Tourific Logo.png")}
       />
       <View
@@ -18,18 +19,22 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
           justifyContent: "flex-end",
         }}
       >
-        <Pressable
-          onPress={() => {
-            router.push(`./userProfile/${user.firebaseUserId}`);
-          }}
+        <TouchableOpacity
+          onPress={() => router.push("/friends/search")}
+          style={{ marginRight: 5 }}
         >
+          <Ionicons name="person-add-outline" size={20} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("userProfile/profile")}>
           <Image
             style={styles.avatar}
             source={{
-              uri: user.avatar.url,
+              uri: user.avatar?.url
+                ? user.avatar.url
+                : "https://t4.ftcdn.net/jpg/03/59/58/91/360_F_359589186_JDLl8dIWoBNf1iqEkHxhUeeOulx0wOC5.jpg",
             }}
           />
-        </Pressable>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -40,13 +45,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    padding: 10,
-    marginHorizontal: 15,
+    paddingTop: 10,
+    marginRight: 15,
+    marginLeft: 5,
   },
-  notificationIcon: {
-    position: "absolute",
-    right: 60,
-    padding: 10,
+  // notificationIcon: {
+  //   position: "absolute",
+  //   right: 60,
+  //   padding: 10,
+  // },
+  logo: {
+    width: 150,
+    height: 30,
+    padding: 0,
+    marginBottom: 2,
   },
   appName: {
     fontSize: 18,
@@ -55,9 +67,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   avatar: {
-    width: 30,
-    height: 30,
+    width: 25,
+    height: 25,
     borderRadius: 20,
-    marginLeft: 20,
+    marginLeft: 15,
   },
 });

@@ -379,7 +379,7 @@ const Itinerary = () => {
           start: dateForUpdateForm.startDate,
           end: dateForUpdateForm.endDate,
           children: eventNotes,
-          activityid: eventToMove.id,
+          activityid: eventToMove.id!,
           url: eventToMove.image?.url
             ? eventToMove.image?.url
             : "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MTM3Mjd8MHwxfHNlYXJjaHw1fHxUcmF2ZWx8ZW58MHx8fHwxNzE2MTczNzc1fDA&ixlib=rb-4.0.3&q=80&w=400",
@@ -527,8 +527,8 @@ const Itinerary = () => {
         ) : null;
         return {
           title: activity.name,
-          start: new Date(activity.startTime),
-          end: new Date(activity.endTime),
+          start: new Date(activity.startTime!),
+          end: new Date(activity.endTime!),
           children: eventNotes,
           activityid: activity.id,
           url: activity.imageUrl
@@ -928,7 +928,8 @@ const Itinerary = () => {
                                         styles.setField,
                                         {
                                           backgroundColor: "darkblue",
-                                          height: 20,
+                                          height: 22,
+                                          paddingHorizontal: 10,
                                         },
                                       ]}
                                     >
@@ -1481,6 +1482,7 @@ const styles = StyleSheet.create({
   setField: {
     alignSelf: "flex-start",
     padding: 3,
+    paddingHorizontal: 5,
     marginVertical: 5,
     borderRadius: 5,
   },

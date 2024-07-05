@@ -94,7 +94,7 @@ const Home = () => {
     <>
       <HomeScreen user={user} />
       <StatusBar style="auto" />
-      <View
+      {/* <View
         style={{
           flex: 0.2,
           alignItems: "center",
@@ -102,7 +102,7 @@ const Home = () => {
         }}
       >
         <Text>Your expo push token: {expoPushToken}</Text>
-      </View>
+      </View> */}
     </>
   );
 };

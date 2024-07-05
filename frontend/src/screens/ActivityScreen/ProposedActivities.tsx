@@ -285,7 +285,21 @@ const styles = StyleSheet.create({
     margin: 7,
     backgroundColor: "white",
   },
-
+  button: {
+    width: "100%",
+    height: 50,
+    backgroundColor: "#1e90ff",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 17,
+    fontWeight: "bold",
+    marginLeft: 8,
+  },
   submitButton: {
     alignSelf: "center",
     borderRadius: 30,

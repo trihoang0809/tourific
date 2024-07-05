@@ -94,8 +94,9 @@ export const categories: Record<string, string[]> = {
     "meal_delivery",
     "meal_takeaway",
     "food",
+    "pizza_restaurant",
   ],
-  Entertainment: [
+  Leisure: [
     "movie_theater",
     "night_club",
     "amusement_park",
@@ -106,6 +107,14 @@ export const categories: Record<string, string[]> = {
     "tourist_attraction",
     "casino",
     "bowling_alley",
+    "aquarium",
+    "movie_rental",
+    "book_store",
+    "university",
+    "zoo",
+    "park",
+    "establishment",
+    "point_of_interest",
   ],
   OutdoorRecreation: [
     "park",
@@ -116,6 +125,7 @@ export const categories: Record<string, string[]> = {
     "stadium",
     "city_hall",
     "church",
+    "establishment",
   ],
   Shopping: [
     "clothing_store",
@@ -132,9 +142,11 @@ export const categories: Record<string, string[]> = {
     "convenience_store",
     "movie_rental",
     "hardware_store",
-    "",
+    "department_store",
+    "shoe_store",
   ],
   Services: [
+    "local_government_office",
     "car_rental",
     "car_repair",
     "laundry",
@@ -218,3 +230,6 @@ export const getUserIdFromToken = async (): Promise<string | null> => {
   }
   return null;
 };
+
+export const defaultAvatar =
+  "https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg";

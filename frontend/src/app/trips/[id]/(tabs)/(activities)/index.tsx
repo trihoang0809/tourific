@@ -28,7 +28,7 @@ const ActivitiesScreen = () => {
   } = useQuery({
     queryKey: ["activities", id],
     queryFn: () => fetchActivities(id),
-    //refetchInterval: 100000, // Refetch every 100 seconds
+    // refetchInterval: 100000, // Refetch every 100 seconds
   });
   const [filteredActivities, setFilteredActivities] = useState<ActivityProps[]>(
     [],
@@ -49,10 +49,16 @@ const ActivitiesScreen = () => {
   const handleSelectCategory = (category: string) => {
     setSelectedCategory(category);
     if (category === "All") {
-      setFilteredActivities(activities || []);
+      const filtered = (activities || []).filter(
+        (activity) => !activity.category.includes("lodging"),
+      );
+      setFilteredActivities(filtered);
     } else {
-      const filtered = activities?.filter((activity) =>
-        activity.category.some((type) => categories[category].includes(type)),
+      const filtered = activities?.filter(
+        (activity) =>
+          activity.category.some((type) =>
+            categories[category].includes(type),
+          ) && !activity.category.includes("lodging"),
       );
       setFilteredActivities(filtered || []);
     }
@@ -78,82 +84,90 @@ const ActivitiesScreen = () => {
         backgroundColor: "white",
       }}
     >
-      <View style={styles.searchContainer}>
-        <Feather name="search" size={20} color="black" />
-        <TextInput
-          placeholder="Search for activities..."
-          value={searchTerm}
-          onChangeText={handleSearch}
-          style={styles.searchInput}
-        />
-      </View>
       <ScrollView
-        horizontal
-        contentContainerStyle={styles.categoryContainer}
-        showsHorizontalScrollIndicator={false}
-        alwaysBounceVertical={false}
-      >
-        {categoriesMap.map((category) => (
-          <TouchableOpacity
-            key={category.key}
-            style={[
-              styles.categoryItem,
-              selectedCategory === category.key && styles.selectedCategory,
-            ]}
-            onPress={() => handleSelectCategory(category.key)}
-          >
-            {category.icon}
-            <Text>{category.name}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          flexDirection: "row",
-          flexWrap: "wrap",
-          padding: 5,
-        }}
         refreshControl={
           <RefreshControl refreshing={isFetching} onRefresh={onRefresh} />
         }
       >
-        {filteredActivities.length > 0 ? (
+        <View>
+          <View style={styles.searchContainer}>
+            <Feather name="search" size={20} color="black" />
+            <TextInput
+              placeholder="Search for activities..."
+              value={searchTerm}
+              onChangeText={handleSearch}
+              style={styles.searchInput}
+            />
+          </View>
           <ScrollView
-            contentContainerStyle={{
-              flexGrow: 1,
-              flexDirection: "row",
-              flexWrap: "wrap",
-              padding: 5,
-            }}
+            horizontal
+            contentContainerStyle={styles.categoryContainer}
+            showsHorizontalScrollIndicator={false}
+            alwaysBounceVertical={false}
+            style={{ height: 70 }}
           >
-            {filteredActivities.map((activity: ActivityProps) => (
-              <View key={activity.id} style={{ width: "100%", padding: 15 }}>
-                <ActivityThumbnail activity={activity} tripId={id} />
-              </View>
-            ))}
-          </ScrollView>
-        ) : (
-          <View style={styles.noActivitiesView}>
-            <Text style={styles.noActivitiesText}>
-              No activities found for this category.
-            </Text>
-            <Link href={`/trips/create?id=${id}`}>
-              <TouchableOpacity style={styles.updateButton}>
-                <Text style={styles.updateButtonText}>
-                  Update trip's radius or location
+            {categoriesMap.map((category) => (
+              <TouchableOpacity
+                key={category.key}
+                style={[
+                  styles.categoryItem,
+                  selectedCategory === category.key && styles.selectedCategory,
+                ]}
+                onPress={() => handleSelectCategory(category.key)}
+              >
+                {category.icon}
+                <Text style={{ fontSize: 16, paddingTop: 0.5 }}>
+                  {category.name}
                 </Text>
               </TouchableOpacity>
-            </Link>
-          </View>
-        )}
+            ))}
+          </ScrollView>
+        </View>
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            flexDirection: "row",
+            flexWrap: "wrap",
+            padding: 5,
+          }}
+        >
+          {filteredActivities.length > 0 ? (
+            <ScrollView
+            // contentContainerStyle={{
+            //   flexGrow: 1,
+            //   flexDirection: "row",
+            //   flexWrap: "wrap",
+            //   padding: 5,
+            // }}
+            >
+              {filteredActivities.map((activity: ActivityProps) => (
+                <View key={activity.id} style={{ width: "100%", padding: 15 }}>
+                  <ActivityThumbnail activity={activity} tripId={id} />
+                </View>
+              ))}
+            </ScrollView>
+          ) : (
+            <View style={styles.noActivitiesView}>
+              <Text style={styles.noActivitiesText}>
+                No activities found for this category.
+              </Text>
+              <Link href={`../create`}>
+                <TouchableOpacity style={styles.updateButton}>
+                  <Text style={styles.updateButtonText}>
+                    Create a new activity
+                  </Text>
+                </TouchableOpacity>
+              </Link>
+            </View>
+          )}
+        </ScrollView>
       </ScrollView>
       <TouchableOpacity
         style={{
           alignItems: "center",
           justifyContent: "center",
-          width: 50,
-          height: 50,
+          width: 58,
+          height: 58,
           position: "absolute",
           bottom: 10,
           right: 10,
@@ -168,7 +182,7 @@ const ActivitiesScreen = () => {
           router.push("../create");
         }}
       >
-        <Ionicons name="add" size={25} color="white" />
+        <Ionicons name="add" size={40} color="white" />
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -179,8 +193,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#E6E6E6",
-    borderRadius: 20,
-    borderWidth: 1,
+    borderRadius: 15,
+    borderWidth: 0.1,
     padding: 10,
     margin: 10,
   },
@@ -198,7 +212,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 3,
   },
   categoryItem: {
-    height: 55,
+    height: 80,
     alignItems: "center",
     padding: 10,
   },
@@ -212,12 +226,13 @@ const styles = StyleSheet.create({
   noActivitiesText: {
     fontSize: 18,
     color: "#666",
+    paddingBottom: 10,
   },
   updateButton: {
     backgroundColor: "#1e90ff",
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 10,
+    borderRadius: 8,
     marginTop: 10, // Add margin to give space between the text and button
   },
   updateButtonText: {
