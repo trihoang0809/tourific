@@ -135,7 +135,7 @@ export const HomeScreen: React.FC<UserProps> = ({ user }) => {
             {ongoingTrips?.length > 0 ? (
               ongoingTrips.map((trip) => (
                 <View key={trip.id}>
-                  <TripCard trip={trip} height={230} width={300} />
+                  <TripCard trip={trip} height={230} width={320} />
                 </View>
               ))
             ) : (

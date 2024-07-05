@@ -10,7 +10,7 @@ const Layout = () => {
         options={{
           title: "Notifications",
           headerShown: true,
-          headerTitle: "Notifications",
+          headerTitleAlign: "center",
           headerLeft: () => (
             <MaterialIcons
               name="arrow-back"

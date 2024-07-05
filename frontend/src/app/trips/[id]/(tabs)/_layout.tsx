@@ -50,13 +50,13 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="participants/index"
         options={{
           href: null,
           headerShown: false,
         }}
-      />
+      /> */}
     </Tabs>
   );
 }

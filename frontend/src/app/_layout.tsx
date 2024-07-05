@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Slot, Stack } from "expo-router";
+import { Slot, Stack, router } from "expo-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,7 +38,18 @@ const RootNavigation = () => {
         <Stack.Screen name="notification" options={{ headerShown: false }} />
         <Stack.Screen
           name="userProfile/profile"
-          options={{ title: "Profile", headerShown: true }}
+          options={{
+            title: "Profile",
+            headerShown: true,
+            headerLeft: () => (
+              <MaterialIcons
+                name="arrow-back"
+                size={24}
+                color="black"
+                onPress={() => router.back()}
+              />
+            ),
+          }}
         />
       </Stack>
     </QueryClientProvider>

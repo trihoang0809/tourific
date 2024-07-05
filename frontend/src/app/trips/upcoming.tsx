@@ -7,7 +7,7 @@ export default function App() {
   const { userId } = useLocalSearchParams();
   return (
     <View style={{ backgroundColor: "white" }}>
-        <ListFilteredCards isUpcoming={true} userId={userId} />
+      <ListFilteredCards isUpcoming={true} userId={userId} />
     </View>
   );
 }

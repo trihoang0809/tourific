@@ -134,7 +134,14 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
         >
           <Ionicons name="person-add-outline" size={20} color="black" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => router.push("userProfile/profile")}>
+        <TouchableOpacity
+          onPress={() =>
+            router.push({
+              pathname: "userProfile/profile",
+              params: { firebaseUserId: user.firebaseUserId },
+            })
+          }
+        >
           <Image
             style={styles.avatar}
             source={{

@@ -99,9 +99,14 @@ export const TripCard: React.FC<tripProps> = ({
             </Text>
           </View>
 
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              alignItems: "center",
+            }}
+          >
             <View style={styles.detail}>
-              {/* <Ionicons name="location-outline" size={18} color="#696e6e" /> */}
               <Image
                 style={styles.icon}
                 source={{
@@ -115,12 +120,7 @@ export const TripCard: React.FC<tripProps> = ({
                 {location}
               </Text>
             </View>
-            <View style={styles.detail}>
-              {/* <MaterialCommunityIcons
-                name="timetable"
-                size={17}
-                color="#696e6e"
-              /> */}
+            <View style={[styles.detail, styles.tripDateContainer]}>
               <Image
                 style={styles.icon}
                 source={{
@@ -173,7 +173,6 @@ const styles = StyleSheet.create({
   icon: {
     width: 15,
     height: 20,
-    padding: 0,
     marginBottom: 2,
   },
 
@@ -181,5 +180,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginRight: 18,
     alignItems: "center",
+    marginBottom: 2,
+  },
+  tripDateContainer: {
+    marginTop: 2,
   },
 });

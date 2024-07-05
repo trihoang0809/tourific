@@ -94,7 +94,7 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
     if (true) {
       try {
         const createActivity = await fetch(
-          serverUrl + "trips/" + id.id + "/activities",
+          `http://${process.env.EXPO_PUBLIC_HOST_URL}:3000/trips/${id.id}/activities`,
           {
             method: "POST",
             headers: {
@@ -112,13 +112,13 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
                 longitude: activityLocation.longitude,
                 radius: 0,
               },
+              category: [],
+              googlePlacesId: "",
               notes: activityNote,
               imageUrl: await getRandomCover(),
-              googlePlacesId: "",
             }),
           },
         );
-
         //alert Success
         alertSuccess();
       } catch (error) {
