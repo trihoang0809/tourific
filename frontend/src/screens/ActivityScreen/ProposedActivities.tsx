@@ -75,9 +75,22 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
 
   const onPressSubmit = async () => {
     validateForm();
-    console.log("Submit: " + activityNote);
-    console.log(isFormFilled);
-    console.log(activityLocation.address);
+    const getRandomCover = async () => {
+      try {
+        let response = await fetch(
+          `https://api.unsplash.com/search/photos?page=1&per_page=30&query=scenery&client_id=${process.env.EXPO_PUBLIC_UNSPLASH_API_KEY}`,
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch images");
+        }
+        let data = await response.json();
+        return data.results[Math.floor(Math.random() * data.results.length)]
+          ?.urls?.small;
+      } catch (error: any) {
+        console.error("Error fetching trip:", error.toString());
+      }
+    };
+
     if (true) {
       try {
         const createActivity = await fetch(
@@ -100,8 +113,7 @@ export const ProposedActivities: React.FC<props> = (id: props) => {
                 radius: 0,
               },
               notes: activityNote,
-              imageUrl:
-                "https://assets-global.website-files.com/5ca5fe687e34be0992df1fbe/64d3853418a507bc6b3d03a0_Vol%20en%20parapente%20au%20mont%20blanc.jpg",
+              imageUrl: await getRandomCover(),
               googlePlacesId: "",
             }),
           },
