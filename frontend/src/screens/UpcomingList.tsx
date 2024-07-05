@@ -94,7 +94,7 @@ export const ListFilteredCards = ({ isUpcoming, userId }: listprops) => {
       <View style={styles.searchContainer}>
         <Feather name="search" size={20} color="black" />
         <TextInput
-          placeholder="Search for people..."
+          placeholder="Search for trips..."
           value={searchTerm}
           onChangeText={handleSearch}
           style={styles.searchInput}

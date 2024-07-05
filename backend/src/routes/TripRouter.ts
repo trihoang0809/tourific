@@ -117,6 +117,7 @@ router.get("/", async (req: Request<TripParams>, res) => {
         trip: true,
       },
     });
+    console.log("trips: ", trips);
     const tripData = trips.map((tripMember) => tripMember.trip);
     res.status(StatusCodes.OK).json(tripData);
   } catch (err) {
