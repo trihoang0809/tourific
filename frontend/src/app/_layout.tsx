@@ -51,6 +51,21 @@ const RootNavigation = () => {
             ),
           }}
         />
+        <Stack.Screen
+          name="userProfile/update"
+          options={{
+            title: "Edit profile",
+            headerShown: true,
+            headerLeft: () => (
+              <MaterialIcons
+                name="arrow-back"
+                size={24}
+                color="black"
+                onPress={() => router.back()}
+              />
+            ),
+          }}
+        />
       </Stack>
     </QueryClientProvider>
   );

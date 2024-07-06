@@ -78,7 +78,6 @@ router.get("/:firebaseUserId", async (req, res) => {
   }
 });
 
-
 // Create a user profile
 router.post("/", async (req, res) => {
   const { userName, email, password, firstName, lastName, dateOfBirth, avatar, firebaseUserId } = req.body;
@@ -202,21 +201,20 @@ router.post("/find", async (req, res) => {
           {
             userName: {
               startsWith: text,
-              mode: 'insensitive',
+              mode: "insensitive",
             },
           },
           {
             email: {
               startsWith: text,
-              mode: 'insensitive',
+              mode: "insensitive",
             },
           },
         ],
       },
     });
     res.status(StatusCodes.OK).json(user);
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while finding a user." });
   }
@@ -278,10 +276,11 @@ router.post("/add-friend", async (req, res) => {
       });
       res.status(StatusCodes.CREATED).json(friend);
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while adding/cancelling a friend." });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while adding/cancelling a friend." });
   }
 });
 
@@ -323,10 +322,11 @@ router.patch("/friend", async (req, res) => {
       });
       res.status(StatusCodes.OK).json(rejectFriend);
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while accepting/declining a friend." });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while accepting/declining a friend." });
   }
 });
 
@@ -350,22 +350,21 @@ router.get("/:userId/friends", async (req, res) => {
             senderID: MongoUserId?.id as string,
             friendStatus: status as Status,
             receiverID: {
-              not: MongoUserId?.id as string
-            }
+              not: MongoUserId?.id as string,
+            },
           },
           {
             receiverID: MongoUserId?.id as string,
             friendStatus: status as Status,
             senderID: {
-              not: MongoUserId?.id as string
-            }
+              not: MongoUserId?.id as string,
+            },
           },
         ],
       },
     });
     res.status(StatusCodes.OK).json(friends);
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting friends." });
   }
@@ -384,7 +383,7 @@ router.get("/friend/sent-requests", async (req, res) => {
     const sentRequests = await prisma.friendship.findMany({
       where: {
         senderID: MongoUserId?.id as string,
-        friendStatus: 'PENDING',
+        friendStatus: "PENDING",
       },
     });
     res.status(StatusCodes.OK).json(sentRequests);
@@ -408,16 +407,18 @@ router.get("/friend/pending-requests", async (req, res) => {
     const pendingRequests = await prisma.friendship.findMany({
       where: {
         receiverID: MongoUserId?.id as string,
-        friendStatus: 'PENDING',
+        friendStatus: "PENDING",
       },
       include: {
-        sender: true
-      }
+        sender: true,
+      },
     });
     res.status(StatusCodes.OK).json(pendingRequests);
   } catch (error) {
     console.log(error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while getting pending friend requests." });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while getting pending friend requests." });
   }
 });
 

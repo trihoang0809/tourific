@@ -7,6 +7,7 @@ import {
   ScrollView,
   Image,
   Pressable,
+  TouchableOpacity,
 } from "react-native";
 import { material } from "react-native-typography";
 import React, { useState, useEffect } from "react";
@@ -71,13 +72,20 @@ export const UserProfileEdit: React.FC<editProps> = ({ id = "" }) => {
 
   //Header render + Return Button + Alert Pop up
 
-  const Header = () => (
-    <View>
-      <View style={styles.headerContainer}>
-        <Text style={[material.display1, { alignSelf: "center" }]}>Edit</Text>
-      </View>
-    </View>
-  );
+  // const Header = () => (
+  //   <View>
+  //     <View style={styles.headerContainer}>
+  //       <Text
+  //         style={[
+  //           material.display1,
+  //           { alignSelf: "center", color: "black", fontSize: 30 },
+  //         ]}
+  //       >
+  //         Edit
+  //       </Text>
+  //     </View>
+  //   </View>
+  // );
 
   //Validate User input
   const validateUserName = (value: String) => {
@@ -146,11 +154,9 @@ export const UserProfileEdit: React.FC<editProps> = ({ id = "" }) => {
   };
 
   const SubmitButton = () => (
-    <Pressable onPress={onPressSubmit} style={styles.submitButton}>
-      <Text style={[material.headline, { color: "white" }]}>
-        Save And Continue
-      </Text>
-    </Pressable>
+    <TouchableOpacity style={styles.button} onPress={onPressSubmit}>
+      <Text style={styles.buttonText}>Save and continue</Text>
+    </TouchableOpacity>
   );
 
   //Show DOB Date Picker Modal
@@ -187,7 +193,7 @@ export const UserProfileEdit: React.FC<editProps> = ({ id = "" }) => {
 
   return (
     <ScrollView style={styles.formContainer}>
-      <Header />
+      {/* <Header /> */}
 
       {/* Form */}
       <View style={styles.formInputContainer}>
@@ -362,7 +368,7 @@ export const UserProfileEdit: React.FC<editProps> = ({ id = "" }) => {
         {/* Date of Birth input using DateTimePickerModal */}
         <View style={styles.dateButtonContainer}>
           <Text style={[material.title, { color: "grey", marginBottom: 20 }]}>
-            Birth Date (Optional)
+            Birth Date
           </Text>
           <View style={styles.dateButton}>
             <View style={styles.dateStyle}>
@@ -416,6 +422,22 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 25,
     backgroundColor: "white",
+  },
+  button: {
+    width: "100%",
+    height: 45,
+    backgroundColor: "#1e90ff",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+    flexDirection: "row",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+    marginLeft: 8,
   },
 
   submitButton: {

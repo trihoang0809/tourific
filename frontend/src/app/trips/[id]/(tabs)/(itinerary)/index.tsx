@@ -18,6 +18,7 @@ import {
   TouchableWithoutFeedback,
   Image,
   Alert,
+  RefreshControl,
 } from "react-native";
 import { useGlobalSearchParams, router } from "expo-router";
 import { Calendar, DateRangeHandler } from "react-native-big-calendar";
@@ -77,6 +78,7 @@ const Itinerary = () => {
   const [startTimeModalOpen, setStartTimeModalOpen] = useState(false);
   const [endTimeModalOpen, setEndTimeModalOpen] = useState(false);
   const [shouldUpdateTime, setShouldUpdateTime] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const {
     formState: { errors },
     control,
@@ -278,36 +280,46 @@ const Itinerary = () => {
     }
   };
 
-  useEffect(() => {
-    const getActivities = async ({ id }: { id: string }) => {
-      try {
-        const response = await fetch(
-          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
+  const getActivities = async ({ id }: { id: string }) => {
+    try {
+      setRefreshing(true);
+      const response = await fetch(
+        `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch activities");
-        }
-        const data = await response.json();
-        setTripDate({
-          start: data.startDate,
-          range: differenceInDays(data.endDate, data.startDate),
-        });
-        const activities = data.activities;
-        setActivities(activities);
-      } catch (error: any) {
-        console.error("Error fetching activities:", error.toString());
+        },
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch activities");
       }
-    };
+      const data = await response.json();
+      setTripDate({
+        start: data.startDate,
+        range: differenceInDays(data.endDate, data.startDate),
+      });
+      const activities = data.activities;
+      setActivities(activities);
+    } catch (error: any) {
+      console.error("Error fetching activities:", error.toString());
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
     if (typeof id === "string") {
       getActivities({ id });
     }
   }, [savedActivityId]);
+
+  const onRefresh = () => {
+    if (typeof id === "string") {
+      getActivities({ id });
+    }
+  };
 
   const updateActivityOnBackend = async ({
     id,
@@ -667,7 +679,12 @@ const Itinerary = () => {
 
   return (
     <GestureHandlerRootView>
-      <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+      <ScrollView
+        style={{ flex: 1, backgroundColor: "white", marginBottom: 20 }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View
           style={[
             styles.row,
@@ -1232,118 +1249,129 @@ const Itinerary = () => {
         )}
 
         {/* Generating Button  */}
-        <Pressable
-          style={[Style.addIcon, { width: 60, height: 60 }]}
-          onPress={() => {
-            setDescriptionModal(true);
-          }}
-        >
-          <Ionicons name="color-wand-sharp" size={30} color="#FFFFFF" />
-        </Pressable>
+      </ScrollView>
+      <Pressable
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          width: 58,
+          height: 58,
+          position: "absolute",
+          bottom: 10,
+          right: 10,
+          borderRadius: 35,
+          backgroundColor: "#006ee6",
+          shadowOffset: { width: 1, height: 1 },
+          shadowColor: "#333",
+          shadowOpacity: 0.3,
+          shadowRadius: 2,
+        }}
+        onPress={() => {
+          setDescriptionModal(true);
+        }}
+      >
+        <Ionicons name="color-wand-sharp" size={30} color="#FFFFFF" />
+      </Pressable>
 
-        {/* Description Modal */}
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={descriptionModal}
-          onRequestClose={() => {
-            setModalVisible(!descriptionModal);
+      {/* Description Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={descriptionModal}
+        onRequestClose={() => {
+          setModalVisible(!descriptionModal);
+        }}
+      >
+        <View
+          style={{
+            flex: 2,
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 22,
+            backgroundColor: "rgba(0,0,0,0.5)",
           }}
         >
           <View
             style={{
-              flex: 2,
-              justifyContent: "center",
+              margin: 20,
+              backgroundColor: "white",
+              borderRadius: 20,
+              padding: 35,
+              shadowColor: "#000",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              justifyContent: "space-around",
+              rowGap: 30,
               alignItems: "center",
-              marginTop: 22,
-              backgroundColor: "rgba(0,0,0,0.5)",
             }}
           >
-            <View
-              style={{
-                margin: 20,
-                backgroundColor: "white",
-                borderRadius: 20,
-                padding: 35,
-                shadowColor: "#000",
-                shadowOffset: {
-                  width: 0,
-                  height: 2,
-                },
-                justifyContent: "space-around",
-                rowGap: 30,
-                alignItems: "center",
+            {/* <FontAwesome5 name="robot" size={80} color="#2196F3" /> */}
+            <Image
+              style={{ width: 300, height: 200 }}
+              source={{
+                uri: "https://img.freepik.com/free-vector/camping-place-cartoon-composition-with-yellow-tent-lamp-pot-with-dinner-fire-night-sky_1284-54945.jpg?size=626&ext=jpg&ga=GA1.1.1887574231.1711929600&semt=ais",
               }}
+            />
+            <Text
+              style={[styles.modalText, { textAlign: "center", fontSize: 23 }]}
             >
-              {/* <FontAwesome5 name="robot" size={80} color="#2196F3" /> */}
-              <Image
-                style={{ width: 300, height: 200 }}
-                source={{
-                  uri: "https://img.freepik.com/free-vector/camping-place-cartoon-composition-with-yellow-tent-lamp-pot-with-dinner-fire-night-sky_1284-54945.jpg?size=626&ext=jpg&ga=GA1.1.1887574231.1711929600&semt=ais",
-                }}
-              />
-              <Text
+              Automatically generate your schedule with just one tap.
+            </Text>
+            <View style={{ alignItems: "center" }}>
+              <Pressable
                 style={[
-                  styles.modalText,
-                  { textAlign: "center", fontSize: 23 },
+                  {
+                    borderRadius: 20,
+                    padding: 10,
+                    elevation: 2,
+                    backgroundColor: "#2196F3",
+                    width: 200,
+                  },
                 ]}
+                onPress={() => {
+                  setDescriptionModal(false);
+                  generateAlert();
+                }}
               >
-                Automatically generate your schedule with just one tap.
-              </Text>
-              <View style={{ alignItems: "center" }}>
-                <Pressable
-                  style={[
-                    {
-                      borderRadius: 20,
-                      padding: 10,
-                      elevation: 2,
-                      backgroundColor: "#2196F3",
-                      width: 200,
-                    },
-                  ]}
-                  onPress={() => {
-                    setDescriptionModal(false);
-                    generateAlert();
+                <Text
+                  style={{
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    fontSize: 22,
                   }}
                 >
-                  <Text
-                    style={{
-                      color: "white",
-                      fontWeight: "bold",
-                      textAlign: "center",
-                      fontSize: 22,
-                    }}
-                  >
-                    Continue
-                  </Text>
-                </Pressable>
-                <Pressable
-                  style={[
-                    {
-                      paddingTop: 15,
-                      width: "100%",
-                    },
-                  ]}
-                  onPress={() => {
-                    setDescriptionModal(false);
+                  Continue
+                </Text>
+              </Pressable>
+              <Pressable
+                style={[
+                  {
+                    paddingTop: 15,
+                    width: "100%",
+                  },
+                ]}
+                onPress={() => {
+                  setDescriptionModal(false);
+                }}
+              >
+                <Text
+                  style={{
+                    color: "grey",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    fontSize: 17,
                   }}
                 >
-                  <Text
-                    style={{
-                      color: "grey",
-                      fontWeight: "bold",
-                      textAlign: "center",
-                      fontSize: 17,
-                    }}
-                  >
-                    Close
-                  </Text>
-                </Pressable>
-              </View>
+                  Close
+                </Text>
+              </Pressable>
             </View>
           </View>
-        </Modal>
-      </SafeAreaView>
+        </View>
+      </Modal>
     </GestureHandlerRootView>
   );
 };

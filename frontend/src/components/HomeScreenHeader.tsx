@@ -138,7 +138,7 @@ export const HomeScreenHeader: React.FC<UserProps> = ({ user }) => {
           onPress={() =>
             router.push({
               pathname: "userProfile/profile",
-              params: { firebaseUserId: user.firebaseUserId },
+              params: { firebaseUserId: user.firebaseUserId, isUser: "true" },
             })
           }
         >

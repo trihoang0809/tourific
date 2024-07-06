@@ -241,15 +241,27 @@ const TripDetailsScreen = () => {
                   {trip.participants &&
                     trip.participants.length > 0 &&
                     trip.participants.map((user, index) => (
-                      <View key={user?.invitee?.id} style={{}}>
+                      <TouchableOpacity
+                        key={user?.invitee?.id}
+                        style={{ alignItems: "center" }}
+                        onPress={() =>
+                          router.push({
+                            pathname: "userProfile/profile",
+                            params: {
+                              firebaseUserId: user.invitee?.firebaseUserId,
+                              isUser: "false",
+                            },
+                          })
+                        }
+                      >
                         <Avatar.Image
                           size={50}
                           source={{ uri: user?.invitee?.avatar?.url }}
                         />
-                        <Text>
+                        <Text style={{ paddingTop: 10 }}>
                           {`${user?.invitee?.firstName} ${user?.invitee?.lastName}`}
                         </Text>
-                      </View>
+                      </TouchableOpacity>
                     ))}
                   <TouchableOpacity
                     style={[

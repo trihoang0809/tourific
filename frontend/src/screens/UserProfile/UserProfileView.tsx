@@ -16,6 +16,7 @@ import { router } from "expo-router";
 
 interface userIDProps {
   userID: string;
+  isUser: string;
 }
 
 const badges = [
@@ -27,6 +28,15 @@ const badges = [
   "Screenshot 2024-07-05 at 16.26.01",
   "Screenshot 2024-07-05 at 16.26.07",
   "Screenshot 2024-07-05 at 16.26.34",
+];
+
+const coverImages = [
+  "https://media.licdn.com/dms/image/C5612AQEOduMZUBmMeQ/article-cover_image-shrink_600_2000/0/1520043376366?e=2147483647&v=beta&t=NKeRSrgW7qljxjBZnCfsj565vUIFOD7uGA0q8v_CHOs",
+  "https://miro.medium.com/v2/resize:fit:1400/1*p32MpotSj4fEEiHDdYexHg.jpeg",
+  "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?fm=jpg&w=3000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2l0eXxlbnwwfHwwfHx8MA%3D%3D",
+  "https://cdn.mos.cms.futurecdn.net/xaycNDmeyxpHDrPqU6LmaD.jpg",
+  "https://hips.hearstapps.com/hmg-prod/images/ama-dablam-mountain-peak-view-from-chola-pass-royalty-free-image-1623254695.jpg",
+  "https://a57.foxnews.com/static.foxnews.com/foxnews.com/content/uploads/2024/02/1200/675/poipu.jpg?ve=1&tl=1",
 ];
 
 const badgeImages = {
@@ -55,6 +65,11 @@ const getRandomBadges = (array: any, numItems: number) => {
   const shuffled = [...array].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, numItems);
 };
+
+function getRandomCover() {
+  const randomIndex = Math.floor(Math.random() * coverImages.length);
+  return coverImages[randomIndex];
+}
 
 const UserProfileView = (userID: userIDProps) => {
   const [userProfile, setUserProfile] = useState<User>();
@@ -85,7 +100,7 @@ const UserProfileView = (userID: userIDProps) => {
       <View style={[{ flexDirection: "column" }, styles.header]}>
         <Image
           source={{
-            uri: "https://miro.medium.com/v2/resize:fit:1400/1*p32MpotSj4fEEiHDdYexHg.jpeg",
+            uri: getRandomCover(),
           }}
           style={styles.headerImage}
         />
@@ -121,28 +136,26 @@ const UserProfileView = (userID: userIDProps) => {
           </View> */}
         </View>
       </View>
-      {/* <View style={styles.signUpContainer}>
-        <TouchableOpacity style={styles.signUpButton}>
-          <Text style={styles.signUpText}>Edit profile</Text>
-        </TouchableOpacity>
-      </View> */}
 
       <View
         style={{
           alignItems: "center",
-          // columnGap: 10,
           padding: 10,
           paddingTop: 50,
           width: "100%",
         }}
       >
-        <TouchableOpacity
-          style={styles.editButton}
-          onPress={() => router.push("userProfile/update")}
-        >
-          <Feather name="edit-2" size={20} color="white" />
-          <Text style={styles.editText}>Edit profile</Text>
-        </TouchableOpacity>
+        {userID.isUser === "true" ? (
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => router.push("userProfile/update")}
+          >
+            <Feather name="edit-2" size={20} color="white" />
+            <Text style={styles.editText}>Edit profile</Text>
+          </TouchableOpacity>
+        ) : (
+          ""
+        )}
       </View>
 
       <View
@@ -338,6 +351,9 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  disabledButton: {
+    backgroundColor: "#a0a0a0",
   },
   sectionPhoto: {
     borderBottomWidth: 1,
