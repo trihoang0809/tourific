@@ -197,7 +197,7 @@ export const ActivityDetail: React.FC<Actprops> = (id: Actprops) => {
             <Entypo
               name="dots-three-vertical"
               size={24}
-              color="black"
+              color="transparent"
               style={{ zIndex: 10, margin: 10 }}
             />
           </TouchableWithoutFeedback>

@@ -364,7 +364,20 @@ export default function CreateTripScreen() {
   return (
     <View>
       {isUpdating ? (
-        ""
+        <Stack.Screen
+        options={{
+          title: "Update trip",
+          headerShown: true,
+          headerLeft: () => (
+            <MaterialIcons
+              name="arrow-back"
+              size={24}
+              color="black"
+              onPress={() => router.back()}
+            />
+          ),
+        }}
+      />
       ) : (
         <Stack.Screen
           options={{
