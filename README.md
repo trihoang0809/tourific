@@ -112,10 +112,9 @@ https://github.com/user-attachments/assets/9334e20b-caaa-4a18-8279-539c8c608f7b 
 
 
 #### Upvote your favorite activities
-* This is built with Socket.io.
-* You can see the other person's profile.
-* You can also do other things, such as changing chat nickname, leave chat, etc.
-* You will receive a notification from other people when you are not in the chat.
+* This is built with React Query.
+* You can see real-time net upvotes on activities.
+* You can view activities by categories.
 <p align="center">
   <img width="60%" alt="Screenshot 2024-06-26 at 10 19 28 AM" src="https://github.com/jennydo/PeacePod-Frontend/assets/126405175/3b21d1b5-4686-4dca-8da9-bcf836b34bb8">
 </p>
@@ -202,9 +201,9 @@ BookHub has 6 containers for 6 services:
 
 ## What's next for PeacePod 🤫
 
-- [ ] Implement add-on features for Chat (change theme icon, chat color...)
-- [ ] Increase speed of socket.io
-- [ ] Improve authentication (i.e implement Forget Password)
+- [ ] Improve on UI/UX
+- [ ] Enhance algorithm's efficiency
+- [ ] Launch the app!
 
 ### Contributing Guidelines 🛠️
 
@@ -240,10 +239,10 @@ Thanks goes to these wonderful people:
 <!-- markdownlint-disable -->
 <table>
   <tbody><tr>
-        <td align="center"><a href="https://www.linkedin.com/in/hennessy-nguyen/"><img alt="Hennessy Nguyen" src="https://res.cloudinary.com/khoa165/image/upload/v1711768766/viettech/haianh.jpg" width="100px;"><br><sub><b>Hennessy Nguyen</b></sub></a><br><a href="https://github.com/jennydo/PeacePod-Frontend/commits?author=haianhng31" title="Code&Design">💻 🎨</a></td>
-        <td align="center"><a href="https://www.linkedin.com/in/knaboagye/"><img alt="Nam Nguyen" src="https://res.cloudinary.com/khoa165/image/upload/v1711261963/viettech/nam.jpg" width="100px;"><br><sub><b>Nam Nguyen</b></sub></a><br><a href="https://github.com/jennydo/PeacePod-Frontend/commits?author=Euclid0192" title="Code&Design">💻 🎨</a></td>
-        <td align="center"><a href="https://www.linkedin.com/in/emily-xinyi-chen/"><img alt="Jenny Do" src="https://res.cloudinary.com/khoa165/image/upload/v1711671186/viettech/trangdo.jpg" width="100px;"><br><sub><b>Jenny Do</b></sub></a><br><a href="https://github.com/jennydo/PeacePod-Frontend/commits?author=jennydo" title="Code&Design">💻 🎨</a></td>
-        <td align="center"><a href="https://www.linkedin.com/in/dakshinapalasamudrum/"><img alt="Thanh Nguyen" src="https://res.cloudinary.com/khoa165/image/upload/v1711083621/viettech/thanh.jpg" width="100px;"><br><sub><b>Thanh Nguyen</b></sub></a><br><a href="https://github.com/jennydo/PeacePod-Frontend/commits?author=gsthanhnguyen" title="Code&Design">💻 🎨</a></td>
+        <td align="center"><a href="https://www.linkedin.com/in/minhtrihoang/"><img alt="Tri Hoang" src="https://res.cloudinary.com/khoa165/image/upload/v1711131353/viettech/tri.jpg" width="100px;"><br><sub><b>Tri Hoang</b></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=trihoang0809" title="Code&Design">💻 🎨</a></td>
+        <td align="center"><a href="https://www.linkedin.com/in/knaboagye/"><img alt="Trang Vu" src="https://res.cloudinary.com/khoa165/image/upload/v1711084156/viettech/trangvu.jpg" width="100px;"><br><sub><b>Trang Vu</b></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=tranguv" title="Code&Design">💻 🎨</a></td>
+        <td align="center"><a href="https://www.linkedin.com/in/emily-xinyi-chen/"><img alt="Van Nguyen" src="https://res.cloudinary.com/khoa165/image/upload/v1711420611/viettech/van.jpg" width="100px;"><br><sub><b>Van Nguyen</b></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=yourvivian" title="Code&Design">💻 🎨</a></td>
+        <td align="center"><a href="https://www.linkedin.com/in/dakshinapalasamudrum/"><img alt="Kha Tran" src="https://res.cloudinary.com/khoa165/image/upload/v1711823667/viettech/kha.jpg" width="100px;"><br><sub><b>Kha Tran</b></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=ComTDK" title="Code&Design">💻 🎨</a></td>
 
 </tr>
 </tbody></table>
