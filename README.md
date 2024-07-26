@@ -18,16 +18,14 @@ An app where friends effortlessly plan complete trips together, from start to fi
 | 3.    | Van Nguyen | [@yourvivian](https://github.com/yourvivian)     |
 | 4.    | Kha Tran   | [@ComTDK](https://github.com/ComTDK)             | -->
 
-## Contributors ✨
-
-Thanks goes to these wonderful people:
+Created by:
 
 <table>
   <tbody><tr>
-        <td align="center"><a href="https://www.linkedin.com/in/minhtrihoang/"><img alt="Tri Hoang" src="https://res.cloudinary.com/khoa165/image/upload/v1711131353/viettech/tri.jpg" width="100px;"><br><sub><b>Tri Hoang</b></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=trihoang0809" title="Code&Design">💻 😎</a></td>
-        <td align="center"><a href="https://www.linkedin.com/in/knaboagye/"><img alt="Trang Vu" src="https://res.cloudinary.com/khoa165/image/upload/v1711084156/viettech/trangvu.jpg" width="100px;"><br><sub><b>Trang Vu</b></sub><sub>[@trangvu](https://github.com/tranguv)</sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=tranguv" title="Code&Design">🐥 ✿</a></td>
-        <td align="center"><a href="https://www.linkedin.com/in/emily-xinyi-chen/"><img alt="Van Nguyen" src="https://res.cloudinary.com/khoa165/image/upload/v1711420611/viettech/van.jpg" width="100px;"><br><sub><b>Van Nguyen</b></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=yourvivian" title="Code&Design">🥾 ✨</a></td>
-        <td align="center"><a href="https://www.linkedin.com/in/dakshinapalasamudrum/"><img alt="Kha Tran" src="https://res.cloudinary.com/khoa165/image/upload/v1711823667/viettech/kha.jpg" width="100px;"><br><sub><b>Kha Tran</b></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=ComTDK" title="Code&Design">💻 🎨</a></td>
+        <td align="center"><a href="https://www.linkedin.com/in/minhtrihoang/"><img alt="Tri Hoang" src="https://res.cloudinary.com/khoa165/image/upload/v1711131353/viettech/tri.jpg" width="100px;"><br><sub><b>Tri Hoang</b></sub><br><sub><a href="https://github.com/trihoang0809">@trihoang0809</a></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=trihoang0809" title="Code&Design">💻 😎</a></td>
+        <td align="center"><a href="https://www.linkedin.com/in/knaboagye/"><img alt="Trang Vu" src="https://res.cloudinary.com/khoa165/image/upload/v1711084156/viettech/trangvu.jpg" width="100px;"><br><sub><b>Trang Vu</b></sub><br><sub><a href="https://github.com/tranguv">@trangvu</a></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=tranguv" title="Code&Design">🐥 ✿</a></td>
+        <td align="center"><a href="https://www.linkedin.com/in/emily-xinyi-chen/"><img alt="Van Nguyen" src="https://res.cloudinary.com/khoa165/image/upload/v1711420611/viettech/van.jpg" width="100px;"><br><sub><b>Van Nguyen</b></sub><br><sub><a href="https://github.com/yourvivian">@yourvivian</a></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=yourvivian" title="Code&Design">🥾 ✨</a></td>
+        <td align="center"><a href="https://www.linkedin.com/in/dakshinapalasamudrum/"><img alt="Kha Tran" src="https://res.cloudinary.com/khoa165/image/upload/v1711823667/viettech/kha.jpg" width="100px;"><br><sub><b>Kha Tran</b></sub><br><sub><a href="https://github.com/ComTDK">@ComTDK</a></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=ComTDK" title="Code&Design">💻 🎨</a></td>
 
 </tr>
 </tbody></table>
