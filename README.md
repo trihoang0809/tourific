@@ -5,15 +5,32 @@
 <img alt="Book Hub GIF" src="./book-hub-home.gif"> -->
 
 <!--  **Deployed Project Link: ...** -->
-
-<br />
-
 # Tourific ✈️
 
 An app where friends effortlessly plan complete trips together, from start to finish.
 
-By Tri Hoang, Trang Vu, Van Nguyen, Kha Tran.
+<!-- ## Team 🧑‍🤝‍🧑
 
+| S.No. | Name       | GitHub Username:octocat:                         |
+| ----- | ---------- | ------------------------------------------------ |
+| 1.    | Tri Hoang  | [@trihoang0809](https://github.com/trihoang0809) |
+| 2.    | Trang Vu   | [@trangvu](https://github.com/tranguv)           |
+| 3.    | Van Nguyen | [@yourvivian](https://github.com/yourvivian)     |
+| 4.    | Kha Tran   | [@ComTDK](https://github.com/ComTDK)             | -->
+
+## Contributors ✨
+
+Thanks goes to these wonderful people:
+
+<table>
+  <tbody><tr>
+        <td align="center"><a href="https://www.linkedin.com/in/minhtrihoang/"><img alt="Tri Hoang" src="https://res.cloudinary.com/khoa165/image/upload/v1711131353/viettech/tri.jpg" width="100px;"><br><sub><b>Tri Hoang</b></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=trihoang0809" title="Code&Design">💻 😎</a></td>
+        <td align="center"><a href="https://www.linkedin.com/in/knaboagye/"><img alt="Trang Vu" src="https://res.cloudinary.com/khoa165/image/upload/v1711084156/viettech/trangvu.jpg" width="100px;"><br><sub><b>Trang Vu</b></sub><sub>[@trangvu](https://github.com/tranguv)</sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=tranguv" title="Code&Design">🐥 ✿</a></td>
+        <td align="center"><a href="https://www.linkedin.com/in/emily-xinyi-chen/"><img alt="Van Nguyen" src="https://res.cloudinary.com/khoa165/image/upload/v1711420611/viettech/van.jpg" width="100px;"><br><sub><b>Van Nguyen</b></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=yourvivian" title="Code&Design">🥾 ✨</a></td>
+        <td align="center"><a href="https://www.linkedin.com/in/dakshinapalasamudrum/"><img alt="Kha Tran" src="https://res.cloudinary.com/khoa165/image/upload/v1711823667/viettech/kha.jpg" width="100px;"><br><sub><b>Kha Tran</b></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=ComTDK" title="Code&Design">💻 🎨</a></td>
+
+</tr>
+</tbody></table>
 <!--
 ## Table of Contents 🗺️
 
@@ -33,7 +50,10 @@ By Tri Hoang, Trang Vu, Van Nguyen, Kha Tran.
 **Tourific** draws inspiration from the joy of discovery and the bonds forged through travel. In a world where time is precious and distractions abound, we envision a platform that simplifies trip planning, enabling friends to embark on journeys that deepen their connections and create lasting memories. Our mission is to cultivate a sense of wonder and belonging, making every trip an opportunity for growth, exploration, and shared experiences.
 
 ## Pitch Video 
-https://github.com/user-attachments/assets/9334e20b-caaa-4a18-8279-539c8c608f7b <!-- this is video of itinerary -->
+
+https://drive.google.com/file/d/1wMmxj-aVlQ8rpTz8H0qQWfqaCB2G_HoZ/view
+
+<!-- this is video of itinerary -->
 
 ## Main Features & How to use 👍
 
@@ -170,7 +190,8 @@ https://github.com/trihoang0809/tourific/assets/87792873/4c5b57fa-2166-46b2-a3dc
 - Create a trip schedule with one click
 - Optimize my friends and my daily travel distance and preferences
 - Our upvotes and joy matter to Tourific
-https://github.com/user-attachments/assets/a7b20475-5dbc-4a19-a006-9c8da2b7d1f1
+
+https://github.com/user-attachments/assets/75928ec4-f03e-4ea2-9ab6-777814a9709e
 
 <!-- this is video of itinerary auto generate -->
 
@@ -244,42 +265,11 @@ See [`CONTRIBUTING.md`](https://github.com/). -->
 | ----- | --------------------------------------------------- | ----------------------------------------------- |
 | 1.    | [tourifc](https://github.com/trihoang0809/tourific) | contains both the frontend and the backend code |
 
-### Setup ⏰
 
-## Team 🧑‍🤝‍🧑
 
-| S.No. | Name       | GitHub Username:octocat:                         |
-| ----- | ---------- | ------------------------------------------------ |
-| 1.    | Tri Hoang  | [@trihoang0809](https://github.com/trihoang0809) |
-| 2.    | Trang Vu   | [@trangvu](https://github.com/tranguv)           |
-| 3.    | Van Nguyen | [@yourvivian](https://github.com/yourvivian)     |
-| 4.    | Kha Tran   | [@ComTDK](https://github.com/ComTDK)             |
-
-<br>
-<br>
-
-## Contributors ✨
-
-Thanks goes to these wonderful people:
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tbody><tr>
-        <td align="center"><a href="https://www.linkedin.com/in/minhtrihoang/"><img alt="Tri Hoang" src="https://res.cloudinary.com/khoa165/image/upload/v1711131353/viettech/tri.jpg" width="100px;"><br><sub><b>Tri Hoang</b></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=trihoang0809" title="Code&Design">💻 😎</a></td>
-        <td align="center"><a href="https://www.linkedin.com/in/knaboagye/"><img alt="Trang Vu" src="https://res.cloudinary.com/khoa165/image/upload/v1711084156/viettech/trangvu.jpg" width="100px;"><br><sub><b>Trang Vu</b></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=tranguv" title="Code&Design">💻 🐥 ✿</a></td>
-        <td align="center"><a href="https://www.linkedin.com/in/emily-xinyi-chen/"><img alt="Van Nguyen" src="https://res.cloudinary.com/khoa165/image/upload/v1711420611/viettech/van.jpg" width="100px;"><br><sub><b>Van Nguyen</b></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=yourvivian" title="Code&Design">🥾 ✨</a></td>
-        <td align="center"><a href="https://www.linkedin.com/in/dakshinapalasamudrum/"><img alt="Kha Tran" src="https://res.cloudinary.com/khoa165/image/upload/v1711823667/viettech/kha.jpg" width="100px;"><br><sub><b>Kha Tran</b></sub></a><br><a href="https://github.com/trihoang0809/tourific/commits/main/?author=ComTDK" title="Code&Design">💻 🎨</a></td>
-
-</tr>
-</tbody></table>
 
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
-
-
----
