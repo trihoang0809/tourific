@@ -4,8 +4,9 @@
     "baseUrl": ".",
     "target": "esnext",
     "module": "commonjs",
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": ["**/*.ts", "**/*.tsx"]
+  "include": ["**/*.ts", "**/*.tsx", "src/middleware/GenerateSchedule/scheduleData/prepareData.ts"]
 }

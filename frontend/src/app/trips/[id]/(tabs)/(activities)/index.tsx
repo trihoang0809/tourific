@@ -4,23 +4,32 @@ import {
   TouchableOpacity,
   TextInput,
   Text,
-  SafeAreaView
+  SafeAreaView,
+  RefreshControl,
 } from "react-native";
-import { useState, useEffect } from "react";
-import { useGlobalSearchParams } from "expo-router";
+import { useState, useEffect, useCallback } from "react";
+import { router, useGlobalSearchParams, usePathname, Link } from "expo-router";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { Dimensions, StyleSheet } from "react-native";
 import ActivityThumbnail from "@/components/ActivityThumbnail";
 import { ActivityProps } from "@/types";
-import { fetchActivities } from "@/utils/fetchActivities";
 import { categories } from "@/utils";
 import { categoriesMap } from "@/types";
-
-const EXPO_PUBLIC_HOST_URL = process.env.EXPO_PUBLIC_HOST_URL;
+import { fetchActivities } from "@/utils/fetchAndSaveActivities";
+import { useQuery } from "@tanstack/react-query";
 
 const ActivitiesScreen = () => {
   const { id } = useGlobalSearchParams();
-  const [activities, setActivities] = useState<ActivityProps[]>([]);
+  const {
+    data: activities,
+    error,
+    refetch,
+    isFetching,
+  } = useQuery({
+    queryKey: ["activities", id],
+    queryFn: () => fetchActivities(id),
+    // refetchInterval: 100000, // Refetch every 100 seconds
+  });
   const [filteredActivities, setFilteredActivities] = useState<ActivityProps[]>(
     [],
   );
@@ -28,100 +37,42 @@ const ActivitiesScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
 
   useEffect(() => {
-    const getTripAndActivities = async () => {
-      try {
-        const response = await fetch(
-          `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch trip");
-        }
-        const data = await response.json();
-        if (
-          data.location.latitude &&
-          data.location.longitude &&
-          data.location.radius
-        ) {
-          const fetchedActivities = await fetchActivities(
-            data.location.latitude,
-            data.location.longitude,
-            data.location.radius,
-          );
-          setActivities(fetchedActivities);
-          setFilteredActivities(fetchedActivities);
-          //await saveActivitiesToBackend(fetchedActivities);
-        }
-      } catch (error: any) {
-        console.error("Error fetching trip:", error.toString());
-      }
-    };
-    getTripAndActivities();
-  }, [id]);
+    if (activities) {
+      setFilteredActivities(activities);
+    }
+  }, [activities]);
 
-  // const saveActivitiesToBackend = async (activities: ActivityProps[]) => {
-  //   const promises = activities.map(async (activity) => {
-  //     const response = await fetch(
-  //       `http://${EXPO_PUBLIC_HOST_URL}:3000/trips/${id}/activities`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           name: activity.name,
-  //           description: activity.description,
-  //           startTime: new Date(),
-  //           endTime: new Date(),
-  //           location: {
-  //             citystate: activity.location.citystate,
-  //             latitude: activity.location.latitude,
-  //             longitude: activity.location.longitude,
-  //           },
-  //           notes: activity.notes,
-  //           netUpvotes: activity.netUpvotes,
-  //           isOnCalendar: activity.isOnCalendar,
-  //           category: activity.category,
-  //           rating: activity.rating,
-  //         }),
-  //       },
-  //     );
-  //     return response.json();
-  //   });
-  //   try {
-  //     //const newActivities = await Promise.all(promises);
-  //     //setActivities(newActivities); // Update the activities state with new data including IDs
-  //   } catch (error) {
-  //     console.error("Error saving activities:", error);
-  //   }
-  // };
+  const onRefresh = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
   const handleSelectCategory = (category: string) => {
     setSelectedCategory(category);
     if (category === "All") {
-      setFilteredActivities(activities);
-    } else {
-      const filtered = activities.filter((activity) =>
-        activity.category.some((type) => categories[category].includes(type)),
+      const filtered = (activities || []).filter(
+        (activity) => !activity.category.includes("lodging"),
       );
       setFilteredActivities(filtered);
+    } else {
+      const filtered = activities?.filter(
+        (activity) =>
+          activity.category.some((type) =>
+            categories[category].includes(type),
+          ) && !activity.category.includes("lodging"),
+      );
+      setFilteredActivities(filtered || []);
     }
   };
 
   const handleSearch = (text: string) => {
     setSearchTerm(text);
     if (text) {
-      const searchedActivities = filteredActivities.filter((activity) =>
+      const searchedActivities = activities?.filter((activity) =>
         activity.name.toLowerCase().includes(text.toLowerCase()),
       );
-      setFilteredActivities(searchedActivities);
+      setFilteredActivities(searchedActivities || []);
     } else {
-      setFilteredActivities(activities);
+      setFilteredActivities(activities || []);
     }
   };
 
@@ -133,85 +84,90 @@ const ActivitiesScreen = () => {
         backgroundColor: "white",
       }}
     >
-      <View style={styles.searchContainer}>
-        <Feather name="search" size={20} color="black" />
-        <TextInput
-          placeholder="Search for activities..."
-          value={searchTerm}
-          onChangeText={handleSearch}
-          style={styles.searchInput}
-        />
-      </View>
       <ScrollView
-        horizontal
-        contentContainerStyle={styles.categoryContainer}
-        showsHorizontalScrollIndicator={false}
-        alwaysBounceVertical={false}
+        refreshControl={
+          <RefreshControl refreshing={isFetching} onRefresh={onRefresh} />
+        }
       >
-        {categoriesMap.map((category) => (
-          <TouchableOpacity
-            key={category.key}
-            style={[
-              styles.categoryItem,
-              selectedCategory === category.key && styles.selectedCategory,
-            ]}
-            onPress={() => handleSelectCategory(category.key)}
-          >
-            {category.icon}
-            <Text>{category.name}</Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          flexDirection: "row",
-          flexWrap: "wrap",
-          padding: 5,
-        }}
-      >
-        {filteredActivities.length > 0 ? (
+        <View>
+          <View style={styles.searchContainer}>
+            <Feather name="search" size={20} color="black" />
+            <TextInput
+              placeholder="Search for activities..."
+              value={searchTerm}
+              onChangeText={handleSearch}
+              style={styles.searchInput}
+            />
+          </View>
           <ScrollView
-            contentContainerStyle={{
-              flexGrow: 1,
-              flexDirection: "row",
-              flexWrap: "wrap",
-              padding: 5,
-            }}
+            horizontal
+            contentContainerStyle={styles.categoryContainer}
+            showsHorizontalScrollIndicator={false}
+            alwaysBounceVertical={false}
+            style={{ height: 70 }}
           >
-            {filteredActivities.map(
-              (activity: ActivityProps, index: number) => (
-                <View key={index} style={{ width: "100%", padding: 15 }}>
+            {categoriesMap.map((category) => (
+              <TouchableOpacity
+                key={category.key}
+                style={[
+                  styles.categoryItem,
+                  selectedCategory === category.key && styles.selectedCategory,
+                ]}
+                onPress={() => handleSelectCategory(category.key)}
+              >
+                {category.icon}
+                <Text style={{ fontSize: 16, paddingTop: 0.5 }}>
+                  {category.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            flexDirection: "row",
+            flexWrap: "wrap",
+            padding: 5,
+          }}
+        >
+          {filteredActivities.length > 0 ? (
+            <ScrollView
+            // contentContainerStyle={{
+            //   flexGrow: 1,
+            //   flexDirection: "row",
+            //   flexWrap: "wrap",
+            //   padding: 5,
+            // }}
+            >
+              {filteredActivities.map((activity: ActivityProps) => (
+                <View key={activity.id} style={{ width: "100%", padding: 15 }}>
                   <ActivityThumbnail activity={activity} tripId={id} />
                 </View>
-              ),
-            )}
-          </ScrollView>
-        ) : (
-          <View style={styles.noActivitiesView}>
-            <Text style={styles.noActivitiesText}>
-              No activities found for this category.
-            </Text>
-            <TouchableOpacity
-              style={styles.updateButton}
-              onPress={() => {
-                /* Replace with the route to the update trip page */
-                console.log("Navigate to update trip page");
-              }}
-            >
-              <Text style={styles.updateButtonText}>
-                Update trip's radius or location
+              ))}
+            </ScrollView>
+          ) : (
+            <View style={styles.noActivitiesView}>
+              <Text style={styles.noActivitiesText}>
+                No activities found for this category.
               </Text>
-            </TouchableOpacity>
-          </View>
-        )}
+              <Link href={`../create`}>
+                <TouchableOpacity style={styles.updateButton}>
+                  <Text style={styles.updateButtonText}>
+                    Create a new activity
+                  </Text>
+                </TouchableOpacity>
+              </Link>
+            </View>
+          )}
+        </ScrollView>
       </ScrollView>
       <TouchableOpacity
         style={{
           alignItems: "center",
           justifyContent: "center",
-          width: 50,
-          height: 50,
+          width: 58,
+          height: 58,
           position: "absolute",
           bottom: 10,
           right: 10,
@@ -223,10 +179,10 @@ const ActivitiesScreen = () => {
           shadowRadius: 2,
         }}
         onPress={() => {
-          /* Handle the button press */
+          router.push("../create");
         }}
       >
-        <Ionicons name="add" size={25} color="white" />
+        <Ionicons name="add" size={40} color="white" />
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -237,8 +193,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#E6E6E6",
-    borderRadius: 20,
-    borderWidth: 1,
+    borderRadius: 15,
+    borderWidth: 0.1,
     padding: 10,
     margin: 10,
   },
@@ -256,7 +212,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 3,
   },
   categoryItem: {
-    height: 55,
+    height: 80,
     alignItems: "center",
     padding: 10,
   },
@@ -270,12 +226,13 @@ const styles = StyleSheet.create({
   noActivitiesText: {
     fontSize: 18,
     color: "#666",
+    paddingBottom: 10,
   },
   updateButton: {
     backgroundColor: "#1e90ff",
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 10,
+    borderRadius: 8,
     marginTop: 10, // Add margin to give space between the text and button
   },
   updateButtonText: {

@@ -2,7 +2,6 @@ import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { AntDesign } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { useLocalSearchParams } from "expo-router";
 
 export default function TabLayout() {
   return (
@@ -25,16 +24,18 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
+          title: "Home",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome size={28} name="home" color={color} />
+          ),
 
-          headerTitle: '',
+          headerTitle: "",
         }}
       />
       <Tabs.Screen
         name="(activities)"
         options={{
-          title: "Suggestions",
+          title: "Explore",
           tabBarIcon: ({ color }) => (
             <AntDesign name="find" size={28} color={color} />
           ),
@@ -49,6 +50,13 @@ export default function TabLayout() {
           ),
         }}
       />
+      {/* <Tabs.Screen
+        name="participants/index"
+        options={{
+          href: null,
+          headerShown: false,
+        }}
+      /> */}
     </Tabs>
   );
 }

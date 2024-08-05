@@ -86,7 +86,7 @@ const PhotoAPI = ({ savePhoto, isVisible, setIsVisible }: PhotoAPIProps) => {
             {results &&
               results.map((result: Result) => {
                 return (
-                  <View>
+                  <View key={result.id}>
                     <TouchableOpacity
                       onPress={() => {
                         savePhoto(result.urls.small);
@@ -94,7 +94,6 @@ const PhotoAPI = ({ savePhoto, isVisible, setIsVisible }: PhotoAPIProps) => {
                       }}
                     >
                       <Image
-                        key={result.id}
                         source={{
                           uri: result.urls.small,
                         }}

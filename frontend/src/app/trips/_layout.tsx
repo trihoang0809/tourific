@@ -14,13 +14,16 @@ const Layout = () => {
         options={{
           title: "Upcoming trips",
           headerShown: true,
-          headerTitleAlign: 'center',
+          headerTitleAlign: "center",
+          headerStyle: {
+            backgroundColor: "#fff", // Customize the background color
+          },
           headerLeft: () => (
             <MaterialIcons
               name="arrow-back"
               size={24}
               color="black"
-              onPress={() => router.navigate("/")}
+              onPress={() => router.back()}
             />
           ),
         }}
@@ -30,24 +33,35 @@ const Layout = () => {
         options={{
           title: "Ongoing trips",
           headerShown: true,
-          headerTitleAlign: 'center',
+          headerTitleAlign: "center",
           headerLeft: () => (
             <MaterialIcons
               name="arrow-back"
               size={24}
               color="black"
-              onPress={() => router.navigate("/")}
+              onPress={() => router.back()}
             />
           ),
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="create"
         options={{
-          title: "",
-          headerShown: true,
+          title: "Create trip",
+          headerShown: false,
+          headerStyle: {
+            backgroundColor: "#red", // Customize the background color
+          },
+          headerLeft: () => (
+            <MaterialIcons
+              name="arrow-back"
+              size={24}
+              color="black"
+              onPress={() => router.back()}
+            />
+          ),
         }}
-      />
+      /> */}
     </Stack>
   );
 };

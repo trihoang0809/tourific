@@ -1,15 +1,15 @@
-import React from 'react';
-import { View } from 'react-native';
-import { ListFilteredCards } from '@/screens/UpcomingList';
-import { Stack } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React from "react";
+import { View } from "react-native";
+import { ListFilteredCards } from "@/screens/UpcomingList";
+import { useLocalSearchParams } from "expo-router";
 
 export default function App() {
+  const { userId } = useLocalSearchParams();
   return (
-    <View>
-      <SafeAreaView>
-        <ListFilteredCards isUpcoming={false} />
-      </SafeAreaView>
+    <View style={{ backgroundColor: "white" }}>
+      <View>
+        <ListFilteredCards isUpcoming={false} userId={userId} />
+      </View>
     </View>
   );
 }
